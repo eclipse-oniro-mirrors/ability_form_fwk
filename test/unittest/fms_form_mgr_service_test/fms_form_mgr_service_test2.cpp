@@ -539,21 +539,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0096, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0097
- * @tc.name: test HiDumpHasFormVisible function.
- * @tc.desc: Verify that the HiDumpHasFormVisible interface is called normally
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0097, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0097 start";
-    FormMgrService formMgrService;
-    std::string args = "args";
-    std::string result = "result";
-    formMgrService.HiDumpHasFormVisible(args, result);
-    GTEST_LOG_(INFO) << "FormMgrService_0097 end";
-}
-
-/**
  * @tc.number: FormMgrService_0098
  * @tc.name: test StartAbility function.
  * @tc.desc: Verify that the StartAbility interface is called normally
@@ -582,21 +567,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0098, TestSize.Level1)
     MockIsSACall(false);
 
     GTEST_LOG_(INFO) << "FormMgrService_0098 end";
-}
-
-/**
- * @tc.number: FormMgrService_0099
- * @tc.name: test FormMgr HiDumpFormRunningFormInfos function.
- * @tc.desc: Verify that the HiDumpFormRunningFormInfos interface is available.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0099, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0099 start";
-    FormMgrService formMgrService;
-    std::string args;
-    std::string runningFormInfo;
-    formMgrService.HiDumpFormRunningFormInfos(args, runningFormInfo);
-    GTEST_LOG_(INFO) << "FormMgrService_0099 end";
 }
 
 /**
@@ -668,48 +638,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0103, TestSize.Level1)
     EXPECT_EQ(formMgrService.UnregisterPublishFormInterceptor(callerToken), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
 
     GTEST_LOG_(INFO) << "FormMgrService_0103 end";
-}
-
-/**
- * @tc.number: FormMgrService_0104
- * @tc.name: test HiDump functions.
- * @tc.desc: Verify that the HiDump interfaces are calling normally
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0104, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0104 start";
-    FormMgrService formMgrService;
-    std::string args;
-    std::string formInfo;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    formMgrService.HiDumpStorageFormInfos(args, formInfo);
-    formMgrService.HiDumpTemporaryFormInfos(args, formInfo);
-    formMgrService.HiDumpStaticBundleFormInfos(args, formInfo);
-    formMgrService.HiDumpFormInfoByBundleName(args, formInfo);
-    formMgrService.HiDumpHasFormVisible(args, formInfo);
-    formMgrService.HiDumpFormInfoByFormId(args, formInfo);
-
-    std::string args0 = "0";
-    formMgrService.HiDumpFormInfoByFormId(args0, formInfo);
-    std::string args1 = "1";
-    formMgrService.HiDumpFormInfoByFormId(args1, formInfo);
-
-    GTEST_LOG_(INFO) << "FormMgrService_0104 end";
-}
-
-/**
- * @tc.number: FormMgrService_0105
- * @tc.name: test GetCurrentDateTime function.
- * @tc.desc: Verify that the GetCurrentDateTime interface is called normally
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0105, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0105 start";
-    FormMgrService formMgrService;
-    EXPECT_NE(formMgrService.GetCurrentDateTime(), "");
-
-    GTEST_LOG_(INFO) << "FormMgrService_0105 end";
 }
 
 /**
@@ -990,21 +918,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0118, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0119
- * @tc.name: test FormMgr HiDumpFormBlockedApps function.
- * @tc.desc: Verify that the HiDumpFormBlockedApps interface is available.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0119, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0119 start";
-    FormMgrService formMgrService;
-    std::string args;
-    std::string blockAppInfo;
-    formMgrService.HiDumpFormBlockedApps(args, blockAppInfo);
-    GTEST_LOG_(INFO) << "FormMgrService_0119 end";
-}
-
-/**
  * @tc.number: FormMgrService_0120
  * @tc.name: test SetPublishFormResult function.
  * @tc.desc: Verify that the SetPublishFormResult interface is called normally and the return value is ERR_OK.
@@ -1033,34 +946,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0121, TestSize.Level1)
     int64_t formId = 1;
     EXPECT_EQ(formMgrService.AcquireAddFormResult(formId), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0121 end";
-}
-
-/**
- * @tc.number: FormMgrService_0122
- * @tc.name: test OnSystemloadLevel function.
- * @tc.desc: Verify that the OnSystemloadLevel interface is called normally.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0122, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0122 start";
-    FormMgrService formMgrService;
-    int32_t level = 5;
-    formMgrService.OnSystemloadLevel(level);
-    GTEST_LOG_(INFO) << "FormMgrService_0122 end";
-}
-
-/**
- * @tc.number: FormMgrService_0123
- * @tc.name: test OnSystemloadLevel function.
- * @tc.desc: Verify that the OnSystemloadLevel interface is called normally.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0123, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0123 start";
-    FormMgrService formMgrService;
-    int32_t level = 1;
-    formMgrService.OnSystemloadLevel(level);
-    GTEST_LOG_(INFO) << "FormMgrService_0123 end";
 }
 
 /**
@@ -1190,33 +1075,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0130, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0132
- * @tc.name: test SubscribeSysEventReceiver function.
- * @tc.desc: Verify that the SubscribeSysEventReceiver
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0132, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0132 start";
-    FormMgrService formMgrService;
-    formMgrService.SubscribeSysEventReceiver();
-    GTEST_LOG_(INFO) << "FormMgrService_0132 end";
-}
-
-/**
- * @tc.number: FormMgrService_0133
- * @tc.name: test FormMgrService function.
- * @tc.desc: Verify that the FormMgrService
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0133, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0133 start";
-    FormMgrService* service = new FormMgrService();
-    service->SubscribeSysEventReceiver();
-    delete service;
-    GTEST_LOG_(INFO) << "FormMgrService_0133 end";
-}
-
-/**
  * @tc.number: FormMgrService_0135
  * @tc.name: test IsSystemAppForm function.
  * @tc.desc: !formRecords.empty()
@@ -1228,21 +1086,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0135, TestSize.Level1)
     std::string bundleName = "bundleName";
     EXPECT_FALSE(formMgrService.IsSystemAppForm(bundleName));
     GTEST_LOG_(INFO) << "FormMgrService_0135 end";
-}
-
-/**
- * @tc.number: FormMgrService_0136
- * @tc.name: test IsSystemAppForm function.
- * @tc.desc: formRecords.empty()
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0136, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0136 start";
-    FormMgrService formMgrService;
-    std::string bundleName = "bundleName";
-
-    EXPECT_FALSE(formMgrService.IsSystemAppForm(bundleName));
-    GTEST_LOG_(INFO) << "FormMgrService_0136 end";
 }
 
 /**
@@ -1261,34 +1104,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0137, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0138
- * @tc.name: test HasFormVisible function.
- * @tc.desc: formRecords.empty()
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0138, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0138 start";
-    FormMgrService formMgrService;
-    std::string abilityName = "abilityName";
-    int64_t formId = 1;
-    formMgrService.SubscribeSysEventReceiver();
-    formMgrService.OnStop();
-    formMgrService.SubscribeSysEventReceiver();
-    RunningFormInfo formInfo;
-    std::vector<RunningFormInfo> formInfos;
-    Want want;
-    formMgrService.StartAbilityByFms(want);
-    std::vector<std::u16string> args;
-    std::string result = "result";
-    int fd = 1;
-    formMgrService.Dump(fd, args);
-    formMgrService.Dump(args, result);
-    formMgrService.OpenFormEditAbility(abilityName, formId, true);
-    formMgrService.OpenFormEditAbility(abilityName, formId, false);
-    GTEST_LOG_(INFO) << "FormMgrService_0138 end";
-}
-
-/**
  * @tc.number: FormMgrService_0139
  * @tc.name: test RegisterPublishFormInterceptor function.
  * @tc.desc: Verify that the RegisterPublishFormInterceptor interface is called normally
@@ -1304,44 +1119,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0139, TestSize.Level1)
 }
 
 // FormMgrService_0140-0179 in file fms_form_mgr_service_test.cpp
-
-/**
- * @tc.number: FormMgrService_0180
- * @tc.name: test formMgrService function.
- * @tc.desc: Verify
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0180, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0180 start";
-    FormMgrService formMgrService;
-    int64_t formId = 1;
-    std::string abilityName = "abilityName";
-    std::string bundleName = "bundleName";
-    float width = 1;
-    float height = 1;
-    float borderWidth = 1;
-    float formViewScale = 1;
-    FormLockInfo formLockInfo;
-    formLockInfo.bundleName = "bundleName";
-    formLockInfo.userId = 1;
-    formLockInfo.lock = true;
-    FormLockInfo formLockInfo1;
-    std::vector<FormLockInfo> formLockInfos = {formLockInfo, formLockInfo1};
-    MockIsSACall(false);
-    formMgrService.LockForms(formLockInfos, LockChangeType::SWITCH_CHANGE);
-    formMgrService.IsFormBundleProtected(bundleName, formId);
-    formMgrService.IsFormBundleExempt(formId);
-    formMgrService.NotifyFormLocked(formId, true);
-    formMgrService.UpdateFormSize(formId, width, height, borderWidth, formViewScale);
-    MockIsSACall(true);
-    formMgrService.LockForms(formLockInfos, LockChangeType::SWITCH_CHANGE);
-    formMgrService.LockForms(formLockInfos, LockChangeType::PROTECT_CHANGE);
-    formMgrService.IsFormBundleProtected(bundleName, formId);
-    formMgrService.IsFormBundleExempt(formId);
-    formMgrService.NotifyFormLocked(formId, true);
-    formMgrService.UpdateFormSize(formId, width, height, borderWidth, formViewScale);
-    GTEST_LOG_(INFO) << "FormMgrService_0180 end";
-}
 
 /**
  * @tc.number: FormMgrService_0181

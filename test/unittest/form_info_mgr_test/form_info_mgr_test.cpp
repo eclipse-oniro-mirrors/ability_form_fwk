@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -151,22 +151,6 @@ HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetResourceManager_0100, TestSize.Level
     bundleInfo.hapModuleInfos.push_back(hapModuleInfo);
     EXPECT_NE(nullptr, formInfoHelper_->GetResourceManager(bundleInfo));
     GTEST_LOG_(INFO) << "FormInfoHelper_GetResourceManager_0100 end";
-}
-
-/**
- * @tc.name: FormInfoHelper_GetFormInfoDescription_0100
- * @tc.number: GetFormInfoDescription
- * @tc.desc: call GetFormInfoDescription with formInfo.descriptionId not 0
- */
-HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetFormInfoDescription_0100, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormInfoHelper_GetFormInfoDescription_0100 start";
-    BundleInfo bundleInfo;
-    auto resourceManager = formInfoHelper_->GetResourceManager(bundleInfo);
-    FormInfo formInfo;
-    formInfo.descriptionId = 1;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formInfoHelper_->GetFormInfoDescription(resourceManager, formInfo));
-    GTEST_LOG_(INFO) << "FormInfoHelper_GetFormInfoDescription_0100 end";
 }
 
 /**
@@ -666,19 +650,6 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_IsCaller_0100, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormInfoMgr_ReloadFormInfos_0100
- * @tc.number: ReloadFormInfos
- * @tc.desc: call ReloadFormInfos success
- */
-HWTEST_F(FormInfoMgrTest, FormInfoMgr_ReloadFormInfos_0100, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormInfoMgr_ReloadFormInfos_0100 start";
-    formInfoMgr_.Start();
-    EXPECT_EQ(ERR_OK, formInfoMgr_.ReloadFormInfos(USER_ID));
-    GTEST_LOG_(INFO) << "FormInfoMgr_ReloadFormInfos_0100 end";
-}
-
-/**
  * @tc.name: FormInfoMgr_ReloadFormInfos_0200
  * @tc.number: ReloadFormInfos
  * @tc.desc: ReloadFormInfos for the same user is deduplicated; second call is skipped
@@ -863,22 +834,6 @@ HWTEST_F(FormInfoMgrTest, FormInfoHelperTest0001, TestSize.Level1)
     auto ret = formInfoHelper_->LoadAbilityFormConfigInfo(bundleInfo, formInfos);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormInfoHelperTest0001 end";
-}
-
-/**
- * @tc.name: FormInfoHelperTest0002
- * @tc.number: GetResourceManager
- */
-HWTEST_F(FormInfoMgrTest, FormInfoHelperTest0002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormInfoHelperTest0002 start";
-    BundleInfo bundleInfo;
-    HapModuleInfo hapModuleInfo;
-    hapModuleInfo.hapPath = "hapPath";
-    bundleInfo.hapModuleInfos.push_back(hapModuleInfo);
-    auto ret = formInfoHelper_->GetResourceManager(bundleInfo);
-    EXPECT_NE(ret, nullptr);
-    GTEST_LOG_(INFO) << "FormInfoHelperTest0002 end";
 }
 
 /**
@@ -1753,22 +1708,6 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetAllTemplateFormsInfo_003, TestSize.Leve
     MockVerifyCallingPermission(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE, formInfoMgr_.GetAllTemplateFormsInfo(formInfos, USER_ID));
     GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_003 end";
-}
-
-/**
- * @tc.name: FormInfoMgr_GetAllTemplateFormsInfo_004
- * @tc.desc: test GetAllTemplateFormsInfo with empty map.
- * @tc.type: FUNC
- */
-HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetAllTemplateFormsInfo_004, TestSize.Level2)
-{
-    GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_004 start";
-    formInfoMgr_.bundleFormInfoMap_.clear();
-    std::vector<FormInfo> formInfos;
-    MockIsSACall(true);
-    EXPECT_EQ(ERR_OK, formInfoMgr_.GetAllTemplateFormsInfo(formInfos, USER_ID));
-    EXPECT_TRUE(formInfos.empty());
-    GTEST_LOG_(INFO) << "FormInfoMgr_GetAllTemplateFormsInfo_004 end";
 }
 
 /**

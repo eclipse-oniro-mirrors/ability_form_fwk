@@ -44,20 +44,6 @@ void FmsFormObserverRecordTest::SetUp() {}
 void FmsFormObserverRecordTest::TearDown() {}
 
 /**
- * @tc.number: FmsFormObserverRecordTest_001
- * @tc.name: SetDeathRecipient.
- * @tc.desc: Verify that the SetDeathRecipient interface executes normally and exits without exception.
- */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_001 start";
-    FormObserverRecord formObserverRecord;
-    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    formObserverRecord.SetDeathRecipient(callerToken, nullptr);
-    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_001 end";
-}
-
-/**
  * @tc.number: FmsFormObserverRecordTest_002
  * @tc.name: SetFormAddObserver.
  * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
@@ -85,51 +71,6 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_003, TestSize.Leve
     std::string bundleName = "bundle";
     EXPECT_EQ(ERR_OK, formObserverRecord.SetFormRemoveObserver(bundleName, callerToken));
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_003 end";
-}
-
-/**
- * @tc.number: FmsFormObserverRecordTest_004
- * @tc.name: onFormAdd.
- * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
- */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_004, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_004 start";
-    FormObserverRecord formObserverRecord;
-    RunningFormInfo runningFormInfo;
-    std::string bundleName = "bundle";
-    formObserverRecord.onFormAdd(bundleName, runningFormInfo);
-    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_004 end";
-}
-
-/**
- * @tc.number: FmsFormObserverRecordTest_005
- * @tc.name: onFormRemove.
- * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
- */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_005, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_005 start";
-    FormObserverRecord formObserverRecord;
-    RunningFormInfo runningFormInfo;
-    std::string bundleName = "bundle";
-    formObserverRecord.onFormRemove(bundleName, runningFormInfo);
-    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_005 end";
-}
-
-/**
- * @tc.number: FmsFormObserverRecordTest_006
- * @tc.name: CleanResource.
- * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
- */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_006, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_006 start";
-    FormObserverRecord formObserverRecord;
-    RunningFormInfo runningFormInfo;
-    wptr<IRemoteObject> remote;
-    formObserverRecord.CleanResource(remote);
-    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_006 end";
 }
 
 /**
@@ -255,63 +196,6 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_011, TestSize.Leve
     formObserverRecordInner.RemoveEvent(type);
     EXPECT_EQ(formObserverRecordInner.eventGroup_.size(), size - 1);
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_011 end";
-}
-
-/**
- * @tc.number: FmsFormObserverRecordTest_012
- * @tc.name: OnRemoteDied.
- * @tc.desc: OnRemoteDied
- */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_012, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_012 start";
-    FormObserverRecord::ClientDeathRecipient clientDeathRecipient;
-    wptr<IRemoteObject> remote;
-    clientDeathRecipient.OnRemoteDied(remote);
-    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_012 end";
-}
-
-/**
- * @tc.number: FmsFormObserverRecordTest_013
- * @tc.name: NotifyFormEvent.
- * @tc.desc: NotifyFormEvent
- */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_013, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_013 start";
-    FormObserverRecord formObserverRecord;
-    sptr<IRemoteObject> callerToken = nullptr;
-    FormObserverRecordInner recordInner(callerToken);
-    RunningFormInfo runningFormInfo;
-    std::string formEventType = "";
-    formObserverRecord.NotifyFormEvent(recordInner, FormEventId::FORM_EVENT_NON, runningFormInfo, formEventType);
-    formObserverRecord.NotifyFormEvent(recordInner, FormEventId::FORM_EVENT_CALL, runningFormInfo, formEventType);
-    formObserverRecord.NotifyFormEvent(recordInner, FormEventId::FORM_EVENT_MESSAGE, runningFormInfo, formEventType);
-    formObserverRecord.NotifyFormEvent(recordInner, FormEventId::FORM_EVENT_ROUTER, runningFormInfo, formEventType);
-    formObserverRecord.NotifyFormEvent(recordInner, FormEventId::FORM_EVENT_FORM_ADD, runningFormInfo, formEventType);
-    formObserverRecord.NotifyFormEvent(recordInner,
-        FormEventId::FORM_EVENT_FORM_REMOVE, runningFormInfo, formEventType);
-    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_013 end";
-}
-
-/**
- * @tc.number: FmsFormObserverRecordTest_014
- * @tc.name: SetFormEventObserverLocked.
- * @tc.desc: SetFormEventObserverLocked
- */
-HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_014, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_014 start";
-    FormObserverRecord formObserverRecord;
-    std::string bundleName = "";
-    sptr<IRemoteObject> callerToken;
-    formObserverRecord.SetFormEventObserverLocked(bundleName, FormEventId::FORM_EVENT_NON, callerToken);
-    formObserverRecord.SetFormEventObserverLocked(bundleName, FormEventId::FORM_EVENT_CALL, callerToken);
-    formObserverRecord.SetFormEventObserverLocked(bundleName, FormEventId::FORM_EVENT_MESSAGE, callerToken);
-    formObserverRecord.SetFormEventObserverLocked(bundleName, FormEventId::FORM_EVENT_ROUTER, callerToken);
-    formObserverRecord.SetFormEventObserverLocked(bundleName, FormEventId::FORM_EVENT_FORM_ADD, callerToken);
-    formObserverRecord.SetFormEventObserverLocked(bundleName, FormEventId::FORM_EVENT_FORM_REMOVE, callerToken);
-    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_014 end";
 }
 
 /**

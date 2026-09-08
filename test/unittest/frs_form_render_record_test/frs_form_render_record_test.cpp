@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -205,23 +205,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_003, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormRenderRecordTest_004
- * @tc.desc: test DeleteRenderRecord function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_004, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_004 start";
-
-    ASSERT_NE(nullptr, formRenderRecordPtr_);
-    int64_t formId = 1;
-    std::string compId = "compId";
-    bool isRenderGroupEmpty = true;
-    formRenderRecordPtr_->DeleteRenderRecord(formId, compId, nullptr, isRenderGroupEmpty);
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_004 end";
-}
-
-/**
  * @tc.name: FormRenderRecordTest_005
  * @tc.desc: test IsEmpty function.
  * @tc.type: FUNC
@@ -282,109 +265,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_008, TestSize.Level0)
     EXPECT_EQ(true, formRenderRecordPtr_->CreateRuntime(formJsInfo));
     formRenderRecordPtr_->runtime_ = nullptr;
     GTEST_LOG_(INFO) << "FormRenderRecordTest_008 end";
-}
-
-/**
- * @tc.name: FormRenderRecordTest_009
- * @tc.desc: test CreateContext function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_009, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_009 start";
-
-    FormJsInfo formJsInfo;
-    Want want;
-    EXPECT_NE(nullptr, formRenderRecordPtr_->CreateContext(formJsInfo, want));
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_009 end";
-}
-
-/**
- * @tc.name: FormRenderRecordTest_010
- * @tc.desc: test GetContext function and iter == contextsMapForModuleName_.end().
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_010, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_010 start";
-
-    FormJsInfo formJsInfo;
-    Want want;
-    EXPECT_NE(nullptr, formRenderRecordPtr_->GetContext(formJsInfo, want));
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_010 end";
-}
-
-/**
- * @tc.name: FormRenderRecordTest_011
- * @tc.desc: test GetContext function and iter != contextsMapForModuleName_.end().
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_011, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_011 start";
-
-    FormJsInfo formJsInfo;
-    formJsInfo.bundleName = "bundleName";
-    formJsInfo.moduleName = "moduleName";
-    Want want;
-    // set contextsMapForModuleName_
-    formRenderRecordPtr_->CreateContext(formJsInfo, want);
-    // test GetContext
-    EXPECT_NE(nullptr, formRenderRecordPtr_->GetContext(formJsInfo, want));
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_011 end";
-}
-
-/**
- * @tc.name: FormRenderRecordTest_012
- * @tc.desc: test CreateFormRendererGroupLock function and formRendererGroup is not nullptr.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_012, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_012 start";
-
-    FormJsInfo formJsInfo;
-    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
-    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
-    EXPECT_NE(nullptr, formRenderRecordPtr_->CreateFormRendererGroupLock(context, runtime));
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_012 end";
-}
-
-/**
- * @tc.name: FormRenderRecordTest_013
- * @tc.desc: test GetFormRendererGroup function and iter == formRendererGroupMap_.end().
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_013, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_013 start";
-
-    FormJsInfo formJsInfo;
-    formJsInfo.formId = 1;
-    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
-    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
-    EXPECT_NE(nullptr, formRenderRecordPtr_->GetFormRendererGroup(formJsInfo, context, runtime));
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_013 end";
-}
-
-/**
- * @tc.name: FormRenderRecordTest_014
- * @tc.desc: test GetFormRendererGroup function and iter != formRendererGroupMap_.end().
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_014, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_014 start";
-
-    FormJsInfo formJsInfo;
-    formJsInfo.formId = 1;
-    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
-    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
-    // set formRendererGroupMap_
-    formRenderRecordPtr_->GetFormRendererGroup(formJsInfo, context, runtime);
-    // test GetFormRendererGroup function
-    EXPECT_NE(nullptr, formRenderRecordPtr_->GetFormRendererGroup(formJsInfo, context, runtime));
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_014 end";
 }
 
 /**

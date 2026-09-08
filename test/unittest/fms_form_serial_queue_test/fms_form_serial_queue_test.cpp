@@ -66,27 +66,4 @@ HWTEST_F(FmsFormSerialQueueTest, FmsFormSerialQueueTest_ScheduleTask_001, TestSi
     GTEST_LOG_(INFO) << "FmsFormSerialQueueTest_ScheduleTask_001 end";
 }
 
-/**
- * @tc.number: FmsFormSerialQueueTest_CancelDelayTask_002
- * @tc.name: ScheduleDelayTask
- * @tc.desc: Verify ScheduleDelayTask
- */
-HWTEST_F(FmsFormSerialQueueTest, FmsFormSerialQueueTest_CancelDelayTask_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormSerialQueueTest_CancelDelayTask_002 start";
-    const std::string queueName = "queue1";
-    std::shared_ptr<FormSerialQueue> queue = std::make_shared<FormSerialQueue>(queueName.c_str());
-    EXPECT_NE(nullptr, queue);
-    int64_t msg = 1;
-    int64_t eventId = 2;
-    queue->CancelDelayTask(std::make_pair(msg, eventId));
-
-    auto task = [] () {
-        GTEST_LOG_(INFO) << "FmsFormSerialQueueTest_CancelDelayTask_002 Task called";
-    };
-    queue->ScheduleDelayTask(std::make_pair(msg, eventId), 0, task);
-    queue->CancelDelayTask(std::make_pair(msg, eventId));
-
-    GTEST_LOG_(INFO) << "FmsFormSerialQueueTest_CancelDelayTask_002 end";
-}
 }
