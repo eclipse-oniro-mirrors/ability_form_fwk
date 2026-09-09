@@ -154,8 +154,8 @@ ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
         return nullptr;
     }
     std::unique_ptr<EtsLiveFormExtensionContext> etsContext = std::make_unique<EtsLiveFormExtensionContext>(context);
-    // Keep the Cleaner inert until construction and native binding succeed.
-    if ((status = env->Object_New(cls, method, &contextObj, static_cast<ani_long>(0))) != ANI_OK) {
+    if ((status = env->Object_New(cls, method, &contextObj, reinterpret_cast<ani_long>(etsContext.release()))) !=
+        ANI_OK) {
         HILOG_ERROR("status: %{public}d", status);
         return nullptr;
     }
@@ -189,26 +189,6 @@ ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
         delete workContext;
         return nullptr;
     }
-    ani_ref cleaner = nullptr;
-    if ((status = env->Object_GetFieldByName_Ref(contextObj, "cleaner", &cleaner)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
-        delete workContext;
-        return nullptr;
-    }
-    ani_long nativePtr = reinterpret_cast<ani_long>(etsContext.get());
-    if ((status = env->Object_SetFieldByName_Long(contextObj, "nativeEtsContext", nativePtr)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
-        delete workContext;
-        return nullptr;
-    }
-    // Transfer ownership only after the Cleaner receives the native pointer.
-    if ((status = env->Object_SetFieldByName_Long(static_cast<ani_object>(cleaner), "ptr", nativePtr)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
-        delete workContext;
-        return nullptr;
-    }
-    etsContext.release();
-
     OHOS::AbilityRuntime::ContextUtil::CreateEtsBaseContext(env, cls, contextObj, context);
     OHOS::AbilityRuntime::CreateEtsExtensionContext(env, cls, contextObj, context, context->GetAbilityInfo());
     ani_ref *contextGlobalRef = new (std::nothrow) ani_ref;
