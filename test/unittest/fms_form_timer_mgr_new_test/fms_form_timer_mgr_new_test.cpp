@@ -914,7 +914,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0129, TestSize.Level1)
 /**
  * @tc.number: Fms_FormTimerMgr_0130
  * @tc.name: TimerReceiver::OnReceiveEvent.
- * @tc.desc: Verify TYPE_DYNAMIC_UPDATE reassembles wake-up time by bit pattern so a negative right half is zero-extended.
+ * @tc.desc: Verify TYPE_DYNAMIC_UPDATE reassembles wake-up time by bit pattern; negative right half is zero-extended.
  */
 HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0130, TestSize.Level1)
 {
