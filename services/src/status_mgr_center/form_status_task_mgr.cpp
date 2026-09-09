@@ -490,7 +490,7 @@ void FormStatusTaskMgr::RenderForm(
         RemoveConnection(connectId);
         HILOG_ERROR("get formRenderProxy failed");
         return;
-}
+    }
 
     FormJsInfo formJsInfo;
     CreateRenderFormJsInfo(formRecord, want, formJsInfo);
