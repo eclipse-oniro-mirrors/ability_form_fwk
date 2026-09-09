@@ -212,13 +212,19 @@ bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
 bool FormModuleChecker::CheckApiWithSuffix(const std::string& apiPath, const std::string& item)
 {
     HILOG_DEBUG("apiPath: '%{public}s', item: '%{public}s'", apiPath.c_str(), item.c_str());
-    if (item.compare(0, apiPath.size(), apiPath) == 0) {
+    if (apiPath.empty()) {
+        HILOG_ERROR("empty apiPath");
+        return false;
+    }
+    // Exact match for non-wildcard items
+    if (apiPath == item) {
         return true;
     }
     const int32_t kSuffixLength = 2;
     if (item.size() >= kSuffixLength && item.substr(item.size() - kSuffixLength) == ".*") {
         const std::string path = item.substr(0, item.rfind('.'));
-        if (apiPath.compare(0, path.size(), path) == 0) {
+        // Wildcard match: apiPath must start with path + '.' to ensure component boundary
+        if (apiPath.size() > path.size() && apiPath.compare(0, path.size(), path) == 0 && apiPath[path.size()] == '.') {
             return true;
         }
     }
@@ -229,6 +235,10 @@ bool FormModuleChecker::CheckApiWithSuffix(const std::string& apiPath, const std
 bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
     std::unique_ptr<ApiAllowListChecker> &apiAllowListChecker, bool isAppModule)
 {
+    if (moduleName == nullptr || moduleName[0] == '\0') {
+        HILOG_ERROR("invalid module name");
+        return false;
+    }
     if (isAppModule) {
         HILOG_DEBUG("module is not system, moduleName= %{public}s", moduleName);
         return false;

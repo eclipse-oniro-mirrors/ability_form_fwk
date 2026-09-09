@@ -405,6 +405,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         // Some resources need to be initialized in a JS thread
         if (GetEventHandler(true, formJsInfo.isDynamic) == nullptr) {
             HILOG_ERROR("null eventHandler");
+            MarkRenderFormTaskDone(renderType);
             return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
         }
         std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
@@ -412,6 +413,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         sptr<IFormSupply> formSupplyClient = GetFormSupplyClient();
         if (formSupplyClient == nullptr) {
             HILOG_ERROR("null formSupplyClient");
+            MarkRenderFormTaskDone(renderType);
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
 
@@ -431,6 +433,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         };
         if (eventHandler == nullptr) {
             HILOG_ERROR("null eventHandler");
+            MarkRenderFormTaskDone(renderType);
             return RENDER_FORM_FAILED;
         }
         eventHandler->PostTask(task, "UpdateRenderRecord");

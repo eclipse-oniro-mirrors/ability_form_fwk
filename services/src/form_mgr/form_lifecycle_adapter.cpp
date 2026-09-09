@@ -414,14 +414,7 @@ ErrCode FormLifecycleAdapter::HandleDeleteForm(const int64_t formId, const sptr<
         HILOG_ERROR("not exist such db form:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    FormRecord record;
-    FormDataMgr::GetInstance().GetFormRecord(formId, record);
-    FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
 
-#ifdef DEVICE_USAGE_STATISTICS_ENABLE
-    DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
-        record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_REMOVED);
-#endif
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     bool isSelfDbFormId = (userId == dbRecord.providerUserId) && ((std::find(dbRecord.formUserUids.begin(),
@@ -430,6 +423,15 @@ ErrCode FormLifecycleAdapter::HandleDeleteForm(const int64_t formId, const sptr<
         HILOG_ERROR("not self form:%{public}" PRId64 ", callingUid:%{public}d", formId, callingUid);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
+
+    FormRecord record;
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
+
+#ifdef DEVICE_USAGE_STATISTICS_ENABLE
+    DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
+        record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_REMOVED);
+#endif
 
     ErrCode result = HandleDeleteFormCache(dbRecord, callingUid, formId);
     if (result != ERR_OK) {
@@ -566,7 +568,10 @@ int FormLifecycleAdapter::DeleteCommonForm(const int64_t formId,
     const sptr<IRemoteObject> &callerToken, const int32_t userId)
 {
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
+    auto supplyCallback = FormSupplyCallback::GetInstance();
+    if (supplyCallback != nullptr) {
+        supplyCallback->RemoveConnection(matchedFormId, callerToken);
+    }
     FormDataProxyMgr::GetInstance().UnsubscribeFormData(matchedFormId);
     RunningFormInfo runningFormInfo;
     FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo, userId);
@@ -735,15 +740,6 @@ int FormLifecycleAdapter::ReleaseForm(const int64_t formId,
     }
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
-
-    if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
-        return HandleDeleteTempForm(matchedFormId, callerToken);
-    }
-
-    FormRecord record;
-    FormDataMgr::GetInstance().GetFormRecord(formId, record);
-    FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
 
     FormRecord dbRecord;
     if (FormDbCache::GetInstance().GetDBRecord(matchedFormId, dbRecord) != ERR_OK) {
@@ -760,6 +756,16 @@ int FormLifecycleAdapter::ReleaseForm(const int64_t formId,
         HILOG_ERROR("not self form:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
+
+    FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
+
+    if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
+        return HandleDeleteTempForm(matchedFormId, callerToken);
+    }
+
+    FormRecord record;
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
 
     if (delCache) {
         ErrCode result = HandleReleaseForm(matchedFormId, callerToken);
@@ -872,6 +878,9 @@ int FormLifecycleAdapter::CreateForm(const Want &want, RunningFormInfo &runningF
     if (isThemeForm) {
         HILOG_INFO("isThemeForm");
 #ifdef THEME_MGR_ENABLE
+        // TODO: TOCTOU race - CheckFormCountLimit checks the count but the actual form creation
+        // (GenerateFormId + AddForm) happens later. A concurrent request could exceed the limit
+        // between the check and the creation. This requires an atomic check-and-create mechanism.
         int ret = CheckFormCountLimit(0, want);
         if (ret != ERR_OK) {
             HILOG_ERROR("CheckFormCountLimit failed");
@@ -1010,6 +1019,9 @@ FormRecord FormLifecycleAdapter::AllotThemeRecord(const Want &want, int64_t form
 // Implementation of EnableForms
 ErrCode FormLifecycleAdapter::EnableForms(const std::string &bundleName, const int32_t userId, const bool enable)
 {
+    // TODO: SetBundleForbiddenStatus is called without userId scoping, which may cause cross-user state pollution.
+    // A broader fix should scope the forbidden status per userId to prevent one user's enable/disable
+    // from affecting another user's forms for the same bundle.
     FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, !enable);
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
@@ -1046,6 +1058,11 @@ ErrCode FormLifecycleAdapter::EnableForms(const std::string &bundleName, const i
 ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, int32_t userId, const bool protect)
 {
     HILOG_INFO("ProtectLockForms entry");
+    std::vector<FormRecord> formInfos;
+    if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos, userId)) {
+        HILOG_ERROR("GetFormRecord error");
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
     if (FormBundleLockMgr::GetInstance().IsLockServiceInitialized() &&
         FormBundleLockMgr::GetInstance().IsBundleProtect(bundleName, userId) == protect) {
         HILOG_INFO("No need to change protect status, bundleName = %{public}s, protect = %{public}d",
@@ -1053,11 +1070,6 @@ ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, in
         return ERR_OK;
     }
     FormBundleLockMgr::GetInstance().SetBundleProtectStatus(bundleName, protect);
-    std::vector<FormRecord> formInfos;
-    if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos, userId)) {
-        HILOG_ERROR("GetFormRecord error");
-        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-    }
     if (!protect && !FormBundleForbidMgr::GetInstance().IsBundleForbidden(bundleName)) {
         FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTask(bundleName);
     }
@@ -1300,7 +1312,7 @@ ErrCode FormLifecycleAdapter::BatchNotifyFormsConfigurationUpdate(const AppExecF
         visibleFormRecords.size(), invisibleFormRecords.size());
     Want reqWant;
     for (const auto &formRecord : visibleFormRecords) {
-        std::string key = formRecord.bundleName + formRecord.abilityName;
+        std::string key = formRecord.bundleName + "::" + formRecord.abilityName;
         if (notified.find(key) != notified.end()) {
             continue;
         }
@@ -1308,7 +1320,7 @@ ErrCode FormLifecycleAdapter::BatchNotifyFormsConfigurationUpdate(const AppExecF
         FormProviderMgr::GetInstance().ConnectForConfigUpdate(configuration, formRecord, reqWant);
     }
     for (const auto &formRecord : invisibleFormRecords) {
-        std::string key = formRecord.bundleName + formRecord.abilityName;
+        std::string key = formRecord.bundleName + "::" + formRecord.abilityName;
         if (notified.find(key) != notified.end()) {
             continue;
         }
@@ -1535,6 +1547,9 @@ ErrCode FormLifecycleAdapter::CheckAddRequestPublishForm(const Want &want, const
 
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     int32_t currentUserId = FormUtil::GetCallerUserId(callingUid);
+    // TODO: TOCTOU race - CheckTempEnoughForm/CheckEnoughForm verifies the quota, but the actual
+    // form record allocation happens later in the caller. A concurrent request could exceed the quota
+    // between the check and the allocation. This requires an atomic check-and-allocate mechanism.
     ErrCode errCode = ERR_OK;
     if (isTemporary) {
         errCode = FormDataMgr::GetInstance().CheckTempEnoughForm(currentUserId);

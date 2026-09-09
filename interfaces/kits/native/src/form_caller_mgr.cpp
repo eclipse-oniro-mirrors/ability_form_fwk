@@ -97,6 +97,10 @@ void FormCallerMgr::OnHostCallBackDied(const wptr<IRemoteObject> &remote)
     };
 
     auto handler = GetEventHandler();
+    if (handler == nullptr) {
+        HILOG_ERROR("get event handler failed");
+        return;
+    }
     handler->PostTask(hostCallBackDiedFunc, FORM_TASK_DELAY_TIME);
 }
 
@@ -163,12 +167,12 @@ void FormCallerMgr::RemoveFormProviderCaller(const sptr<IRemoteObject> &callerTo
 {
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formProviderCallerMutex_);
-    for (auto iter = formProviderCallers_.begin(); iter != formProviderCallers_.end(); ++iter) {
-        if (!(*iter)->IsSameToken(callerToken)) {
-            continue;
+    for (auto iter = formProviderCallers_.begin(); iter != formProviderCallers_.end();) {
+        if (*iter != nullptr && (*iter)->IsSameToken(callerToken)) {
+            iter = formProviderCallers_.erase(iter);
+        } else {
+            ++iter;
         }
-        iter = formProviderCallers_.erase(iter);
-        break;
     }
 }
 
@@ -185,6 +189,10 @@ void FormCallerMgr::OnProviderCallBackDied(const wptr<IRemoteObject> &remote)
     };
 
     auto handler = GetEventHandler();
+    if (handler == nullptr) {
+        HILOG_ERROR("get event handler failed");
+        return;
+    }
     handler->PostTask(providerCallBackDiedFunc, FORM_TASK_DELAY_TIME);
 }
 

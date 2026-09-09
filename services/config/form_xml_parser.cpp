@@ -76,8 +76,8 @@ bool FormXMLParser::ParseInternal(xmlNodePtr &node)
 {
     HILOG_DEBUG("ParseInternal start");
     xmlNodePtr curNodePtr = node->xmlChildrenNode;
-    if (curNodePtr == nullptr) {
-        HILOG_ERROR("curNodePtr is null");
+    if (curNodePtr == nullptr || curNodePtr->name == nullptr) {
+        HILOG_ERROR("null child node or name");
         return false;
     }
     std::string quantityConfig = "quantityConfig";
@@ -109,6 +109,7 @@ bool FormXMLParser::ParseInternal(xmlNodePtr &node)
         auto result = std::from_chars(contentStr.data(), contentStr.data() + contentStr.size(), contentInt);
         if (!(result.ec == std::errc() && (result.ptr == contentStr.data() + contentStr.size()))) {
             HILOG_ERROR("convert formId failed");
+            xmlFree(content);
             return false;
         }
         configMap_.emplace(std::make_pair(childNodeName, contentInt));

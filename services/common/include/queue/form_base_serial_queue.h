@@ -75,7 +75,7 @@ struct TaskKeyComparator {
  * - std::pair<int64_t, std::string>: ID and string pair
  * - std::string: String name
  */
-class FormBaseSerialQueue {
+class FormBaseSerialQueue : public std::enable_shared_from_this<FormBaseSerialQueue> {
 public:
     DISALLOW_COPY_AND_MOVE(FormBaseSerialQueue);
 
@@ -123,7 +123,8 @@ private:
     std::mutex mutex_;
 
     // Unified taskMap using std::variant as key
-    std::map<TaskKey, ffrt::task_handle, TaskKeyComparator> taskMap_;
+    std::map<TaskKey, std::pair<ffrt::task_handle, uint64_t>, TaskKeyComparator> taskMap_;
+    uint64_t seqCounter_ = 0;
 };
 
 } // namespace Common
