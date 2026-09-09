@@ -1319,25 +1319,42 @@ private:
 #endif
     }
 
-    static std::shared_ptr<napi_ref> CreateCallbackRefGuard(napi_env env, napi_value callback)
+    class CallbackRefGuard {
+    public:
+        CallbackRefGuard(napi_env env, napi_ref ref) : env_(env), ref_(ref) {}
+        ~CallbackRefGuard()
+        {
+            if (ref_ != nullptr) {
+                napi_delete_reference(env_, ref_);
+            }
+        }
+        napi_ref GetRef() const
+        {
+            return ref_;
+        }
+    private:
+        napi_env env_;
+        napi_ref ref_;
+    };
+
+    static std::shared_ptr<CallbackRefGuard> CreateCallbackRefGuard(napi_env env, napi_value callback)
     {
         napi_ref callbackRef = nullptr;
         if (napi_create_reference(env, callback, REF_COUNT, &callbackRef) != napi_ok || callbackRef == nullptr) {
             HILOG_ERROR("create callback reference failed");
             return nullptr;
         }
-        return std::shared_ptr<napi_ref>(new napi_ref(callbackRef),
-            [env](napi_ref* p) { if (p && *p) { napi_delete_reference(env, *p); } delete p; });
+        return std::make_shared<CallbackRefGuard>(env, callbackRef);
     }
 
     NapiAsyncTask::CompleteCallback CreateSetRouterProxyCompleteCallback(std::shared_ptr<int32_t> ret,
-        std::shared_ptr<napi_ref> refGuard, std::vector<int64_t> formIds)
+        std::shared_ptr<CallbackRefGuard> refGuard, std::vector<int64_t> formIds)
     {
         return [ret, refGuard, formIdsCopy = std::move(formIds)](napi_env env, NapiAsyncTask &task,
             int32_t status) {
             if (*ret == ERR_OK) {
                 napi_value callback = nullptr;
-                if (napi_get_reference_value(env, *refGuard, &callback) != napi_ok || callback == nullptr) {
+                if (napi_get_reference_value(env, refGuard->GetRef(), &callback) != napi_ok || callback == nullptr) {
                     HILOG_ERROR("napi_get_reference_value failed");
                 } else {
                     JsFormRouterProxyMgr::GetInstance()->AddFormRouterProxyCallback(env, callback, formIdsCopy);
