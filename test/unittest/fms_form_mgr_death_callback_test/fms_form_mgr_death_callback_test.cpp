@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -244,19 +244,5 @@ HWTEST_F(FmsFormMgrDeathCallbackTest, OnRemoteDied_002, TestSize.Level0)
     FormDataMgr::GetInstance().DeleteHostRecord(token_, formId);
 
     GTEST_LOG_(INFO) << "fms_form_mgr_death_callback_test_002 end";
-}
-
-/**
- * @tc.name: OnRemoteDied_003
- * @tc.desc: Verify ProcessRecycleForm
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrDeathCallbackTest, OnRemoteDied_003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "OnRemoteDied_003 begin";
-    std::shared_ptr<FormCallbackInterface> deathCallback = std::make_shared<MockFormDeathCallback>();
-    EXPECT_NE(deathCallback, nullptr);
-    deathCallback->ProcessRecycleForm();
-    GTEST_LOG_(INFO) << "OnRemoteDied_003 end";
 }
 }

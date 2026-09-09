@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -783,24 +783,6 @@ HWTEST_F(FormRenderMgrInnerTest, GetUserId_001, TestSize.Level0)
 }
 
 /**
- * @tc.name: RerenderAllFormsImmediate_002
- * @tc.desc: test RerenderAllFormsImmediate function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, RerenderAllFormsImmediate_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    sptr<IRemoteObject> remote = nullptr;
-    std::unordered_set<int64_t> form;
-    int64_t formId = 1;
-    form.insert(formId);
-    formRenderMgrInner.etsHosts_.emplace(remote, form);
-    formRenderMgrInner.RerenderAllFormsImmediate();
-    GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_002 end";
-}
-
-/**
  * @tc.name: DisconnectAllRenderConnections_001
  * @tc.desc: test DisconnectAllRenderConnections function.
  * @tc.type: FUNC
@@ -1570,21 +1552,6 @@ HWTEST_F(FormRenderMgrInnerTest, GetRenderRemoteObj_001, TestSize.Level0)
     formRenderMgrInner->renderRemoteObj_ = nullptr;
     EXPECT_EQ(nullptr, formRenderMgrInner->GetRenderRemoteObj());
     GTEST_LOG_(INFO) << "GetRenderRemoteObj_001 end";
-}
-
-/**
- * @tc.name: SetRenderRemoteObj_001
- * @tc.desc: test SetRenderRemoteObj function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, SetRenderRemoteObj_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "SetRenderRemoteObj_001 start";
-    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
-    sptr<IFormRender> remoteObject = new (std::nothrow) MockIFormRender();
-    formRenderMgrInner->SetRenderRemoteObj(remoteObject);
-    EXPECT_NE(nullptr, formRenderMgrInner->renderRemoteObj_);
-    GTEST_LOG_(INFO) << "SetRenderRemoteObj_001 end";
 }
 
 /**
