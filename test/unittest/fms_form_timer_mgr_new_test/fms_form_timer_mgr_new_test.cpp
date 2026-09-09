@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -909,5 +909,46 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0129, TestSize.Level1)
     EXPECT_NO_FATAL_FAILURE(formTimerMgr->UpdateLimiterAlarm());
     
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0129 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0130
+ * @tc.name: TimerReceiver::OnReceiveEvent.
+ * @tc.desc: Verify TYPE_DYNAMIC_UPDATE reassembles wake-up time by bit pattern so a negative right half is zero-extended.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0130, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0130 start";
+    // Left 1 and right -1 (bit pattern 0xFFFFFFFF) reassemble to 0x1FFFFFFFF; sign extension
+    // of the right half would give -1, get rejected and leave the due task in the list.
+    constexpr int wakeUpTimeLeft = 1;
+    constexpr int wakeUpTimeRight = -1;
+    constexpr int64_t reassembledTime = 0x1FFFFFFFF;
+    constexpr int64_t formId = 95274520;
+
+    auto &timerMgr = FormTimerMgr::GetInstance();
+    {
+        std::lock_guard<std::mutex> lock(timerMgr.dynamicMutex_);
+        timerMgr.dynamicRefreshTasks_.clear();
+        timerMgr.dynamicRefreshTasks_.emplace_back(DynamicRefreshItem(formId, reassembledTime));
+    }
+
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want;
+    want.SetAction(Constants::ACTION_UPDATEATTIMER);
+    want.SetParam(Constants::KEY_ACTION_TYPE, Constants::TYPE_DYNAMIC_UPDATE);
+    want.SetParam(Constants::KEY_WAKEUP_TIME_LEFT, wakeUpTimeLeft);
+    want.SetParam(Constants::KEY_WAKEUP_TIME_RIGHT, wakeUpTimeRight);
+    eventData.SetWant(want);
+    std::shared_ptr<FormTimerMgr::TimerReceiver> timeReceiver = std::make_shared<FormTimerMgr::TimerReceiver>();
+    ASSERT_NE(nullptr, timeReceiver);
+    timeReceiver->OnReceiveEvent(eventData);
+
+    // The due task must be consumed, proving the reassembled time is positive and not smaller.
+    {
+        std::lock_guard<std::mutex> lock(timerMgr.dynamicMutex_);
+        EXPECT_TRUE(timerMgr.dynamicRefreshTasks_.empty());
+    }
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0130 end";
 }
 }
