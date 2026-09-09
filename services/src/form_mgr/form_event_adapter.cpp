@@ -265,6 +265,10 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         }
     }
 
+    // 进入 AMS 前输出完整 want（含路由目标与透传参数），便于排查 router 参数；
+    // want 可能携带卡片业务数据，整体以 private 输出。
+    HILOG_INFO("RouterEvent send to ams, want: %{private}s", want.ToString().c_str());
+
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
         int32_t result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerToken,

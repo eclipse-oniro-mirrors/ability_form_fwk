@@ -150,8 +150,9 @@ public:
      * @param insightIntentHostClient The host client carrying host context for the
      *        execute-done callback.
      * @param param The insight intent execute param.
-     * @param wantParams The want params carrying intentName, intentParams and the form identity
-     *        params (ohos.extra.param.key.form_identity / formID) of the clicked card.
+     * @param wantParams The want params carrying the insight intent execute info and
+     *        the form identity params (ohos.extra.param.key.form_identity / formID)
+     *        of the clicked card.
      * @param specifyTokenId The specified token id for permission checking.
      * @param callerToken The caller ability token.
      * @return Returns ERR_OK on success, others on failure.
