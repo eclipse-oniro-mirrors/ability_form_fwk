@@ -1902,7 +1902,7 @@ void DeleteInvalidForms([[maybe_unused]] ani_env *env, ani_object arrayObj, ani_
 
     ani_size arrayLength = 0;
     if (env->Array_GetLength(reinterpret_cast<ani_array>(arrayObj), &arrayLength) != ANI_OK ||
-        arrayLength > FormAniUtil::MAX_FORM_ID_LIST_SIZE) {
+        arrayLength > Constants::MAX_FORM_IDS_SIZE) {
         InvokeAsyncWithBusinessError(env, callback,
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
         return;
@@ -2403,14 +2403,10 @@ void NotifyVisibleForms([[maybe_unused]] ani_env *env, ani_object arrayObj, ani_
     }
 
     ani_size arrayLength = 0;
-    if (env->Array_GetLength(reinterpret_cast<ani_array>(arrayObj), &arrayLength) != ANI_OK) {
+    if (env->Array_GetLength(reinterpret_cast<ani_array>(arrayObj), &arrayLength) != ANI_OK ||
+        arrayLength > Constants::MAX_VISIBLE_NOTIFY_LIST) {
         InvokeAsyncWithBusinessError(env, callback,
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
-        return;
-    }
-    if (arrayLength > Constants::MAX_VISIBLE_NOTIFY_LIST) {
-        InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID), nullptr);
         return;
     }
 
@@ -2448,14 +2444,10 @@ void NotifyInvisibleForms([[maybe_unused]] ani_env *env, ani_object arrayObj, an
     }
 
     ani_size arrayLength = 0;
-    if (env->Array_GetLength(reinterpret_cast<ani_array>(arrayObj), &arrayLength) != ANI_OK) {
+    if (env->Array_GetLength(reinterpret_cast<ani_array>(arrayObj), &arrayLength) != ANI_OK ||
+        arrayLength > Constants::MAX_VISIBLE_NOTIFY_LIST) {
         InvokeAsyncWithBusinessError(env, callback,
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
-        return;
-    }
-    if (arrayLength > Constants::MAX_VISIBLE_NOTIFY_LIST) {
-        InvokeAsyncWithBusinessError(env, callback,
-            static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_FORM_ID), nullptr);
         return;
     }
 
