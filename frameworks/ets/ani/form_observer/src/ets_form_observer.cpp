@@ -433,13 +433,8 @@ private:
             HILOG_ERROR("get aniVM failed");
             return;
         }
-        int ret = formObserver->RegisterFormInstanceCallback(
+        formObserver->RegisterFormInstanceCallback(
             aniVM, callback, isVisibility, bundleName, formObserver);
-        if (ret == ERR_APPEXECFWK_FORM_INVALID_PARAM) {
-            EtsFormErrorUtil::ThrowParamError(env,
-                "The number of bundleNames registered to listen has exceeded the limit.");
-            return;
-        }
     }
 
     static void OnRegisterClickEventCallback(ani_env* env, const std::string &type,
