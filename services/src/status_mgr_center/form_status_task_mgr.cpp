@@ -499,13 +499,17 @@ void FormStatusTaskMgr::RenderForm(
     std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(formRecord.formId);
     newWant.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
 
+    auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
+    if (renderType == Constants::RENDER_FORM) {
+        newWant.SetParam(Constants::FORM_IS_VISIBLE, FormDataMgr::GetInstance().GetFormVisible(formRecord.formId));
+    }
+
     int32_t error = remoteFormRender->RenderForm(formJsInfo, newWant, FormSupplyCallback::GetInstance());
     FormRecordReport::GetInstance().IncreaseUpdateTimes(formRecord.formId, HiSysEventPointType::TYPE_DAILY_REFRESH);
     if (!formRecord.isVisible) {
         FormRecordReport::GetInstance().IncreaseUpdateTimes(
             formRecord.formId, HiSysEventPointType::TYPE_INVISIBLE_UPDATE);
     }
-    auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     if (error != ERR_OK) {
         HILOG_ERROR("StopRenderingForm fail formId: %{public}" PRId64 " error: %{public}d", formRecord.formId, error);
         RemoveConnection(connectId);
