@@ -21,7 +21,10 @@
 #include "bundle_info.h"
 #include "bundle_mgr_interface.h"
 #include "hitrace_meter.h"
+// For the INSIGHT_INTENT_EXECUTE_PARAM_* reserved keys carried in the want; the execute param
+// itself uses the lite variant below (AMS no longer parses the want on its side).
 #include "insight_intent/insight_intent_execute_param.h"
+#include "insight_intent/insight_intent_execute_lite_param.h"
 #include "insight_intent_host_client.h"
 #include "running_form_info.h"
 #include "start_options.h"
@@ -92,30 +95,42 @@ std::string GetProviderMainElement(const FormRecord &record)
     return "";
 }
 
-// Extract intent execute params from the host want and backfill provider info; returns ERR_OK or an error code.
-int PrepareInsightIntentParam(Want &want, const FormRecord &record, InsightIntentExecuteParam &executeParam)
+// Extract the intent name and params from the host want into the lite param (AMS reads them
+// only from the param on its side) and backfill the provider triple into the want element,
+// which AMS reads via want.GetElement(); returns ERR_OK or an error code.
+int PrepareInsightIntentParam(Want &want, const FormRecord &record, InsightIntentExecuteLiteParam &executeParam)
 {
-    if (!InsightIntentExecuteParam::GenerateFromWant(want, executeParam)) {
-        HILOG_ERROR("GenerateFromWant failed");
+    const WantParams &wantParams = want.GetParams();
+    if (!wantParams.HasParam(INSIGHT_INTENT_EXECUTE_PARAM_NAME)) {
+        HILOG_ERROR("no intent name in want");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+    executeParam.insightIntentName = wantParams.GetStringParam(INSIGHT_INTENT_EXECUTE_PARAM_NAME);
+    if (executeParam.insightIntentName.empty()) {
+        HILOG_ERROR("empty intent name");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    executeParam.insightIntentParam = wantParams.GetWantParams(INSIGHT_INTENT_EXECUTE_PARAM_PARAM);
     // The host want may carry the target triple passed through by postCardAction: fields
     // already provided keep the user values; only missing ones are backfilled from
     // FormRecord (AMS requires all three to be non-empty in the end).
-    if (executeParam.bundleName_.empty()) {
-        executeParam.bundleName_ = record.bundleName;
+    ElementName element = want.GetElement();
+    if (element.GetBundleName().empty()) {
+        element.SetBundleName(record.bundleName);
     }
-    if (executeParam.moduleName_.empty()) {
-        executeParam.moduleName_ = record.moduleName;
+    if (element.GetModuleName().empty()) {
+        element.SetModuleName(record.moduleName);
     }
-    if (executeParam.abilityName_.empty()) {
-        executeParam.abilityName_ = GetProviderMainElement(record);
-        if (executeParam.abilityName_.empty()) {
+    if (element.GetAbilityName().empty()) {
+        const std::string mainElement = GetProviderMainElement(record);
+        if (mainElement.empty()) {
             HILOG_ERROR("empty mainElement, bundleName:%{public}s, moduleName:%{public}s",
                 record.bundleName.c_str(), record.moduleName.c_str());
             return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
         }
+        element.SetAbilityName(mainElement);
     }
+    want.SetElement(element);
     return ERR_OK;
 }
 
@@ -383,25 +398,25 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
         HILOG_ERROR("get provider specifyTokenId failed, bundleName:%{public}s", record.bundleName.c_str());
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
-    InsightIntentExecuteParam executeParam;
+    InsightIntentExecuteLiteParam executeParam;
     int32_t result = PrepareInsightIntentParam(want, record, executeParam);
     if (result != ERR_OK) {
         return result;
     }
-    executeParam.key_ = static_cast<uint64_t>(matchedFormId);
-    executeParam.insightIntentHostClient_ =
+    executeParam.key = static_cast<uint64_t>(matchedFormId);
+    executeParam.insightIntentHostClient =
         new (std::nothrow) AbilityRuntime::InsightIntentHostClient();
-    if (executeParam.insightIntentHostClient_ == nullptr) {
+    if (executeParam.insightIntentHostClient == nullptr) {
         HILOG_ERROR("null insightIntentHostClient");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     // matchedFormId serves as the intent execute callback key; formId goes into want
     // via the system reserved key (same as router).
     SetFormIdentityParams(want, matchedFormId);
-    result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecifyTokenId(
+    result = FormAmsHelper::GetInstance().ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(
         want, callerToken, executeParam, providerSpecifyTokenId);
     if (result != ERR_OK) {
-        HILOG_ERROR("fail ExecuteIntentWithSpecifyTokenId, result:%{public}d", result);
+        HILOG_ERROR("fail ExecuteUIAbilityForegroundIntentWithSpecifyTokenId, result:%{public}d", result);
         return result;
     }
     NotifyFormClickEvent(formId, FORM_CLICK_INSIGHT_INTENT, FormCommonAdapter::GetInstance().GetCallingUserId());

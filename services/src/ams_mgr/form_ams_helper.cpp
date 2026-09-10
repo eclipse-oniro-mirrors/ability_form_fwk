@@ -334,16 +334,17 @@ ErrCode FormAmsHelper::StartAbilityByCallerToken(const Want &want, const sptr<IR
 }
 
 /**
- * @brief ExecuteIntentWithSpecifyTokenId, execute insight intent with ability manager service.
- * @param want The want carrying the form identity params of the clicked card.
+ * @brief ExecuteUIAbilityForegroundIntentWithSpecifyTokenId, execute insight intent with AMS.
+ * @param want The want of the intent execution; carries the form identity params and the
+ *        target triple in its element.
  * @param callerAbilityToken The caller ability token.
- * @param param The insight intent execute param, whose key and insightIntentHostClient
+ * @param param The insight intent execute lite param, whose key and insightIntentHostClient
  *        carry the execute-done callback info of the form scenario.
  * @param specifyTokenId The specified token id for permission checking.
  * @return Returns ERR_OK on success, others on failure.
  */
-ErrCode FormAmsHelper::ExecuteIntentWithSpecifyTokenId(const AAFwk::Want &want,
-    const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteParam &param,
+ErrCode FormAmsHelper::ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(const AAFwk::Want &want,
+    const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteLiteParam &param,
     uint32_t specifyTokenId)
 {
     HILOG_DEBUG("call");
@@ -352,8 +353,8 @@ ErrCode FormAmsHelper::ExecuteIntentWithSpecifyTokenId(const AAFwk::Want &want,
         HILOG_ERROR("null ams");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    return IN_PROCESS_CALL(ams->ExecuteIntentWithSpecifyTokenId(want, callerAbilityToken,
-        param, specifyTokenId));
+    return IN_PROCESS_CALL(ams->ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(
+        want, callerAbilityToken, param, specifyTokenId));
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
