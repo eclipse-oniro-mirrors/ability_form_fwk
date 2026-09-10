@@ -288,7 +288,7 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int InsightIntentEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override;
+    int InsightIntentEvent(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken) override;
 
     /**
      * @brief Delete the invalid forms.

@@ -365,7 +365,7 @@ int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
     return ERR_OK;
 }
 
-int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
+int FormEventAdapter::InsightIntentEvent(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("call");
@@ -390,8 +390,11 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
         HILOG_ERROR("get provider fullTokenId failed, bundleName:%{public}s", record.bundleName.c_str());
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
+    // Copy the host want locally: the wantParams sent to AMS needs the form identity
+    // params appended (system reserved keys), while the caller's want stays read-only.
+    Want executeWant(want);
     InsightIntentExecuteParam executeParam;
-    int32_t result = PrepareInsightIntentParam(want, record, executeParam);
+    int32_t result = PrepareInsightIntentParam(executeWant, record, executeParam);
     if (result != ERR_OK) {
         return result;
     }
@@ -403,9 +406,9 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
     }
     // matchedFormId serves as the intent execute callback key; formId goes into wantParams
     // via the system reserved key (same as router).
-    SetFormIdentityParams(want, matchedFormId);
+    SetFormIdentityParams(executeWant, matchedFormId);
     result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecifyTokenId(
-        static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, want.GetParams(),
+        static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, executeWant.GetParams(),
         providerFullTokenId, callerToken);
     if (result != ERR_OK) {
         HILOG_ERROR("fail ExecuteIntentWithSpecifyTokenId, result:%{public}d", result);

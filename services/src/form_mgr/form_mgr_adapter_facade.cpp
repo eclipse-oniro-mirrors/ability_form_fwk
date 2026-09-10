@@ -519,7 +519,7 @@ int FormMgrAdapterFacade::BackgroundEvent(const int64_t formId, Want &want,
     return FormEventAdapter::GetInstance().BackgroundEvent(formId, want, callerToken);
 }
 
-int FormMgrAdapterFacade::InsightIntentEvent(const int64_t formId, Want &want,
+int FormMgrAdapterFacade::InsightIntentEvent(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
     return FormEventAdapter::GetInstance().InsightIntentEvent(formId, want, callerToken);

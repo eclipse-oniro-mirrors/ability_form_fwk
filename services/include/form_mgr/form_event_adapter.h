@@ -54,7 +54,7 @@ public:
     int BackgroundEvent(const int64_t formId, Want &want,
         const sptr<IRemoteObject> &callerToken);
 
-    int InsightIntentEvent(const int64_t formId, Want &want,
+    int InsightIntentEvent(const int64_t formId, const Want &want,
         const sptr<IRemoteObject> &callerToken);
 
     void SetFreeInstallFlag(const FormRecord &record, Want &want);
