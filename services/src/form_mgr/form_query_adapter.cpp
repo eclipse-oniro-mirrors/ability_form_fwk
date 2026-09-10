@@ -273,10 +273,7 @@ int FormQueryAdapter::AcquireFormData(int64_t formId, int64_t requestCode, const
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     FormItemInfo info;
-    if (!FormDataMgr::GetInstance().CreateFormAcquireDataRecord(requestCode, info, callerToken, callingUid)) {
-        HILOG_ERROR("create form acquire data record failed");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
+    FormDataMgr::GetInstance().CreateFormAcquireDataRecord(requestCode, info, callerToken, callingUid);
     sptr<IAbilityConnection> connection =
         new (std::nothrow) FormAcquireDataConnection(formId, bundleName, abilityName, requestCode, userId);
     if (connection == nullptr) {

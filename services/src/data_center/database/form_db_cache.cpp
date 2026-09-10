@@ -92,10 +92,15 @@ ErrCode FormDbCache::SaveFormInfoNolock(const FormDBInfo &formDBInfo)
     HILOG_INFO("formId:%{public}" PRId64, formDBInfo.formId);
     auto iter = find(formDBInfos_.begin(), formDBInfos_.end(), formDBInfo);
     if (iter != formDBInfos_.end()) {
-        // Callers pass the cache element itself after in-place updates, so always persist to keep RDB consistent.
-        *iter = formDBInfo;
-        InnerFormInfo innerFormInfo(formDBInfo);
-        return FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormData(innerFormInfo);
+        if (iter->Compare(formDBInfo) == false) {
+            HILOG_WARN("need update, formId[%{public}" PRId64 "].", formDBInfo.formId);
+            *iter = formDBInfo;
+            InnerFormInfo innerFormInfo(formDBInfo);
+            return FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormData(innerFormInfo);
+        } else {
+            HILOG_WARN("already exist, formId[%{public}" PRId64 "].", formDBInfo.formId);
+            return ERR_OK;
+        }
     } else {
         formDBInfos_.emplace_back(formDBInfo);
         InnerFormInfo innerFormInfo(formDBInfo);
@@ -245,8 +250,11 @@ ErrCode FormDbCache::GetNoHostDBForms(const int uid, std::map<FormIdKey,
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     for (FormDBInfo& dbInfo : formDBInfos_) {
         if (dbInfo.Contains(uid)) {
-            dbInfo.Remove(uid);
-            if (dbInfo.formUserUids.empty()) {
+            // Copy first so SaveFormInfoNolock compares distinct old/new records, not the element with itself.
+            FormDBInfo dbInfoTemp = dbInfo;
+            dbInfoTemp.Remove(uid);
+            if (dbInfoTemp.formUserUids.empty()) {
+                dbInfo.Remove(uid);
                 FormIdKey formIdKey(dbInfo.bundleName, dbInfo.abilityName, dbInfo.moduleName);
                 auto itIdsSet = noHostFormDBList.find(formIdKey);
                 if (itIdsSet == noHostFormDBList.end()) {
@@ -257,9 +265,9 @@ ErrCode FormDbCache::GetNoHostDBForms(const int uid, std::map<FormIdKey,
                     itIdsSet->second.emplace(dbInfo.formId);
                 }
             } else {
-                foundFormsMap.emplace(dbInfo.formId, false);
-                SaveFormInfoNolock(dbInfo);
-                FormBmsHelper::GetInstance().NotifyModuleNotRemovable(dbInfo.bundleName, dbInfo.moduleName);
+                foundFormsMap.emplace(dbInfoTemp.formId, false);
+                SaveFormInfoNolock(dbInfoTemp);
+                FormBmsHelper::GetInstance().NotifyModuleNotRemovable(dbInfoTemp.bundleName, dbInfoTemp.moduleName);
             }
         }
     }
@@ -332,8 +340,11 @@ void FormDbCache::GetNoHostInvalidDBForms(int32_t userId, int32_t callingUid, st
         }
 
         HILOG_WARN("found invalid form:%{public}" PRId64, formId);
-        formRecord.formUserUids.erase(iter);
-        if (formRecord.formUserUids.empty()) {
+        // Copy first so SaveFormInfoNolock compares distinct old/new records, not the record with itself.
+        FormDBInfo formRecordTemp = formRecord;
+        formRecordTemp.Remove(callingUid);
+        if (formRecordTemp.formUserUids.empty()) {
+            formRecord.formUserUids.erase(iter);
             FormIdKey formIdKey(formRecord.bundleName, formRecord.abilityName, formRecord.moduleName);
             auto itIdsSet = noHostDBFormsMap.find(formIdKey);
             if (itIdsSet == noHostDBFormsMap.end()) {
@@ -345,8 +356,8 @@ void FormDbCache::GetNoHostInvalidDBForms(int32_t userId, int32_t callingUid, st
             }
         } else {
             foundFormsMap.emplace(formId, false);
-            SaveFormInfoNolock(formRecord);
-            FormBmsHelper::GetInstance().NotifyModuleNotRemovable(formRecord.bundleName, formRecord.moduleName);
+            SaveFormInfoNolock(formRecordTemp);
+            FormBmsHelper::GetInstance().NotifyModuleNotRemovable(formRecordTemp.bundleName, formRecordTemp.moduleName);
         }
     }
 }

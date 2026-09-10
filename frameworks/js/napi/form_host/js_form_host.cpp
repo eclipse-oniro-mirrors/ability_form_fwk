@@ -47,7 +47,6 @@ using namespace OHOS::AppExecFwk;
 
 namespace {
     constexpr uint32_t MAX_FORM_IDS_COUNT = 1024;
-    constexpr uint32_t MAX_WANT_PARAMS_COUNT = 1024;
     constexpr int REF_COUNT = 1;
     // NANOSECONDS mean 10^9 nano second
     constexpr int64_t NANOSECONDS = 1000000000;
@@ -3664,7 +3663,12 @@ ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, 
         dataParam->condition.notify_all();
     };
 
-    napi_send_event(env, task, napi_eprio_immediate);
+    // If posting fails the task never runs, so fail fast instead of waiting out the interface timeout.
+    napi_status status = napi_send_event(env, task, napi_eprio_immediate);
+    if (status != napi_ok) {
+        HILOG_ERROR("napi_send_event failed, status: %{public}d", static_cast<int>(status));
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     std::unique_lock<std::mutex> lock(dataParam->mutex);
     dataParam->condition.wait_for(
         lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
@@ -4367,10 +4371,10 @@ bool JsFormRouterProxyMgr::ParseWantParamsArray(napi_value funcResult,
         HILOG_ERROR("get array length failed, status: %{public}d", static_cast<int>(lengthStatus));
         return false;
     }
-    // The length is app-controlled (JS callback result), so cap it like MAX_FORM_IDS_COUNT.
-    if (arrayLength > MAX_WANT_PARAMS_COUNT) {
+    // The length is app-controlled (JS callback result), so cap it with the existing form-id bound.
+    if (arrayLength > MAX_FORM_IDS_COUNT) {
         HILOG_ERROR("callback result size %{public}u exceeds maximum %{public}u",
-            arrayLength, MAX_WANT_PARAMS_COUNT);
+            arrayLength, MAX_FORM_IDS_COUNT);
         return false;
     }
     for (uint32_t i = 0; i < arrayLength; i++) {
