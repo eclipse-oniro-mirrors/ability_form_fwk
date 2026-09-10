@@ -388,18 +388,18 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
     if (result != ERR_OK) {
         return result;
     }
-    sptr<AbilityRuntime::InsightIntentHostClient> insightIntentHostClient =
+    executeParam.key_ = static_cast<uint64_t>(matchedFormId);
+    executeParam.insightIntentHostClient_ =
         new (std::nothrow) AbilityRuntime::InsightIntentHostClient();
-    if (insightIntentHostClient == nullptr) {
+    if (executeParam.insightIntentHostClient_ == nullptr) {
         HILOG_ERROR("null insightIntentHostClient");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    // matchedFormId serves as the intent execute callback key; formId goes into wantParams
+    // matchedFormId serves as the intent execute callback key; formId goes into want
     // via the system reserved key (same as router).
     SetFormIdentityParams(want, matchedFormId);
     result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecifyTokenId(
-        static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, want.GetParams(),
-        providerSpecifyTokenId, callerToken);
+        want, callerToken, executeParam, providerSpecifyTokenId);
     if (result != ERR_OK) {
         HILOG_ERROR("fail ExecuteIntentWithSpecifyTokenId, result:%{public}d", result);
         return result;

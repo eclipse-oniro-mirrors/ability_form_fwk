@@ -324,10 +324,9 @@ public:
         return 0;
     }
 
-    int32_t ExecuteIntentWithSpecifyTokenId(uint64_t key,
-        const sptr<IRemoteObject> &hostClient,
-        const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams,
-        uint32_t specifiedFullTokenId, const sptr<IRemoteObject> &callerToken) override
+    int32_t ExecuteIntentWithSpecifyTokenId(const AAFwk::Want &want,
+        const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteParam &param,
+        uint32_t specifyTokenId) override
     {
         return 0;
     }
@@ -830,10 +829,9 @@ public:
         return 0;
     }
 
-    int32_t ExecuteIntentWithSpecifyTokenId(uint64_t key,
-        const sptr<IRemoteObject> &hostClient,
-        const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams,
-        uint32_t specifiedFullTokenId, const sptr<IRemoteObject> &callerToken) override
+    int32_t ExecuteIntentWithSpecifyTokenId(const AAFwk::Want &want,
+        const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteParam &param,
+        uint32_t specifyTokenId) override
     {
         return 0;
     }

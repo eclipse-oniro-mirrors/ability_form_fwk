@@ -335,21 +335,16 @@ ErrCode FormAmsHelper::StartAbilityByCallerToken(const Want &want, const sptr<IR
 
 /**
  * @brief ExecuteIntentWithSpecifyTokenId, execute insight intent with ability manager service.
- * @param key The key of the intent executing client, formId for the form scenario.
- * @param insightIntentHostClient The host client carrying host context for the
- *        execute-done callback.
- * @param param The insight intent execute param.
- * @param wantParams The want params carrying the insight intent execute info and
- *        the form identity params (ohos.extra.param.key.form_identity / formID)
- *        of the clicked card.
+ * @param want The want carrying the form identity params of the clicked card.
+ * @param callerAbilityToken The caller ability token.
+ * @param param The insight intent execute param, whose key and insightIntentHostClient
+ *        carry the execute-done callback info of the form scenario.
  * @param specifyTokenId The specified token id for permission checking.
- * @param callerToken The caller ability token.
  * @return Returns ERR_OK on success, others on failure.
  */
-ErrCode FormAmsHelper::ExecuteIntentWithSpecifyTokenId(uint64_t key,
-    const sptr<AbilityRuntime::InsightIntentHostClient> &insightIntentHostClient,
-    const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams,
-    uint32_t specifyTokenId, const sptr<IRemoteObject> &callerToken)
+ErrCode FormAmsHelper::ExecuteIntentWithSpecifyTokenId(const AAFwk::Want &want,
+    const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteParam &param,
+    uint32_t specifyTokenId)
 {
     HILOG_DEBUG("call");
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
@@ -357,8 +352,8 @@ ErrCode FormAmsHelper::ExecuteIntentWithSpecifyTokenId(uint64_t key,
         HILOG_ERROR("null ams");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    return IN_PROCESS_CALL(ams->ExecuteIntentWithSpecifyTokenId(key, insightIntentHostClient,
-        param, wantParams, specifyTokenId, callerToken));
+    return IN_PROCESS_CALL(ams->ExecuteIntentWithSpecifyTokenId(want, callerAbilityToken,
+        param, specifyTokenId));
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
