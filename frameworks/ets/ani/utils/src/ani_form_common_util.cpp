@@ -613,8 +613,8 @@ bool SetPropertyIntByName(ani_env *env, ani_object object, const char *name, int
 
 void SetPropertyByName(ani_env *env, ani_object object, const char *name, ani_object value)
 {
-    if (env == nullptr) {
-        HILOG_ERROR("null env");
+    if (env == nullptr || object == nullptr) {
+        HILOG_ERROR("env or object is nullptr");
         return;
     }
     ani_status status = ANI_ERROR;
@@ -649,8 +649,14 @@ std::string AniStringToStdString(ani_env *env, ani_string aniStr)
 {
     HILOG_INFO("Call AniStringToStdString");
     ani_size strSize;
-    if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+    if (env == nullptr || aniStr == nullptr) {
+        HILOG_ERROR("env or aniStr is nullptr");
+        return "";
+    }
+    ani_boolean isNullish = ANI_FALSE;
+    ani_status status = env->Reference_IsNullishValue(aniStr, &isNullish);
+    if (status != ANI_OK || isNullish == ANI_TRUE) {
+        HILOG_ERROR("aniStr is invalid, status: %{public}d", status);
         return "";
     }
     if (env->String_GetUTF8Size(aniStr, &strSize) != ANI_OK) {
@@ -1262,7 +1268,11 @@ ani_object GetAniArray(ani_env *env, size_t array_size)
         return nullptr;
     }
     ani_class arrayCls = GetAniClass(env, CLASSNAME_ARRAY);
-    ani_method arrayCtor;
+    if (arrayCls == nullptr) {
+        HILOG_ERROR("GetAniClass failed");
+        return nullptr;
+    }
+    ani_method arrayCtor = nullptr;
     ani_status status = env->Class_FindMethod(arrayCls, "<ctor>", "i:", &arrayCtor);
     if (status != ANI_OK) {
         HILOG_ERROR("FindMethod failed");
@@ -1271,8 +1281,8 @@ ani_object GetAniArray(ani_env *env, size_t array_size)
 
     ani_object arrayObj = nullptr;
     status = env->Object_New(arrayCls, arrayCtor, &arrayObj, array_size);
-    if (status != ANI_OK) {
-        HILOG_ERROR("Object_New Array failed");
+    if (status != ANI_OK || arrayObj == nullptr) {
+        HILOG_ERROR("Object_New Array failed, status: %{public}d", status);
         return nullptr;
     }
     return arrayObj;
@@ -1518,18 +1528,27 @@ void InvokeAsyncWithBusinessError(ani_env *env, ani_object obj, int32_t internal
         return;
     }
 
-    ani_boolean isUndefined;
-    env->Reference_IsUndefined(obj, &isUndefined);
-    auto callbackIsValid = (obj != nullptr) || (isUndefined != ANI_TRUE);
-
-    if ((internalErrorCode != ERR_OK) && !callbackIsValid) {
-        AbilityRuntime::EtsErrorUtil::ThrowError(env, extErrCode, errMsg);
+    if (obj == nullptr) {
+        HILOG_ERROR("obj is nullptr");
+        if (internalErrorCode != ERR_OK) {
+            AbilityRuntime::EtsErrorUtil::ThrowError(env, extErrCode, errMsg);
+        }
+        return;
+    }
+    ani_boolean isNullish = ANI_FALSE;
+    ani_status status = env->Reference_IsNullishValue(obj, &isNullish);
+    if (status != ANI_OK || isNullish == ANI_TRUE) {
+        HILOG_ERROR("callback is invalid, status: %{public}d", status);
+        if (internalErrorCode != ERR_OK) {
+            AbilityRuntime::EtsErrorUtil::ThrowError(env, extErrCode, errMsg);
+        }
         return;
     }
 
     ani_object errorObject = CreateBusinessError(env, extErrCode, errMsg);
     bool result = InvokeAsyncCallback(env, obj, errorObject, arg);
     if (!result) {
+        HILOG_ERROR("InvokeAsyncCallback failed");
         auto errorCode = static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE);
         auto message = AppExecFwk::FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(errorCode);
         AbilityRuntime::EtsErrorUtil::ThrowError(env, errorCode, message);

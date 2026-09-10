@@ -337,12 +337,17 @@ int32_t EtsFormStateObserver::OnAddForm(const std::string &bundleName,
     const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
     HILOG_DEBUG("call");
-
-    std::lock_guard<std::mutex> lock(addFormCallbackMutex_);
-    auto callbackClient = formAddCallbackMap_.find(bundleName);
-    if (callbackClient != formAddCallbackMap_.end()) {
-        for (auto iter : callbackClient->second) {
-            iter->ProcessFormAdd(bundleName, runningFormInfo);
+    std::vector<std::shared_ptr<EtsFormAddCallbackClient>> callbackClients;
+    {
+        std::lock_guard<std::mutex> lock(addFormCallbackMutex_);
+        auto callbackClient = formAddCallbackMap_.find(bundleName);
+        if (callbackClient != formAddCallbackMap_.end()) {
+            callbackClients = callbackClient->second;
+        }
+    }
+    for (const auto &callbackClient : callbackClients) {
+        if (callbackClient != nullptr) {
+            callbackClient->ProcessFormAdd(bundleName, runningFormInfo);
         }
     }
     return ERR_OK;
