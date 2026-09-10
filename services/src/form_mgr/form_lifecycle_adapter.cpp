@@ -568,10 +568,7 @@ int FormLifecycleAdapter::DeleteCommonForm(const int64_t formId,
     const sptr<IRemoteObject> &callerToken, const int32_t userId)
 {
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    auto supplyCallback = FormSupplyCallback::GetInstance();
-    if (supplyCallback != nullptr) {
-        supplyCallback->RemoveConnection(matchedFormId, callerToken);
-    }
+    FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
     FormDataProxyMgr::GetInstance().UnsubscribeFormData(matchedFormId);
     RunningFormInfo runningFormInfo;
     FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo, userId);
@@ -878,9 +875,6 @@ int FormLifecycleAdapter::CreateForm(const Want &want, RunningFormInfo &runningF
     if (isThemeForm) {
         HILOG_INFO("isThemeForm");
 #ifdef THEME_MGR_ENABLE
-        // TODO: TOCTOU race - CheckFormCountLimit checks the count but the actual form creation
-        // (GenerateFormId + AddForm) happens later. A concurrent request could exceed the limit
-        // between the check and the creation. This requires an atomic check-and-create mechanism.
         int ret = CheckFormCountLimit(0, want);
         if (ret != ERR_OK) {
             HILOG_ERROR("CheckFormCountLimit failed");
@@ -903,7 +897,9 @@ int FormLifecycleAdapter::CreateForm(const Want &want, RunningFormInfo &runningF
 
         ret = AddThemeDBRecord(want, formId);
         if (ret != ERR_OK) {
-            HILOG_ERROR("AddThemeDBRecord failed");
+            HILOG_ERROR("AddThemeDBRecord failed, rollback ThemeManager");
+            ThemeFormClient::GetInstance().DeleteForms({formId});
+            return ret;
         }
 
         runningFormInfo.formId = formId;
@@ -1019,9 +1015,6 @@ FormRecord FormLifecycleAdapter::AllotThemeRecord(const Want &want, int64_t form
 // Implementation of EnableForms
 ErrCode FormLifecycleAdapter::EnableForms(const std::string &bundleName, const int32_t userId, const bool enable)
 {
-    // TODO: SetBundleForbiddenStatus is called without userId scoping, which may cause cross-user state pollution.
-    // A broader fix should scope the forbidden status per userId to prevent one user's enable/disable
-    // from affecting another user's forms for the same bundle.
     FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, !enable);
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
@@ -1547,9 +1540,6 @@ ErrCode FormLifecycleAdapter::CheckAddRequestPublishForm(const Want &want, const
 
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     int32_t currentUserId = FormUtil::GetCallerUserId(callingUid);
-    // TODO: TOCTOU race - CheckTempEnoughForm/CheckEnoughForm verifies the quota, but the actual
-    // form record allocation happens later in the caller. A concurrent request could exceed the quota
-    // between the check and the allocation. This requires an atomic check-and-allocate mechanism.
     ErrCode errCode = ERR_OK;
     if (isTemporary) {
         errCode = FormDataMgr::GetInstance().CheckTempEnoughForm(currentUserId);
