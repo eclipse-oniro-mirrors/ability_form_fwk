@@ -1051,11 +1051,6 @@ ErrCode FormLifecycleAdapter::EnableForms(const std::string &bundleName, const i
 ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, int32_t userId, const bool protect)
 {
     HILOG_INFO("ProtectLockForms entry");
-    std::vector<FormRecord> formInfos;
-    if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos, userId)) {
-        HILOG_ERROR("GetFormRecord error");
-        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-    }
     if (FormBundleLockMgr::GetInstance().IsLockServiceInitialized() &&
         FormBundleLockMgr::GetInstance().IsBundleProtect(bundleName, userId) == protect) {
         HILOG_INFO("No need to change protect status, bundleName = %{public}s, protect = %{public}d",
@@ -1063,6 +1058,11 @@ ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, in
         return ERR_OK;
     }
     FormBundleLockMgr::GetInstance().SetBundleProtectStatus(bundleName, protect);
+    std::vector<FormRecord> formInfos;
+    if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos, userId)) {
+        HILOG_ERROR("GetFormRecord error");
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
     if (!protect && !FormBundleForbidMgr::GetInstance().IsBundleForbidden(bundleName)) {
         FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTask(bundleName);
     }
