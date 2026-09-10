@@ -250,11 +250,8 @@ ErrCode FormDbCache::GetNoHostDBForms(const int uid, std::map<FormIdKey,
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     for (FormDBInfo& dbInfo : formDBInfos_) {
         if (dbInfo.Contains(uid)) {
-            // Copy first so SaveFormInfoNolock compares distinct old/new records, not the element with itself.
-            FormDBInfo dbInfoTemp = dbInfo;
-            dbInfoTemp.Remove(uid);
-            if (dbInfoTemp.formUserUids.empty()) {
-                dbInfo.Remove(uid);
+            dbInfo.Remove(uid);
+            if (dbInfo.formUserUids.empty()) {
                 FormIdKey formIdKey(dbInfo.bundleName, dbInfo.abilityName, dbInfo.moduleName);
                 auto itIdsSet = noHostFormDBList.find(formIdKey);
                 if (itIdsSet == noHostFormDBList.end()) {
@@ -265,9 +262,9 @@ ErrCode FormDbCache::GetNoHostDBForms(const int uid, std::map<FormIdKey,
                     itIdsSet->second.emplace(dbInfo.formId);
                 }
             } else {
-                foundFormsMap.emplace(dbInfoTemp.formId, false);
-                SaveFormInfoNolock(dbInfoTemp);
-                FormBmsHelper::GetInstance().NotifyModuleNotRemovable(dbInfoTemp.bundleName, dbInfoTemp.moduleName);
+                foundFormsMap.emplace(dbInfo.formId, false);
+                SaveFormInfoNolock(dbInfo);
+                FormBmsHelper::GetInstance().NotifyModuleNotRemovable(dbInfo.bundleName, dbInfo.moduleName);
             }
         }
     }
@@ -340,11 +337,8 @@ void FormDbCache::GetNoHostInvalidDBForms(int32_t userId, int32_t callingUid, st
         }
 
         HILOG_WARN("found invalid form:%{public}" PRId64, formId);
-        // Copy first so SaveFormInfoNolock compares distinct old/new records, not the record with itself.
-        FormDBInfo formRecordTemp = formRecord;
-        formRecordTemp.Remove(callingUid);
-        if (formRecordTemp.formUserUids.empty()) {
-            formRecord.formUserUids.erase(iter);
+        formRecord.formUserUids.erase(iter);
+        if (formRecord.formUserUids.empty()) {
             FormIdKey formIdKey(formRecord.bundleName, formRecord.abilityName, formRecord.moduleName);
             auto itIdsSet = noHostDBFormsMap.find(formIdKey);
             if (itIdsSet == noHostDBFormsMap.end()) {
@@ -356,8 +350,8 @@ void FormDbCache::GetNoHostInvalidDBForms(int32_t userId, int32_t callingUid, st
             }
         } else {
             foundFormsMap.emplace(formId, false);
-            SaveFormInfoNolock(formRecordTemp);
-            FormBmsHelper::GetInstance().NotifyModuleNotRemovable(formRecordTemp.bundleName, formRecordTemp.moduleName);
+            SaveFormInfoNolock(formRecord);
+            FormBmsHelper::GetInstance().NotifyModuleNotRemovable(formRecord.bundleName, formRecord.moduleName);
         }
     }
 }
