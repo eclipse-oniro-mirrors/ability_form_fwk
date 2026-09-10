@@ -141,7 +141,7 @@ public:
      * @param formId Indicates the unique id of form.
      * @param record Form record.
      * @param want information passed to supplier.
-     * @return Returns true if execute success, false otherwise.
+     * @return Returns ERR_OK on success, others on failure.
      */
     int MessageEvent(const int64_t formId, const FormRecord &record, const Want &want);
 
@@ -177,7 +177,7 @@ private:
     /**
      * @brief Rebind form to provider by free install.
      * @param want Indicates the want containing information about free install.
-     * @return Returns true if execute success, false otherwise.
+     * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RebindByFreeInstall(const FormRecord &record, Want &want,
         const sptr<AAFwk::IAbilityConnection> formRefreshConnection);

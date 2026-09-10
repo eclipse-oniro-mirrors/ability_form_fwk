@@ -546,7 +546,7 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId,
  * @param formId Indicates the unique id of form.
  * @param record Form record.
  * @param want information passed to supplier.
- * @return Returns true if execute success, false otherwise.
+ * @return Returns ERR_OK on success, others on failure.
  */
 int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record, const Want &want)
 {

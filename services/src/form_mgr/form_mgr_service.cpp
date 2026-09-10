@@ -699,7 +699,7 @@ int FormMgrService::DumpFormTimerByFormId(const std::int64_t formId, std::string
  * @param formId Indicates the unique id of form.
  * @param want information passed to supplier.
  * @param callerToken Caller ability token.
- * @return Returns true if execute success, false otherwise.
+ * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken)
 {
@@ -737,7 +737,7 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
  * @param formId Indicates the unique id of form.
  * @param want the want of the ability to start.
  * @param callerToken Caller ability token.
- * @return Returns true if execute success, false otherwise.
+ * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
@@ -780,7 +780,7 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
  * @param formId Indicates the unique id of form.
  * @param want the want which carries the insight intent execute param.
  * @param callerToken Caller ability token.
- * @return Returns true if execute success, false otherwise.
+ * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrService::InsightIntentEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
@@ -805,7 +805,7 @@ int FormMgrService::InsightIntentEvent(const int64_t formId, Want &want, const s
  * @param formId Indicates the unique id of form.
  * @param want the want of the ability to start.
  * @param callerToken Caller ability token.
- * @return Returns true if execute success, false otherwise.
+ * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {

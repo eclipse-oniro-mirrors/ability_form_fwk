@@ -214,7 +214,7 @@ public:
      * @param formId Indicates the unique id of form.
      * @param want information passed to supplier.
      * @param callerToken Caller ability token.
-     * @return Returns true if execute success, false otherwise.
+     * @return Returns ERR_OK on success, others on failure.
      */
     virtual int MessageEvent(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken) override;
 
@@ -223,7 +223,7 @@ public:
      * @param formId Indicates the unique id of form.
      * @param want the want of the ability to start.
      * @param callerToken Caller ability token.
-     * @return Returns true if execute success, false otherwise.
+     * @return Returns ERR_OK on success, others on failure.
      */
     virtual int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override;
 
@@ -232,7 +232,7 @@ public:
      * @param formId Indicates the unique id of form.
      * @param want the want which carries the insight intent execute param.
      * @param callerToken Caller ability token.
-     * @return Returns true if execute success, false otherwise.
+     * @return Returns ERR_OK on success, others on failure.
      */
     virtual int InsightIntentEvent(const int64_t formId, Want &want,
         const sptr<IRemoteObject> &callerToken) override;
@@ -242,7 +242,7 @@ public:
      * @param formId Indicates the unique id of form.
      * @param want the want of the ability to start.
      * @param callerToken Caller ability token.
-     * @return Returns true if execute success, false otherwise.
+     * @return Returns ERR_OK on success, others on failure.
      */
     virtual int BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override;
 

@@ -53,7 +53,7 @@ namespace {
 constexpr int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 constexpr const char* PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
 
-// 拼接提供方 fullTokenId（高 32 位 tokenAttr + 低 32 位 hapTokenId），查询失败返回 0。
+// Compose the provider fullTokenId (high 32 bits tokenAttr + low 32 bits hapTokenId); returns 0 on failure.
 uint64_t GetProviderFullTokenId(const std::string &bundleName, const int32_t userId)
 {
     if (bundleName.empty()) {
@@ -75,15 +75,17 @@ uint64_t GetProviderFullTokenId(const std::string &bundleName, const int32_t use
     return (static_cast<uint64_t>(hapInfo.tokenAttr) << TOKEN_ID_BIT_SIZE) + tokenId;
 }
 
-// 意图执行目标是提供方模块的入口 UIAbility（module.json5 的 mainElement，如 EntryAbility），
-// 而非提供卡片的 FormExtensionAbility（record.abilityName）。AMS 侧 GenerateWant 以该
-// abilityName 设置 element，并与装饰器/配置条目声明的 abilityName 严格比对，若回填
-// FormExtensionAbility 名会导致 "ability name mismatch" 且拉起目标错误。
-std::string GetProviderMainElement(const FormRecord &record, const int32_t userId)
+// The intent execution target is the provider module's entry UIAbility (mainElement in
+// module.json5, e.g. EntryAbility), not the FormExtensionAbility providing the form
+// (record.abilityName). AMS sets the element with this abilityName and strictly matches
+// it with the declared one; backfilling the FormExtensionAbility name causes mismatch.
+std::string GetProviderMainElement(const FormRecord &record)
 {
     BundleInfo bundleInfo;
     const int32_t flags = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_HAP_MODULE);
-    if (!FormBmsHelper::GetInstance().GetBundleInfoByFlags(record.bundleName, flags, userId, bundleInfo)) {
+    // Query in the provider's user space; in multi-user scenarios it may differ from the caller user.
+    if (!FormBmsHelper::GetInstance().GetBundleInfoByFlags(
+        record.bundleName, flags, record.providerUserId, bundleInfo)) {
         HILOG_ERROR("GetBundleInfoByFlags failed, bundleName:%{public}s", record.bundleName.c_str());
         return "";
     }
@@ -97,16 +99,16 @@ std::string GetProviderMainElement(const FormRecord &record, const int32_t userI
     return "";
 }
 
-// 从宿主 want 提取意图执行参数并回填提供方信息，返回 ERR_OK 或对应错误码。
-int PrepareInsightIntentParam(Want &want, const FormRecord &record, const int32_t callerUserId,
-    InsightIntentExecuteParam &executeParam)
+// Extract intent execute params from the host want and backfill provider info; returns ERR_OK or an error code.
+int PrepareInsightIntentParam(Want &want, const FormRecord &record, InsightIntentExecuteParam &executeParam)
 {
     if (!InsightIntentExecuteParam::GenerateFromWant(want, executeParam)) {
         HILOG_ERROR("GenerateFromWant failed");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    // 宿主 want 可携带 postCardAction 透传的目标三元组：已传入字段保持用户值，
-    // 仅缺失时按 FormRecord 回填提供方信息（AMS 侧要求三项最终非空）。
+    // The host want may carry the target triple passed through by postCardAction: fields
+    // already provided keep the user values; only missing ones are backfilled from
+    // FormRecord (AMS requires all three to be non-empty in the end).
     if (executeParam.bundleName_.empty()) {
         executeParam.bundleName_ = record.bundleName;
     }
@@ -114,9 +116,7 @@ int PrepareInsightIntentParam(Want &want, const FormRecord &record, const int32_
         executeParam.moduleName_ = record.moduleName;
     }
     if (executeParam.abilityName_.empty()) {
-        // 用户未传 abilityName 时回填提供方模块 mainElement（入口 UIAbility）。
-        // record.abilityName 为 FormExtensionAbility 名，不能作为意图执行目标。
-        executeParam.abilityName_ = GetProviderMainElement(record, callerUserId);
+        executeParam.abilityName_ = GetProviderMainElement(record);
         if (executeParam.abilityName_.empty()) {
             HILOG_ERROR("empty mainElement, bundleName:%{public}s, moduleName:%{public}s",
                 record.bundleName.c_str(), record.moduleName.c_str());
@@ -126,7 +126,8 @@ int PrepareInsightIntentParam(Want &want, const FormRecord &record, const int32_
     return ERR_OK;
 }
 
-// 卡片标识参数以系统保留键塞入 want，同 RouterEvent（int/string 分支防 JS 精度溢出）。
+// Put form identity params into the want with system reserved keys, same as RouterEvent
+// (int/string branches prevent JS precision overflow).
 void SetFormIdentityParams(Want &want, const int64_t formId)
 {
     if (formId < MAX_NUMBER_OF_JS) {
@@ -265,8 +266,8 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         }
     }
 
-    // 进入 AMS 前输出完整 want（含路由目标与透传参数），便于排查 router 参数；
-    // want 可能携带卡片业务数据，整体以 private 输出。
+    // Log the full want (routing target and passed-through params) before entering AMS for
+    // troubleshooting; the want may carry form business data, so log it entirely as private.
     HILOG_INFO("RouterEvent send to ams, want: %{private}s", want.ToString().c_str());
 
     if (!want.GetUriString().empty()) {
@@ -378,20 +379,19 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
         HILOG_ERROR("not exist such form:%{public}" PRId64 "", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    // insightIntent 仅开放给预置系统应用的卡片提供方，不放行系统签名应用。
+    // insightIntent is only open to preset system app form providers, not system-signed apps.
     if (!record.isSystemApp) {
         HILOG_ERROR("insightIntent rejected, provider is not system app, "
             "bundleName:%{public}s", record.bundleName.c_str());
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
-    const int32_t callerUserId = FormCommonAdapter::GetInstance().GetCallingUserId();
     const uint64_t providerFullTokenId = GetProviderFullTokenId(record.bundleName, record.providerUserId);
     if (providerFullTokenId == 0) {
         HILOG_ERROR("get provider fullTokenId failed, bundleName:%{public}s", record.bundleName.c_str());
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
     InsightIntentExecuteParam executeParam;
-    int32_t result = PrepareInsightIntentParam(want, record, callerUserId, executeParam);
+    int32_t result = PrepareInsightIntentParam(want, record, executeParam);
     if (result != ERR_OK) {
         return result;
     }
@@ -401,7 +401,8 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
         HILOG_ERROR("null insightIntentHostClient");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    // key = matchedFormId（意图执行回调句柄）；formId 以系统保留键塞入 wantParams（同 router）。
+    // matchedFormId serves as the intent execute callback key; formId goes into wantParams
+    // via the system reserved key (same as router).
     SetFormIdentityParams(want, matchedFormId);
     result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecifyTokenId(
         static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, want.GetParams(),
