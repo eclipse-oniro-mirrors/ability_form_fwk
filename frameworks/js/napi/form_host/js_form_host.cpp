@@ -576,7 +576,7 @@ private:
     bool GetStringsValue(napi_env env, napi_value array, std::vector<std::string> &strList)
     {
         bool isArray = false;
-        if(napi_is_array(env, array, &isArray)) {
+        if (napi_is_array(env, array, &isArray)) {
             HILOG_ERROR("napi_is_array failed");
             return false;
         }
