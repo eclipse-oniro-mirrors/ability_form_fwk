@@ -127,7 +127,7 @@ public:
     {
         return ZERO_NUM;
     }
-    int InsightIntentEvent(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken) override
+    int InsightIntentEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override
     {
         return ZERO_NUM;
     }

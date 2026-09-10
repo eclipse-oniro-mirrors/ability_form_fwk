@@ -53,26 +53,19 @@ namespace {
 constexpr int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 constexpr const char* PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
 
-// Compose the provider fullTokenId (high 32 bits tokenAttr + low 32 bits hapTokenId); returns 0 on failure.
-uint64_t GetProviderFullTokenId(const std::string &bundleName, const int32_t userId)
+// Get the provider specify token id (hapTokenId) for permission checking; returns 0 on failure.
+uint32_t GetProviderSpecifyTokenId(const std::string &bundleName, const int32_t userId)
 {
     if (bundleName.empty()) {
         return 0;
     }
-    const auto tokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(userId, bundleName, 0);
-    if (tokenId == 0) {
+    const auto specifyTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(userId, bundleName, 0);
+    if (specifyTokenId == 0) {
         HILOG_ERROR("GetHapTokenID failed, userId:%{public}d, bundleName:%{public}s",
             userId, bundleName.c_str());
         return 0;
     }
-    Security::AccessToken::HapTokenInfo hapInfo;
-    if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo)
-        != Security::AccessToken::AccessTokenKitRet::RET_SUCCESS) {
-        HILOG_ERROR("GetHapTokenInfo failed, bundleName:%{public}s", bundleName.c_str());
-        return 0;
-    }
-    constexpr int32_t TOKEN_ID_BIT_SIZE = 32;
-    return (static_cast<uint64_t>(hapInfo.tokenAttr) << TOKEN_ID_BIT_SIZE) + tokenId;
+    return specifyTokenId;
 }
 
 // The intent execution target is the provider module's entry UIAbility (mainElement in
@@ -365,7 +358,7 @@ int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
     return ERR_OK;
 }
 
-int FormEventAdapter::InsightIntentEvent(const int64_t formId, const Want &want,
+int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("call");
@@ -385,16 +378,13 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, const Want &want,
             "bundleName:%{public}s", record.bundleName.c_str());
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
-    const uint64_t providerFullTokenId = GetProviderFullTokenId(record.bundleName, record.providerUserId);
-    if (providerFullTokenId == 0) {
-        HILOG_ERROR("get provider fullTokenId failed, bundleName:%{public}s", record.bundleName.c_str());
+    const uint32_t providerSpecifyTokenId = GetProviderSpecifyTokenId(record.bundleName, record.providerUserId);
+    if (providerSpecifyTokenId == 0) {
+        HILOG_ERROR("get provider specifyTokenId failed, bundleName:%{public}s", record.bundleName.c_str());
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
-    // Copy the host want locally: the wantParams sent to AMS needs the form identity
-    // params appended (system reserved keys), while the caller's want stays read-only.
-    Want executeWant(want);
     InsightIntentExecuteParam executeParam;
-    int32_t result = PrepareInsightIntentParam(executeWant, record, executeParam);
+    int32_t result = PrepareInsightIntentParam(want, record, executeParam);
     if (result != ERR_OK) {
         return result;
     }
@@ -406,10 +396,10 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, const Want &want,
     }
     // matchedFormId serves as the intent execute callback key; formId goes into wantParams
     // via the system reserved key (same as router).
-    SetFormIdentityParams(executeWant, matchedFormId);
+    SetFormIdentityParams(want, matchedFormId);
     result = FormAmsHelper::GetInstance().ExecuteIntentWithSpecifyTokenId(
-        static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, executeWant.GetParams(),
-        providerFullTokenId, callerToken);
+        static_cast<uint64_t>(matchedFormId), insightIntentHostClient, executeParam, want.GetParams(),
+        providerSpecifyTokenId, callerToken);
     if (result != ERR_OK) {
         HILOG_ERROR("fail ExecuteIntentWithSpecifyTokenId, result:%{public}d", result);
         return result;

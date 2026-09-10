@@ -160,7 +160,7 @@ public:
     ErrCode ExecuteIntentWithSpecifyTokenId(uint64_t key,
         const sptr<AbilityRuntime::InsightIntentHostClient> &insightIntentHostClient,
         const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams,
-        uint64_t specifyTokenId, const sptr<IRemoteObject> &callerToken);
+        uint32_t specifyTokenId, const sptr<IRemoteObject> &callerToken);
 private:
     /**
      * @brief acquire a form ability manager, if it not existed,

@@ -349,7 +349,7 @@ ErrCode FormAmsHelper::StartAbilityByCallerToken(const Want &want, const sptr<IR
 ErrCode FormAmsHelper::ExecuteIntentWithSpecifyTokenId(uint64_t key,
     const sptr<AbilityRuntime::InsightIntentHostClient> &insightIntentHostClient,
     const InsightIntentExecuteParam &param, const AAFwk::WantParams &wantParams,
-    uint64_t specifyTokenId, const sptr<IRemoteObject> &callerToken)
+    uint32_t specifyTokenId, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("call");
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();

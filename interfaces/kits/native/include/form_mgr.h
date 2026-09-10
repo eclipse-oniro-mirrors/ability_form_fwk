@@ -241,7 +241,7 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int InsightIntentEvent(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken);
+    int InsightIntentEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken);
 
     /**
      * @brief Process Background event.
