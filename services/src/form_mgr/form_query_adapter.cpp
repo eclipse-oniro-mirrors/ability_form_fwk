@@ -278,6 +278,7 @@ int FormQueryAdapter::AcquireFormData(int64_t formId, int64_t requestCode, const
         new (std::nothrow) FormAcquireDataConnection(formId, bundleName, abilityName, requestCode, userId);
     if (connection == nullptr) {
         HILOG_ERROR("create FormAcquireDataConnection failed");
+        FormDataMgr::GetInstance().RemoveFormAcquireDataRecord(requestCode);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     Want targetWant;
@@ -289,6 +290,7 @@ int FormQueryAdapter::AcquireFormData(int64_t formId, int64_t requestCode, const
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(targetWant, connection);
     if (errorCode != ERR_OK) {
         HILOG_ERROR("ConnectServiceAbility failed");
+        FormDataMgr::GetInstance().RemoveFormAcquireDataRecord(requestCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;

@@ -2067,6 +2067,17 @@ bool FormDataMgr::CreateFormAcquireDataRecord(int64_t requestCode, const FormIte
     return false;
 }
 
+void FormDataMgr::RemoveFormAcquireDataRecord(int64_t requestCode)
+{
+    std::lock_guard<std::mutex> lock(formAcquireDataRecordMutex_);
+    auto iter = formAcquireDataRecord_.find(requestCode);
+    if (iter == formAcquireDataRecord_.end()) {
+        return;
+    }
+    iter->second.CleanResource();
+    formAcquireDataRecord_.erase(iter);
+}
+
 ErrCode FormDataMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams, int64_t requestCode)
 {
     std::lock_guard<std::mutex> lock(formAcquireDataRecordMutex_);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -296,6 +296,11 @@ bool FormCacheMgr::AddImgDataToDb(
     auto imgCache = formProviderData.GetImageDataMap();
     HILOG_DEBUG("AddImgDataToDb imgCache size:%{public}zu", imgCache.size());
     for (const auto &iter : imgCache) {
+        // Trust boundary: imageDataMap may come from IPC or in-process callers, so check each entry.
+        if (iter.second.first == nullptr || iter.second.second < 0) {
+            HILOG_ERROR("invalid image data, imgName:%{public}s", iter.first.c_str());
+            return false;
+        }
         int64_t rowId = INVALID_INDEX;
         std::vector<uint8_t> value;
         bool ret = GetImageDataFromAshmem(

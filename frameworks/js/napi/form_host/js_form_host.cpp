@@ -3645,7 +3645,12 @@ bool JsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
 ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap)
 {
     HILOG_INFO("call");
-    if (getLiveFormStatusEnv_ == nullptr) {
+    napi_env env = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(registerGetLiveFormStatusProxyMutex_);
+        env = getLiveFormStatusEnv_;
+    }
+    if (env == nullptr) {
         HILOG_ERROR("getLiveFormStatusEnv_ is nullptr");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
@@ -3658,11 +3663,12 @@ ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, 
         dataParam->condition.notify_all();
     };
 
-    if (getLiveFormStatusEnv_ == nullptr) {
-        HILOG_ERROR("null getLiveFormStatusEnv_");
+    // If posting fails the task never runs, so fail fast instead of waiting out the interface timeout.
+    napi_status status = napi_send_event(env, task, napi_eprio_immediate);
+    if (status != napi_ok) {
+        HILOG_ERROR("napi_send_event failed, status: %{public}d", static_cast<int>(status));
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    napi_send_event(getLiveFormStatusEnv_, task, napi_eprio_immediate);
     std::unique_lock<std::mutex> lock(dataParam->mutex);
     dataParam->condition.wait_for(
         lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
@@ -4360,7 +4366,17 @@ bool JsFormRouterProxyMgr::ParseWantParamsArray(napi_value funcResult,
     }
 
     uint32_t arrayLength = 0;
-    napi_get_array_length(formWantCallbackEnv_, funcResult, &arrayLength);
+    napi_status lengthStatus = napi_get_array_length(formWantCallbackEnv_, funcResult, &arrayLength);
+    if (lengthStatus != napi_ok) {
+        HILOG_ERROR("get array length failed, status: %{public}d", static_cast<int>(lengthStatus));
+        return false;
+    }
+    // The length is app-controlled (JS callback result), so cap it with the existing form-id bound.
+    if (arrayLength > MAX_FORM_IDS_COUNT) {
+        HILOG_ERROR("callback result size %{public}u exceeds maximum %{public}u",
+            arrayLength, MAX_FORM_IDS_COUNT);
+        return false;
+    }
     for (uint32_t i = 0; i < arrayLength; i++) {
         napi_value element = nullptr;
         napi_get_element(formWantCallbackEnv_, funcResult, i, &element);
