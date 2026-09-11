@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -150,8 +150,8 @@ bool FormTimerMgr::AddFormTimerForMultiUpdate(int64_t formId, std::vector<std::v
             HILOG_ERROR("Insufficient length");
             return false;
         }
-        if (time[0] < Constants::MIN_TIME || time[0] > Constants::MAX_HOUR
-            || time[1] < Constants::MIN_TIME || time[1] > Constants::MAX_MINUTE) {
+        if (time[0] < Constants::MIN_TIME || time[0] > Constants::MAX_HOUR ||
+            time[1] < Constants::MIN_TIME || time[1] > Constants::MAX_MINUTE) {
             HILOG_ERROR("Invalid time value, hour:%{public}d, min:%{public}d", (int)time[0], (int)time[1]);
             return false;
         }
@@ -243,8 +243,8 @@ bool FormTimerMgr::UpdateFormTimer(int64_t formId, const UpdateType &type, const
  */
 bool FormTimerMgr::UpdateIntervalValue(int64_t formId, const FormTimerCfg &timerCfg)
 {
-    if (timerCfg.updateDuration < 0 || timerCfg.updateDuration > Constants::MAX_PERIOD
-        || (timerCfg.updateDuration % Constants::MIN_PERIOD) != 0) {
+    if (timerCfg.updateDuration < 0 || timerCfg.updateDuration > Constants::MAX_PERIOD ||
+        (timerCfg.updateDuration % Constants::MIN_PERIOD) != 0) {
         HILOG_ERROR("invalid param");
         return false;
     }
@@ -284,7 +284,8 @@ bool FormTimerMgr::UpdateTimerValue(int64_t formId, const FormTimerCfg &timerCfg
         }
     }
 
-    if (changedItem.refreshTask.formId == 0) {
+    // Default-constructed FormTimer has formId -1; non-positive means no matching task was found.
+    if (changedItem.refreshTask.formId <= 0) {
         HILOG_ERROR("the updateAtTimer not exist");
         return false;
     }
@@ -324,10 +325,21 @@ bool FormTimerMgr::UpdateTimerValue(int64_t formId, const FormTimerCfg &timerCfg
  */
 bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerCfg)
 {
-    if (timerCfg.updateAtHour < Constants::MIN_TIME || timerCfg.updateAtHour > Constants::MAX_HOUR
-        || timerCfg.updateAtMin < Constants::MIN_TIME || timerCfg.updateAtMin > Constants::MAX_MINUTE) {
+    if (timerCfg.updateAtHour < Constants::MIN_TIME || timerCfg.updateAtHour > Constants::MAX_HOUR ||
+        timerCfg.updateAtMin < Constants::MIN_TIME || timerCfg.updateAtMin > Constants::MAX_MINUTE) {
         HILOG_ERROR("invalid time");
         return false;
+    }
+    for (const auto &time : timerCfg.updateAtTimes) {
+        if (time.size() < TIME_MIN_SIZE) {
+            HILOG_ERROR("Insufficient length");
+            return false;
+        }
+        if (time[0] < Constants::MIN_TIME || time[0] > Constants::MAX_HOUR ||
+            time[1] < Constants::MIN_TIME || time[1] > Constants::MAX_MINUTE) {
+            HILOG_ERROR("Invalid time value, hour:%{public}d, min:%{public}d", (int)time[0], (int)time[1]);
+            return false;
+        }
     }
     UpdateAtItem changedItem;
 
@@ -349,8 +361,8 @@ bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerC
  */
 bool FormTimerMgr::IntervalToAtTimer(int64_t formId, const FormTimerCfg &timerCfg)
 {
-    if (timerCfg.updateAtHour < Constants::MIN_TIME || timerCfg.updateAtHour > Constants::MAX_HOUR
-        || timerCfg.updateAtMin < Constants::MIN_TIME || timerCfg.updateAtMin > Constants::MAX_MINUTE) {
+    if (timerCfg.updateAtHour < Constants::MIN_TIME || timerCfg.updateAtHour > Constants::MAX_HOUR ||
+        timerCfg.updateAtMin < Constants::MIN_TIME || timerCfg.updateAtMin > Constants::MAX_MINUTE) {
         HILOG_ERROR("invalid time");
         return false;
     }
@@ -401,8 +413,8 @@ bool FormTimerMgr::IntervalToAtTimer(int64_t formId, const FormTimerCfg &timerCf
  */
 bool FormTimerMgr::AtTimerToIntervalTimer(int64_t formId, const FormTimerCfg &timerCfg)
 {
-    if (timerCfg.updateDuration < 0 || timerCfg.updateDuration > Constants::MAX_PERIOD
-        || (timerCfg.updateDuration % Constants::MIN_PERIOD) != 0) {
+    if (timerCfg.updateDuration < 0 || timerCfg.updateDuration > Constants::MAX_PERIOD ||
+        (timerCfg.updateDuration % Constants::MIN_PERIOD) != 0) {
         HILOG_ERROR("invalid time");
         return false;
     }
@@ -426,7 +438,8 @@ bool FormTimerMgr::AtTimerToIntervalTimer(int64_t formId, const FormTimerCfg &ti
         return false;
     }
 
-    if (targetItem.refreshTask.formId == 0) {
+    // Default-constructed FormTimer has formId -1; non-positive means no matching task was found.
+    if (targetItem.refreshTask.formId <= 0) {
         HILOG_ERROR("the updateAtTimer not exist");
         return false;
     }
@@ -875,7 +888,8 @@ bool FormTimerMgr::GetDynamicItem(int64_t formId, DynamicRefreshItem &dynamicIte
 void FormTimerMgr::SetTimeSpeed(int32_t timeSpeed)
 {
     HILOG_INFO("set time speed to:%{public}d", timeSpeed);
-    timeSpeed_ = timeSpeed;
+    // Enforce documented range; zero or negative speed would cause divide-by-zero in timer calc.
+    timeSpeed_ = std::clamp(timeSpeed, Constants::MIN_TIME_SPEED, Constants::MAX_TIME_SPEED);
     HandleResetLimiter();
     ClearIntervalTimer();
     FormPeriodReport();
@@ -1599,8 +1613,8 @@ void FormTimerMgr::TimerReceiver::OnReceiveEvent(const EventFwk::CommonEventData
         // Time speed must between 1 and 1000.
         auto timeSpeed = std::clamp(eventData.GetCode(), Constants::MIN_TIME_SPEED, Constants::MAX_TIME_SPEED);
         FormTimerMgr::GetInstance().SetTimeSpeed(timeSpeed);
-    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED
-        || action == EventFwk::CommonEventSupport::COMMON_EVENT_TIMEZONE_CHANGED) {
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED ||
+        action == EventFwk::CommonEventSupport::COMMON_EVENT_TIMEZONE_CHANGED) {
         FormTimerMgr::GetInstance().HandleSystemTimeChanged();
     } else if (action == Constants::ACTION_UPDATEATTIMER) {
         int type = want.GetIntParam(Constants::KEY_ACTION_TYPE, Constants::TYPE_STATIC_UPDATE);
@@ -1616,8 +1630,10 @@ void FormTimerMgr::TimerReceiver::OnReceiveEvent(const EventFwk::CommonEventData
         } else if (type == Constants::TYPE_DYNAMIC_UPDATE) {
             int updateTimeLeft = want.GetIntParam(Constants::KEY_WAKEUP_TIME_LEFT, -1);
             int updateTimeRight = want.GetIntParam(Constants::KEY_WAKEUP_TIME_RIGHT, -1);
-            int64_t updateTime = static_cast<int64_t>(((static_cast<uint64_t>(updateTimeLeft) <<
-                SHIFT_BIT_LENGTH) | static_cast<uint64_t>(updateTimeRight)));
+            // Reassemble by bit pattern: uint32_t casts avoid sign extension of negative halves.
+            uint64_t wakeUpTimeLeft = static_cast<uint32_t>(updateTimeLeft);
+            uint64_t wakeUpTimeRight = static_cast<uint32_t>(updateTimeRight);
+            int64_t updateTime = static_cast<int64_t>((wakeUpTimeLeft << SHIFT_BIT_LENGTH) | wakeUpTimeRight);
             if (updateTime <= 0) {
                 HILOG_ERROR("invalid updateTime:%{public}" PRId64 "", updateTime);
                 return;

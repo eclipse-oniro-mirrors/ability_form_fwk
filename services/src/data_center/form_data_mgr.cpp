@@ -1093,6 +1093,8 @@ void FormDataMgr::CleanHostRemovedForms(const std::vector<int64_t> &removedFormI
     std::lock_guard<std::mutex> lock(formHostRecordMutex_);
     std::vector<FormHostRecord>::iterator itHostRecord;
     for (itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
+        // Reset per host record; ids matched for one record must not leak into the next.
+        matchedIds.clear();
         for (const int64_t &formId : removedFormIds) {
             if (itHostRecord->Contains(formId)) {
                 matchedIds.emplace_back(formId);
