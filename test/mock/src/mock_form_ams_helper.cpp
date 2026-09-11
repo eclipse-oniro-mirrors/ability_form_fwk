@@ -52,5 +52,17 @@ ErrCode FormAmsHelper::ConnectServiceAbilityWithUserId(
     }
     return ERR_OK;
 }
+
+ErrCode FormAmsHelper::ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(const Want &want,
+    const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteLiteParam &param,
+    uint32_t specifyTokenId)
+{
+    GTEST_LOG_(INFO) << "ExecuteUIAbilityForegroundIntentWithSpecifyTokenId called";
+    if (AppExecFwk::MockFormAmsHelper::obj) {
+        return AppExecFwk::MockFormAmsHelper::obj->ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(
+            want, callerAbilityToken, param, specifyTokenId);
+    }
+    return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

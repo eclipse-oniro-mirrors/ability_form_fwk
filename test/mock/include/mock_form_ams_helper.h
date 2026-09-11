@@ -21,6 +21,7 @@
 #include "gmock/gmock.h"
 #include "want.h"
 #include "ability_connect_callback_interface.h"
+#include "insight_intent/insight_intent_execute_lite_param.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -33,6 +34,9 @@ public:
         const Want &want, const sptr<AAFwk::IAbilityConnection> &connect) = 0;
     virtual ErrCode ConnectServiceAbilityWithUserId(
         const Want &want, const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId) = 0;
+    virtual ErrCode ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(
+        const Want &want, const sptr<IRemoteObject> &callerAbilityToken,
+        const InsightIntentExecuteLiteParam &param, uint32_t specifyTokenId) = 0;
 };
 
 class MockFormAmsHelper : public AbstractMockFormAmsHelper {
@@ -45,6 +49,9 @@ public:
         const sptr<AAFwk::IAbilityConnection> &connect));
     MOCK_METHOD3(ConnectServiceAbilityWithUserId, ErrCode(const Want &want,
         const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId));
+    MOCK_METHOD4(ExecuteUIAbilityForegroundIntentWithSpecifyTokenId, ErrCode(const Want &want,
+        const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteLiteParam &param,
+        uint32_t specifyTokenId));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

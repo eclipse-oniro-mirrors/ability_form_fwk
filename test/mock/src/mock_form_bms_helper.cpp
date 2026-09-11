@@ -82,6 +82,16 @@ bool FormBmsHelper::GetBundleInfoWithPermission(const std::string &bundleName, i
     return false;
 }
 
+bool FormBmsHelper::GetBundleInfoByFlags(const std::string &bundleName, int32_t flags,
+    int32_t userId, BundleInfo &bundleInfo)
+{
+    GTEST_LOG_(INFO) << "GetBundleInfoByFlags called";
+    if (AppExecFwk::MockFormBmsHelper::obj) {
+        return AppExecFwk::MockFormBmsHelper::obj->GetBundleInfoByFlags(bundleName, flags, userId, bundleInfo);
+    }
+    return false;
+}
+
 ErrCode FormBmsHelper::GetEnabledCloneIndex(int32_t userId, const std::string &bundleName, int32_t &appIndex)
 {
     GTEST_LOG_(INFO) << "GetEnabledCloneIndex called";

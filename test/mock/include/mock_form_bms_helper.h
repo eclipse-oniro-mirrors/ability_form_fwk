@@ -36,6 +36,8 @@ public:
         AbilityInfo &abilityInfo, ExtensionAbilityInfo &extensionAbilityInfo) = 0;
     virtual bool GetBundleInfoWithPermission(const std::string &bundleName, int32_t userId,
         BundleInfo &bundleInfo) = 0;
+    virtual bool GetBundleInfoByFlags(const std::string &bundleName, int32_t flags,
+        int32_t userId, BundleInfo &bundleInfo) = 0;
     virtual ErrCode GetEnabledCloneIndex(int32_t userId, const std::string &bundleName,
         int32_t &appIndex) = 0;
     virtual int32_t GetUidByBundleName(const std::string &bundleName, int32_t userId, int32_t appIndex) = 0;
@@ -54,6 +56,8 @@ public:
         AbilityInfo &abilityInfo, ExtensionAbilityInfo &extensionAbilityInfo));
     MOCK_METHOD3(GetBundleInfoWithPermission, bool(const std::string &bundleName, int32_t userId,
         BundleInfo &bundleInfo));
+    MOCK_METHOD4(GetBundleInfoByFlags, bool(const std::string &bundleName, int32_t flags,
+        int32_t userId, BundleInfo &bundleInfo));
     MOCK_METHOD3(GetEnabledCloneIndex, ErrCode(int32_t userId, const std::string &bundleName, int32_t &appIndex));
     MOCK_METHOD3(GetUidByBundleName, int32_t(const std::string &bundleName, int32_t userId, int32_t appIndex));
 };
