@@ -21,6 +21,7 @@
 #include "fms_log_wrapper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
+#include "feature/bundle_lock/form_exempt_lock_mgr.h"
 #include "data_center/form_cache_mgr.h"
 #include "form_constants.h"
 #include "form_constants_util.h"
@@ -3569,6 +3570,9 @@ void FormDataMgr::DeleteRecordTempForms(const std::vector<int64_t> &recordTempFo
     for (const auto &pair : deletedRecords) {
         FormProviderMgr::GetInstance().NotifyProviderFormDelete(pair.first, pair.second);
         FormDataProxyMgr::GetInstance().UnsubscribeFormData(pair.first);
+        // Temp form is terminated, clean its cache; normal forms unaffected
+        FormCacheMgr::GetInstance().DeleteData(pair.first);
+        FormExemptLockMgr::GetInstance().SetExemptLockStatus(pair.first, false);
     }
     if (hadNetCondition && !HasNetworkConditionForm()) {
         NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();

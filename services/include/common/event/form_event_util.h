@@ -43,6 +43,7 @@ public:
         const std::vector<FormInfo> &targetForms, const BundleInfo &bundleInfo);
     static bool ProviderFormUpdated(int64_t formId, FormRecord &formRecord, const BundlePackInfo &bundlePackInfo,
         const BundleInfo &bundleInfo);
+    static void RemoveUpdatedForm(FormRecord &formRecord, std::vector<int64_t> &removedForms);
     static void ClearFormDBRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap);
     static void ClearTempFormRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap);
     static void BatchDeleteNoHostTempForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
