@@ -62,7 +62,6 @@ namespace {
     const std::set<std::string> FORM_LISTENER_TYPE = {
         FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE, GET_FORM_RECT, GET_LIVE_FORM_STATUS
     };
-    constexpr int32_t CALL_INRTERFACE_TIMEOUT_MILLS = 10;
     constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
     constexpr int32_t REQUEST_CODE_SEQ_BITS = 16;
 
@@ -3655,23 +3654,17 @@ ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, 
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_ptr<LiveFormInterfaceParam> dataParam = std::make_shared<LiveFormInterfaceParam>();
-    auto task = [dataParam] () {
-        JsFormRouterProxyMgr::GetInstance()->GetLiveFormStatusInner(dataParam.get());
-        HILOG_INFO("getLiveFormStatus start notify.");
-        std::unique_lock<std::mutex> lock(dataParam->mutex);
-        dataParam->isReady = true;
-        dataParam->condition.notify_all();
-    };
-
-    // If posting fails the task never runs, so fail fast instead of waiting out the interface timeout.
-    napi_status status = napi_send_event(env, task, napi_eprio_immediate);
-    if (status != napi_ok) {
-        HILOG_ERROR("napi_send_event failed, status: %{public}d", static_cast<int>(status));
+    auto runner = EventRunner::GetMainEventRunner();
+    if (runner == nullptr) {
+        HILOG_ERROR("GetMainEventRunner returned nullptr");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    std::unique_lock<std::mutex> lock(dataParam->mutex);
-    dataParam->condition.wait_for(
-        lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
+    std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(runner);
+    std::function<void()> executeFunc = [dataParam]() {
+        JsFormRouterProxyMgr::GetInstance()->GetLiveFormStatusInner(dataParam.get());
+    };
+    mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::GetLiveFormStatus");
+
     bool result = dataParam->result;
     liveFormStatusMap = std::move(dataParam->liveFormStatusMap);
     return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
