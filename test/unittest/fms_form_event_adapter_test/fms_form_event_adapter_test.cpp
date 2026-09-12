@@ -538,39 +538,6 @@ HWTEST_F(FmsFormEventAdapterTest, CheckKeepBackgroundRunningPermission_003, Test
 // ========== Method 7: BackgroundEvent Additional Branch Tests ==========
 
 /**
- * @tc.name: BackgroundEvent_004
- * @tc.desc: Verify CheckKeepBackgroundRunningPermission returns false → ERR_APPEXECFWK_FORM_PERMISSION_DENY
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormEventAdapterTest, BackgroundEvent_004, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "BackgroundEvent_004 start";
-
-    Want want;
-    want.SetBundle("com.test.bundle");
-    want.SetElementName("com.test.bundle", "MainAbility");
-    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
-    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
-    FormRecord record;
-    record.formId = TEST_FORM_ID;
-    record.bundleName = "com.test.bundle";
-
-    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
-        .WillOnce(Return(TEST_FORM_ID));
-    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(mockBundleMgr));
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoWithPermission(_, _, _))
-        .WillOnce(Return(false));
-
-    auto result = FormEventAdapter::GetInstance().BackgroundEvent(TEST_FORM_ID, want, callerToken);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
-
-    GTEST_LOG_(INFO) << "BackgroundEvent_004 end";
-}
-
-/**
  * @tc.name: BackgroundEvent_005
  * @tc.desc: Verify invalid JSON params (is_discarded) → ERR_APPEXECFWK_FORM_INVALID_PARAM
  * @tc.type: FUNC

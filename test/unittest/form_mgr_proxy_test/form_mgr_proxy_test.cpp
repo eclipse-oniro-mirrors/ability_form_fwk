@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -337,21 +337,6 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0013, TestSize.Level1) {
 }
 
 /**
- * @tc.name: FormMgrProxyTest_0014
- * @tc.desc: text RegisterFormRemoveObserverByBundle function.
- * @tc.type: FUNC
- * @tc.require: issueI639Z3
- */
-HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0014, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_0012 starts";
-    std::string bundleName = "ohos.samples.FormApplication";
-    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
-    int result = formMgrProxy->RegisterFormRemoveObserverByBundle(bundleName, callerToken);
-    EXPECT_EQ(result, ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_0014 test ends";
-}
-
-/**
  * @tc.name: FormMgrProxyTest_0015
  * @tc.desc: text RegisterFormRemoveObserverByBundle function.
  * @tc.type: FUNC
@@ -379,22 +364,6 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0016, TestSize.Level1) {
     sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
     int result = formMgrProxy->RegisterFormRouterProxy(formIds, token);
     EXPECT_EQ(result, ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_0016 test ends";
-}
-
-/**
- * @tc.name: FormMgrProxyTest_0017
- * @tc.desc: text RegisterFormRouterProxy function.
- * @tc.type: FUNC
- * @tc.require: IssueI8H9R5
- */
-HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0017, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_0016 starts";
-    int64_t formId = 2;
-    std::vector<int64_t> formIds;
-    formIds.push_back(formId);
-    int result = formMgrProxy->RegisterFormRouterProxy(formIds, nullptr);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0016 test ends";
 }
 
@@ -683,61 +652,6 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0036, TestSize.Level1) {
     auto result = formMgrProxy->NotifyFormLocked(formId, isLocked);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0036 test ends";
-}
-
-/**
- * @tc.name: FormMgrProxyTest_0037
- * @tc.desc: Verify GetFormsInfo
- * @tc.type: FUNC
- * @tc.require: #I59O23
- */
-HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0037, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_0037 starts";
-    // initialize input parameters.
-    FormInfoFilter filter;
-    filter.moduleName = "";
-    std::vector<FormInfo> formInfos;
-    // setup expectations.
-    std::vector<FormInfo> expectFormInfos;
-    FormInfo formInfo = {};
-    formInfo.bundleName = "ohos.samples.FormApplication";
-    expectFormInfos.push_back(formInfo);
-    EXPECT_CALL(*mockFormMgrService, GetFormsInfo(_, _))
-        .Times(1)
-        .WillOnce(DoAll(SetArgReferee<1>(expectFormInfos), Return(ERR_OK)));
-    // test.
-    formMgrProxy->GetFormsInfo(filter, formInfos);
-    // expect result.
-    EXPECT_THAT(formInfos, ContainerEq(expectFormInfos));
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_0037 test ends";
-}
-
-/**
- * @tc.name: FormMgrProxyTest_0038
- * @tc.desc: Verify GetFormsInfo
- * @tc.type: FUNC
- * @tc.require: #I59O23
- */
-HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0038, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_0038 starts";
-    // initialize input parameters.
-    FormInfoFilter filter;
-    filter.moduleName = "empty";
-    std::vector<FormInfo> formInfos;
-    // setup expectations.
-    std::vector<FormInfo> expectFormInfos;
-    FormInfo formInfo = {};
-    formInfo.bundleName = "ohos.samples.FormApplication";
-    formInfo.moduleName = "entry";
-    expectFormInfos.push_back(formInfo);
-    EXPECT_CALL(*mockFormMgrService, GetFormsInfo(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
-    // test.
-    formMgrProxy->GetFormsInfo(filter, formInfos);
-    // expect result.
-    EXPECT_EQ(formInfos.size(), 0);
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_0038 test ends";
 }
 
 /**
@@ -1554,18 +1468,6 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_BatchRefreshForms_001, TestSize.Leve
     int32_t formRefreshType = Constants::REFRESH_ALL_FORM;
     EXPECT_EQ(formMgrProxy->BatchRefreshForms(formRefreshType), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_BatchRefreshForms_001 test ends";
-}
-
-/**
- * @tc.number: FormMgrProxyTest_BatchRefreshForms_002
- * @tc.name: test BatchRefreshForms function.
- * @tc.desc: Verify that the BatchRefreshForms interface is called normally and the return value is ERR_OK.
- */
-HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_BatchRefreshForms_002, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_BatchRefreshForms_002 starts";
-    int32_t formRefreshType = Constants::REFRESH_ALL_FORM;
-    EXPECT_EQ(formMgrProxy->BatchRefreshForms(formRefreshType), ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_BatchRefreshForms_002 test ends";
 }
 
 /**

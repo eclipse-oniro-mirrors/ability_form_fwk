@@ -106,7 +106,7 @@ void EtsLiveFormExtensionImpl::BindMethod(ani_env *env)
     }
     std::array functions = {
         ani_native_function { "nativeSetWindowBackgroundColor", nullptr,
-            reinterpret_cast<ani_int*>(EtsLiveFormExtensionImpl::SetWindowBackgroundColor) },
+            reinterpret_cast<void *>(EtsLiveFormExtensionImpl::SetWindowBackgroundColor) },
         ani_native_function { "nativeSetFontScale", SIGNATURE_SET_FONT_SCALE,
             reinterpret_cast<void *>(EtsLiveFormExtensionImpl::SetFontScale) },
         };
@@ -137,7 +137,7 @@ EtsLiveFormExtensionImpl* EtsLiveFormExtensionImpl::GetEtsEtsLiveForm(ani_env *e
     return etsLiveForm;
 }
 
-void EtsLiveFormExtensionImpl::SetWindowBackgroundColor(ani_env *env, ani_object obj, ani_object callback)
+void EtsLiveFormExtensionImpl::SetWindowBackgroundColor(ani_env *env, ani_object obj)
 {
     HILOG_INFO("called");
     if (env == nullptr) {
@@ -149,10 +149,10 @@ void EtsLiveFormExtensionImpl::SetWindowBackgroundColor(ani_env *env, ani_object
         HILOG_ERROR("null etsContext");
         return;
     }
-    etsContext->OnSetWindowBackgroundColor(env, callback);
+    etsContext->OnSetWindowBackgroundColor(env);
 }
 
-void EtsLiveFormExtensionImpl::OnSetWindowBackgroundColor(ani_env *env, ani_object callback)
+void EtsLiveFormExtensionImpl::OnSetWindowBackgroundColor(ani_env *env)
 {
     if (env == nullptr) {
         HILOG_ERROR("null env");
@@ -160,20 +160,15 @@ void EtsLiveFormExtensionImpl::OnSetWindowBackgroundColor(ani_env *env, ani_obje
     }
     if (!context_) {
         HILOG_ERROR("null context");
-        AsyncCallback(env, callback,
-            EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
-            FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)), nullptr);
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR);
         return;
     }
     bool isSuccess = context_->SetWindowBackgroundColor();
     if (!isSuccess) {
         HILOG_ERROR("SetWindowBackgroundColor failed");
-        AsyncCallback(env, callback,
-            EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
-            FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)), nullptr);
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR);
         return;
     }
-    AsyncCallback(env, callback, EtsFormErrorUtil::CreateError(env, ERR_OK), nullptr);
 }
 
 void EtsLiveFormExtensionImpl::SetFontScale(ani_env *env, ani_object aniObj, ani_double fontScale)

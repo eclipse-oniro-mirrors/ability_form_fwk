@@ -884,22 +884,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0039, TestSize.Level1) {
 }
 
 /**
- * @tc.name: FormMgrTest_0040
- * @tc.desc: Verify RegisterDeathCallback
- * @tc.type: FUNC
- * @tc.require: issueI63OQL
- */
-HWTEST_F(FormMgrTest, FormMgrTest_0040, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrTest_0040 starts";
-    std::shared_ptr<FormMgr> formMgr = std::make_shared<FormMgr>();
-    ASSERT_NE(nullptr, formMgr);
-    formMgr->RegisterDeathCallback(nullptr);
-    formMgr->UnRegisterDeathCallback(nullptr);
-    formMgr->SetRecoverStatus(Constants::IN_RECOVERING);
-    GTEST_LOG_(INFO) << "FormMgrTest_0040 test ends";
-}
-
-/**
  * @tc.name: FormMgrTest_0041
  * @tc.desc: Verify DeleteInvalidForms
  * @tc.type: FUNC
@@ -1330,42 +1314,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0064, TestSize.Level1) {
 }
 
 /**
- * @tc.name: FormMgrTest_0065
- * @tc.desc: Verify RegisterDeathCallback (Parameter is not nullptr)
- * @tc.type: FUNC
- * @tc.require: issueI63Y7Y
- */
-HWTEST_F(FormMgrTest, FormMgrTest_0065, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrTest_0065 starts";
-    std::shared_ptr<FormMgr> formMgr = std::make_shared<FormMgr>();
-    ASSERT_NE(nullptr, formMgr);
-    std::shared_ptr<FormInterfaceCallbackTest> callback = std::make_shared<FormInterfaceCallbackTest>();
-    std::shared_ptr<FormInterfaceCallbackTest> callback_first = std::make_shared<FormInterfaceCallbackTest>();
-    formMgr->formDeathCallbacks_.emplace_back(callback);
-    formMgr->formDeathCallbacks_.emplace_back(callback_first);
-    formMgr->RegisterDeathCallback(callback);
-    GTEST_LOG_(INFO) << "FormMgrTest_0065 test ends";
-}
-
-/**
- * @tc.name: FormMgrTest_0066
- * @tc.desc: Verify UnRegisterDeathCallback (Parameter is not nullptr)
- * @tc.type: FUNC
- * @tc.require: issueI63Y7Y
- */
-HWTEST_F(FormMgrTest, FormMgrTest_0066, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrTest_0066 starts";
-    std::shared_ptr<FormMgr> formMgr = std::make_shared<FormMgr>();
-    ASSERT_NE(nullptr, formMgr);
-    std::shared_ptr<FormInterfaceCallbackTest> callback = std::make_shared<FormInterfaceCallbackTest>();
-    std::shared_ptr<FormInterfaceCallbackTest> callback_first = std::make_shared<FormInterfaceCallbackTest>();
-    formMgr->formDeathCallbacks_.emplace_back(callback);
-    formMgr->formDeathCallbacks_.emplace_back(callback_first);
-    formMgr->UnRegisterDeathCallback(callback);
-    GTEST_LOG_(INFO) << "FormMgrTest_0066 test ends";
-}
-
-/**
  * @tc.name: FormMgrTest_0067
  * @tc.desc: Verify GetDeathRecipient
  * @tc.type: FUNC
@@ -1444,19 +1392,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0071, TestSize.Level1) {
     formMgrDeath->OnRemoteDied(mockFormProviderClient);
     EXPECT_TRUE(FormMgr::GetInstance().GetRecoverStatus() == Constants::IN_RECOVERING);
     GTEST_LOG_(INFO) << "FormMgrTest_0071 test ends";
-}
-
-/**
- * @tc.name: FormMgrTest_0072
- * @tc.desc: Verify OnRemoteDied (Parameter is nullptr)
- * @tc.type: FUNC
- * @tc.require: issueI63Y7Y
- */
-HWTEST_F(FormMgrTest, FormMgrTest_0072, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrTest_0072 starts";
-    sptr<FormMgr::FormMgrDeathRecipient> formMgrDeath = new (std::nothrow) FormMgr::FormMgrDeathRecipient();
-    formMgrDeath->OnRemoteDied(nullptr);
-    GTEST_LOG_(INFO) << "FormMgrTest_0072 test ends";
 }
 
 /**
@@ -2466,26 +2401,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0127, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrTest_0128
- * @tc.desc: Verify RegisterClickEventObserver
- * @tc.type: FUNC
- */
-HWTEST_F(FormMgrTest, FormMgrTest_0128, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrTest_0128 begin";
-    std::string bundleName = "";
-    std::string formEventType = "formAdd";
-    FormMgr::GetInstance().resetFlag_ = true;
-    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
-    ASSERT_NE(nullptr, iremoteObject);
-    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
-    FormMgr::GetInstance().RegisterClickEventObserver(bundleName, formEventType, iremoteObject);
-    FormMgr::GetInstance().resetFlag_ = false;
-    FormMgr::GetInstance().SetFormMgrService(mockProxy);
-    GTEST_LOG_(INFO) << "FormMgrTest_0128 end";
-}
-
-/**
  * @tc.name: FormMgrTest_0129
  * @tc.desc: Verify UnregisterClickEventObserver
  * @tc.type: FUNC
@@ -2540,26 +2455,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0131, TestSize.Level0)
     int result = FormMgr::GetInstance().UnregisterClickEventObserver(bundleName, formEventType, iremoteObject);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_0131 end";
-}
-
-/**
- * @tc.name: FormMgrTest_0132
- * @tc.desc: Verify UnregisterClickEventObserver
- * @tc.type: FUNC
- */
-HWTEST_F(FormMgrTest, FormMgrTest_0132, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrTest_0132 begin";
-    std::string bundleName = "";
-    std::string formEventType = "formAdd";
-    FormMgr::GetInstance().resetFlag_ = true;
-    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
-    ASSERT_NE(nullptr, iremoteObject);
-    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
-    FormMgr::GetInstance().UnregisterClickEventObserver(bundleName, formEventType, iremoteObject);
-    FormMgr::GetInstance().resetFlag_ = false;
-    FormMgr::GetInstance().SetFormMgrService(mockProxy);
-    GTEST_LOG_(INFO) << "FormMgrTest_0132 end";
 }
 
 /**

@@ -3644,7 +3644,12 @@ bool JsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
 ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap)
 {
     HILOG_INFO("call");
-    if (getLiveFormStatusEnv_ == nullptr) {
+    napi_env env = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(registerGetLiveFormStatusProxyMutex_);
+        env = getLiveFormStatusEnv_;
+    }
+    if (env == nullptr) {
         HILOG_ERROR("getLiveFormStatusEnv_ is nullptr");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
@@ -4354,7 +4359,17 @@ bool JsFormRouterProxyMgr::ParseWantParamsArray(napi_value funcResult,
     }
 
     uint32_t arrayLength = 0;
-    napi_get_array_length(formWantCallbackEnv_, funcResult, &arrayLength);
+    napi_status lengthStatus = napi_get_array_length(formWantCallbackEnv_, funcResult, &arrayLength);
+    if (lengthStatus != napi_ok) {
+        HILOG_ERROR("get array length failed, status: %{public}d", static_cast<int>(lengthStatus));
+        return false;
+    }
+    // The length is app-controlled (JS callback result), so cap it with the existing form-id bound.
+    if (arrayLength > MAX_FORM_IDS_COUNT) {
+        HILOG_ERROR("callback result size %{public}u exceeds maximum %{public}u",
+            arrayLength, MAX_FORM_IDS_COUNT);
+        return false;
+    }
     for (uint32_t i = 0; i < arrayLength; i++) {
         napi_value element = nullptr;
         napi_get_element(formWantCallbackEnv_, funcResult, i, &element);

@@ -141,6 +141,7 @@ private:
     ani_ref changeSceneAnimationStateRigisterCallback_ = nullptr;
     ani_ref getFormRectCallbackRef_ = nullptr;
     ani_ref getLiveFormStatusCallbackRef_ = nullptr;
+    mutable std::mutex registerGetLiveFormStatusMutex_;
     DISALLOW_COPY_AND_MOVE(EtsFormRouterProxyMgr);
 
     ErrCode RequestOverflow(const int64_t formId, const AppExecFwk::OverflowInfo &overflowInfo, bool isOverflow = true);
@@ -154,7 +155,7 @@ private:
     void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
     ani_env* GetAniEnv();
     void SetAniVM(ani_vm* ani_vm);
-    bool bindNativeMethod(ani_env* env, ani_class cls, LiveFormInterfaceParam *dataParam);
+    bool BindNativeMethod(ani_env* env, ani_class cls, LiveFormInterfaceParam *dataParam, ani_object callbackObj);
     void CallPromise(ani_env* env, ani_class cls, ani_object callbackObj, ani_object retObj,
         LiveFormInterfaceParam *params);
     static void GetFormRectPromiseCallback(ani_env *env, ani_object aniObj, ani_object obj);
@@ -165,14 +166,14 @@ private:
 
     mutable std::mutex registerTemplateFormDetailInfoChangeMutex_;
     ani_ref templateFormDetailInfoChangeCallbackRef_ = nullptr;
-    ani_vm* templateFormDetailInfoChangeVM;
+    ani_vm* templateFormDetailInfoChangeVM_ = nullptr;
     ani_env* GetTemplateFormDetailInfoChangeEnv();
     void SetTemplateFormDetailInfoChangeVM(ani_vm* ani_vm);
 
     ErrCode TemplateFormDetailInfoChange(const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
-    void TemplateFormDetailInfoChangeInner(
+    bool TemplateFormDetailInfoChangeInner(
         const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo);
-    void GetTemplateFormInfoArray(ani_env* env,
+    bool GetTemplateFormInfoArray(ani_env* env,
         const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo,
         ani_array &templateFormInfoArray);
 
@@ -183,6 +184,8 @@ private:
         std::vector<AAFwk::WantParams> &wantParamsList);
     bool RequestFormWantsInner(const std::vector<AppExecFwk::FormInfo> &formInfos,
         std::vector<AAFwk::WantParams> &wantParamsList);
+    bool InvokeFormWantCallback(ani_env *env, ani_ref callbackRef,
+        const std::vector<AppExecFwk::FormInfo> &formInfos, std::vector<AAFwk::WantParams> &wantParamsList);
 
     ani_ref updateFormsConfigCallbackRef_ = nullptr;
     ani_vm *updateFormsConfigVM_ = nullptr;
@@ -196,6 +199,8 @@ private:
 
     ErrCode UpdateFormsConfigCallback(const std::vector<AppExecFwk::FormCustomConfig> &configs);
     bool UpdateFormsConfigCallbackInner(const std::vector<AppExecFwk::FormCustomConfig> &configs);
+    bool InvokeUpdateFormsConfigCallback(ani_env *env, ani_ref callbackRef,
+        const std::vector<AppExecFwk::FormCustomConfig> &configs);
     bool GetFormCustomConfigAniArray(ani_env *env,
         const std::vector<AppExecFwk::FormCustomConfig> &configs, ani_array &configArray);
 

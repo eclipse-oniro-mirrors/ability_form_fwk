@@ -41,7 +41,7 @@ public:
     void UnregisterPublishFormCrossBundleControl();
 private:
     ani_ref crossBundleControlCallback_ = nullptr;
-    ani_vm* crossBundleControlVm_;
+    ani_vm* crossBundleControlVm_ = nullptr;
 
     ani_env* GetCrossBundleControlEnv();
     mutable std::mutex crossBundleControlMutex_;

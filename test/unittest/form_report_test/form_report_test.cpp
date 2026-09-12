@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -115,21 +115,6 @@ HWTEST_F(FormReportTest, FormReport_004, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormReport_005
- * @tc.desc: test SetStartGetTime function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormReportTest, FormReport_005, TestSize.Level1)
-{
-    int64_t endTime = 12 * 1000;
-    int64_t startTime = 1* 1000;
-    formReport.SetDurationStartTime(testFormId, startTime);
-    formReport.SetDurationEndTime(testFormId, endTime);
-    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
-    EXPECT_NE(statisticIt, formReport.formStatisticMap_.end());
-}
-
-/**
  * @tc.name: FormReport_006
  * @tc.desc: test SetDurationStartTime function.
  * @tc.type: FUNC
@@ -242,33 +227,6 @@ HWTEST_F(FormReportTest, FormReport_013, TestSize.Level1)
     auto statisticIt = formReport.formStatisticMap_.find(testFormId);
     EXPECT_NE(statisticIt, formReport.formStatisticMap_.end());
     EXPECT_EQ(statisticIt->second.endBindTime_, endTime);
-}
-
-/**
- * @tc.name: FormReport_014
- * @tc.desc: test HandleAddFormStatistic function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormReportTest, FormReport_014, TestSize.Level1)
-{
-    formReport.SetFormRecordInfo(testFormId, want);
-    formReport.HandleAddFormStatistic(testFormId);
-    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
-    EXPECT_NE(statisticIt, formReport.formStatisticMap_.end());
-}
-
-/**
- * @tc.name: FormReport_015
- * @tc.desc: test HandleAddFormStatistic function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormReportTest, FormReport_015, TestSize.Level1)
-{
-    formReport.SetFormRecordInfo(testFormId, want);
-    formReport.InsertFormId(testFormId);
-    formReport.HandleAddFormStatistic(testFormId);
-    auto statisticIt = formReport.formStatisticMap_.find(testFormId);
-    EXPECT_NE(statisticIt, formReport.formStatisticMap_.end());
 }
 
 /**

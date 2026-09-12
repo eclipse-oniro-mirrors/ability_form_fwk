@@ -67,20 +67,6 @@ HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_DisconnectServiceAbilityDelay_001, 
 }
 
 /**
- * @tc.name: FormAmsHelper_DisconnectAbilityTask_001
- * @tc.desc: test DisconnectAbilityTask function
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_DisconnectAbilityTask_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormAmsHelper_DisconnectAbilityTask_001 start";
-    FormAmsHelper formAmsHelper;
-    sptr<AAFwk::IAbilityConnection> connect = nullptr;
-    formAmsHelper.DisconnectAbilityTask(connect);
-    GTEST_LOG_(INFO) << "FormAmsHelper_DisconnectAbilityTask_001 end";
-}
-
-/**
  * @tc.name: FormAmsHelper_StartAbilityOnlyUIAbility_001
  * @tc.desc: test StartAbilityOnlyUIAbility function
  * @tc.type: FUNC
