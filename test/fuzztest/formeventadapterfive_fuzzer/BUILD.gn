@@ -17,10 +17,10 @@ import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("FormEventAdapterFourFuzzTest") {
+ohos_fuzztest("FormEventAdapterFiveFuzzTest") {
   module_out_path = form_fuzz_test_path
 
-  fuzz_config_file = "${form_fwk_path}/test/fuzztest/formeventadapterfour_fuzzer"
+  fuzz_config_file = "${form_fwk_path}/test/fuzztest/formeventadapterfive_fuzzer"
 
   include_dirs = [
     "${form_fwk_path}/interfaces/kits/native/include",
@@ -35,7 +35,7 @@ ohos_fuzztest("FormEventAdapterFourFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "formeventadapterfour_fuzzer.cpp",
+    "formeventadapterfive_fuzzer.cpp",
   ]
 
   deps = [
@@ -82,7 +82,7 @@ group("fuzztest") {
   testonly = true
   deps = []
   deps += [
-    ":FormEventAdapterFourFuzzTest",
+    ":FormEventAdapterFiveFuzzTest",
   ]
 }
 ###############################################################################
