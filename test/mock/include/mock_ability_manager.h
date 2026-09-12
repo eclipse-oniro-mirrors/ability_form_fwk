@@ -318,8 +318,8 @@ public:
         return 0;
     }
 
-    int32_t ExecuteIntent(uint64_t key,  const sptr<IRemoteObject> &callerToken,
-        const InsightIntentExecuteLiteParam &param)
+    int32_t ExecuteIntent(uint64_t key, const sptr<IRemoteObject> &callerToken,
+        const InsightIntentExecuteParam &param) override
     {
         return 0;
     }
@@ -823,8 +823,8 @@ public:
         return 0;
     }
 
-    int32_t ExecuteIntent(uint64_t key,  const sptr<IRemoteObject> &callerToken,
-        const InsightIntentExecuteLiteParam &param)
+    int32_t ExecuteIntent(uint64_t key, const sptr<IRemoteObject> &callerToken,
+        const InsightIntentExecuteParam &param) override
     {
         return 0;
     }
