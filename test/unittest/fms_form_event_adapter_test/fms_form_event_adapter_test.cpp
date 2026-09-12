@@ -50,6 +50,7 @@ using namespace testing::ext;
 namespace OHOS {
 // Defined in the directory-private mock_accesstoken_kit.cpp.
 void MockGetHapTokenID(uint32_t mockRet);
+void MockGetHapTokenInfoAttr(uint32_t mockAttr);
 }
 
 namespace OHOS {
@@ -59,6 +60,8 @@ constexpr int32_t TEST_USER_ID = 100;
 constexpr int32_t TEST_CALLING_UID = 20000000;
 constexpr int64_t TEST_FORM_ID = 123456789L;
 constexpr uint32_t TEST_PROVIDER_HAP_TOKEN_ID = 1000;
+// Non-zero tokenAttr so the full token id differs from the bare hap token id.
+constexpr uint32_t TEST_PROVIDER_TOKEN_ATTR = 0x1;
 }
 
 class FmsFormEventAdapterTest : public testing::Test {
@@ -1224,8 +1227,8 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_009, TestSize.Level1)
 
 /**
  * @tc.name: InsightIntentEvent_010
- * @tc.desc: Verify success path backfills provider triple into want, passes provider
- *           hapTokenId as specifyTokenId and returns ERR_OK
+ * @tc.desc: Verify success path backfills provider triple into want, passes the provider
+ *           specified full token id (spliced from hapTokenId and tokenAttr) and returns ERR_OK
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_010, TestSize.Level1)
@@ -1270,6 +1273,55 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_010, TestSize.Level1)
     EXPECT_TRUE(want.HasParameter(Constants::PARAM_FORM_IDENTITY_KEY));
 
     GTEST_LOG_(INFO) << "InsightIntentEvent_010 end";
+}
+
+/**
+ * @tc.name: InsightIntentEvent_011
+ * @tc.desc: Verify the specified full token id passed to AMS is spliced with tokenAttr
+ *           in the high 32 bits and the hap token id in the low 32 bits
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "InsightIntentEvent_011 start";
+
+    Want want;
+    want.SetParam(INSIGHT_INTENT_EXECUTE_PARAM_NAME, std::string("TestIntent"));
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+    record.providerUserId = TEST_USER_ID;
+    record.moduleName = "entry";
+    record.isSystemApp = true;
+
+    BundleInfo bundleInfo;
+    HapModuleInfo hapModuleInfo;
+    hapModuleInfo.name = "entry";
+    hapModuleInfo.mainElementName = "EntryAbility";
+    bundleInfo.hapModuleInfos.push_back(hapModuleInfo);
+
+    MockGetHapTokenID(TEST_PROVIDER_HAP_TOKEN_ID);
+    MockGetHapTokenInfoAttr(TEST_PROVIDER_TOKEN_ATTR);
+    const uint64_t expectedFullTokenId =
+        (static_cast<uint64_t>(TEST_PROVIDER_TOKEN_ATTR) << 32) + TEST_PROVIDER_HAP_TOKEN_ID;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoByFlags(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(bundleInfo), Return(true)));
+    EXPECT_CALL(*MockFormAmsHelper::obj,
+        ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(_, _, _, expectedFullTokenId))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormEventAdapter::GetInstance().InsightIntentEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_EQ(result, ERR_OK);
+
+    // Restore the default mocked tokenAttr so other cases are not affected.
+    MockGetHapTokenInfoAttr(0);
+    GTEST_LOG_(INFO) << "InsightIntentEvent_011 end";
 }
 
 } // namespace AppExecFwk

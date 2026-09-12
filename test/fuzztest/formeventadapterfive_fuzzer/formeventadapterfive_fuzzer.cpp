@@ -26,6 +26,7 @@
 #define private public
 #define protected public
 #include "form_mgr/form_event_adapter.h"
+#include "data_center/form_data_mgr.h"
 #undef private
 #undef protected
 
@@ -87,6 +88,25 @@ Want GenerateInsightIntentWant(FuzzedDataProvider *fdp)
     return want;
 }
 
+// Seed FormDataMgr with a valid system-app FormRecord so InsightIntentEvent can pass
+// the GetFormRecord/isSystemApp checks and reach PrepareInsightIntentParam and the
+// AMS invocation path.
+void AddFormRecordForFuzz(int64_t formId)
+{
+    if (formId <= 0) {
+        return;
+    }
+    FormDataMgr::GetInstance().ClearFormRecords();
+    FormRecord record;
+    record.formId = formId;
+    record.bundleName = "com.example.fuzzer";
+    record.moduleName = "entry";
+    record.abilityName = "FormAbility";
+    record.providerUserId = 100;
+    record.isSystemApp = true;
+    FormDataMgr::GetInstance().formRecords_[formId] = record;
+}
+
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     if (fdp == nullptr) {
@@ -100,12 +120,14 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     int64_t formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
     Want want = GenerateInsightIntentWant(fdp);
     want.SetParam(INSIGHT_INTENT_EXECUTE_PARAM_NAME, GenerateSafeString(fdp, MAX_LENGTH));
+    AddFormRecordForFuzz(formId);
     sptr<IRemoteObject> callerToken = nullptr;
     adapter.InsightIntentEvent(formId, want, callerToken);
 
     // Fuzz InsightIntentEvent without the intent name param (covers HasParam false branch)
     int64_t absentFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
     Want absentWant = GenerateInsightIntentWant(fdp);
+    AddFormRecordForFuzz(absentFormId);
     adapter.InsightIntentEvent(absentFormId, absentWant, callerToken);
 
     // Fuzz InsightIntentEvent with a negative or zero formId (covers invalid formId branch)
@@ -121,7 +143,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     return 0;
 }
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)

@@ -56,19 +56,30 @@ namespace {
 constexpr int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 constexpr const char* PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
 
-// Get the provider specify token id (hapTokenId) for permission checking; returns 0 on failure.
-uint32_t GetProviderSpecifyTokenId(const std::string &bundleName, const int32_t userId)
+// Get the provider specified full token id for permission checking: the high 32 bits
+// carry tokenAttr and the low 32 bits the hap token id; returns 0 on failure.
+uint64_t GetProviderSpecifiedFullTokenId(const std::string &bundleName, const int32_t userId)
 {
     if (bundleName.empty()) {
         return 0;
     }
-    const auto specifyTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(userId, bundleName, 0);
-    if (specifyTokenId == 0) {
+    const auto hapTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(userId, bundleName, 0);
+    if (hapTokenId == 0) {
         HILOG_ERROR("GetHapTokenID failed, userId:%{public}d, bundleName:%{public}s",
             userId, bundleName.c_str());
         return 0;
     }
-    return specifyTokenId;
+    // Rebuild the full token id from the 32-bit hap token id so that downstream
+    // permission checks can read tokenAttr from the high 32 bits and correctly
+    // determine system-app status; fall back to the zero-extended hap token id
+    // when token info is unavailable.
+    Security::AccessToken::HapTokenInfo hapInfo;
+    uint64_t specifiedFullTokenId = hapTokenId;
+    if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(hapTokenId, hapInfo) ==
+        Security::AccessToken::AccessTokenKitRet::RET_SUCCESS) {
+        specifiedFullTokenId = (static_cast<uint64_t>(hapInfo.tokenAttr) << 32) + hapTokenId;
+    }
+    return specifiedFullTokenId;
 }
 
 // The intent execution target is the provider module's entry UIAbility (mainElement in
@@ -393,9 +404,11 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
             "bundleName:%{public}s", record.bundleName.c_str());
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
-    const uint32_t providerSpecifyTokenId = GetProviderSpecifyTokenId(record.bundleName, record.providerUserId);
-    if (providerSpecifyTokenId == 0) {
-        HILOG_ERROR("get provider specifyTokenId failed, bundleName:%{public}s", record.bundleName.c_str());
+    const uint64_t specifiedFullTokenId =
+        GetProviderSpecifiedFullTokenId(record.bundleName, record.providerUserId);
+    if (specifiedFullTokenId == 0) {
+        HILOG_ERROR("get provider specifiedFullTokenId failed, bundleName:%{public}s",
+            record.bundleName.c_str());
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
     InsightIntentExecuteLiteParam executeParam;
@@ -414,7 +427,7 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
     // via the system reserved key (same as router).
     SetFormIdentityParams(want, matchedFormId);
     result = FormAmsHelper::GetInstance().ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(
-        want, callerToken, executeParam, providerSpecifyTokenId);
+        want, callerToken, executeParam, specifiedFullTokenId);
     if (result != ERR_OK) {
         HILOG_ERROR("fail ExecuteUIAbilityForegroundIntentWithSpecifyTokenId, result:%{public}d", result);
         return result;

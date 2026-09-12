@@ -340,12 +340,13 @@ ErrCode FormAmsHelper::StartAbilityByCallerToken(const Want &want, const sptr<IR
  * @param callerAbilityToken The caller ability token.
  * @param param The insight intent execute lite param, whose key and insightIntentHostClient
  *        carry the execute-done callback info of the form scenario.
- * @param specifyTokenId The specified token id for permission checking.
+ * @param specifiedFullTokenId The specified full token id for permission checking,
+ *        with tokenAttr in the high 32 bits and the hap token id in the low 32 bits.
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormAmsHelper::ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(const AAFwk::Want &want,
     const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteLiteParam &param,
-    uint32_t specifyTokenId)
+    uint64_t specifiedFullTokenId)
 {
     HILOG_DEBUG("call");
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
@@ -354,7 +355,7 @@ ErrCode FormAmsHelper::ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(const 
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return IN_PROCESS_CALL(ams->ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(
-        want, callerAbilityToken, param, specifyTokenId));
+        want, callerAbilityToken, param, specifiedFullTokenId));
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
