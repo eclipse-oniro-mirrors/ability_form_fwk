@@ -119,6 +119,7 @@ group("fuzztest") {
     "formeventadapter_fuzzer:fuzztest",
     "formeventadaptertwo_fuzzer:fuzztest",
     "formeventadapterthree_fuzzer:fuzztest",
+    "formeventadapterfour_fuzzer:fuzztest",
     "formlifecycleadapter_fuzzer:fuzztest",
     "formpublishadapter_fuzzer:fuzztest",
     "formpublishadaptertwo_fuzzer:fuzztest",
