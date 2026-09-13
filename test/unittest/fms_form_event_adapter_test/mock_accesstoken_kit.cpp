@@ -21,6 +21,7 @@
 namespace {
 uint32_t g_GetHapTokenID = 0;
 uint32_t g_HapTokenAttr = 0;
+int g_HapTokenInfoRet = OHOS::Security::AccessToken::AccessTokenKitRet::RET_SUCCESS;
 }
 
 namespace OHOS {
@@ -32,6 +33,11 @@ void MockGetHapTokenID(uint32_t mockRet)
 void MockGetHapTokenInfoAttr(uint32_t mockAttr)
 {
     g_HapTokenAttr = mockAttr;
+}
+
+void MockGetHapTokenInfoRet(int mockRet)
+{
+    g_HapTokenInfoRet = mockRet;
 }
 } // namespace OHOS
 
@@ -46,9 +52,9 @@ AccessTokenID AccessTokenKit::GetHapTokenID(int32_t userID, const std::string& b
 
 int AccessTokenKit::GetHapTokenInfo(AccessTokenID tokenID, HapTokenInfo &hapTokenInfo)
 {
-    GTEST_LOG_(INFO) << "GetHapTokenInfo called " << tokenID;
+    GTEST_LOG_(INFO) << "GetHapTokenInfo called " << tokenID << " ret " << g_HapTokenInfoRet;
     hapTokenInfo.tokenAttr = g_HapTokenAttr;
-    return AccessTokenKitRet::RET_SUCCESS;
+    return g_HapTokenInfoRet;
 }
 } // namespace AccessToken
 } // namespace Security

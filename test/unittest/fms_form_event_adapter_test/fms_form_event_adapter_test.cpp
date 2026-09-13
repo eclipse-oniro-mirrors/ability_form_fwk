@@ -26,6 +26,7 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "want.h"
+#include "accesstoken_kit.h"
 #include "data_center/form_record/form_record.h"
 #include "insight_intent/insight_intent_execute_param.h"
 
@@ -51,6 +52,7 @@ namespace OHOS {
 // Defined in the directory-private mock_accesstoken_kit.cpp.
 void MockGetHapTokenID(uint32_t mockRet);
 void MockGetHapTokenInfoAttr(uint32_t mockAttr);
+void MockGetHapTokenInfoRet(int mockRet);
 }
 
 namespace OHOS {
@@ -1322,6 +1324,181 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_011, TestSize.Level1)
     // Restore the default mocked tokenAttr so other cases are not affected.
     MockGetHapTokenInfoAttr(0);
     GTEST_LOG_(INFO) << "InsightIntentEvent_011 end";
+}
+
+/**
+ * @tc.name: InsightIntentEvent_012
+ * @tc.desc: Verify empty provider bundleName returns ERR_APPEXECFWK_FORM_GET_INFO_FAILED
+ *           before the GetHapTokenID lookup
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "InsightIntentEvent_012 start";
+
+    Want want;
+    want.SetParam(INSIGHT_INTENT_EXECUTE_PARAM_NAME, std::string("TestIntent"));
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "";
+    record.providerUserId = TEST_USER_ID;
+    record.isSystemApp = true;
+
+    // Non-zero mock proves the failure comes from the empty-bundleName early return
+    // rather than a failed GetHapTokenID lookup.
+    MockGetHapTokenID(TEST_PROVIDER_HAP_TOKEN_ID);
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    auto result = FormEventAdapter::GetInstance().InsightIntentEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+
+    GTEST_LOG_(INFO) << "InsightIntentEvent_012 end";
+}
+
+/**
+ * @tc.name: InsightIntentEvent_013
+ * @tc.desc: Verify failed GetHapTokenInfo falls back to the zero-extended hap token id
+ *           passed to AMS
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_013, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "InsightIntentEvent_013 start";
+
+    Want want;
+    want.SetParam(INSIGHT_INTENT_EXECUTE_PARAM_NAME, std::string("TestIntent"));
+    want.SetElementName("", "com.test.bundle", "MainAbility");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+    record.providerUserId = TEST_USER_ID;
+    record.moduleName = "entry";
+    record.isSystemApp = true;
+
+    MockGetHapTokenID(TEST_PROVIDER_HAP_TOKEN_ID);
+    // Non-RET_SUCCESS forces the zero-extended hap token id fallback (no tokenAttr in
+    // the high 32 bits).
+    MockGetHapTokenInfoRet(Security::AccessToken::AccessTokenKitRet::RET_FAILED);
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormAmsHelper::obj,
+        ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(_, _, _, TEST_PROVIDER_HAP_TOKEN_ID))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormEventAdapter::GetInstance().InsightIntentEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_EQ(result, ERR_OK);
+
+    // Restore the default mocked result so other cases are not affected.
+    MockGetHapTokenInfoRet(Security::AccessToken::AccessTokenKitRet::RET_SUCCESS);
+    GTEST_LOG_(INFO) << "InsightIntentEvent_013 end";
+}
+
+/**
+ * @tc.name: InsightIntentEvent_014
+ * @tc.desc: Verify a partially filled want element keeps the host-provided
+ *           bundleName/moduleName and only backfills the missing abilityName
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "InsightIntentEvent_014 start";
+
+    Want want;
+    want.SetParam(INSIGHT_INTENT_EXECUTE_PARAM_NAME, std::string("TestIntent"));
+    // Host want already carries bundleName/moduleName (passed through by postCardAction);
+    // only the abilityName is missing.
+    ElementName element;
+    element.SetBundleName("com.host.bundle");
+    element.SetModuleName("hostModule");
+    want.SetElement(element);
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    // Provider record values differ from the host ones to tell kept values from backfilled.
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+    record.providerUserId = TEST_USER_ID;
+    record.moduleName = "entry";
+    record.isSystemApp = true;
+
+    BundleInfo bundleInfo;
+    HapModuleInfo hapModuleInfo;
+    hapModuleInfo.name = "entry";
+    hapModuleInfo.mainElementName = "EntryAbility";
+    bundleInfo.hapModuleInfos.push_back(hapModuleInfo);
+
+    MockGetHapTokenID(TEST_PROVIDER_HAP_TOKEN_ID);
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoByFlags(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(bundleInfo), Return(true)));
+    EXPECT_CALL(*MockFormAmsHelper::obj,
+        ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(_, _, _, TEST_PROVIDER_HAP_TOKEN_ID))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormEventAdapter::GetInstance().InsightIntentEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_EQ(result, ERR_OK);
+    // Host-provided fields are kept; only the missing abilityName is backfilled.
+    EXPECT_EQ(want.GetElement().GetBundleName(), "com.host.bundle");
+    EXPECT_EQ(want.GetElement().GetModuleName(), "hostModule");
+    EXPECT_EQ(want.GetElement().GetAbilityName(), "EntryAbility");
+
+    GTEST_LOG_(INFO) << "InsightIntentEvent_014 end";
+}
+
+/**
+ * @tc.name: InsightIntentEvent_015
+ * @tc.desc: Verify a matched formId at the JS number limit is serialized as a string
+ *           form identity param to avoid JS precision overflow
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_015, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "InsightIntentEvent_015 start";
+
+    Want want;
+    want.SetParam(INSIGHT_INTENT_EXECUTE_PARAM_NAME, std::string("TestIntent"));
+    want.SetElementName("", "com.test.bundle", "MainAbility");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+    record.providerUserId = TEST_USER_ID;
+    record.moduleName = "entry";
+    record.isSystemApp = true;
+
+    // MAX_NUMBER_OF_JS (2^53): at or beyond this limit the form identity params go
+    // through the string branch instead of the int branch.
+    constexpr int64_t beyondJsNumber = 0x20000000000000;
+
+    MockGetHapTokenID(TEST_PROVIDER_HAP_TOKEN_ID);
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(beyondJsNumber));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormAmsHelper::obj,
+        ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(_, _, _, TEST_PROVIDER_HAP_TOKEN_ID))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormEventAdapter::GetInstance().InsightIntentEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_EQ(result, ERR_OK);
+    // The oversized formId is serialized as a string to avoid JS precision overflow.
+    EXPECT_EQ(want.GetStringParam(Constants::PARAM_FORM_ID), "9007199254740992");
+    EXPECT_EQ(want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY), "9007199254740992");
+
+    GTEST_LOG_(INFO) << "InsightIntentEvent_015 end";
 }
 
 } // namespace AppExecFwk
