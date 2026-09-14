@@ -737,13 +737,6 @@ int FormLifecycleAdapter::ReleaseForm(const int64_t formId,
     }
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-
-    FormRecord dbRecord;
-    if (FormDbCache::GetInstance().GetDBRecord(matchedFormId, dbRecord) != ERR_OK) {
-        HILOG_ERROR("not exist such db form:%{public}" PRId64 "", formId);
-        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-    }
-
     FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
 
     if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
@@ -753,6 +746,12 @@ int FormLifecycleAdapter::ReleaseForm(const int64_t formId,
     FormRecord record;
     FormDataMgr::GetInstance().GetFormRecord(formId, record);
     FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
+
+    FormRecord dbRecord;
+    if (FormDbCache::GetInstance().GetDBRecord(matchedFormId, dbRecord) != ERR_OK) {
+        HILOG_ERROR("not exist such db form:%{public}" PRId64 "", formId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
 
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t callerUserId = FormUtil::GetCallerUserId(callingUid);
