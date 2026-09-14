@@ -16,6 +16,7 @@
 #include "bms_mgr/form_bundle_event_callback.h"
 
 #include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
+#include "feature/bundle_lock/form_bundle_lock_mgr.h"
 #include "form_mgr/form_mgr_queue.h"
 #include "feature/bundle_distributed/form_distributed_mgr.h"
 #include "common/util/form_util.h"
@@ -119,6 +120,8 @@ void FormBundleEventCallback::HandlePackageRemoved(const std::string &bundleName
         DistributedModule distributedModule;
         distributedModule.userId = userId;
         FormDistributedMgr::GetInstance().SetBundleDistributedStatus(bundleName, false, distributedModule);
+        // Align with forbid/distributed: unregister on main app uninstall only (clones still hold the key)
+        FormBundleLockMgr::GetInstance().SetBundleLockStatus(bundleName, false);
     };
     FormMgrQueue::GetInstance().ScheduleTask(0, taskFunc);
 }

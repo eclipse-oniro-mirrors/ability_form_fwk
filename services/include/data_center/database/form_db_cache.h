@@ -111,6 +111,13 @@ public:
     ErrCode GetDBRecord(const int64_t formId, FormDBInfo &record) const;
 
     /**
+     * @brief Check whether the formId exists in DB cache, without copying the record.
+     * @param formId Form data Id
+     * @return Returns true if the formId exists, false otherwise.
+     */
+    bool HasDBRecord(const int64_t formId) const;
+
+    /**
      * @brief Use record save or update DB data and DB cache with formId
      * @param formId Form data Id
      * @param record Form data

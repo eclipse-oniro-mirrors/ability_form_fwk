@@ -20,6 +20,7 @@
 #include <singleton.h>
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 #include "form_provider_data.h"
 #include "data_center/database/form_rdb_data_mgr.h"
@@ -71,6 +72,10 @@ public:
      * @return Returns true on success, false otherwise.
      */
     bool GetFormCacheIds(std::unordered_set<int64_t> &formIds);
+    /**
+     * @brief Delete invalid image rows in img_cache which are not referenced by any form_cache.FORM_IMAGES.
+     */
+    void DeleteInvalidImgCache();
 private:
     void CreateFormCacheTable();
     bool GetDataCacheFromDb(int64_t formId, FormCache &formCache) const;
@@ -80,16 +85,21 @@ private:
     bool SaveImgCacheToDb(const std::vector<uint8_t> &value, int32_t size, int64_t &rowId);
     bool DeleteImgCacheInDb(const std::string &rowId);
     bool DeleteImgCachesInDb(const std::vector<std::string> &rowIds);
+    void RollbackNewImgCaches(const std::vector<std::string> &rowIds);
 
     bool AddCacheData(const FormProviderData &formProviderData, FormCache &formCache);
-    bool AddImgData(const FormProviderData &formProviderData, FormCache &formCache);
+    bool AddImgData(const FormProviderData &formProviderData, FormCache &formCache,
+        std::vector<std::string> &newRowIds);
     bool AddImgDataToDb(
-        const FormProviderData &formProviderData, nlohmann::json &imgDataJson);
+        const FormProviderData &formProviderData, nlohmann::json &imgDataJson,
+        std::vector<std::string> &newRowIds);
     bool GetImageDataFromAshmem(
         const std::string& picName, const sptr<Ashmem> &ashmem, int32_t len, std::vector<uint8_t> &value);
     bool InnerGetImageData(const FormCache &formCache,
         std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap) const;
     void ResetCacheStateAfterReboot();
+    bool GetReferencedImgIds(std::unordered_set<int64_t> &referencedIds) const;
+    bool GetAllImgIds(std::vector<int64_t> &imgIds) const;
 
     mutable std::mutex cacheMutex_;
 };

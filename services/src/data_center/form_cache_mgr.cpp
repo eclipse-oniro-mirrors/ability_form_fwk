@@ -15,7 +15,7 @@
 
 #include "data_center/form_cache_mgr.h"
 
-#include <regex>
+#include <algorithm>
 #include <sstream>
 
 #include "fms_log_wrapper.h"
@@ -52,12 +52,12 @@ constexpr int32_t IMAGE_SIZE_INDEX = 2;
 constexpr int32_t INVALID_INDEX = -1;
 constexpr int32_t MAX_IMAGE_DATA_SIZE = 50 * 1024 * 1024; // 50MB, consistent with MAX_IMAGE_BYTE_SIZE
 constexpr const char *IS_DIRTY_DATA_CLEANED = "isDirtyDataCleaned";
-
-inline bool IsDigitsOnly(const std::string &str)
-{
-    static const std::regex pattern("^[0-9]+$");
-    return !str.empty() && std::regex_match(str, pattern);
-}
+// DATA_CACHE of the sentinel row stores the finished cleanup version as a decimal string;
+// bump CACHE_CLEANUP_VERSION to trigger one more sweep on upgrade. Empty means legacy format.
+constexpr int32_t CACHE_CLEANUP_VERSION = 1;
+constexpr int32_t CACHE_CLEANUP_INVALID_VERSION = -1;
+constexpr int32_t MAX_DELETE_BATCH_SIZE = 500; // rowIds per batch, avoid SQL length limit
+constexpr int32_t SINGLE_COLUMN_INDEX = 0; // index of the only column in single-column SELECT
 
 inline bool HasContent(const std::string &str)
 {
@@ -199,27 +199,47 @@ bool FormCacheMgr::AddData(int64_t formId, const FormProviderData &formProviderD
     FormCache formCache;
     formCache.formId = formId;
     GetDataCacheFromDb(formId, formCache);
-    if (!AddImgData(formProviderData, formCache)) {
+
+    // Track newly inserted rows for rollback on later failures
+    std::vector<std::string> newImgRowIds;
+    if (!AddImgData(formProviderData, formCache, newImgRowIds)) {
         HILOG_ERROR("AddImgData failed");
+        RollbackNewImgCaches(newImgRowIds);
         return false;
     }
 
     if (!AddCacheData(formProviderData, formCache)) {
         HILOG_ERROR("AddCacheData failed");
+        RollbackNewImgCaches(newImgRowIds);
         return false;
     }
 
     // Save dataCache and imgCache
     formCache.cacheState = CacheState::DEFAULT;
     FormReport::GetInstance().SetDurationEndTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
-    return SaveDataCacheToDb(formId, formCache);
+    if (!SaveDataCacheToDb(formId, formCache)) {
+        RollbackNewImgCaches(newImgRowIds);
+        return false;
+    }
+    return true;
+}
+
+void FormCacheMgr::RollbackNewImgCaches(const std::vector<std::string> &rowIds)
+{
+    if (rowIds.empty()) {
+        return;
+    }
+    if (!DeleteImgCachesInDb(rowIds)) {
+        // Leftover rows are recovered by the version-triggered sweep
+        HILOG_ERROR("FormImgRollbackFail, size:%{public}zu", rowIds.size());
+    }
 }
 
 bool FormCacheMgr::AddImgData(
-    const FormProviderData &formProviderData, FormCache &formCache)
+    const FormProviderData &formProviderData, FormCache &formCache, std::vector<std::string> &newRowIds)
 {
     nlohmann::json newImgDbData;
-    if (!AddImgDataToDb(formProviderData, newImgDbData)) {
+    if (!AddImgDataToDb(formProviderData, newImgDbData, newRowIds)) {
         HILOG_ERROR("AddImgDataToDb failed");
         return false;
     }
@@ -241,7 +261,7 @@ bool FormCacheMgr::AddImgData(
             rowIds.push_back(value.dump());
         }
         if (!DeleteImgCachesInDb(rowIds)) {
-            HILOG_ERROR("delete img caches failed");
+            HILOG_ERROR("FormImgDeleteFail, size:%{public}zu", rowIds.size());
         }
     }
 
@@ -291,7 +311,7 @@ bool FormCacheMgr::AddCacheData(
 }
 
 bool FormCacheMgr::AddImgDataToDb(
-    const FormProviderData &formProviderData, nlohmann::json &imgDataJson)
+    const FormProviderData &formProviderData, nlohmann::json &imgDataJson, std::vector<std::string> &newRowIds)
 {
     auto imgCache = formProviderData.GetImageDataMap();
     HILOG_DEBUG("AddImgDataToDb imgCache size:%{public}zu", imgCache.size());
@@ -317,6 +337,8 @@ bool FormCacheMgr::AddImgDataToDb(
         }
 
         imgDataJson[iter.first] = rowId;
+        // Record on success for mid-loop rollback
+        newRowIds.emplace_back(std::to_string(rowId));
     }
 
     return true;
@@ -378,7 +400,7 @@ bool FormCacheMgr::DeleteData(const int64_t formId)
 
         imgCacheObj = SafeJsonParse(formCache.imgCache);
         if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
-            HILOG_ERROR("parse data failed");
+            HILOG_WARN("parse imgCache failed, no image data, formId:%{public}s", formCache.formId.c_str());
             isNeedDeleteImgCache = false;
         }
     }
@@ -539,19 +561,9 @@ bool FormCacheMgr::DeleteImgCachesInDb(const std::vector<std::string> &rowIds)
         return false;
     }
     HILOG_DEBUG("size:%{public}zu", rowIds.size());
-    std::stringstream sql;
-    sql << "DELETE FROM " << IMG_CACHE_TABLE << " WHERE " << IMAGE_ID << " IN (";
-    for (auto iter = rowIds.begin(); iter != rowIds.end(); ++iter) {
-        // RowIds are spliced into SQL directly, allow digits only to block SQL injection
-        if (!IsDigitsOnly(*iter)) {
-            HILOG_ERROR("invalid rowId:%{public}s", iter->c_str());
-            return false;
-        }
-        sql << "\'" << *iter << "\',";
-    }
-    sql.seekp(-1, std::ios::end);
-    sql << ");";
-    return FormRdbDataMgr::GetInstance().ExecuteSql(sql.str()) == ERR_OK;
+    NativeRdb::AbsRdbPredicates predicates(IMG_CACHE_TABLE);
+    predicates.In(IMAGE_ID, rowIds);
+    return FormRdbDataMgr::GetInstance().DeleteData(predicates) == ERR_OK;
 }
 
 void FormCacheMgr::ResetCacheStateAfterReboot()
@@ -564,11 +576,11 @@ void FormCacheMgr::ResetCacheStateAfterReboot()
 bool FormCacheMgr::IsDirtyDataCleaned() const
 {
     std::stringstream sql;
-    sql << "SELECT " << FORM_ID << " FROM " << FORM_CACHE_TABLE << " WHERE " << FORM_ID << " = \'";
-    sql << IS_DIRTY_DATA_CLEANED << "\'";
+    sql << "SELECT " << DATA_CACHE << " FROM " << FORM_CACHE_TABLE << " WHERE " << FORM_ID << " = '"
+        << IS_DIRTY_DATA_CLEANED << "'";
     auto absSharedResultSet = FormRdbDataMgr::GetInstance().QuerySql(sql.str());
     if (absSharedResultSet == nullptr) {
-        HILOG_ERROR("GetFormCacheIds failed");
+        HILOG_ERROR("IsDirtyDataCleaned query failed");
         return false;
     }
     ScopeGuard stateGuard([absSharedResultSet] {
@@ -580,25 +592,26 @@ bool FormCacheMgr::IsDirtyDataCleaned() const
         HILOG_ERROR("absSharedResultSet has no block");
         return false;
     }
-    int ret = absSharedResultSet->GoToFirstRow();
-    if (ret != NativeRdb::E_OK) {
-        HILOG_ERROR("GoToFirstRow failed, ret:%{public}d", ret);
+    if (absSharedResultSet->GoToFirstRow() != NativeRdb::E_OK) {
         return false;
     }
-    std::string isDirtyDataCleaned;
-    ret = absSharedResultSet->GetString(FORM_ID_INDEX, isDirtyDataCleaned);
-    if (ret != NativeRdb::E_OK) {
-        HILOG_DEBUG("GetString isDirtyDataCleaned failed, ret:%{public}d", ret);
+    std::string cleanedVersionStr;
+    if (absSharedResultSet->GetString(SINGLE_COLUMN_INDEX, cleanedVersionStr) != NativeRdb::E_OK) {
         return false;
     }
-    return true;
+    // Empty or non-numeric means legacy format (never cleaned by version mechanism)
+    int64_t cleanedVersion = CACHE_CLEANUP_INVALID_VERSION;
+    if (cleanedVersionStr.empty() || !FormUtil::ConvertStringToInt64(cleanedVersionStr, cleanedVersion)) {
+        return false;
+    }
+    return cleanedVersion >= CACHE_CLEANUP_VERSION;
 }
 
 void FormCacheMgr::SetIsDirtyDataCleaned()
 {
     NativeRdb::ValuesBucket valuesBucket;
     valuesBucket.PutString(FORM_ID, IS_DIRTY_DATA_CLEANED);
-    valuesBucket.PutString(DATA_CACHE, "");
+    valuesBucket.PutString(DATA_CACHE, std::to_string(CACHE_CLEANUP_VERSION));
     valuesBucket.PutString(FORM_IMAGES, "");
     valuesBucket.PutInt(CACHE_STATE, 0);
     int64_t rowId;
@@ -640,6 +653,107 @@ bool FormCacheMgr::GetFormCacheIds(std::unordered_set<int64_t> &formIds)
         return false;
     }
     return true;
+}
+
+bool FormCacheMgr::GetReferencedImgIds(std::unordered_set<int64_t> &referencedIds) const
+{
+    std::stringstream sql;
+    sql << "SELECT " << FORM_IMAGES << " FROM " << FORM_CACHE_TABLE << " WHERE " << FORM_IMAGES
+        << " IS NOT NULL AND " << FORM_IMAGES << " != '' AND " << FORM_IMAGES << " != '{}'";
+    auto absSharedResultSet = FormRdbDataMgr::GetInstance().QuerySql(sql.str());
+    if (absSharedResultSet == nullptr) {
+        HILOG_ERROR("GetReferencedImgIds query failed");
+        return false;
+    }
+    ScopeGuard stateGuard([absSharedResultSet] {
+        if (absSharedResultSet) {
+            absSharedResultSet->Close();
+        }
+    });
+    if (!absSharedResultSet->HasBlock()) {
+        HILOG_ERROR("absSharedResultSet has no block");
+        return false;
+    }
+    while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK) {
+        std::string imgCache;
+        if (absSharedResultSet->GetString(SINGLE_COLUMN_INDEX, imgCache) != NativeRdb::E_OK) {
+            continue;
+        }
+        nlohmann::json imgCacheObj = SafeJsonParse(imgCache);
+        if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
+            continue;
+        }
+        for (auto && [key, value] : imgCacheObj.items()) {
+            if (value.is_number_integer()) {
+                referencedIds.emplace(value.get<int64_t>());
+            }
+        }
+    }
+    return true;
+}
+
+bool FormCacheMgr::GetAllImgIds(std::vector<int64_t> &imgIds) const
+{
+    std::stringstream sql;
+    sql << "SELECT " << IMAGE_ID << " FROM " << IMG_CACHE_TABLE;
+    auto absSharedResultSet = FormRdbDataMgr::GetInstance().QuerySql(sql.str());
+    if (absSharedResultSet == nullptr) {
+        HILOG_ERROR("GetAllImgIds query failed");
+        return false;
+    }
+    ScopeGuard stateGuard([absSharedResultSet] {
+        if (absSharedResultSet) {
+            absSharedResultSet->Close();
+        }
+    });
+    if (!absSharedResultSet->HasBlock()) {
+        HILOG_ERROR("absSharedResultSet has no block");
+        return false;
+    }
+    while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK) {
+        int64_t imgId = 0;
+        if (absSharedResultSet->GetLong(SINGLE_COLUMN_INDEX, imgId) != NativeRdb::E_OK) {
+            continue;
+        }
+        imgIds.emplace_back(imgId);
+    }
+    return true;
+}
+
+void FormCacheMgr::DeleteInvalidImgCache()
+{
+    HILOG_INFO("DeleteInvalidImgCache start");
+    std::lock_guard<std::mutex> lock(cacheMutex_);
+    // Enumerate all ids before collecting references: ids inserted after the snapshot
+    // are excluded from the diff, avoiding false-positive deletion of newly added images
+    std::vector<int64_t> allImgIds;
+    if (!GetAllImgIds(allImgIds)) {
+        return;
+    }
+    std::unordered_set<int64_t> referencedIds;
+    if (!GetReferencedImgIds(referencedIds)) {
+        return;
+    }
+    // Orphans = rows not referenced by any FORM_IMAGES mapping
+    std::vector<std::string> orphanRowIds;
+    for (int64_t imgId : allImgIds) {
+        if (referencedIds.find(imgId) == referencedIds.end()) {
+            orphanRowIds.emplace_back(std::to_string(imgId));
+        }
+    }
+    if (orphanRowIds.empty()) {
+        HILOG_INFO("FormCacheSweepDone, orphan:0, total:%{public}zu", allImgIds.size());
+        return;
+    }
+    size_t orphanCount = orphanRowIds.size();
+    for (size_t begin = 0; begin < orphanCount; begin += MAX_DELETE_BATCH_SIZE) {
+        size_t end = std::min(begin + static_cast<size_t>(MAX_DELETE_BATCH_SIZE), orphanCount);
+        std::vector<std::string> batch(orphanRowIds.begin() + begin, orphanRowIds.begin() + end);
+        if (!DeleteImgCachesInDb(batch)) {
+            HILOG_ERROR("FormImgDeleteFail, sweep batch failed, batch size:%{public}zu", batch.size());
+        }
+    }
+    HILOG_INFO("FormCacheSweepDone, orphan:%{public}zu, total:%{public}zu", orphanCount, allImgIds.size());
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
