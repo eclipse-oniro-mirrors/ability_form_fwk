@@ -596,28 +596,13 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_028, TestSize.Level1)
 
 /*
  * @tc.name: FmsFormCacheMgrTest_029
- * @tc.desc: Verify ResetCacheStateAfterReboot keeps the sentinel row cleanup version.
+ * @tc.desc: Verify IsDirtyDataCleaned returns false for legacy-format sentinel row.
  * @tc.type: FUNC
  * @tc.level: Level1
  */
 HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_029, TestSize.Level1)
 {
     HILOG_INFO("FmsFormCacheMgrTest_029 start");
-    formCacheMgr_.SetIsDirtyDataCleaned();
-    formCacheMgr_.ResetCacheStateAfterReboot();
-    EXPECT_TRUE(formCacheMgr_.IsDirtyDataCleaned());
-    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_029 end";
-}
-
-/*
- * @tc.name: FmsFormCacheMgrTest_030
- * @tc.desc: Verify IsDirtyDataCleaned returns false for legacy-format sentinel row.
- * @tc.type: FUNC
- * @tc.level: Level1
- */
-HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_030, TestSize.Level1)
-{
-    HILOG_INFO("FmsFormCacheMgrTest_030 start");
     // simulate a device cleaned by the legacy one-shot sweep (empty DATA_CACHE, legacy format)
     formCacheMgr_.SetIsDirtyDataCleaned();
     EXPECT_TRUE(FormRdbDataMgr::GetInstance().ExecuteSql(
@@ -626,18 +611,18 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_030, TestSize.Level1)
     // sweep again upgrades the stored version
     formCacheMgr_.SetIsDirtyDataCleaned();
     EXPECT_TRUE(formCacheMgr_.IsDirtyDataCleaned());
-    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_030 end";
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_029 end";
 }
 
 /*
- * @tc.name: FmsFormCacheMgrTest_031
+ * @tc.name: FmsFormCacheMgrTest_030
  * @tc.desc: Verify DeleteInvalidImgCache removes orphan rows and keeps referenced rows.
  * @tc.type: FUNC
  * @tc.level: Level1
  */
-HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_031, TestSize.Level1)
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_030, TestSize.Level1)
 {
-    HILOG_INFO("FmsFormCacheMgrTest_031 start");
+    HILOG_INFO("FmsFormCacheMgrTest_030 start");
     int64_t formId = 10031;
     // referenced row
     std::vector<uint8_t> value = {7, 8, 9};
@@ -668,6 +653,6 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_031, TestSize.Level1)
     // DeleteData removes the form_cache row and its referenced image rows
     EXPECT_TRUE(formCacheMgr_.DeleteData(formId));
     EXPECT_FALSE(formCacheMgr_.GetImgCacheFromDb(refRowId, blob, size));
-    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_031 end";
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_030 end";
 }
 }

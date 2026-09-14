@@ -596,7 +596,7 @@ bool FormCacheMgr::IsDirtyDataCleaned() const
     }
     // Empty or non-numeric means legacy format (never cleaned by version mechanism)
     int64_t cleanedVersion = CACHE_CLEANUP_INVALID_VERSION;
-    if (!FormUtil::ConvertStringToInt64(cleanedVersionStr, cleanedVersion)) {
+    if (cleanedVersionStr.empty() || !FormUtil::ConvertStringToInt64(cleanedVersionStr, cleanedVersion)) {
         return false;
     }
     return cleanedVersion >= CACHE_CLEANUP_VERSION;
