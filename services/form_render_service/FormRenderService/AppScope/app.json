@@ -2,7 +2,7 @@
   "app": {
     "bundleName": "com.ohos.formrenderservice",
     "vendor": "ohos",
-    "versionCode": 5000003,
+    "versionCode": 5000004,
     "versionName": "5.0.0.4",
     "minAPIVersion": 20,
     "targetAPIVersion": 20,
