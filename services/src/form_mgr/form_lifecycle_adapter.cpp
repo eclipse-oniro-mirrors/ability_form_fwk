@@ -744,16 +744,6 @@ int FormLifecycleAdapter::ReleaseForm(const int64_t formId,
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t callerUserId = FormUtil::GetCallerUserId(callingUid);
-    bool isSelfDbFormId = (callerUserId == dbRecord.providerUserId) &&
-        ((std::find(dbRecord.formUserUids.begin(), dbRecord.formUserUids.end(), callingUid)
-        != dbRecord.formUserUids.end()) ? true : false);
-    if (!isSelfDbFormId) {
-        HILOG_ERROR("not self form:%{public}" PRId64 "", formId);
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
-    }
-
     FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
 
     if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
@@ -763,6 +753,16 @@ int FormLifecycleAdapter::ReleaseForm(const int64_t formId,
     FormRecord record;
     FormDataMgr::GetInstance().GetFormRecord(formId, record);
     FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
+
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t callerUserId = FormUtil::GetCallerUserId(callingUid);
+    bool isSelfDbFormId = (callerUserId == dbRecord.providerUserId) &&
+        ((std::find(dbRecord.formUserUids.begin(), dbRecord.formUserUids.end(), callingUid)
+        != dbRecord.formUserUids.end()) ? true : false);
+    if (!isSelfDbFormId) {
+        HILOG_ERROR("not self form:%{public}" PRId64 "", formId);
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
 
     if (delCache) {
         ErrCode result = HandleReleaseForm(matchedFormId, callerToken);
