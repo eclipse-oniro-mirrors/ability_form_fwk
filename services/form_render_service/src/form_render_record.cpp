@@ -394,7 +394,6 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             HILOG_WARN("Form node has been released");
             return ERR_APPEXECFWK_FORM_FORM_NODE_RELEASED;
         }
-        renderFormTasksNum++;
         bool formIsVisible = want.GetBoolParam(Constants::FORM_IS_VISIBLE, false);
         RecordFormVisibility(formJsInfo.formId, formIsVisible);
     }
@@ -405,7 +404,6 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         // Some resources need to be initialized in a JS thread
         if (GetEventHandler(true, formJsInfo.isDynamic) == nullptr) {
             HILOG_ERROR("null eventHandler");
-            MarkRenderFormTaskDone(renderType);
             return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
         }
         std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
@@ -413,7 +411,6 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         sptr<IFormSupply> formSupplyClient = GetFormSupplyClient();
         if (formSupplyClient == nullptr) {
             HILOG_ERROR("null formSupplyClient");
-            MarkRenderFormTaskDone(renderType);
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
 
@@ -427,14 +424,17 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
                 std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
                 FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formJsInfo.formId,
                     FormFsmEvent::RENDER_FORM_FAIL, eventId, formSupplyClient);
+                MarkRenderFormTaskDone(renderType);
                 return;
             }
             renderRecord->HandleUpdateRenderRecord(formJsInfo, want, formSupplyClient, renderType);
         };
         if (eventHandler == nullptr) {
             HILOG_ERROR("null eventHandler");
-            MarkRenderFormTaskDone(renderType);
             return RENDER_FORM_FAILED;
+        }
+        if (renderType == Constants::RENDER_FORM) {
+            renderFormTasksNum++;
         }
         eventHandler->PostTask(task, "UpdateRenderRecord");
     }

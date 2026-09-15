@@ -212,19 +212,13 @@ bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
 bool FormModuleChecker::CheckApiWithSuffix(const std::string& apiPath, const std::string& item)
 {
     HILOG_DEBUG("apiPath: '%{public}s', item: '%{public}s'", apiPath.c_str(), item.c_str());
-    if (apiPath.empty()) {
-        HILOG_ERROR("empty apiPath");
-        return false;
-    }
-    // Exact match for non-wildcard items
-    if (apiPath == item) {
+    if (item.compare(0, apiPath.size(), apiPath) == 0) {
         return true;
     }
     const int32_t kSuffixLength = 2;
     if (item.size() >= kSuffixLength && item.substr(item.size() - kSuffixLength) == ".*") {
         const std::string path = item.substr(0, item.rfind('.'));
-        // Wildcard match: apiPath must start with path + '.' to ensure component boundary
-        if (apiPath.size() > path.size() && apiPath.compare(0, path.size(), path) == 0 && apiPath[path.size()] == '.') {
+        if (apiPath.compare(0, path.size(), path) == 0) {
             return true;
         }
     }
