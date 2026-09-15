@@ -424,7 +424,6 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
                 std::string eventId = want.GetStringParam(Constants::FORM_STATUS_EVENT_ID);
                 FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(formJsInfo.formId,
                     FormFsmEvent::RENDER_FORM_FAIL, eventId, formSupplyClient);
-                MarkRenderFormTaskDone(renderType);
                 return;
             }
             renderRecord->HandleUpdateRenderRecord(formJsInfo, want, formSupplyClient, renderType);
