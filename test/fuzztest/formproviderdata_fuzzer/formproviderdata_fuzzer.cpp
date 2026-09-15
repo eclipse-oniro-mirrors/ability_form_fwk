@@ -49,6 +49,7 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 
 constexpr size_t U32_AT_SIZE = 4;
+constexpr size_t MAX_SAFE_STRING_LENGTH = 64;
 uint32_t GetU32Data(const char* ptr)
 {
     // convert fuzz input data to an integer
@@ -59,7 +60,7 @@ uint32_t GetU32Data(const char* ptr)
 std::string GenerateSafeString(const char* data, size_t size)
 {
     std::string result;
-    for (size_t i = 0; i < size && i < 64; i++) {
+    for (size_t i = 0; i < size && i < MAX_SAFE_STRING_LENGTH; i++) {
         unsigned char c = static_cast<unsigned char>(data[i]);
         if (isalnum(c) || c == '_' || c == '-' || c == '.' || c == '/' || c == ':') {
             result += static_cast<char>(c);

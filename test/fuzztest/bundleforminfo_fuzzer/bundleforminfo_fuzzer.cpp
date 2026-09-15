@@ -53,6 +53,10 @@ constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_NUM = 10000;
 constexpr int32_t MIN_NUM = 0;
 constexpr int32_t MAX_LOOP_COUNT = 10;
+constexpr int32_t TEST_TYPE_BASIC = 0;
+constexpr int32_t TEST_TYPE_UPDATE_CONFIGS = 1;
+constexpr int32_t TEST_TYPE_FORM_INFO_MGR = 2;
+constexpr int32_t NUM_TEST_SCENARIOS = 3;
 
 FormInfo GenerateFuzzedFormInfo(FuzzedDataProvider *fdp)
 {
@@ -174,14 +178,14 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     }
 
     uint8_t testType = fdp->ConsumeIntegral<uint8_t>();
-    switch (testType % 3) {
-        case 0:
+    switch (testType % NUM_TEST_SCENARIOS) {
+        case TEST_TYPE_BASIC:
             TestBundleFormInfoBasic(fdp);
             break;
-        case 1:
+        case TEST_TYPE_UPDATE_CONFIGS:
             TestBundleFormInfoUpdateConfigs(fdp);
             break;
-        case 2:
+        case TEST_TYPE_FORM_INFO_MGR:
             TestFormInfoMgrWithBundleFormInfo(fdp);
             break;
         default:
