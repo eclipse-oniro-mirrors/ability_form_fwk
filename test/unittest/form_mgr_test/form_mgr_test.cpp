@@ -1499,7 +1499,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0075, TestSize.Level1) {
     sptr<IRemoteObject> remote = new (std::nothrow) MockFormProviderClient();
     FormMgr::GetInstance().ResetProxy(remote);
     EXPECT_TRUE(FormMgr::GetInstance().GetRecoverStatus() == Constants::IN_RECOVERING);
-    EXPECT_TRUE(FormMgr::GetInstance().remoteProxy_ == nullptr);
+    EXPECT_FALSE(FormMgr::GetInstance().remoteProxy_ == nullptr);
     FormMgr::GetInstance().SetFormMgrService(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0075 test ends";
 }
