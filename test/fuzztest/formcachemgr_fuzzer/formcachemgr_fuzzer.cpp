@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <cctype>
 #include "formcachemgr_fuzzer.h"
 
 #include <cstddef>
@@ -27,20 +28,53 @@
 #undef private
 #undef protected
 #include "securec.h"
+#include "ffrt.h"
+
+// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
+// tasks spawns ffrt CPU workers whose threads still run when ffrt's static
+// CPUWorkerGroup is torn down at exit (heap-use-after-free).
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+// Interpose WatchParameter so the memory-watermark watcher never arms. The
+// param-service callback creates an ffrt queue during exit, racing with ffrt's
+// static QueueMonitor teardown (heap-use-after-free).
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr size_t U32_AT_SIZE = 4;
 constexpr int64_t EVENT_MSG = 1;
 constexpr int64_t EVENT_ID = 2;
+
+// Sanitize fuzz bytes to pure ASCII so json::dump() doesn't abort on invalid UTF-8.
+std::string GenerateSafeString(FuzzedDataProvider *fdp)
+{
+    std::string raw = fdp->ConsumeRandomLengthString(64);
+    std::string result;
+    for (unsigned char c : raw) {
+        if (isalnum(c) || c == '_' || c == '-' || c == '.' || c == '/' || c == ':') {
+            result += static_cast<char>(c);
+        }
+    }
+    return result.empty() ? "default" : result;
+}
+
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     if (fdp == nullptr) {
         return true;
     }
     int64_t formId = fdp->ConsumeIntegral<int64_t>();
-    std::string datas = fdp->ConsumeRandomLengthString();
+    std::string datas = GenerateSafeString(fdp);
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
     FormCacheMgr::GetInstance().GetData(formId, datas, imageDataMap);
 

@@ -354,10 +354,12 @@ bool FormUtil::ConvertStringToInt(std::string_view strInfo, int &intValue, int r
     if (strInfo.empty()) {
         return false;
     }
+    std::string strInfoStr(strInfo);
     char *endPtr = nullptr;
     errno = 0;
-    long result = strtol(std::string(strInfo).c_str(), &endPtr, radix);
-    if (errno == ERANGE || endPtr == strInfo.data() || *endPtr != '\0' || result < INT32_MIN || result > INT32_MAX) {
+    long result = strtol(strInfoStr.c_str(), &endPtr, radix);
+    if (errno == ERANGE || endPtr == strInfoStr.c_str() || *endPtr != '\0' ||
+        result < INT32_MIN || result > INT32_MAX) {
         return false;
     }
     intValue = static_cast<int>(result);

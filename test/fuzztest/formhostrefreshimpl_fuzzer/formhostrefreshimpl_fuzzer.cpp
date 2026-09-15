@@ -27,8 +27,26 @@
 #define protected public
 #include "form_refresh/refresh_impl/form_host_refresh_impl.h"
 #include "form_refresh/strategy/refresh_config.h"
+#include "ffrt.h"
 #undef private
 #undef protected
+
+// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
+// tasks spawns ffrt CPU workers whose threads still run when ffrt's static
+// CPUWorkerGroup is torn down at exit (heap-use-after-free).
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+// Interpose WatchParameter so the memory-watermark watcher never arms. The
+// param-service callback creates an ffrt queue during exit, racing with ffrt's
+// static QueueMonitor teardown (heap-use-after-free).
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 // Interpose RdbHelper::GetRdbStore so no real rdb store is opened. Opening the
 // store spawns an async backup thread that outlives the fuzz process and races
@@ -44,18 +62,10 @@ std::shared_ptr<RdbStore> RdbHelper::GetRdbStore(
 } // namespace NativeRdb
 } // namespace OHOS
 
-// The fuzz target links the real form service stack, whose FormDataMgr registers a
-// memory-watermark parameter watcher. Its IPC-thread callback can submit ffrt tasks
-// after the global scheduler is torn down at process exit (heap-use-after-free). The
-// watcher path is not reachable from fuzz input, so stub the registration as no-op.
-extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
-{
-    return 0;
-}
-
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_NUM = 10000;
 constexpr int32_t MIN_NUM = 0;

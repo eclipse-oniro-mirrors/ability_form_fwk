@@ -48,10 +48,19 @@ extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
     return nullptr;
 }
 
+// Interpose WatchParameter so the memory-watermark watcher never arms. The
+// param-service callback creates an ffrt queue during exit, racing with ffrt's
+// static QueueMonitor teardown (heap-use-after-free).
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
+
 using namespace OHOS::AppExecFwk;
 using Want = OHOS::AAFwk::Want;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 128;
 constexpr int32_t MAX_VECTOR_SIZE = 10;
 constexpr int32_t MAX_FORM_ID = 10000;

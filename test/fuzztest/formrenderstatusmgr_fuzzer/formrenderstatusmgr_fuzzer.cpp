@@ -27,10 +27,29 @@
 #undef private
 #undef protected
 #include "securec.h"
+#include "ffrt.h"
+
+// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
+// tasks spawns ffrt CPU workers whose threads still run when ffrt's static
+// CPUWorkerGroup is torn down at exit (heap-use-after-free).
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+// Interpose WatchParameter so the memory-watermark watcher never arms. The
+// param-service callback creates an ffrt queue during exit, racing with ffrt's
+// static QueueMonitor teardown (heap-use-after-free).
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr size_t U32_AT_SIZE = 4;
 constexpr int32_t MAX_FORM_ID = 100000;
 constexpr int32_t MIN_FORM_ID = 1;

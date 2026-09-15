@@ -15,6 +15,7 @@
 
 #include "forminfostorage_fuzzer.h"
 
+#include <cctype>
 #include <cstddef>
 #include <cstdint>
 #include <fuzzer/FuzzedDataProvider.h>
@@ -24,30 +25,67 @@
 #include "data_center/form_info/form_info_storage.h"
 #undef private
 #undef protected
+#include "ffrt.h"
+
+// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
+// tasks spawns ffrt CPU workers whose threads still run when ffrt's static
+// CPUWorkerGroup is torn down at exit (heap-use-after-free).
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+// Interpose WatchParameter so the memory-watermark watcher never arms. The
+// param-service callback creates an ffrt queue during exit, racing with ffrt's
+// static QueueMonitor teardown (heap-use-after-free).
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS;
 using namespace OHOS::AAFwk;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_NUM = 10000;
 constexpr int32_t MIN_NUM = -10000;
 
+// Sanitize fuzz bytes to safe ASCII for fields serialized by FormInfo::to_json
+// → nlohmann::json::dump(), which aborts on invalid UTF-8 with the default
+// strict error handler.
+std::string GenerateSafeString(FuzzedDataProvider *fdp, int32_t maxLength = MAX_LENGTH)
+{
+    std::string result = fdp->ConsumeRandomLengthString(maxLength);
+    std::string safeResult;
+    for (char c : result) {
+        if (std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-' ||
+            c == '.' || c == '/' || c == ':') {
+            safeResult += c;
+        } else {
+            safeResult += '_';
+        }
+    }
+    return safeResult.empty() ? "default" : safeResult;
+}
+
 AppExecFwk::FormInfo CreateFormInfo(FuzzedDataProvider *fdp)
 {
     AppExecFwk::FormInfo formInfo;
-    formInfo.name = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    formInfo.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    formInfo.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    formInfo.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    formInfo.description = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    formInfo.formConfigAbility = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formInfo.name = GenerateSafeString(fdp);
+    formInfo.bundleName = GenerateSafeString(fdp);
+    formInfo.moduleName = GenerateSafeString(fdp);
+    formInfo.abilityName = GenerateSafeString(fdp);
+    formInfo.description = GenerateSafeString(fdp);
+    formInfo.formConfigAbility = GenerateSafeString(fdp);
     formInfo.updateEnabled = fdp->ConsumeBool();
     formInfo.updateDuration = fdp->ConsumeIntegral<uint32_t>();
-    formInfo.scheduledUpdateTime = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formInfo.scheduledUpdateTime = GenerateSafeString(fdp);
     formInfo.formVisibleNotify = fdp->ConsumeBool();
-    formInfo.relatedBundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    formInfo.jsComponentName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formInfo.relatedBundleName = GenerateSafeString(fdp);
+    formInfo.jsComponentName = GenerateSafeString(fdp);
     formInfo.isDynamic = fdp->ConsumeBool();
     formInfo.isStatic = fdp->ConsumeBool();
     formInfo.isTemplateForm = fdp->ConsumeBool();
@@ -58,8 +96,8 @@ AppExecFwk::FormInfo CreateFormInfo(FuzzedDataProvider *fdp)
 AppExecFwk::FormInfoFilter CreateFormInfoFilter(FuzzedDataProvider *fdp)
 {
     AppExecFwk::FormInfoFilter filter;
-    filter.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    filter.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    filter.bundleName = GenerateSafeString(fdp);
+    filter.moduleName = GenerateSafeString(fdp);
     int32_t numShapes = fdp->ConsumeIntegralInRange(0, 10);
     for (int32_t i = 0; i < numShapes; i++) {
         filter.supportShapes.push_back(fdp->ConsumeIntegral<int32_t>());
@@ -92,7 +130,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     resultFormInfos.clear();
     formInfoStorage.GetAllTemplateFormsInfo(userId, resultFormInfos);
 
-    std::string moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    std::string moduleName = GenerateSafeString(fdp);
     resultFormInfos.clear();
     formInfoStorage.GetFormsInfoByModule(userId, moduleName, resultFormInfos);
 

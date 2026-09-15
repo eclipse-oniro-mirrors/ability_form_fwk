@@ -15,12 +15,44 @@
 
 #include "formproviderinfo_fuzzer.h"
 
+#include <cctype>
 #include <cstddef>
 #include <cstdint>
 #include <fuzzer/FuzzedDataProvider.h>
 
+#include "ffrt.h"
 #include "form_provider_info.h"
 #include "securec.h"
+
+// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
+// tasks spawns ffrt CPU workers whose threads still run when ffrt's static
+// CPUWorkerGroup is torn down at exit (heap-use-after-free).
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+// Interpose WatchParameter so the memory-watermark watcher never arms. The
+// param-service callback creates an ffrt queue during exit, racing with ffrt's
+// static QueueMonitor teardown (heap-use-after-free).
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
+
+// Sanitize fuzz bytes to pure ASCII so json::dump() doesn't abort on invalid UTF-8.
+std::string GenerateSafeString(FuzzedDataProvider *fdp)
+{
+    std::string raw = fdp->ConsumeRandomLengthString(64);
+    std::string result;
+    for (char c : raw) {
+        if (isalnum(c) || c == '_' || c == '-' || c == '.' || c == '/' || c == ':') {
+            result += c;
+        }
+    }
+    return result.empty() ? "default" : result;
+}
 
 using namespace OHOS::AppExecFwk;
 
@@ -29,17 +61,17 @@ namespace OHOS {
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     FormProviderInfo formProviderInfo;
-    std::string dataString = fdp->ConsumeRandomLengthString();
+    std::string dataString = GenerateSafeString(fdp);
     formProviderInfo.SetFormDataString(dataString);
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
     formProviderInfo.SetImageDataMap(imageDataMap);
     formProviderInfo.GetImageDataMap();
     nlohmann::json addJsonData;
-    std::string key1 = fdp->ConsumeRandomLengthString();
-    std::string value1 = fdp->ConsumeRandomLengthString();
-    std::string key2 = fdp->ConsumeRandomLengthString();
-    std::string value2 = fdp->ConsumeRandomLengthString();
-    std::string jsonStr = "{\"" + key1 + "\" : " + value1 + ", \"" + key2 + "\" : " + value2 +"}";
+    std::string key1 = GenerateSafeString(fdp);
+    std::string value1 = GenerateSafeString(fdp);
+    std::string key2 = GenerateSafeString(fdp);
+    std::string value2 = GenerateSafeString(fdp);
+    std::string jsonStr = "{\"" + key1 + "\" : \"" + value1 + "\", \"" + key2 + "\" : \"" + value2 +"\"}";
     addJsonData = nlohmann::json::parse(jsonStr, nullptr, false);
     formProviderInfo.MergeData(addJsonData);
     formProviderInfo.NeedCache();

@@ -28,6 +28,7 @@
 #undef private
 #undef protected
 #include "form_constants.h"
+#include "ffrt.h"
 
 // Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing the
 // publish timeout tasks spawns ffrt CPU workers whose threads still run when
@@ -51,6 +52,7 @@ using namespace OHOS::AppExecFwk;
 using OHOS::AAFwk::Want;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_FORM_ID = 10000;
 constexpr int32_t MIN_FORM_ID = 0;

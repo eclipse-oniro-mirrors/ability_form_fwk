@@ -37,11 +37,20 @@
 #include "want.h"
 #include "want_params.h"
 #include "data_center/form_info/form_item_info.h"
+#include "ffrt.h"
 
-// The fuzz target links the real form service stack, whose FormDataMgr registers a
-// memory-watermark parameter watcher. Its IPC-thread callback can submit ffrt tasks
-// after the global scheduler is torn down at process exit (heap-use-after-free). The
-// watcher path is not reachable from fuzz input, so stub the registration as no-op.
+// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
+// tasks spawns ffrt CPU workers whose threads still run when ffrt's static
+// CPUWorkerGroup is torn down at exit (heap-use-after-free).
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+// Interpose WatchParameter so the memory-watermark watcher never arms. The
+// param-service callback creates an ffrt queue during exit, racing with ffrt's
+// static QueueMonitor teardown (heap-use-after-free).
 extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
 {
     return 0;
@@ -51,6 +60,7 @@ using namespace OHOS::AppExecFwk;
 using Want = OHOS::AAFwk::Want;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 128;
 constexpr int32_t MAX_VECTOR_SIZE = 10;
 constexpr int32_t MAX_FORM_ID = 10000;

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <cctype>
 #include "formproviderdata_fuzzer.h"
 
 #include <cstddef>
@@ -24,16 +25,49 @@
 #undef private
 #undef protected
 #include "securec.h"
+#include "ffrt.h"
+
+// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
+// tasks spawns ffrt CPU workers whose threads still run when ffrt's static
+// CPUWorkerGroup is torn down at exit (heap-use-after-free).
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+// Interpose WatchParameter so the memory-watermark watcher never arms. The
+// param-service callback creates an ffrt queue during exit, racing with ffrt's
+// static QueueMonitor teardown (heap-use-after-free).
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr size_t U32_AT_SIZE = 4;
 uint32_t GetU32Data(const char* ptr)
 {
     // convert fuzz input data to an integer
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
 }
+
+// Sanitize fuzz bytes to pure ASCII so json::dump() doesn't abort on invalid UTF-8.
+std::string GenerateSafeString(const char* data, size_t size)
+{
+    std::string result;
+    for (size_t i = 0; i < size && i < 64; i++) {
+        unsigned char c = static_cast<unsigned char>(data[i]);
+        if (isalnum(c) || c == '_' || c == '-' || c == '.' || c == '/' || c == ':') {
+            result += static_cast<char>(c);
+        }
+    }
+    return result.empty() ? "default" : result;
+}
+
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
     FormProviderData formProviderData;
@@ -45,7 +79,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formProviderData.AddImageData(picName, fd);
     formProviderData.ParseImagesData();
     formProviderData.RemoveImageData(picName);
-    std::string jsonDataString(data, size);
+    std::string jsonDataString = GenerateSafeString(data, size);
     formProviderData.SetDataString(jsonDataString);
     nlohmann::json addJsonData;
     formProviderData.MergeData(addJsonData);
