@@ -2930,7 +2930,8 @@ std::mutex g_formUninstallCallbackListMutex;
 void OnFormUninstallCallback(const std::vector<int64_t> &formIds)
 {
     HILOG_DEBUG("Call");
-    auto mainHandler = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    static const auto mainHandler =
+        std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
     mainHandler->PostSyncTask([&formIds]() {
         std::list<std::shared_ptr<FormUninstallCallback>> callbacks;
         {

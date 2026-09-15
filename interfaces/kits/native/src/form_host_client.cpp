@@ -16,6 +16,7 @@
 #include "form_host_client.h"
 
 #include <cinttypes>
+#include <utility>
 
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
@@ -274,7 +275,7 @@ void FormHostClient::OnAcquireState(FormState state, const AAFwk::Want &want)
         if (iter == formStateCallbackMap_.end()) {
             HILOG_INFO("state callback not found");
         } else {
-            callbackSet.swap(iter->second);
+            callbackSet = std::move(iter->second);
             formStateCallbackMap_.erase(iter);
         }
     }

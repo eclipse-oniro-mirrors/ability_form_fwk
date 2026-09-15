@@ -404,7 +404,11 @@ int32_t EtsFormStateObserver::OnRemoveForm(const std::string &bundleName,
 {
     HILOG_DEBUG("call");
 
-    auto mainHandler = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    auto mainHandler = GetMainEventRunner();
+    if (mainHandler == nullptr) {
+        HILOG_ERROR("null handler");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     mainHandler->PostSyncTask([this, &bundleName, &runningFormInfo]() {
         std::vector<std::shared_ptr<EtsFormRemoveCallbackClient>> callbackClients;
         {
@@ -637,9 +641,10 @@ ErrCode EtsFormStateObserver::OnFormClickEvent(
         HILOG_ERROR("empty Calltype");
         return ERR_INVALID_VALUE;
     }
-    std::lock_guard<std::mutex> lock(handlerMutex_);
-    if (handler_ == nullptr) {
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    auto mainHandler = GetMainEventRunner();
+    if (mainHandler == nullptr) {
+        HILOG_ERROR("null handler");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     wptr<EtsFormStateObserver> weakObserver = this;
@@ -668,12 +673,12 @@ ErrCode EtsFormStateObserver::OnFormClickEvent(
             }
             callbacks = (*callBackListIter)->CopyCallbacks();
         }
-        if (callbacks != nullptr) {
+        if (callbacks != nullptr && !callbacks->IsEmpty()) {
             callbacks->HandleFormEvent(runningFormInfo);
         }
     };
 
-    handler_->PostSyncTask(notify);
+    mainHandler->PostSyncTask(notify);
     return ERR_OK;
 }
 
