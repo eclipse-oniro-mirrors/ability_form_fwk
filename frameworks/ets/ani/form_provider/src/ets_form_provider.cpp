@@ -748,18 +748,16 @@ void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
         ani_object runningFormInfoAni = CreateAniObject(env, RUNNING_FORM_INFO_INNER_CLASS_NAME);
         if (runningFormInfoAni == nullptr) {
             HILOG_ERROR("CreateAniObject failed");
-            InvokeAsyncWithBusinessError(env, callback, static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE),
-                nullptr);
-            return;
+            ani_ref undefinedRef = nullptr;
+            env->GetUndefined(&undefinedRef);
+            runningFormInfoAni = reinterpret_cast<ani_object>(undefinedRef);
+        } else {
+            SetRunningFormInfoFields(env, runningFormInfoAni, formInfo);
         }
-        SetRunningFormInfoFields(env, runningFormInfoAni, formInfo);
         ani_status status = env->Object_CallMethodByName_Void(
             formInfosArray, ANI_SETTER_MARKER, PROVIDER_SET_SIGNATURE, index, runningFormInfoAni);
         if (status != ANI_OK) {
             HILOG_ERROR("Object_CallMethodByName_Void failed, error code: %{public}d", static_cast<int>(status));
-            InvokeAsyncWithBusinessError(env, callback, static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE),
-                nullptr);
-            return;
         }
         index++;
     }
