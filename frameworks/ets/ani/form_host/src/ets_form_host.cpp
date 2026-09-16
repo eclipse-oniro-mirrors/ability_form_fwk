@@ -1341,44 +1341,54 @@ bool EtsFormRouterProxyMgr::TemplateFormDetailInfoChangeInner(
     const std::vector<AppExecFwk::TemplateFormDetailInfo> &templateFormInfo)
 {
     HILOG_INFO("TemplateFormDetailInfoChangeInner Call");
-    ani_env *env = GetTemplateFormDetailInfoChangeEnv();
-    if (env == nullptr) {
-        HILOG_ERROR("env is null");
-        return false;
-    }
-    ani_class cls = nullptr;
-    ani_status status = ANI_ERROR;
-    if ((status = env->FindClass(ETS_TEMPLATEFORMDETAILINFO_CALLBACK, &cls)) != ANI_OK) {
-        HILOG_ERROR("findClass failed");
-        return false;
-    }
-    ani_object call;
+    ani_env *env = nullptr;
+    ani_ref callbackRef = nullptr;
     {
         std::lock_guard<std::mutex> lock(registerTemplateFormDetailInfoChangeMutex_);
-        call = reinterpret_cast<ani_object>(templateFormDetailInfoChangeCallbackRef_);
-        if (call == nullptr) {
+        env = GetTemplateFormDetailInfoChangeEnv();
+        if (env == nullptr) {
+            HILOG_ERROR("env is null");
+            return false;
+        }
+        if (templateFormDetailInfoChangeCallbackRef_ == nullptr) {
             HILOG_ERROR("call is null");
             return false;
         }
+        ani_status status = env->GlobalReference_Create(templateFormDetailInfoChangeCallbackRef_, &callbackRef);
+        if (status != ANI_OK) {
+            HILOG_ERROR("GlobalReference_Create status: %{public}d", status);
+            return false;
+        }
     }
-    ani_array templateFormInfoArray = nullptr;
-    ani_ref aniRef;
-    env->GetUndefined(&aniRef);
-    if ((status = env->Array_New(templateFormInfo.size(),
-        static_cast<ani_object>(aniRef), &templateFormInfoArray)) != ANI_OK) {
-        HILOG_ERROR("Array_New failed %{public}d", static_cast<int>(status));
-        return false;
-    }
-    if (!GetTemplateFormInfoArray(env, templateFormInfo, templateFormInfoArray)) {
-        HILOG_ERROR("GetTemplateFormInfoArray failed");
-        return false;
-    }
-    if ((status = env->Object_CallMethodByName_Void(call, FORM_HOST_INVOKE, nullptr,
-        reinterpret_cast<ani_object>(templateFormInfoArray))) != ANI_OK) {
-        HILOG_ERROR("callMethod failed %{public}d", static_cast<int>(status));
-        return false;
-    }
-    return true;
+    auto doCallback = [this, env, callbackRef, &templateFormInfo]() -> bool {
+        ani_class cls = nullptr;
+        ani_status status = ANI_ERROR;
+        if ((status = env->FindClass(ETS_TEMPLATEFORMDETAILINFO_CALLBACK, &cls)) != ANI_OK) {
+            HILOG_ERROR("findClass failed");
+            return false;
+        }
+        ani_array templateFormInfoArray = nullptr;
+        ani_ref aniRef;
+        env->GetUndefined(&aniRef);
+        if ((status = env->Array_New(templateFormInfo.size(),
+            static_cast<ani_object>(aniRef), &templateFormInfoArray)) != ANI_OK) {
+            HILOG_ERROR("Array_New failed %{public}d", static_cast<int>(status));
+            return false;
+        }
+        if (!GetTemplateFormInfoArray(env, templateFormInfo, templateFormInfoArray)) {
+            HILOG_ERROR("GetTemplateFormInfoArray failed");
+            return false;
+        }
+        if ((status = env->Object_CallMethodByName_Void(static_cast<ani_object>(callbackRef),
+            FORM_HOST_INVOKE, nullptr, reinterpret_cast<ani_object>(templateFormInfoArray))) != ANI_OK) {
+            HILOG_ERROR("callMethod failed %{public}d", static_cast<int>(status));
+            return false;
+        }
+        return true;
+    };
+    bool ret = doCallback();
+    DeleteGlobalReference(env, callbackRef);
+    return ret;
 }
 
 bool EtsFormRouterProxyMgr::GetTemplateFormInfoArray(ani_env *env,
@@ -2920,11 +2930,26 @@ std::mutex g_formUninstallCallbackListMutex;
 void OnFormUninstallCallback(const std::vector<int64_t> &formIds)
 {
     HILOG_DEBUG("Call");
-    std::lock_guard<std::mutex> lock(g_formUninstallCallbackListMutex);
-    for (auto item : g_formUninstallCallbackList) {
-        for (int64_t formId : formIds) {
-            item->ProcessFormUninstall(formId);
+    auto mainRunner = AppExecFwk::EventRunner::GetMainEventRunner();
+    if (mainRunner == nullptr) {
+        HILOG_ERROR("null main runner");
+        return;
+    }
+    static const auto mainHandler = std::make_shared<AppExecFwk::EventHandler>(mainRunner);
+    bool posted = mainHandler->PostSyncTask([&formIds]() {
+        std::list<std::shared_ptr<FormUninstallCallback>> callbacks;
+        {
+            std::lock_guard<std::mutex> lock(g_formUninstallCallbackListMutex);
+            callbacks = g_formUninstallCallbackList;
         }
+        for (const auto &item : callbacks) {
+            for (int64_t formId : formIds) {
+                item->ProcessFormUninstall(formId);
+            }
+        }
+    });
+    if (!posted) {
+        HILOG_ERROR("post formUninstall task failed");
     }
 }
 

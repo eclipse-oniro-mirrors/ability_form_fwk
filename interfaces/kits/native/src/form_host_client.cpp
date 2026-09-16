@@ -16,6 +16,7 @@
 #include "form_host_client.h"
 
 #include <cinttypes>
+#include <utility>
 
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
@@ -267,20 +268,23 @@ void FormHostClient::OnAcquireState(FormState state, const AAFwk::Want &want)
         .append(want.GetStringParam(AppExecFwk::Constants::PARAM_FORM_NAME_KEY)).append(doubleColon)
         .append(std::to_string(want.GetIntParam(AppExecFwk::Constants::PARAM_FORM_DIMENSION_KEY, 1)));
 
-    std::lock_guard<std::mutex> lock(formStateCallbackMutex_);
-    auto iter = formStateCallbackMap_.find(key);
-    if (iter == formStateCallbackMap_.end()) {
-        HILOG_INFO("state callback not found");
-    } else {
-        std::set<std::shared_ptr<FormStateCallbackInterface>> &callbackSet = iter->second;
-        for (auto &callback: callbackSet) {
-            if (callback == nullptr) {
-                HILOG_ERROR("null FormCallback");
-                continue;
-            }
-            callback->ProcessAcquireState(state);
+    std::set<std::shared_ptr<FormStateCallbackInterface>> callbackSet;
+    {
+        std::lock_guard<std::mutex> lock(formStateCallbackMutex_);
+        auto iter = formStateCallbackMap_.find(key);
+        if (iter == formStateCallbackMap_.end()) {
+            HILOG_INFO("state callback not found");
+        } else {
+            callbackSet = std::move(iter->second);
+            formStateCallbackMap_.erase(iter);
         }
-        formStateCallbackMap_.erase(iter);
+    }
+    for (const auto &callback : callbackSet) {
+        if (callback == nullptr) {
+            HILOG_ERROR("null FormCallback");
+            continue;
+        }
+        callback->ProcessAcquireState(state);
     }
     HILOG_INFO("done");
 }
