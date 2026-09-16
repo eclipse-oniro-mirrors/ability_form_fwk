@@ -2930,9 +2930,13 @@ std::mutex g_formUninstallCallbackListMutex;
 void OnFormUninstallCallback(const std::vector<int64_t> &formIds)
 {
     HILOG_DEBUG("Call");
-    static const auto mainHandler =
-        std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
-    mainHandler->PostSyncTask([&formIds]() {
+    auto mainRunner = AppExecFwk::EventRunner::GetMainEventRunner();
+    if (mainRunner == nullptr) {
+        HILOG_ERROR("null main runner");
+        return;
+    }
+    static const auto mainHandler = std::make_shared<AppExecFwk::EventHandler>(mainRunner);
+    bool posted = mainHandler->PostSyncTask([&formIds]() {
         std::list<std::shared_ptr<FormUninstallCallback>> callbacks;
         {
             std::lock_guard<std::mutex> lock(g_formUninstallCallbackListMutex);
@@ -2944,6 +2948,9 @@ void OnFormUninstallCallback(const std::vector<int64_t> &formIds)
             }
         }
     });
+    if (!posted) {
+        HILOG_ERROR("post formUninstall task failed");
+    }
 }
 
 void AddFormUninstallCallback(ani_env *env, ani_object callback)

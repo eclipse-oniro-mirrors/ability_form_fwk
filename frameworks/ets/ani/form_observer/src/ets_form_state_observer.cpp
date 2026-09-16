@@ -409,7 +409,7 @@ int32_t EtsFormStateObserver::OnRemoveForm(const std::string &bundleName,
         HILOG_ERROR("null handler");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    mainHandler->PostSyncTask([this, &bundleName, &runningFormInfo]() {
+    bool posted = mainHandler->PostSyncTask([this, &bundleName, &runningFormInfo]() {
         std::vector<std::shared_ptr<EtsFormRemoveCallbackClient>> callbackClients;
         {
             std::lock_guard<std::mutex> lock(removeFormCallbackMutex_);
@@ -422,6 +422,9 @@ int32_t EtsFormStateObserver::OnRemoveForm(const std::string &bundleName,
             callbackClient->ProcessFormRemove(bundleName, runningFormInfo);
         }
     });
+    if (!posted) {
+        HILOG_ERROR("post formRemove task failed");
+    }
     return ERR_OK;
 }
 
