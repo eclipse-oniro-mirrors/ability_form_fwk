@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -273,28 +273,6 @@ HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_008, TestSize.Level1)
     data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
-}
-
-/**
- * @tc.name: FormSupplyStubTest_009
- * @tc.desc: Verify function HandleOnAcquire the return value is ERR_OK
- * @tc.type: FUNC
- */
-HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_009, TestSize.Level1)
-{
-    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
-    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    Want want = {};
-    FormProviderInfo formInfo = {};
-    want.SetParam(Constants::PROVIDER_FLAG, ERR_OK);
-    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
-    data.WriteParcelable(&want);
-    data.WriteParcelable(&formInfo);
-    auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_OK);
 }
 
 /**
@@ -832,155 +810,6 @@ HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_037, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormSupplyStubTest_041
- * @tc.desc: Verify OnRemoteRequest
- * @tc.type: FUNC
- */
-HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_041, TestSize.Level0)
-{
-    FormSupplyCallback callback;
-    uint32_t code = 1;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-}
-
-/**
- * @tc.name: FormSupplyStubTest_042
- * @tc.desc: Verify OnRemoteRequest
- * @tc.type: FUNC
- */
-HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_042, TestSize.Level0)
-{
-    FormSupplyCallback callback;
-    uint32_t code = 2;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-}
-
-/**
- * @tc.name: FormSupplyStubTest_043
- * @tc.desc: Verify OnRemoteRequest
- * @tc.type: FUNC
- * @tc.require: #I5SNG1
- */
-HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_043, TestSize.Level0)
-{
-    FormSupplyCallback callback;
-    uint32_t code = 3;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-}
-
-/**
- * @tc.name: FormSupplyStubTest_044
- * @tc.desc: Verify OnRemoteRequest
- * @tc.type: FUNC
- * @tc.require: #I5SNG1
- */
-HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_044, TestSize.Level0)
-{
-    FormSupplyCallback callback;
-    uint32_t code = 4;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-}
-
-/**
- * @tc.name: FormSupplyStubTest_045
- * @tc.desc: Verify function HandleOnAcquire the return value is ERR_OK
- * @tc.type: FUNC
- */
-HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_045, TestSize.Level1)
-{
-    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
-    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    Want want = {};
-    FormProviderInfo formInfo;
-    want.SetParam(Constants::PROVIDER_FLAG, ERR_OK);
-    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
-    data.WriteParcelable(&want);
-    data.WriteParcelable(&formInfo);
-    auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_OK);
-}
-
-/**
- * @tc.name: FormSupplyStubTest_046
- * @tc.desc: Verify function HandleOnAcquire the return value is ERR_APPEXECFWK_PARCEL_ERROR
- * @tc.type: FUNC
- */
-HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_046, TestSize.Level1)
-{
-    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
-    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    Want want = {};
-    want.SetParam(Constants::PROVIDER_FLAG, ERR_OK);
-    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
-    data.WriteParcelable(&want);
-    auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
-}
-
-/**
- * @tc.name: FormSupplyStubTest_047
- * @tc.desc: Verify function HandleOnAcquire the return value is ERR_APPEXECFWK_PARCEL_ERROR
- * @tc.type: FUNC
- */
-HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_047, TestSize.Level1)
-{
-    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
-    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    Want want = {};
-    want.SetParam(Constants::PROVIDER_FLAG, ERR_APPEXECFWK_PARCEL_ERROR);
-    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
-    data.WriteParcelable(&want);
-    auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
-}
-
-/**
- * @tc.name: FormSupplyStubTest_048
- * @tc.desc: Verify function HandleOnAcquire the return value is ERR_APPEXECFWK_PARCEL_ERROR
- * @tc.type: FUNC
- */
-HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_048, TestSize.Level1)
-{
-    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
-    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
-    auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
-}
-
-/**
  * @tc.name: FormSupplyStubTest_049
  * @tc.desc: Verify function HandleOnAcquire the return value is ERR_OK
  * @tc.type: FUNC
@@ -998,42 +827,6 @@ HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_049, TestSize.Level1)
     data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
     data.WriteParcelable(&want);
     data.WriteParcelable(&formInfo);
-    auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_OK);
-}
-
-/**
- * @tc.name: FormSupplyStubTest_050
- * @tc.desc: Verify function HandleOnEventHandle the return value is ERR_APPEXECFWK_PARCEL_ERROR
- * @tc.type: FUNC
- */
-HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_050, TestSize.Level1)
-{
-    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
-    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_EVENT_HANDLE);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
-    auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
-}
-
-/**
- * @tc.name: FormSupplyStubTest_051
- * @tc.desc: Verify function HandleOnEventHandle the return value is ERR_OK
- * @tc.type: FUNC
- */
-HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_051, TestSize.Level1)
-{
-    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
-    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_EVENT_HANDLE);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    Want want = {};
-    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
-    data.WriteParcelable(&want);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
 }

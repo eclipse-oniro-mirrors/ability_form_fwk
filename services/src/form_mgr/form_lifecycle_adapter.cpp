@@ -483,6 +483,7 @@ ErrCode FormLifecycleAdapter::HandleDeleteFormCache(FormRecord &dbRecord, const 
             HILOG_ERROR("fail remove cache data");
             deleteFormError = deleteFormError != ERR_OK ? deleteFormError : ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
+        FormExemptLockMgr::GetInstance().SetExemptLockStatus(formId, false);
         if (!FormTimerMgr::GetInstance().RemoveFormTimer(formId)) {
             HILOG_ERROR("remove timer error");
             deleteFormError = deleteFormError != ERR_OK ? deleteFormError : ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -956,6 +957,9 @@ int FormLifecycleAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds
                 FormRenderMgr::GetInstance().DeleteAcquireForbiddenTaskByFormId(removedForm.first);
                 RefreshCacheMgr::GetInstance().DelRenderTask(removedForm.first);
                 FormDataMgr::GetInstance().DeleteFormVisible(removedForm.first);
+                // second==true means the form is deleted, clean its cache
+                FormCacheMgr::GetInstance().DeleteData(removedForm.first);
+                FormExemptLockMgr::GetInstance().SetExemptLockStatus(removedForm.first, false);
             }
         }
     }

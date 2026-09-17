@@ -18,6 +18,7 @@
 #include <regex>
 
 #include "ani_form_common_util.h"
+#include "ani_form_error_util.h"
 #include "ani_form_util.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
@@ -70,16 +71,19 @@ void EtsFormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
             HILOG_ERROR("null sharedThis");
             return;
         }
+        if (sharedThis->env_->CreateLocalScope(REFERENCES_MAX_NUMBER) != ANI_OK) {
+            HILOG_ERROR("CreateLocalScope failed");
+            return;
+        }
         ani_object callbackValues = FormAniUtil::CreateRunningFormInfo(sharedThis->env_, runningFormInfo);
         if (callbackValues == nullptr) {
             HILOG_ERROR("null callbackValues");
-            return;
-        }
-        bool bRet = FormAniUtil::Callback(sharedThis->env_, static_cast<ani_object>(sharedThis->callbackRef_),
-            callbackValues, CLASSNAME_CALLBACK_WRAPPER);
-        if (!bRet) {
+        } else if (!FormAniUtil::Callback(sharedThis->env_, static_cast<ani_object>(sharedThis->callbackRef_),
+            callbackValues, CLASSNAME_CALLBACK_WRAPPER)) {
             HILOG_ERROR("callback failed");
-            return;
+        }
+        if (sharedThis->env_->DestroyLocalScope() != ANI_OK) {
+            HILOG_ERROR("DestroyLocalScope failed");
         }
     });
 }
@@ -240,6 +244,12 @@ bool EtsFormStateObserver::RegisterFormAddCallback(ani_vm* ani_vm,
     std::lock_guard<std::mutex> lock(addFormCallbackMutex_);
     auto formAddCallbacks = formAddCallbackMap_.find(bundleName);
     if (formAddCallbacks == formAddCallbackMap_.end()) {
+        if (formAddCallbackMap_.size() >= KEY_LIMIT) {
+            HILOG_ERROR("the number of the bundleName exceeds the limit");
+            EtsFormErrorUtil::ThrowParamError(env,
+                "The number of bundleNames registered to listen has exceeded the limit.");
+            return false;
+        }
         std::vector<std::shared_ptr<EtsFormAddCallbackClient>> callbacks;
         callbacks.emplace_back(callbackClient);
         formAddCallbackMap_.emplace(bundleName, callbacks);
@@ -337,12 +347,17 @@ int32_t EtsFormStateObserver::OnAddForm(const std::string &bundleName,
     const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
     HILOG_DEBUG("call");
-
-    std::lock_guard<std::mutex> lock(addFormCallbackMutex_);
-    auto callbackClient = formAddCallbackMap_.find(bundleName);
-    if (callbackClient != formAddCallbackMap_.end()) {
-        for (auto iter : callbackClient->second) {
-            iter->ProcessFormAdd(bundleName, runningFormInfo);
+    std::vector<std::shared_ptr<EtsFormAddCallbackClient>> callbackClients;
+    {
+        std::lock_guard<std::mutex> lock(addFormCallbackMutex_);
+        auto callbackClient = formAddCallbackMap_.find(bundleName);
+        if (callbackClient != formAddCallbackMap_.end()) {
+            callbackClients = callbackClient->second;
+        }
+    }
+    for (const auto &callbackClient : callbackClients) {
+        if (callbackClient != nullptr) {
+            callbackClient->ProcessFormAdd(bundleName, runningFormInfo);
         }
     }
     return ERR_OK;
@@ -389,12 +404,26 @@ int32_t EtsFormStateObserver::OnRemoveForm(const std::string &bundleName,
 {
     HILOG_DEBUG("call");
 
-    std::lock_guard<std::mutex> lock(removeFormCallbackMutex_);
-    auto callbackClient = formRemoveCallbackMap_.find(bundleName);
-    if (callbackClient != formRemoveCallbackMap_.end()) {
-        for (auto iter : callbackClient->second) {
-            iter->ProcessFormRemove(bundleName, runningFormInfo);
+    auto mainHandler = GetMainEventRunner();
+    if (mainHandler == nullptr) {
+        HILOG_ERROR("null handler");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    bool posted = mainHandler->PostSyncTask([this, &bundleName, &runningFormInfo]() {
+        std::vector<std::shared_ptr<EtsFormRemoveCallbackClient>> callbackClients;
+        {
+            std::lock_guard<std::mutex> lock(removeFormCallbackMutex_);
+            auto callbackClient = formRemoveCallbackMap_.find(bundleName);
+            if (callbackClient != formRemoveCallbackMap_.end()) {
+                callbackClients = callbackClient->second;
+            }
         }
+        for (const auto &callbackClient : callbackClients) {
+            callbackClient->ProcessFormRemove(bundleName, runningFormInfo);
+        }
+    });
+    if (!posted) {
+        HILOG_ERROR("post formRemove task failed");
     }
     return ERR_OK;
 }
@@ -615,9 +644,10 @@ ErrCode EtsFormStateObserver::OnFormClickEvent(
         HILOG_ERROR("empty Calltype");
         return ERR_INVALID_VALUE;
     }
-    std::lock_guard<std::mutex> lock(handlerMutex_);
-    if (handler_ == nullptr) {
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    auto mainHandler = GetMainEventRunner();
+    if (mainHandler == nullptr) {
+        HILOG_ERROR("null handler");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     wptr<EtsFormStateObserver> weakObserver = this;
@@ -627,23 +657,31 @@ ErrCode EtsFormStateObserver::OnFormClickEvent(
             HILOG_ERROR("null Self");
             return;
         }
-        std::unique_lock<std::mutex> lock(self->formEventMapMutex_);
-        auto formEventCallbackListIter = self->formEventMap_.find(bundleName);
-        if (formEventCallbackListIter != self->formEventMap_.end()) {
-            auto &callbackListVec = formEventCallbackListIter->second;
-            auto callBackListIter = std::find_if(callbackListVec.begin(), callbackListVec.end(),
-            [bundleName, callType](auto &iter) {
-                return iter != nullptr &&
-                       iter->BindFormEventType() == callType &&
-                       iter->BindHostBundleName() == bundleName;
-            });
-            if (callBackListIter != callbackListVec.end() && (*callBackListIter) != nullptr) {
-                (*callBackListIter)->HandleFormEvent(runningFormInfo);
+        std::shared_ptr<EtsFormEventCallbackList> callbacks;
+        {
+            std::lock_guard<std::mutex> lock(self->formEventMapMutex_);
+            auto formEventCallbackListIter = self->formEventMap_.find(bundleName);
+            if (formEventCallbackListIter == self->formEventMap_.end()) {
+                return;
             }
+            const auto &callbackListVec = formEventCallbackListIter->second;
+            auto callBackListIter = std::find_if(callbackListVec.begin(), callbackListVec.end(),
+                [bundleName, callType](auto &iter) {
+                    return iter != nullptr &&
+                           iter->BindFormEventType() == callType &&
+                           iter->BindHostBundleName() == bundleName;
+                });
+            if (callBackListIter == callbackListVec.end()) {
+                return;
+            }
+            callbacks = (*callBackListIter)->CopyCallbacks();
+        }
+        if (callbacks != nullptr && !callbacks->IsEmpty()) {
+            callbacks->HandleFormEvent(runningFormInfo);
         }
     };
 
-    handler_->PostSyncTask(notify);
+    mainHandler->PostSyncTask(notify);
     return ERR_OK;
 }
 
@@ -823,6 +861,25 @@ void EtsFormEventCallbackList::RemoveCallback(ani_object call)
         }
         callbacks_.erase(iter);
     }
+}
+
+std::shared_ptr<EtsFormEventCallbackList> EtsFormEventCallbackList::CopyCallbacks() const
+{
+    if (env_ == nullptr) {
+        HILOG_ERROR("null env");
+        return nullptr;
+    }
+    auto snapshot = std::make_shared<EtsFormEventCallbackList>(bindHostBundleName, eventType_, env_);
+    for (const auto &callback : callbacks_) {
+        ani_ref callbackRef = nullptr;
+        ani_status status = env_->GlobalReference_Create(callback, &callbackRef);
+        if (status != ANI_OK) {
+            HILOG_ERROR("GlobalReference_Create status: %{public}d", status);
+            return nullptr;
+        }
+        snapshot->callbacks_.emplace_back(callbackRef);
+    }
+    return snapshot;
 }
 
 void EtsFormEventCallbackList::HandleFormEvent(const AppExecFwk::RunningFormInfo &runningFormInfo) const

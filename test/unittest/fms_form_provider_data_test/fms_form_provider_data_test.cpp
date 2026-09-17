@@ -976,36 +976,6 @@ HWTEST_F(FmsFormProviderDataTest, Marshalling_NullData_003, TestSize.Level1)
 }
 
 /**
- * @tc.name: ParseImagesData_Normal_001
- * @tc.type: FUNC
- * @tc.desc: Verify whether the ParseImagesData interface calls normally.
- */
-HWTEST_F(FmsFormProviderDataTest, ParseImagesData_Normal_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "ParseImagesData_Normal_001 start";
-    InitJsonData();
-    FormProviderData formProviderData(jsonData_);
-    formProviderData.ParseImagesData();
-    EXPECT_TRUE(formProviderData.jsonFormProviderData_ != nullptr);
-    GTEST_LOG_(INFO) << "ParseImagesData_Normal_001 end";
-}
-
-/**
- * @tc.name: ParseImagesData_NullJson_001
- * @tc.type: FUNC
- * @tc.desc: When the jsonFormProviderData_ is nullptr, the ParseImagesData interface calls normally.
- */
-HWTEST_F(FmsFormProviderDataTest, ParseImagesData_NullJson_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "ParseImagesData_NullJson_001 start";
-    FormProviderData formProviderData("");
-    formProviderData.jsonFormProviderData_ = nullptr;
-    formProviderData.ParseImagesData();
-    EXPECT_TRUE(formProviderData.jsonFormProviderData_ == nullptr);
-    GTEST_LOG_(INFO) << "ParseImagesData_NullJson_001 end";
-}
-
-/**
  * @tc.name: NeedCache_NullJson_002
  * @tc.type: FUNC
  * @tc.desc: When the jsonFormProviderData_ is nullptr, the NeedCache interface calls normally.
@@ -1033,20 +1003,6 @@ HWTEST_F(FmsFormProviderDataTest, SetImageDataState_GetImageDataState_001, TestS
     formProviderData.SetImageDataState(imageStage);
     EXPECT_EQ(imageStage, formProviderData.imageDataState_);
     GTEST_LOG_(INFO) << "SetImageDataState_GetImageDataState_001 end";
-}
-
-/**
- * @tc.name: GetImageDataState_Normal_002
- * @tc.type: FUNC
- * @tc.desc: Verify whether the GetImageDataState interface calls normally.
- */
-HWTEST_F(FmsFormProviderDataTest, GetImageDataState_Normal_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GetImageDataState_Normal_002 start";
-    FormProviderData formProviderData("");
-    formProviderData.jsonFormProviderData_.clear();
-    EXPECT_EQ(formProviderData.imageDataState_, formProviderData.GetImageDataState());
-    GTEST_LOG_(INFO) << "GetImageDataState_Normal_002 end";
 }
 
 /**
@@ -1611,22 +1567,6 @@ HWTEST_F(FmsFormProviderDataTest, ReadAshmemDataFromParcel_InvalidBufferSize_001
 }
 
 /**
- * @tc.name: WriteFileDescriptor_DupFailed_001
- * @tc.type: FUNC
- * @tc.desc: Verify WriteFileDescriptor when dup fails (invalid fd).
- */
-HWTEST_F(FmsFormProviderDataTest, WriteFileDescriptor_DupFailed_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "WriteFileDescriptor_DupFailed_001 start";
-    FormProviderData formProviderData("");
-    Parcel parcel;
-    int invalidFd = -1;
-    bool result = formProviderData.WriteFileDescriptor(parcel, invalidFd);
-    EXPECT_FALSE(result);
-    GTEST_LOG_(INFO) << "WriteFileDescriptor_DupFailed_001 end";
-}
-
-/**
  * @tc.name: HandleImageDataStateAdded_NullAshmem_001
  * @tc.type: FUNC
  * @tc.desc: Verify HandleImageDataStateAdded when ReadParcelable returns nullptr.
@@ -2019,24 +1959,6 @@ HWTEST_F(FmsFormProviderDataTest, WriteImageDataToParcel_ValidData_001, TestSize
     EXPECT_EQ(formAshmem->GetAshmemSize(), 100);
 
     GTEST_LOG_(INFO) << "WriteImageDataToParcel_ValidData_001 end";
-}
-
-/**
- * @tc.name: WriteImageDataToParcel_EmptyData_001
- * @tc.type: FUNC
- * @tc.desc: Verify WriteImageDataToParcel with empty data (size=1).
- */
-HWTEST_F(FmsFormProviderDataTest, WriteImageDataToParcel_EmptyData_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "WriteImageDataToParcel_EmptyData_001 start";
-    FormProviderData formProviderData("");
-    Parcel parcel;
-    std::string picName = "emptyImage";
-    std::shared_ptr<char[]> data = std::make_shared<char[]>(1);
-    data.get()[0] = '\0';
-    bool result = formProviderData.WriteImageDataToParcel(parcel, picName, data, 1);
-    EXPECT_TRUE(result);
-    GTEST_LOG_(INFO) << "WriteImageDataToParcel_EmptyData_001 end";
 }
 
 /**

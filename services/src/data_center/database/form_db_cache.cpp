@@ -221,6 +221,17 @@ ErrCode FormDbCache::GetDBRecord(const int64_t formId, FormDBInfo &record) const
     HILOG_ERROR("not find formId[%{public}" PRId64 "]", formId);
     return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
 }
+
+bool FormDbCache::HasDBRecord(const int64_t formId) const
+{
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+    for (const FormDBInfo &dbInfo : formDBInfos_) {
+        if (dbInfo.formId == formId) {
+            return true;
+        }
+    }
+    return false;
+}
 /**
  * @brief Use record save or update DB data and DB cache with formId
  * @param formId Form data Id

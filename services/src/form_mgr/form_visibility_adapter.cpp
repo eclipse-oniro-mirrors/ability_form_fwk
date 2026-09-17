@@ -283,6 +283,11 @@ void FormVisibilityAdapter::NotifyWhetherFormsVisible(const std::string &bundleN
     for (auto remoteObject : remoteObjects) {
         sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
             iface_cast<AbilityRuntime::IJsFormStateObserver>(remoteObject);
+        // Observer may be dead or registered with a mismatched interface descriptor.
+        if (remoteJsFormStateObserver == nullptr) {
+            HILOG_WARN("invalid form state observer, bundleName:%{public}s", bundleName.c_str());
+            continue;
+        }
         auto observer = formInstanceMaps.find(bundleName);
         if (observer != formInstanceMaps.end()) {
             if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {

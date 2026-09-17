@@ -109,8 +109,6 @@ ErrCode FormRenderMgr::RenderForm(
         want.SetParam(Constants::FORM_RENDER_WITHOUT_UNLOCK_STATE, true);
     }
 
-    bool formIsVisible = FormDataMgr::GetInstance().GetFormVisible(formRecord.formId);
-    want.SetParam(Constants::FORM_IS_VISIBLE, formIsVisible);
     want.SetParam(Constants::FORM_LOCATION_KEY, static_cast<int32_t>(formRecord.formLocation));
 
     if (formRecord.privacyLevel > 0) {

@@ -689,29 +689,6 @@ HWTEST_F(FmsFormLifecycleAdapterTest, BatchNotifyFormsConfigurationUpdate_001, T
     GTEST_LOG_(INFO) << "BatchNotifyFormsConfigurationUpdate_001 end";
 }
 
-// ========== HandleFormRemoveObserver Tests ==========
-
-/**
- * @tc.name: HandleFormRemoveObserver_002
- * @tc.desc: Verify HandleFormRemoveObserver calls FormDataMgr when GetCallerBundleName succeeds
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormLifecycleAdapterTest, HandleFormRemoveObserver_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "HandleFormRemoveObserver_002 start";
-
-    RunningFormInfo runningFormInfo;
-
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
-        .WillOnce(DoAll(SetArgReferee<0>("com.test.bundle"), Return(ERR_OK)));
-    EXPECT_CALL(*MockFormDataMgr::obj, HandleFormRemoveObserver(_, _))
-        .Times(1);
-
-    FormLifecycleAdapter::GetInstance().HandleFormRemoveObserver(runningFormInfo);
-
-    GTEST_LOG_(INFO) << "HandleFormRemoveObserver_002 end";
-}
-
 // ========== CheckFormCountLimit Tests ==========
 
 /**

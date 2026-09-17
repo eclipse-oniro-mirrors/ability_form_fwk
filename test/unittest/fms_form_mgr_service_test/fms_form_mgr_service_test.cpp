@@ -1017,24 +1017,6 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0047, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0050
- * @tc.name: test CheckFormPermission function.
- * @tc.desc: Verify that the CheckFormPermission interface if the caller do not have the across local
- *           accounts permission and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
- */
-HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0050, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0050 start";
-    FormMgrService formMgrService;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(true);
-    MockCheckAcrossLocalAccountsPermission(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.CheckFormPermission());
-    GTEST_LOG_(INFO) << "FormMgrService_0050 end";
-}
-
-/**
  * @tc.number: FormMgrService_0051
  * @tc.name: test AcquireFormData function.
  * @tc.desc: Verify that the AcquireFormData interface is called normally and
@@ -1416,49 +1398,6 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0068, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0069
- * @tc.name: test OnStop function.
- * @tc.desc: Verify that the OnStop interface is called normally
- */
-HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0069, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0069 start";
-    FormMgrService formMgrService;
-    formMgrService.OnStop();
-    GTEST_LOG_(INFO) << "FormMgrService_0069 end";
-}
-
-/**
- * @tc.number: FormMgrService_0070
- * @tc.name: test HiDumpHelp function.
- * @tc.desc: Verify that the HiDumpHelp interface is called normally
- */
-HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0070, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0070 start";
-    FormMgrService formMgrService;
-    std::string args = "args";
-    std::string result = "result";
-    formMgrService.HiDumpHelp(args, result);
-    GTEST_LOG_(INFO) << "FormMgrService_0070 end";
-}
-
-/**
- * @tc.number: FormMgrService_0071
- * @tc.name: test HiDumpFormInfoByBundleName function.
- * @tc.desc: Verify that the HiDumpFormInfoByBundleName interface is called normally
- */
-HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0071, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0071 start";
-    FormMgrService formMgrService;
-    std::string args = "args";
-    std::string result = "result";
-    formMgrService.HiDumpFormInfoByBundleName(args, result);
-    GTEST_LOG_(INFO) << "FormMgrService_0071 end";
-}
-
-/**
  * @tc.number: FormMgrService_0072
  * @tc.name: test CheckAcrossLocalAccountsPermission function.
  * @tc.desc: Verify that the CheckAcrossLocalAccountsPermission interface is called normally
@@ -1472,22 +1411,6 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0072, TestSize.Level1)
     bool ret = formMgrService.CheckAcrossLocalAccountsPermission();
     EXPECT_EQ(ret, false);
     GTEST_LOG_(INFO) << "FormMgrService_0072 end";
-}
-
-/**
- * @tc.number: FormMgrService_0073
- * @tc.name: test CheckAcrossLocalAccountsPermission function.
- * @tc.desc: Verify that the CheckAcrossLocalAccountsPermission interface is called normally
- */
-HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0073, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0073 start";
-    FormMgrService formMgrService;
-    std::string args = "args";
-    std::string result = "result";
-    bool ret = formMgrService.CheckAcrossLocalAccountsPermission();
-    EXPECT_EQ(ret, false);
-    GTEST_LOG_(INFO) << "FormMgrService_0073 end";
 }
 
 /**

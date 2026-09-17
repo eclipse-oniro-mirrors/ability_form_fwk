@@ -62,7 +62,6 @@ namespace {
     const std::set<std::string> FORM_LISTENER_TYPE = {
         FORM_UNINSTALL, FORM_OVERFLOW, CHANGE_SCENE_ANIMATION_STATE, GET_FORM_RECT, GET_LIVE_FORM_STATUS
     };
-    constexpr int32_t CALL_INRTERFACE_TIMEOUT_MILLS = 10;
     constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
     constexpr int32_t REQUEST_CODE_SEQ_BITS = 16;
 
@@ -3649,27 +3648,27 @@ bool JsFormRouterProxyMgr::UnregisterGetLiveFormStatusListener()
 ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap)
 {
     HILOG_INFO("call");
-    if (getLiveFormStatusEnv_ == nullptr) {
+    napi_env env = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(registerGetLiveFormStatusProxyMutex_);
+        env = getLiveFormStatusEnv_;
+    }
+    if (env == nullptr) {
         HILOG_ERROR("getLiveFormStatusEnv_ is nullptr");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_ptr<LiveFormInterfaceParam> dataParam = std::make_shared<LiveFormInterfaceParam>();
-    auto task = [dataParam] () {
-        JsFormRouterProxyMgr::GetInstance()->GetLiveFormStatusInner(dataParam.get());
-        HILOG_INFO("getLiveFormStatus start notify.");
-        std::unique_lock<std::mutex> lock(dataParam->mutex);
-        dataParam->isReady = true;
-        dataParam->condition.notify_all();
-    };
-
-    if (getLiveFormStatusEnv_ == nullptr) {
-        HILOG_ERROR("null getLiveFormStatusEnv_");
+    auto runner = EventRunner::GetMainEventRunner();
+    if (runner == nullptr) {
+        HILOG_ERROR("GetMainEventRunner returned nullptr");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    napi_send_event(getLiveFormStatusEnv_, task, napi_eprio_immediate);
-    std::unique_lock<std::mutex> lock(dataParam->mutex);
-    dataParam->condition.wait_for(
-        lock, std::chrono::milliseconds(CALL_INRTERFACE_TIMEOUT_MILLS), [&] { return dataParam->isReady; });
+    std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(runner);
+    std::function<void()> executeFunc = [dataParam]() {
+        JsFormRouterProxyMgr::GetInstance()->GetLiveFormStatusInner(dataParam.get());
+    };
+    mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::GetLiveFormStatus");
+
     bool result = dataParam->result;
     liveFormStatusMap = std::move(dataParam->liveFormStatusMap);
     return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -4364,7 +4363,17 @@ bool JsFormRouterProxyMgr::ParseWantParamsArray(napi_value funcResult,
     }
 
     uint32_t arrayLength = 0;
-    napi_get_array_length(formWantCallbackEnv_, funcResult, &arrayLength);
+    napi_status lengthStatus = napi_get_array_length(formWantCallbackEnv_, funcResult, &arrayLength);
+    if (lengthStatus != napi_ok) {
+        HILOG_ERROR("get array length failed, status: %{public}d", static_cast<int>(lengthStatus));
+        return false;
+    }
+    // The length is app-controlled (JS callback result), so cap it with the existing form-id bound.
+    if (arrayLength > MAX_FORM_IDS_COUNT) {
+        HILOG_ERROR("callback result size %{public}u exceeds maximum %{public}u",
+            arrayLength, MAX_FORM_IDS_COUNT);
+        return false;
+    }
     for (uint32_t i = 0; i < arrayLength; i++) {
         napi_value element = nullptr;
         napi_get_element(formWantCallbackEnv_, funcResult, i, &element);

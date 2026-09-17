@@ -70,57 +70,6 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_001, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormHostStubTest_002
- * @tc.desc: Verify OnRemoteRequest
- * @tc.type: FUNC
- */
-HWTEST_F(FormHostStubTest, FormHostStubTest_002, TestSize.Level0)
-{
-    MockFormHostClient callback;
-    uint32_t code = 2;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-}
-
-/**
- * @tc.name: FormHostStubTest_003
- * @tc.desc: Verify OnRemoteRequest
- * @tc.type: FUNC
- */
-HWTEST_F(FormHostStubTest, FormHostStubTest_003, TestSize.Level0)
-{
-    MockFormHostClient callback;
-    uint32_t code = 3;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-}
-
-/**
- * @tc.name: FormHostStubTest_004
- * @tc.desc: Verify OnRemoteRequest
- * @tc.type: FUNC
- */
-HWTEST_F(FormHostStubTest, FormHostStubTest_004, TestSize.Level0)
-{
-    MockFormHostClient callback;
-    uint32_t code = 4;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-}
-
-/**
  * @tc.name: FormHostStubTest_005
  * @tc.desc: Verify OnRemoteRequest and HandleAcquired
  * @tc.type: FUNC

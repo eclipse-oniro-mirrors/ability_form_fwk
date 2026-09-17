@@ -175,6 +175,22 @@ HWTEST_F(FormUtilTest, FormUtilTest_014, TestSize.Level1)
 }
 
 /**
+ * @tc.name: FormUtilTest_016
+ * @tc.desc: Verify GenerateFormId returns -1 when retries are exhausted
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_016, TestSize.Level1)
+{
+    constexpr int64_t udidHash = 0x00000000ffffffffL;
+    int64_t firstFormId = FormUtil::GenerateFormId(udidHash);
+    // Saturated udidHash makes every candidate 0xffffffff, so the second call
+    // exhausts retries and must return -1 instead of a duplicate id.
+    int64_t secondFormId = FormUtil::GenerateFormId(udidHash);
+    EXPECT_EQ(-1, secondFormId);
+    FormUtil::DeleteFormId(firstFormId);
+}
+
+/**
  * @tc.name: FormUtilTest_017
  * @tc.desc: Verify ConvertStringToInt64 with 19-digit number starting with 8
  * @tc.type: FUNC

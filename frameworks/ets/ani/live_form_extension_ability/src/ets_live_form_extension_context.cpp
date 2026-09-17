@@ -36,7 +36,7 @@ int32_t g_serialNumber = 0;
 static std::map<EtsUIExtensionConnectionKey, sptr<EtsUIExtensionConnection>, Etskey_compare> g_connects;
 constexpr const int FAILED_CODE = -1;
 constexpr const char *LIVE_FORM_EXTENSION_CONTEXT = "Lapplication/LiveFormExtensionContext/LiveFormExtensionContext;";
-constexpr const char *UI_EXTENSION_CONTEXT_CLEANER_CLASS_NAME = "Lapplication/UIExtensionContext/Cleaner;";
+constexpr const char *LIVE_FORM_EXTENSION_CONTEXT_CLEANER_CLASS_NAME = "Lapplication/LiveFormExtensionContext/Cleaner;";
 constexpr const char *SIGNATURE_CONNECT_SERVICE_EXTENSION =
     "L@ohos/app/ability/Want/Want;Lability/connectOptions/ConnectOptions;:J";
 constexpr const char *SIGNATURE_DISCONNECT_SERVICE_EXTENSION =
@@ -214,7 +214,7 @@ bool EtsLiveFormExtensionContext::BindNativePtrCleaner(ani_env *env)
         return false;
     }
     ani_class cleanerCls;
-    ani_status status = env->FindClass(UI_EXTENSION_CONTEXT_CLEANER_CLASS_NAME, &cleanerCls);
+    ani_status status = env->FindClass(LIVE_FORM_EXTENSION_CONTEXT_CLEANER_CLASS_NAME, &cleanerCls);
     if (ANI_OK != status) {
         HILOG_ERROR("Not found Cleaner. status:%{public}d.", status);
         return false;
@@ -237,7 +237,7 @@ void EtsLiveFormExtensionContext::Clean(ani_env *env, ani_object object)
         return;
     }
     ani_long ptr = 0;
-    if (ANI_OK != env->Object_GetFieldByName_Long(object, "nativeEtsContext", &ptr)) {
+    if (ANI_OK != env->Object_GetFieldByName_Long(object, "ptr", &ptr)) {
         return;
     }
 

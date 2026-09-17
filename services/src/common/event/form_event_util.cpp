@@ -30,6 +30,7 @@
 #include "form_render/form_render_mgr.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "common/util/form_trust_mgr.h"
+#include "feature/bundle_lock/form_exempt_lock_mgr.h"
 #include "common/util/form_util.h"
 #include "form_provider/form_provider_mgr.h"
 #include "iform_host_delegate.h"
@@ -136,20 +137,27 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
             updatedForms.emplace_back(formRecord);
             continue;
         }
-
-        if (formRecord.formTempFlag) {
-            FormDataMgr::GetInstance().DeleteTempForm(formId);
-        } else {
-            FormDbCache::GetInstance().DeleteFormInfo(formId);
-        }
-        HILOG_WARN(
-            "delete form record, formName:%{public}s, formId:%{public}" PRId64, formRecord.formName.c_str(), formId);
-        removedForms.emplace_back(formId);
-        FormDataMgr::GetInstance().DeleteFormRecord(formId);
-        FormRenderMgr::GetInstance().StopRenderingForm(formId, formRecord);
-        FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
+        RemoveUpdatedForm(formRecord, removedForms);
     }
     HandleProviderUpdatedDetail(removedForms, updatedForms, bundleName, userId, needReload);
+}
+
+void FormEventUtil::RemoveUpdatedForm(FormRecord &formRecord, std::vector<int64_t> &removedForms)
+{
+    if (formRecord.formTempFlag) {
+        FormDataMgr::GetInstance().DeleteTempForm(formRecord.formId);
+    } else {
+        FormDbCache::GetInstance().DeleteFormInfo(formRecord.formId);
+    }
+    HILOG_WARN("delete form record, formName:%{public}s, formId:%{public}" PRId64,
+        formRecord.formName.c_str(), formRecord.formId);
+    removedForms.emplace_back(formRecord.formId);
+    FormDataMgr::GetInstance().DeleteFormRecord(formRecord.formId);
+    FormRenderMgr::GetInstance().StopRenderingForm(formRecord.formId, formRecord);
+    FormDataProxyMgr::GetInstance().UnsubscribeFormData(formRecord.formId);
+    // Clean cache after formId_ row and memory record are deleted
+    FormCacheMgr::GetInstance().DeleteData(formRecord.formId);
+    FormExemptLockMgr::GetInstance().SetExemptLockStatus(formRecord.formId, false);
 }
 
 void FormEventUtil::HandleFormReload(
@@ -401,6 +409,8 @@ void FormEventUtil::BatchDeleteNoHostTempForms(const int uid, std::map<FormIdKey
                 foundFormsMap.emplace(formId, true);
                 FormDataMgr::GetInstance().DeleteFormRecord(formId);
                 FormDataMgr::GetInstance().DeleteTempForm(formId);
+                FormCacheMgr::GetInstance().DeleteData(formId);
+                FormExemptLockMgr::GetInstance().SetExemptLockStatus(formId, false);
             }
         }
     }
@@ -659,6 +669,8 @@ void FormEventUtil::BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, 
                     FormDbCache::GetInstance().DeleteFormInfo(formId);
                 }
                 FormDataMgr::GetInstance().DeleteFormRecord(formId);
+                FormCacheMgr::GetInstance().DeleteData(formId);
+                FormExemptLockMgr::GetInstance().SetExemptLockStatus(formId, false);
             }
         }
     }
