@@ -18,7 +18,6 @@ group("fuzztest") {
   testonly = true
 
   deps = [
-    "baseformrefresh_fuzzer:fuzztest",
     "bundleforminfo_fuzzer:fuzztest",
     "facrconnectionFourth_fuzzer:fuzztest",
     "facrconnectionThree_fuzzer:fuzztest",

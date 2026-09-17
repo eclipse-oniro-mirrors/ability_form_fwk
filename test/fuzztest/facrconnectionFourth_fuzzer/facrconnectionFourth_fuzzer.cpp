@@ -34,18 +34,12 @@
 #include "securec.h"
 #include "ffrt.h"
 
-// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
-// tasks spawns ffrt CPU workers whose threads still run when ffrt's static
-// CPUWorkerGroup is torn down at exit (heap-use-after-free).
 extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
     ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
 {
     return nullptr;
 }
 
-// Interpose WatchParameter so the memory-watermark watcher never arms. The
-// param-service callback creates an ffrt queue during exit, racing with ffrt's
-// static QueueMonitor teardown (heap-use-after-free).
 extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
 {
     return 0;
@@ -90,35 +84,43 @@ public:
     }
 };
 
+constexpr int32_t MAX_STR_LEN = 64;
+constexpr int32_t MAX_FSM_EVENT = 18; // INVALID_EVENT
+
+FormFsmEvent ConsumeFsmEvent(FuzzedDataProvider *fdp)
+{
+    return static_cast<FormFsmEvent>(fdp->ConsumeIntegralInRange<int32_t>(0, MAX_FSM_EVENT));
+}
+
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     int64_t formId = fdp->ConsumeIntegral<int64_t>();
     Want want;
-    std::string statusData = fdp->ConsumeRandomLengthString(5);
+    std::string statusData = fdp->ConsumeRandomLengthString(MAX_STR_LEN);
+    std::string eventId = fdp->ConsumeRandomLengthString(MAX_STR_LEN);
     sptr<IRemoteObject> callerToken = new (std::nothrow) FormSupplyStubFuzzTest();
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(
-        formId, FormFsmEvent::RENDER_FORM_DONE, "", formSupplyClient);
+        formId, ConsumeFsmEvent(fdp), eventId, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(
-        formId, FormFsmEvent::RECOVER_FORM_DONE, "", formSupplyClient);
+        formId, ConsumeFsmEvent(fdp), eventId, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(
-        formId, FormFsmEvent::DELETE_FORM_DONE, "", formSupplyClient);
+        formId, ConsumeFsmEvent(fdp), eventId, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(
-        formId, FormFsmEvent::RECYCLE_FORM_DONE, "", formSupplyClient);
+        formId, ConsumeFsmEvent(fdp), eventId, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
-        formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
-    std::string eventId = fdp->ConsumeRandomLengthString(5);
+        formId, ConsumeFsmEvent(fdp), statusData, want, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnRenderFormDone(
-        formId, FormFsmEvent::RENDER_FORM_DONE, eventId, formSupplyClient);
+        formId, ConsumeFsmEvent(fdp), eventId, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnRecoverFormDone(
-        formId, FormFsmEvent::RECOVER_FORM_DONE, eventId, formSupplyClient);
+        formId, ConsumeFsmEvent(fdp), eventId, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnDeleteFormDone(
-        formId, FormFsmEvent::DELETE_FORM_DONE, eventId, formSupplyClient);
+        formId, ConsumeFsmEvent(fdp), eventId, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnRecycleFormDone(
-        formId, FormFsmEvent::RECYCLE_FORM_DONE, eventId, formSupplyClient);
+        formId, ConsumeFsmEvent(fdp), eventId, formSupplyClient);
     FormRenderStatusTaskMgr::GetInstance().OnRecycleForm(
-        formId, FormFsmEvent::RECYCLE_DATA_DONE, statusData, want, formSupplyClient);
-    std::string queueStr = "FormRenderSerialQueue";
+        formId, ConsumeFsmEvent(fdp), statusData, want, formSupplyClient);
+    std::string queueStr = fdp->ConsumeRandomLengthString(MAX_STR_LEN);
     std::shared_ptr<Common::FormBaseSerialQueue> serialQueue = std::make_shared<Common::FormBaseSerialQueue>(queueStr);
     FormRenderStatusTaskMgr::GetInstance().SetSerialQueue(serialQueue);
     FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);

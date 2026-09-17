@@ -30,18 +30,12 @@
 #include "securec.h"
 #include "ffrt.h"
 
-// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
-// tasks spawns ffrt CPU workers whose threads still run when ffrt's static
-// CPUWorkerGroup is torn down at exit (heap-use-after-free).
 extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
     ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
 {
     return nullptr;
 }
 
-// Interpose WatchParameter so the memory-watermark watcher never arms. The
-// param-service callback creates an ffrt queue during exit, racing with ffrt's
-// static QueueMonitor teardown (heap-use-after-free).
 extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
 {
     return 0;
@@ -56,7 +50,7 @@ constexpr int32_t MAX_NUM = 10000;
 constexpr int32_t MIN_NUM = 0;
 constexpr int32_t MAX_LOOP_COUNT = 10;
 constexpr int32_t MAX_SCENE_TYPE = 1;
-constexpr int32_t MAX_EVENT_NAME = 10;
+constexpr int32_t MAX_EVENT_NAME = 38; // FORM_EXCEEDS_DISTRIBUTION
 
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {

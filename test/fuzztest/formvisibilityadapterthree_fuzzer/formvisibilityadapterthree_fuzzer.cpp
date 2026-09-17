@@ -36,18 +36,12 @@
 #include "want.h"
 #include "ffrt.h"
 
-// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
-// tasks spawns ffrt CPU workers whose threads still run when ffrt's static
-// CPUWorkerGroup is torn down at exit (heap-use-after-free).
 extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
     ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
 {
     return nullptr;
 }
 
-// Interpose WatchParameter so the memory-watermark watcher never arms. The
-// param-service callback creates an ffrt queue during exit, racing with ffrt's
-// static QueueMonitor teardown (heap-use-after-free).
 extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
 {
     return 0;
@@ -79,7 +73,8 @@ std::string GenerateSafeString(FuzzedDataProvider *fdp, int32_t maxLength)
     std::string result = fdp->ConsumeRandomLengthString(maxLength);
     std::string safeResult;
     for (char c : result) {
-        if (std::isalnum(c) || c == '_' || c == '-' || c == '.' || c == '/' || c == ':') {
+        if (std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-' ||
+            c == '.' || c == '/' || c == ':') {
             safeResult += c;
         } else {
             safeResult += '_';

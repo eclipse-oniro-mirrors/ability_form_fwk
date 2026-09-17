@@ -25,6 +25,7 @@ ohos_fuzztest("FormProviderRefreshImplFuzzTest") {
 
   include_dirs = [
     "${form_fwk_path}/interfaces/kits/native/include",
+    "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
   ]
   cflags = [

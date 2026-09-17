@@ -32,18 +32,12 @@
 #include "securec.h"
 #include "ffrt.h"
 
-// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
-// tasks spawns ffrt CPU workers whose dispatch hits pure-virtual stubs while
-// ffrt's static CPUWorkerGroup is torn down at exit (__cxa_pure_virtual abort).
 extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
     ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
 {
     return nullptr;
 }
 
-// Interpose WatchParameter so the memory-watermark watcher never arms. The
-// param-service callback creates an ffrt queue during exit, racing with ffrt's
-// static QueueMonitor teardown (heap-use-after-free).
 extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
 {
     return 0;

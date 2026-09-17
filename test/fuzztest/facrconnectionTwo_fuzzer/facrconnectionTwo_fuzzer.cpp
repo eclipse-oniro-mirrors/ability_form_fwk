@@ -34,18 +34,12 @@
 #include "securec.h"
 #include "ffrt.h"
 
-// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
-// tasks spawns ffrt CPU workers whose threads still run when ffrt's static
-// CPUWorkerGroup is torn down at exit (heap-use-after-free).
 extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
     ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
 {
     return nullptr;
 }
 
-// Interpose WatchParameter so the memory-watermark watcher never arms. The
-// param-service callback creates an ffrt queue during exit, racing with ffrt's
-// static QueueMonitor teardown (heap-use-after-free).
 extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
 {
     return 0;
@@ -55,6 +49,20 @@ using namespace OHOS::AppExecFwk;
 using namespace OHOS::AppExecFwk::FormRender;
 
 namespace OHOS {
+
+constexpr int32_t MAX_FSM_EVENT = 18; // INVALID_EVENT
+constexpr int32_t MAX_FSM_STATUS = 8;  // UNPROCESSABLE
+
+FormFsmEvent ConsumeFsmEvent(FuzzedDataProvider *fdp)
+{
+    return static_cast<FormFsmEvent>(fdp->ConsumeIntegralInRange<int32_t>(0, MAX_FSM_EVENT));
+}
+
+FormFsmStatus ConsumeFsmStatus(FuzzedDataProvider *fdp)
+{
+    return static_cast<FormFsmStatus>(fdp->ConsumeIntegralInRange<int32_t>(0, MAX_FSM_STATUS));
+}
+
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     std::string str1 = fdp->ConsumeRandomLengthString();
@@ -66,10 +74,11 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     FormRenderServiceMgr::GetInstance().GetFormSupplyClient();
     FormRenderServiceMgr::GetInstance().OnConfigurationUpdatedInner();
     int64_t formId = fdp->ConsumeIntegral<int64_t>();
-    FormFsmEvent event = FormFsmEvent::RELOAD_FORM;
-    std::function<int32_t()> func = []() { return 1; };
+    FormFsmEvent event = ConsumeFsmEvent(fdp);
+    int32_t funcRet = fdp->ConsumeIntegral<int32_t>();
+    std::function<int32_t()> func = [funcRet]() { return funcRet; };
     FormRenderStatusMgr::GetInstance().PostFormEvent(formId, event, func);
-    FormFsmStatus status = FormFsmStatus::UNPROCESSABLE;
+    FormFsmStatus status = ConsumeFsmStatus(fdp);
     FormFsmProcessType processType = fdp->ConsumeBool() ? FormFsmProcessType::PROCESS_TASK_DELETE
         : FormFsmProcessType::PROCESS_TASK_DIRECT;
     FormRenderStatusMgr::GetInstance().ExecFormTask(processType, formId, event, status, func);

@@ -25,18 +25,12 @@
 
 #include "rdb_helper.h"
 
-// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued.
-// Enqueuing tasks spawns ffrt CPU workers whose threads still run when
-// ffrt's static CPUWorkerGroup is torn down at exit (heap-use-after-free).
 extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
     ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
 {
     return nullptr;
 }
 
-// Interpose the parameter watcher registration that FormDataMgr triggers at
-// init time. Its IPC-thread callback can submit ffrt tasks after the global
-// scheduler is torn down at process exit (heap-use-after-free).
 extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
 {
     return 0;
