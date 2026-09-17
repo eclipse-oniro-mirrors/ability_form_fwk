@@ -50,8 +50,8 @@ FormBaseSerialQueue::~FormBaseSerialQueue()
     HILOG_DEBUG("destroy FormBaseSerialQueue");
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto &it : taskMap_) {
-        if (it.second != nullptr) {
-            queue_.cancel(it.second);
+        if (it.second.first != nullptr) {
+            queue_.cancel(it.second.first);
         }
     }
     taskMap_.clear();
@@ -89,18 +89,32 @@ bool FormBaseSerialQueue::ScheduleDelayTask(const TaskKey& taskKey,
     // If a task with the same key exists, cancel it first
     auto it = taskMap_.find(taskKey);
     if (it != taskMap_.end()) {
-        queue_.cancel(it->second);
+        queue_.cancel(it->second.first);
         taskMap_.erase(it);
     }
 
-    ffrt::task_handle handle = queue_.submit_h(func,
+    uint64_t seq = ++seqCounter_;
+    auto wrappedFunc = [weakThis = weak_from_this(), taskKey, seq, func = std::move(func)]() {
+        func();
+        auto self = weakThis.lock();
+        if (!self) {
+            return;
+        }
+        std::lock_guard<std::mutex> innerLock(self->mutex_);
+        auto innerIt = self->taskMap_.find(taskKey);
+        if (innerIt != self->taskMap_.end() && innerIt->second.second == seq) {
+            self->taskMap_.erase(innerIt);
+        }
+    };
+
+    ffrt::task_handle handle = queue_.submit_h(std::move(wrappedFunc),
         ffrt::task_attr().delay(ms * CONVERSION_FACTOR).qos(Convert2FfrtQos(qos)));
     if (handle == nullptr) {
         HILOG_ERROR("submit_h return null");
         return false;
     }
 
-    taskMap_[taskKey] = std::move(handle);
+    taskMap_[taskKey] = {handle, seq};
     return true;
 }
 
@@ -116,8 +130,8 @@ bool FormBaseSerialQueue::CancelDelayTask(const TaskKey& taskKey)
     }
 
     bool result = true;
-    if (it->second != nullptr) {
-        int32_t ret = queue_.cancel(it->second);
+    if (it->second.first != nullptr) {
+        int32_t ret = queue_.cancel(it->second.first);
         if (ret != 0) {
             HILOG_ERROR("Failed,errCode:%{public}d", ret);
             result = false;

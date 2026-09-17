@@ -35,7 +35,7 @@ sptr<MockFormSupplyCallback> MockFormSupplyCallback::GetInstance()
 int MockFormSupplyCallback::OnAcquire(const FormProviderInfo& formProviderInfo, const Want& want)
 {
     HILOG_INFO("OnAcquire called.");
-    return 1;
+    return ERR_OK;
 }
 
 int MockFormSupplyCallback::OnEventHandle(const Want& want)

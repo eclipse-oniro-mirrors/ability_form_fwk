@@ -147,6 +147,7 @@ public:
                 HILOG_ERROR("null sharedThis");
                 return;
             }
+            AbilityRuntime::HandleScope scopeGuard(sharedThis->env_);
             HILOG_DEBUG("task complete formId:%{public}" PRId64 ".", formId);
             std::string formIdString = std::to_string(formId);
             napi_value callbackValues;
@@ -573,10 +574,13 @@ private:
 
     bool GetStringsValue(napi_env env, napi_value array, std::vector<std::string> &strList)
     {
-        napi_valuetype paramType = napi_undefined;
-        napi_typeof(env, array, &paramType);
-        if (paramType == napi_undefined || paramType == napi_null) {
-            HILOG_ERROR("input array is napi_undefined or napi_null");
+        bool isArray = false;
+        if (napi_is_array(env, array, &isArray)) {
+            HILOG_ERROR("napi_is_array failed");
+            return false;
+        }
+        if (!isArray) {
+            HILOG_ERROR("input is not an array");
             return false;
         }
         uint32_t nativeArrayLen = 0;

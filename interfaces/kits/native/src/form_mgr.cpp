@@ -1038,9 +1038,9 @@ void FormMgr::ResetProxy(const wptr<IRemoteObject> &remote)
     auto serviceRemote = remoteProxy_->AsObject();
     if ((serviceRemote != nullptr) && (serviceRemote == remote.promote())) {
         serviceRemote->RemoveDeathRecipient(deathRecipient_);
+        // clearn the remote proxy
+        remoteProxy_ = nullptr;
     }
-    // clearn the remote proxy
-    remoteProxy_ = nullptr;
 }
 
 /**
@@ -1899,10 +1899,6 @@ ErrCode FormMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncluded
     auto errCode = Connect();
     if (errCode != ERR_OK) {
         return errCode;
-    }
-    if (remoteProxy_ == nullptr) {
-        HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {

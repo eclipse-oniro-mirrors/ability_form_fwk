@@ -414,14 +414,7 @@ ErrCode FormLifecycleAdapter::HandleDeleteForm(const int64_t formId, const sptr<
         HILOG_ERROR("not exist such db form:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    FormRecord record;
-    FormDataMgr::GetInstance().GetFormRecord(formId, record);
-    FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
 
-#ifdef DEVICE_USAGE_STATISTICS_ENABLE
-    DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
-        record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_REMOVED);
-#endif
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     bool isSelfDbFormId = (userId == dbRecord.providerUserId) && ((std::find(dbRecord.formUserUids.begin(),
@@ -430,6 +423,15 @@ ErrCode FormLifecycleAdapter::HandleDeleteForm(const int64_t formId, const sptr<
         HILOG_ERROR("not self form:%{public}" PRId64 ", callingUid:%{public}d", formId, callingUid);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
+
+    FormRecord record;
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
+
+#ifdef DEVICE_USAGE_STATISTICS_ENABLE
+    DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
+        record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_REMOVED);
+#endif
 
     ErrCode result = HandleDeleteFormCache(dbRecord, callingUid, formId);
     if (result != ERR_OK) {
@@ -895,7 +897,9 @@ int FormLifecycleAdapter::CreateForm(const Want &want, RunningFormInfo &runningF
 
         ret = AddThemeDBRecord(want, formId);
         if (ret != ERR_OK) {
-            HILOG_ERROR("AddThemeDBRecord failed");
+            HILOG_ERROR("AddThemeDBRecord failed, rollback ThemeManager");
+            ThemeFormClient::GetInstance().DeleteForms({formId});
+            return ret;
         }
 
         runningFormInfo.formId = formId;
@@ -1304,7 +1308,7 @@ ErrCode FormLifecycleAdapter::BatchNotifyFormsConfigurationUpdate(const AppExecF
         visibleFormRecords.size(), invisibleFormRecords.size());
     Want reqWant;
     for (const auto &formRecord : visibleFormRecords) {
-        std::string key = formRecord.bundleName + formRecord.abilityName;
+        std::string key = formRecord.bundleName + "::" + formRecord.abilityName;
         if (notified.find(key) != notified.end()) {
             continue;
         }
@@ -1312,7 +1316,7 @@ ErrCode FormLifecycleAdapter::BatchNotifyFormsConfigurationUpdate(const AppExecF
         FormProviderMgr::GetInstance().ConnectForConfigUpdate(configuration, formRecord, reqWant);
     }
     for (const auto &formRecord : invisibleFormRecords) {
-        std::string key = formRecord.bundleName + formRecord.abilityName;
+        std::string key = formRecord.bundleName + "::" + formRecord.abilityName;
         if (notified.find(key) != notified.end()) {
             continue;
         }

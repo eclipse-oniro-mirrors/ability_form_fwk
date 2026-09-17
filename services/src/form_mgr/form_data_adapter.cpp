@@ -183,14 +183,15 @@ int FormDataAdapter::RequestForm(const int64_t formId,
     }
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    UpdateFormRenderParam(matchedFormId, callerToken, want);
-    FormDataMgr::GetInstance().UpdateHostWant(formId, want, true);
     FormRecord record;
     bool result = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!result) {
         HILOG_ERROR("not exist such formId:%{public}" PRId64 ".", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
+
+    UpdateFormRenderParam(matchedFormId, callerToken, want);
+    FormDataMgr::GetInstance().UpdateHostWant(formId, want, true);
 
     RefreshData data;
     data.callingUid = IPCSkeleton::GetCallingUid();
@@ -745,9 +746,10 @@ void FormDataAdapter::PostEnterpriseAppInstallFailedRetryTask(const FormRecord &
 {
     HILOG_INFO("start");
     auto refreshForm = [record, want]() {
-        RefreshData data;
+        RefreshData data {};
         data.formId = record.formId;
         data.record = record;
+        data.callingUid = record.uid;
         data.want = want;
         FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_APP_UPGRADE);
     };

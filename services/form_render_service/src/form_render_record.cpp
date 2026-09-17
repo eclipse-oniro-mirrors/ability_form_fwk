@@ -394,7 +394,6 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             HILOG_WARN("Form node has been released");
             return ERR_APPEXECFWK_FORM_FORM_NODE_RELEASED;
         }
-        renderFormTasksNum++;
         bool formIsVisible = want.GetBoolParam(Constants::FORM_IS_VISIBLE, false);
         RecordFormVisibility(formJsInfo.formId, formIsVisible);
     }
@@ -432,6 +431,9 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         if (eventHandler == nullptr) {
             HILOG_ERROR("null eventHandler");
             return RENDER_FORM_FAILED;
+        }
+        if (renderType == Constants::RENDER_FORM) {
+            renderFormTasksNum++;
         }
         eventHandler->PostTask(task, "UpdateRenderRecord");
     }

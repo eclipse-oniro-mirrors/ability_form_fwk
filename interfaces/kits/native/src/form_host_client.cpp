@@ -324,17 +324,21 @@ void FormHostClient::OnAcquireDataResponse(const AAFwk::WantParams &wantParams, 
         HILOG_ERROR("invalid requestCode:%{public}" PRId64, requestCode);
         return;
     }
-    std::lock_guard<std::mutex> lock(AcquireDataCallbackMutex_);
-    auto iter = acquireDataCallbackMap_.find(requestCode);
-    if (iter == acquireDataCallbackMap_.end()) {
-        HILOG_DEBUG("acquire form data callback not found");
-        return;
+    std::shared_ptr<FormDataCallbackInterface> callback;
+    {
+        std::lock_guard<std::mutex> lock(AcquireDataCallbackMutex_);
+        auto iter = acquireDataCallbackMap_.find(requestCode);
+        if (iter == acquireDataCallbackMap_.end()) {
+            HILOG_DEBUG("acquire form data callback not found");
+            return;
+        }
+        callback = iter->second;
+        acquireDataCallbackMap_.erase(requestCode);
     }
 
-    if (iter->second) {
-        iter->second->ProcessAcquireFormData(wantParams);
+    if (callback) {
+        callback->ProcessAcquireFormData(wantParams);
     }
-    acquireDataCallbackMap_.erase(requestCode);
     HILOG_DEBUG("done");
 }
 
@@ -449,13 +453,17 @@ void FormHostClient::UpdateForm(const FormJsInfo &formJsInfo)
         HILOG_ERROR("the passed form id can't be negative");
         return;
     }
-    std::lock_guard<std::mutex> lock(callbackMutex_);
-    auto iter = formCallbackMap_.find(formId);
-    if (iter == formCallbackMap_.end()) {
-        HILOG_ERROR("not find formId:%{public}s", std::to_string(formId).c_str());
-        return;
+    std::set<std::shared_ptr<FormCallbackInterface>> callbacks;
+    {
+        std::lock_guard<std::mutex> lock(callbackMutex_);
+        auto iter = formCallbackMap_.find(formId);
+        if (iter == formCallbackMap_.end()) {
+            HILOG_ERROR("not find formId:%{public}s", std::to_string(formId).c_str());
+            return;
+        }
+        callbacks = iter->second;
     }
-    for (const auto &callback : iter->second) {
+    for (const auto &callback : callbacks) {
         HILOG_DEBUG("formId:%{public}" PRId64 ", jspath:%{public}s, data: %{private}s",
             formId, formJsInfo.jsFormCodePath.c_str(), formJsInfo.formData.c_str());
         if (callback == nullptr) {
