@@ -108,14 +108,14 @@ int FormMgrAdapterFacade::CreateForm(const Want &want, RunningFormInfo &runningF
 
 int FormMgrAdapterFacade::StopRenderingForm(const int64_t formId, const std::string &compId)
 {
-    HILOG_INFO("StopRenderingForm called, formId:%{public}" PRId64, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     return FormLifecycleAdapter::GetInstance().StopRenderingForm(formId, compId);
 }
 
 int FormMgrAdapterFacade::DeleteInvalidForms(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, int32_t &numFormsDeleted)
 {
-    HILOG_INFO("DeleteInvalidForms called, formIds size:%{public}zu", formIds.size());
+    HILOG_INFO("formIds size:%{public}zu", formIds.size());
     return FormLifecycleAdapter::GetInstance().DeleteInvalidForms(formIds, callerToken, numFormsDeleted);
 }
 
@@ -132,7 +132,7 @@ int FormMgrAdapterFacade::ReleaseForm(const int64_t formId, const sptr<IRemoteOb
 
 int FormMgrAdapterFacade::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("CastTempForm called, formId:%{public}" PRId64, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     return FormLifecycleAdapter::GetInstance().CastTempForm(formId, callerToken);
 }
 
@@ -143,8 +143,7 @@ int FormMgrAdapterFacade::ReleaseRenderer(int64_t formId, const std::string &com
 
 int32_t FormMgrAdapterFacade::EnableForms(const std::string &bundleName, const int32_t userId, const bool enable)
 {
-    HILOG_INFO("EnableForms called, bundleName:%{public}s, userId:%{public}d, enable:%{public}d",
-        bundleName.c_str(), userId, enable);
+    HILOG_INFO("bundleName:%{public}s, userId:%{public}d, enable:%{public}d", bundleName.c_str(), userId, enable);
     return FormLifecycleAdapter::GetInstance().EnableForms(bundleName, userId, enable);
 }
 
@@ -165,7 +164,7 @@ int32_t FormMgrAdapterFacade::RecoverForms(const std::vector<int64_t> &formIds, 
 
 ErrCode FormMgrAdapterFacade::BatchNotifyFormsConfigurationUpdate(const AppExecFwk::Configuration &configuration)
 {
-    HILOG_INFO("BatchNotifyFormsConfigurationUpdate called");
+    HILOG_INFO("called");
     return FormLifecycleAdapter::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
 }
 
@@ -185,21 +184,21 @@ int FormMgrAdapterFacade::UpdateForm(const int64_t formId, const int32_t calling
 ErrCode FormMgrAdapterFacade::UpdateFormCrossBundle(const int64_t formId, const int32_t callingUid,
     const FormProviderData &formProviderData)
 {
-    HILOG_INFO("call, formId:%{public}" PRId64, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     return FormDataAdapter::GetInstance().UpdateFormCrossBundle(formId, callingUid, formProviderData);
 }
 
 int FormMgrAdapterFacade::RequestForm(const int64_t formId,
     const sptr<IRemoteObject> &callerToken, const Want &want)
 {
-    HILOG_INFO("RequestForm called, formId:%{public}" PRId64, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     return FormDataAdapter::GetInstance().RequestForm(formId, callerToken, want);
 }
 
 void FormMgrAdapterFacade::UpdateFormSize(const int64_t &formId, float width, float height,
     float borderWidth, float formViewScale)
 {
-    HILOG_INFO("UpdateFormSize called, formId:%{public}" PRId64, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     FormDataAdapter::GetInstance().UpdateFormSize(formId, width, height, borderWidth, formViewScale);
 }
 
@@ -266,7 +265,7 @@ void FormMgrAdapterFacade::HandlerNotifyWhetherVisibleForms(const std::vector<in
 void FormMgrAdapterFacade::PaddingNotifyVisibleFormsMap(const int32_t formVisibleType, int64_t formId,
     std::unordered_map<std::string, std::vector<FormInstance>> &formInstanceMaps)
 {
-    HILOG_INFO("PaddingNotifyVisibleFormsMap called, formId:%{public}" PRId64, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     FormVisibilityAdapter::GetInstance().PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
 }
 
@@ -278,13 +277,13 @@ int32_t FormMgrAdapterFacade::SetFormsRecyclable(const std::vector<int64_t> &for
 int32_t FormMgrAdapterFacade::RecycleForms(const std::vector<int64_t> &formIds, const Want &want,
     bool isCheckCallingUid)
 {
-    HILOG_INFO("RecycleForms called, formIds size:%{public}zu", formIds.size());
+    HILOG_INFO("formIds size:%{public}zu", formIds.size());
     return FormLifecycleAdapter::GetInstance().RecycleForms(formIds, want, isCheckCallingUid);
 }
 
 int32_t FormMgrAdapterFacade::NotifyFormLocked(const int64_t &formId, bool isLocked)
 {
-    HILOG_INFO("NotifyFormLocked called, formId:%{public}" PRId64, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     return FormVisibilityAdapter::GetInstance().NotifyFormLocked(formId, isLocked);
 }
 
@@ -341,15 +340,14 @@ int32_t FormMgrAdapterFacade::GetHostFormsCount(std::string &bundleName, int32_t
 int FormMgrAdapterFacade::AcquireFormState(const Want &want, const sptr<IRemoteObject> &callerToken,
     FormStateInfo &stateInfo)
 {
-    HILOG_INFO("AcquireFormState called");
+    HILOG_INFO("called");
     return FormQueryAdapter::GetInstance().AcquireFormState(want, callerToken, stateInfo);
 }
 
 int FormMgrAdapterFacade::AcquireFormData(int64_t formId, int64_t requestCode,
     const sptr<IRemoteObject> &callerToken, AAFwk::WantParams &formData)
 {
-    HILOG_INFO("AcquireFormData called, formId:%{public}" PRId64 ", requestCode:%{public}" PRId64,
-        formId, requestCode);
+    HILOG_INFO("formId:%{public}" PRId64 ", requestCode:%{public}" PRId64, formId, requestCode);
     return FormQueryAdapter::GetInstance().AcquireFormData(formId, requestCode, callerToken, formData);
 }
 
@@ -409,7 +407,7 @@ ErrCode FormMgrAdapterFacade::RegisterRemoveObserver(const std::string &bundleNa
 
 void FormMgrAdapterFacade::CleanResource(const wptr<IRemoteObject> &remote)
 {
-    HILOG_INFO("CleanResource called");
+    HILOG_INFO("called");
     FormObserverAdapter::GetInstance().CleanResource(remote);
 }
 
@@ -447,13 +445,13 @@ bool FormMgrAdapterFacade::CheckFormDueControl(const FormMajorInfo &formMajorInf
 
 ErrCode FormMgrAdapterFacade::HandleFormAddObserver(const int64_t formId)
 {
-    HILOG_INFO("HandleFormAddObserver called, formId:%{public}" PRId64, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     return FormCommonAdapter::GetInstance().HandleFormAddObserver(formId);
 }
 
 ErrCode FormMgrAdapterFacade::HandleFormRemoveObserver(const RunningFormInfo runningFormInfo)
 {
-    HILOG_INFO("HandleFormRemoveObserver called");
+    HILOG_INFO("called");
     FormLifecycleAdapter::GetInstance().HandleFormRemoveObserver(runningFormInfo);
     return ERR_OK;
 }
@@ -466,13 +464,13 @@ ErrCode FormMgrAdapterFacade::ReAcquireProviderFormInfoAsync(const FormItemInfo 
 ErrCode FormMgrAdapterFacade::AcquireProviderFormInfoByFormRecord(const FormRecord &record,
     const WantParams &wantParams)
 {
-    HILOG_INFO("AcquireProviderFormInfoByFormRecord called");
+    HILOG_INFO("called");
     return FormDataAdapter::GetInstance().AcquireProviderFormInfoByFormRecord(record, wantParams);
 }
 
 void FormMgrAdapterFacade::ClearReconnectNum(int64_t formId)
 {
-    HILOG_INFO("ClearReconnectNum called, formId:%{public}" PRId64, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     FormDataAdapter::GetInstance().ClearReconnectNum(formId);
 }
 
@@ -521,14 +519,14 @@ int FormMgrAdapterFacade::BackgroundEvent(const int64_t formId, Want &want,
 
 void FormMgrAdapterFacade::SetFreeInstallFlag(const FormRecord &record, Want &want)
 {
-    HILOG_INFO("SetFreeInstallFlag called");
+    HILOG_INFO("called");
     FormEventAdapter::GetInstance().SetFreeInstallFlag(record, want);
 }
 
 bool FormMgrAdapterFacade::OpenByOpenType(const int32_t openType, const FormRecord &record,
     const sptr<IRemoteObject> &callerToken, Want &want, int32_t &openResult)
 {
-    HILOG_INFO("OpenByOpenType called, openType:%{public}d", openType);
+    HILOG_INFO("openType:%{public}d", openType);
     return FormEventAdapter::GetInstance().OpenByOpenType(openType, record, callerToken, want, openResult);
 }
 
@@ -745,13 +743,13 @@ ErrCode FormMgrAdapterFacade::HandleCrossDevicePublish(Want &want, int32_t userI
 
 ErrCode FormMgrAdapterFacade::StartAbilityByFms(const Want &want)
 {
-    HILOG_INFO("StartAbilityByFms called");
+    HILOG_INFO("called");
     return FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
 }
 
 int FormMgrAdapterFacade::DumpStorageFormInfos(std::string &formInfos) const
 {
-    HILOG_INFO("DumpStorageFormInfos called");
+    HILOG_INFO("called");
     return FormDebugAdapter::GetInstance().DumpStorageFormInfos(formInfos);
 }
 
@@ -797,13 +795,13 @@ int FormMgrAdapterFacade::DumpFormRunningFormInfos(std::string &runningFormInfos
 ErrCode FormMgrAdapterFacade::RegisterFormWantCallback(int32_t callingUid,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("RegisterFormWantCallback called");
+    HILOG_INFO("called");
     return FormCallbackAdapter::GetInstance().RegisterFormWantCallback(callingUid, callerToken);
 }
 
 ErrCode FormMgrAdapterFacade::UnregisterFormWantCallback(int32_t callingUid)
 {
-    HILOG_INFO("UnregisterFormWantCallback called");
+    HILOG_INFO("called");
     return FormCallbackAdapter::GetInstance().UnregisterFormWantCallback(callingUid);
 }
 

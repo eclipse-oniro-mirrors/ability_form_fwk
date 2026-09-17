@@ -3270,7 +3270,6 @@ ErrCode FormDataMgr::SetUpdateDuringDisableForm(const int64_t formId, const bool
 
 void FormDataMgr::LockForms(const std::vector<FormRecord> &&formRecords, const bool lock)
 {
-    HILOG_INFO("LockForms start");
     std::lock_guard<std::mutex> lockMutex(formHostRecordMutex_);
     for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
         std::vector<int64_t> matchedFormIds;

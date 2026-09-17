@@ -242,18 +242,18 @@ int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindin
 {
     HILOG_DEBUG("call");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("UpdateForm failed, form is in recover status, can't do action on form");
+        HILOG_ERROR("Failed, form is in recover status, can't do action on form");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
     if (formId <= 0) {
-        HILOG_ERROR(" UpdateForm failed, the passed in formId can't be negative or zero");
+        HILOG_ERROR("Failed, the passed in formId can't be negative or zero");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
 
     // check formBindingData
     if (formBindingData.GetDataString().empty() && formDataProxies.empty()) {
-        HILOG_ERROR("UpdateForm failed,null formProviderData");
+        HILOG_ERROR("Failed,null formProviderData");
         return ERR_APPEXECFWK_FORM_PROVIDER_DATA_EMPTY;
     }
 

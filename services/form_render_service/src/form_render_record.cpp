@@ -681,7 +681,7 @@ bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, Abilit
             hapPath = moduleInfos[Constants::MODULE_HAP_PATH_KEY].get<std::string>();
             pkgContextInfoJsonStringMap[modulePkgNamePair.first] = hapPath;
         }
-        HILOG_INFO("SetPkgContextInfoMap module:%{public}s, pkgName:%{public}s, hapPath:%{public}s",
+        HILOG_INFO("module:%{public}s, pkgName:%{public}s, hapPath:%{public}s",
             modulePkgNamePair.first.c_str(), pkgName.c_str(), hapPath.c_str());
     }
     if (!pkgContextInfoJsonStringMap.empty()) {
@@ -762,7 +762,7 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const Form
                 if (apiCompatibleVersion != 0) {
                     applicationInfo->apiCompatibleVersion = apiCompatibleVersion;
                 }
-                HILOG_INFO("GetContext bundleName %{public}s, apiCompatibleVersion = %{public}d",
+                HILOG_INFO("bundleName:%{public}s, apiCompatibleVersion:%{public}d",
                     formJsInfo.bundleName.c_str(),
                     applicationInfo->apiCompatibleVersion);
             }

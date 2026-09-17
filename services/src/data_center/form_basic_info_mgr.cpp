@@ -35,7 +35,6 @@ FormBasicInfoMgr::~FormBasicInfoMgr()
 
 void FormBasicInfoMgr::AddFormBasicInfo(const FormBasicInfo &baseInfo)
 {
-    HILOG_INFO("FormBasicInfoMgr::AddFormBasicInfo");
     std::lock_guard<std::mutex> lock(formBasicInfoMutex_);
     auto iter = formBasicInfoMap_.find(baseInfo.formId);
     if (iter != formBasicInfoMap_.end()) {
