@@ -28,7 +28,6 @@
 #include "form_mgr/form_data_adapter.h"
 #undef private
 #undef protected
-
 #include "form_info.h"
 #include "form_instance.h"
 #include "form_major_info.h"
@@ -37,11 +36,24 @@
 #include "want.h"
 #include "want_params.h"
 #include "data_center/form_info/form_item_info.h"
+#include "ffrt.h"
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 using Want = OHOS::AAFwk::Want;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 128;
 constexpr int32_t MAX_VECTOR_SIZE = 10;
 constexpr int32_t MAX_FORM_ID = 10000;

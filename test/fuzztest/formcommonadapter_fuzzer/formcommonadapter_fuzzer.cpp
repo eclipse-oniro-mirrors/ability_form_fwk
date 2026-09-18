@@ -30,16 +30,29 @@
 #include "form_mgr/form_common_adapter.h"
 #undef private
 #undef protected
-
 #include "form_info.h"
 #include "form_major_info.h"
 #include "want.h"
+#include "ffrt.h"
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 // Interpose RdbHelper::GetRdbStore so no real rdb store is opened. Opening the
 // store spawns async rdb threads that outlive the fuzz process and race with
 // rdb's static SqlLog teardown at exit (heap-use-after-free).
 namespace OHOS {
+
 namespace NativeRdb {
+
 std::shared_ptr<RdbStore> RdbHelper::GetRdbStore(
     const RdbStoreConfig &config, int version, RdbOpenCallback &openCallback, int &errCode)
 {
@@ -53,6 +66,7 @@ using namespace OHOS::AppExecFwk;
 using Want = OHOS::AAFwk::Want;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_VECTOR_SIZE = 10;
 constexpr int32_t MAX_FORM_ID = 10000;
@@ -84,7 +98,8 @@ std::string GenerateSafeString(FuzzedDataProvider *fdp, int32_t maxLength)
     std::string result = fdp->ConsumeRandomLengthString(maxLength);
     std::string safeResult;
     for (char c : result) {
-        if (std::isalnum(c) || c == '_' || c == '-' || c == '.' || c == '/' || c == ':') {
+        if (std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-' ||
+            c == '.' || c == '/' || c == ':') {
             safeResult += c;
         } else {
             safeResult += '_';

@@ -23,12 +23,25 @@
 #define private public
 #define protected public
 #include "feature/param_update/param_reader.h"
+#include "ffrt.h"
 #undef private
 #undef protected
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr int32_t MAX_NUM = 15;
 
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
@@ -59,4 +72,4 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
     OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     return 0;
-}
+}

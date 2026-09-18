@@ -29,7 +29,6 @@
 #include "form_mgr/form_lifecycle_adapter.h"
 #undef private
 #undef protected
-
 #include "configuration.h"
 #include "form_constants.h"
 #include "data_center/form_info/form_item_info.h"
@@ -38,11 +37,24 @@
 #include "running_form_info.h"
 #include "want.h"
 #include "want_params.h"
+#include "ffrt.h"
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 using Want = OHOS::AAFwk::Want;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_FORM_ID = 10000;
 constexpr int32_t MIN_FORM_ID = 0;
@@ -63,7 +75,8 @@ std::string GenerateSafeString(FuzzedDataProvider *fdp, int32_t maxLength)
     std::string result = fdp->ConsumeRandomLengthString(maxLength);
     std::string safeResult;
     for (char c : result) {
-        if (std::isalnum(c) || c == '_' || c == '-' || c == '.' || c == '/' || c == ':') {
+        if (std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-' ||
+            c == '.' || c == '/' || c == ':') {
             safeResult += c;
         } else {
             safeResult += '_';
@@ -336,6 +349,7 @@ extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
     return 0;
 }
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     FuzzedDataProvider fdp(data, size);

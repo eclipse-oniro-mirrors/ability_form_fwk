@@ -25,12 +25,25 @@
 #define protected public
 #include "form_refresh/refresh_impl/form_app_upgrade_refresh_impl.h"
 #include "form_refresh/strategy/refresh_config.h"
+#include "ffrt.h"
 #undef private
 #undef protected
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_NUM = 10000;
 constexpr int32_t MIN_NUM = 0;

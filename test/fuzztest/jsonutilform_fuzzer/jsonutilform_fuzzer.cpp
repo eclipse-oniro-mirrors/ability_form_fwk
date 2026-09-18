@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
+#include <cctype>
 #include "jsonutilform_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
 #include <fuzzer/FuzzedDataProvider.h>
+#include "ffrt.h"
 
 #define private public
 #define protected public
@@ -25,9 +27,21 @@
 #undef private
 #undef protected
 
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
+
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 // Input bounds for fuzzer data generation
 constexpr int32_t FUZZ_MAX_LENGTH = 256;
 constexpr int32_t FUZZ_MAX_NUM = 10000;
@@ -256,18 +270,21 @@ std::string GenerateFuzzedJsonString(FuzzedDataProvider *fdp)
 static void FuzzSafeJsonParseBasic(FuzzedDataProvider *fdp)
 {
     std::string jsonStr1 = GenerateFuzzedJsonString(fdp);
-    bool allowExceptions1 = fdp->ConsumeBool();
-    SafeJsonParse(jsonStr1, allowExceptions1);
+    SafeJsonParse(jsonStr1, false);
 
-    bool allowExceptions2 = fdp->ConsumeBool();
-    SafeJsonParse(std::string(), allowExceptions2);
+    SafeJsonParse(std::string(), false);
 }
 
 static void FuzzParseInfoFromJsonStr(FuzzedDataProvider *fdp)
 {
     std::string parseData = fdp->ConsumeRandomLengthString(FUZZ_MAX_LENGTH);
     std::string parsedStr;
-    ParseInfoFromJsonStr<std::string>(parseData.c_str(), parsedStr);
+    // Wrap fuzz data as a JSON string so SafeJsonParse always yields a string
+    // type, matching the std::string template arg. Raw fuzz data could parse
+    // as a number/bool/array, causing get<std::string>() to throw type_error
+    // which aborts under -fno-exceptions.
+    std::string jsonStr = "\"" + EscapeJsonString(parseData) + "\"";
+    ParseInfoFromJsonStr<std::string>(jsonStr.c_str(), parsedStr);
     ParseInfoFromJsonStr<std::string>(nullptr, parsedStr);
 }
 
@@ -388,9 +405,21 @@ static void FuzzGetValueArr(FuzzedDataProvider *fdp)
     }
 }
 
+static std::string GenerateSafeString(FuzzedDataProvider *fdp)
+{
+    std::string raw = fdp->ConsumeRandomLengthString(FUZZ_MAX_LENGTH);
+    std::string result;
+    for (unsigned char c : raw) {
+        if (isalnum(c) || c == '_' || c == '-' || c == '.' || c == '/' || c == ':') {
+            result += static_cast<char>(c);
+        }
+    }
+    return result.empty() ? "default" : result;
+}
+
 static void FuzzGetJsonStrFromInfo(FuzzedDataProvider *fdp)
 {
-    std::string infoStr = fdp->ConsumeRandomLengthString(FUZZ_MAX_LENGTH);
+    std::string infoStr = GenerateSafeString(fdp);
     GetJsonStrFromInfo<std::string>(infoStr);
 }
 

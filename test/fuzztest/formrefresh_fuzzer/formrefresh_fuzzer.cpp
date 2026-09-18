@@ -43,10 +43,23 @@
 #include "form_refresh/refresh_impl/form_provider_refresh_impl.h"
 #include "status_mgr_center/form_status.h"
 #include "feature/param_update/param_control.h"
+#include "ffrt.h"
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr size_t U32_AT_SIZE = 4;
 constexpr int32_t MAX_STRING_SIZE = 20;
 

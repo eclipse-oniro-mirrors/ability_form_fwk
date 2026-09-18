@@ -51,6 +51,7 @@ ohos_fuzztest("JsonUtilFormFuzzTest") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",

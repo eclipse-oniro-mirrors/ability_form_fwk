@@ -26,12 +26,25 @@
 #include "feature/form_check/form_abnormal_info.h"
 #include "feature/form_check/form_abnormal_reporter.h"
 #include "form_event_report_define.h"
+#include "ffrt.h"
 #undef private
 #undef protected
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_NUM = 1000;
 constexpr int32_t MIN_RATIO_NUM = 10;

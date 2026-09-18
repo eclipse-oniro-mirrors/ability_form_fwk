@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <chrono>
 #include <thread>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #define private public
 #define protected public
@@ -27,26 +28,35 @@
 #undef private
 #undef protected
 #include "securec.h"
+#include "ffrt.h"
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
-constexpr size_t U32_AT_SIZE = 4;
-uint32_t GetU32Data(const char* ptr)
-{
-    // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
-}
+
+constexpr int32_t MAX_STR_LEN = 256;
 
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
+    FuzzedDataProvider fdp(reinterpret_cast<const uint8_t*>(data), size);
     // Test LoadStageFormConfigInfo
     BundleInfo bundleInfo;
-    bundleInfo.appId = std::string(data, size);
-    bundleInfo.versionCode = static_cast<int32_t>(GetU32Data(data));
+    bundleInfo.appId = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
+    bundleInfo.versionCode = fdp.ConsumeIntegral<int32_t>();
 
     std::vector<FormInfo> formInfos;
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    int32_t userId = fdp.ConsumeIntegral<int32_t>();
     FormInfoHelper::LoadStageFormConfigInfo(bundleInfo, formInfos, userId);
     FormInfoHelper::LoadStageFormConfigInfo(bundleInfo, formInfos);
 
@@ -55,14 +65,14 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 
     // Test GetFormInfoDescription
     FormInfo formInfo;
-    formInfo.name = std::string(data, size);
-    formInfo.bundleName = std::string(data, size);
-    formInfo.moduleName = std::string(data, size);
-    formInfo.descriptionId = static_cast<int32_t>(GetU32Data(data));
+    formInfo.name = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
+    formInfo.bundleName = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
+    formInfo.moduleName = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
+    formInfo.descriptionId = fdp.ConsumeIntegral<int32_t>();
     FormInfoHelper::GetFormInfoDescription(resourceManager, formInfo);
 
     // Test GetFormInfoDisplayName
-    formInfo.displayName = std::string(data, size);
+    formInfo.displayName = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
     FormInfoHelper::GetFormInfoDisplayName(resourceManager, formInfo);
 
     // Test LoadSharedModuleInfo
@@ -71,27 +81,27 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 
     // Test LoadFormInfos
     ExtensionAbilityInfo extensionInfo;
-    extensionInfo.bundleName = std::string(data, size);
-    extensionInfo.moduleName = std::string(data, size);
-    extensionInfo.name = std::string(data, size);
-    extensionInfo.description = std::string(data, size);
+    extensionInfo.bundleName = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
+    extensionInfo.moduleName = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
+    extensionInfo.name = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
+    extensionInfo.description = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
 
-    std::string profileInfo(data, size);
+    std::string profileInfo = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
     ExtraFormInfo extraFormInfo;
-    extraFormInfo.isDistributedForm = (GetU32Data(data) % 2 == 0);
-    extraFormInfo.moduleName = std::string(data, size);
-    extraFormInfo.isTemplateForm = (GetU32Data(data) % 3 == 0);
+    extraFormInfo.isDistributedForm = fdp.ConsumeBool();
+    extraFormInfo.moduleName = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
+    extraFormInfo.isTemplateForm = fdp.ConsumeBool();
 
     FormInfoHelper::LoadFormInfos(formInfos, bundleInfo, extensionInfo, profileInfo, extraFormInfo);
 
     // Test PrintLoadStageFormConfigInfo
-    bool hasDistributedForm = (GetU32Data(data) % 2 == 0);
+    bool hasDistributedForm = fdp.ConsumeBool();
     FormInfoHelper::PrintLoadStageFormConfigInfo(formInfo, hasDistributedForm);
 
     // Test SetDistributedBundleStatus
-    std::string entryModule(data, size);
-    std::string uiModule(data, size);
-    std::string bundleInfoName(data, size);
+    std::string entryModule = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
+    std::string uiModule = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
+    std::string bundleInfoName = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
     FormInfoHelper::SetDistributedBundleStatus(userId, entryModule, uiModule, bundleInfoName, hasDistributedForm);
 
     // Test SendLoadStageFormConfigEvent
@@ -107,7 +117,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     // Test LoadProfileFormInfos
     std::vector<std::string> profileInfos;
     profileInfos.push_back(profileInfo);
-    profileInfos.push_back(std::string(data, size));
+    profileInfos.push_back(fdp.ConsumeRandomLengthString(MAX_STR_LEN));
     FormInfoHelper::LoadProfileFormInfos(formInfos, bundleInfo, extensionInfo, profileInfos, extraFormInfo);
 
     return true;
@@ -127,7 +137,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    if (size < OHOS::U32_AT_SIZE) {
+    if (size < 1) {
         return 0;
     }
 

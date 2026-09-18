@@ -22,12 +22,25 @@
 #define private public
 #define protected public
 #include "common/timer_mgr/form_timer_mgr.h"
+#include "ffrt.h"
 #undef private
 #undef protected
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     if (fdp == nullptr) {

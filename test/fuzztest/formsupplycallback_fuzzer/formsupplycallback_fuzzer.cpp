@@ -31,12 +31,26 @@
 #undef protected
 #include "securec.h"
 #include "rdb_helper.h"
+#include "ffrt.h"
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 // Interpose RdbHelper::GetRdbStore so no real rdb store is opened. Opening the
 // store spawns async rdb threads that outlive the fuzz process and race with
 // rdb's static SqlLog teardown at exit (heap-use-after-free).
 namespace OHOS {
+
 namespace NativeRdb {
+
 std::shared_ptr<RdbStore> RdbHelper::GetRdbStore(
     const RdbStoreConfig &config, int version, RdbOpenCallback &openCallback, int &errCode)
 {
@@ -46,18 +60,10 @@ std::shared_ptr<RdbStore> RdbHelper::GetRdbStore(
 } // namespace NativeRdb
 } // namespace OHOS
 
-// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
-// tasks spawns ffrt CPU workers whose threads still run when ffrt's static
-// CPUWorkerGroup is torn down at exit (heap-use-after-free).
-extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
-    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
-{
-    return nullptr;
-}
-
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr int32_t INDEX_MAX = 2;
 void FormSerialQueueTest(FuzzedDataProvider *fdp)
 {

@@ -32,6 +32,9 @@ ohos_fuzztest("FormManagerFuzzTest") {
   ]
   sources = [ "formmanager_fuzzer.cpp" ]
 
+  defines = []
+  defines += [ "MEM_MGR_ENABLE" ]
+
   deps = [ "${form_fwk_path}:libfms_internal_static" ]
 
   external_deps = [

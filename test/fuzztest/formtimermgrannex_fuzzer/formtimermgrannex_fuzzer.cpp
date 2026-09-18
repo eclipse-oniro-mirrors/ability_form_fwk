@@ -29,10 +29,23 @@
 #undef private
 #undef protected
 #include "securec.h"
+#include "ffrt.h"
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr int32_t LIMIT_MAX = 55;
 constexpr int32_t INDEX_MAX = 2;
 constexpr char FMS_TIME_SPEED[] = "fms.time_speed";

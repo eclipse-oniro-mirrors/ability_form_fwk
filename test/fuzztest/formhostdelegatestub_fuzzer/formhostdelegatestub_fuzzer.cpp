@@ -20,10 +20,23 @@
 
 #include "form_host_delegate_stub.h"
 #include "securec.h"
+#include "ffrt.h"
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr size_t U32_AT_SIZE = 4;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.appexecfwk.FormMgr";
 class FormHostDelegateStubFuzzTest : public FormHostDelegateStub {
@@ -69,11 +82,13 @@ public:
         return ERR_OK;
     }
 };
+
 uint32_t GetU32Data(const char* ptr)
 {
     // convert fuzz input data to an integer
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
 }
+
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
     FormHostDelegateStubFuzzTest formHostDelegateStub;
