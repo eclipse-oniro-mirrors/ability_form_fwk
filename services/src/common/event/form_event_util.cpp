@@ -51,7 +51,7 @@ void UpdateRecordByBundleInfo(const BundleInfo &bundleInfo, FormRecord &formReco
             auto hapPath = hapModuleInfo.hapPath;
             auto moduleName = hapModuleInfo.moduleName;
             HILOG_INFO("update record %{public}" PRId64 ". packageName is %{public}s, hap path is %{public}s, "
-                "jsFormCodePath:%{public}s", formRecord.formId, hapModuleInfo.packageName.c_str(), 
+                "jsFormCodePath:%{public}s", formRecord.formId, hapModuleInfo.packageName.c_str(),
                 FormFileUtil::GetMaskedPath(hapPath).c_str(), formRecord.jsFormCodePath.c_str());
             if (hapPath.find(Constants::ABS_CODE_PATH) != std::string::npos) {
                 hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH), Constants::LOCAL_BUNDLES);
