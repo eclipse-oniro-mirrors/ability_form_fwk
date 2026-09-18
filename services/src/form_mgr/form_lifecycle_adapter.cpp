@@ -1053,7 +1053,6 @@ ErrCode FormLifecycleAdapter::EnableForms(const std::string &bundleName, const i
 // Implementation of ProtectLockForms
 ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, int32_t userId, const bool protect)
 {
-    HILOG_INFO("ProtectLockForms entry");
     if (FormBundleLockMgr::GetInstance().IsLockServiceInitialized() &&
         FormBundleLockMgr::GetInstance().IsBundleProtect(bundleName, userId) == protect) {
         HILOG_INFO("No need to change protect status, bundleName = %{public}s, protect = %{public}d",
@@ -1254,7 +1253,6 @@ bool FormLifecycleAdapter::IsFormRenderServiceCall(int callingUid)
 // Implementation of SwitchLockForms
 ErrCode FormLifecycleAdapter::SwitchLockForms(const std::string &bundleName, int32_t userId, const bool lock)
 {
-    HILOG_INFO("SwitchLockForms entry");
     if (FormBundleLockMgr::GetInstance().IsBundleLock(bundleName, userId) == lock) {
         HILOG_INFO("No need to change lock status, bundleName = %{public}s, lock = %{public}d",
             bundleName.c_str(), lock);
@@ -1471,7 +1469,7 @@ ErrCode FormLifecycleAdapter::HandleCastTempForm(const int64_t formId, const For
 int FormLifecycleAdapter::ReleaseRenderer(const int64_t formId, const std::string &compId)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("FormLifecycleAdapter::ReleaseRenderer called, formId:%{public}" PRId64, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
 
     if (formId <= 0 || compId.empty()) {
         HILOG_ERROR("Release invalid param");
@@ -1492,7 +1490,7 @@ int FormLifecycleAdapter::ReleaseRenderer(const int64_t formId, const std::strin
 #ifdef RES_SCHEDULE_ENABLE
 void FormLifecycleAdapter::SetTimerTaskNeeded(bool isTimerTaskNeeded)
 {
-    HILOG_INFO("FormLifecycleAdapter::SetTimerTaskNeeded called, isTimerTaskNeeded:%{public}d", isTimerTaskNeeded);
+    HILOG_INFO("isTimerTaskNeeded:%{public}d", isTimerTaskNeeded);
     RefreshControlMgr::GetInstance().SetSystemOverloadFlag(!isTimerTaskNeeded);
 }
 #endif // RES_SCHEDULE_ENABLE

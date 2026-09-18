@@ -27,6 +27,7 @@
 #include "data_center/database/form_db_cache.h"
 #include "data_center/form_info/form_info_mgr.h"
 #include "form_mgr/form_mgr_adapter_facade.h"
+#include "form_file_util.h"
 #include "form_render/form_render_mgr.h"
 #include "common/timer_mgr/form_timer_mgr.h"
 #include "common/util/form_trust_mgr.h"
@@ -51,8 +52,8 @@ void UpdateRecordByBundleInfo(const BundleInfo &bundleInfo, FormRecord &formReco
             auto hapPath = hapModuleInfo.hapPath;
             auto moduleName = hapModuleInfo.moduleName;
             HILOG_INFO("update record %{public}" PRId64 ". packageName is %{public}s, hap path is %{public}s, "
-                "jsFormCodePath:%{public}s", formRecord.formId, hapModuleInfo.packageName.c_str(), hapPath.c_str(),
-                formRecord.jsFormCodePath.c_str());
+                "jsFormCodePath:%{public}s", formRecord.formId, hapModuleInfo.packageName.c_str(),
+                FormFileUtil::GetMaskedPath(hapPath).c_str(), formRecord.jsFormCodePath.c_str());
             if (hapPath.find(Constants::ABS_CODE_PATH) != std::string::npos) {
                 hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH), Constants::LOCAL_BUNDLES);
             }

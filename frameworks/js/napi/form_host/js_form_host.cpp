@@ -1696,7 +1696,6 @@ private:
 
     napi_value OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv)
     {
-        HILOG_INFO("call");
         if (argc == ARGS_ONE && IsTypeForNapiValue(env, argv[PARAM0], napi_object)) {
             return GetFormsInfoByFilter(env, argc, argv);
         }
