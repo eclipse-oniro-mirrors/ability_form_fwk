@@ -65,6 +65,11 @@ public:
 private:
     void NotifyFormClickEvent(int64_t formId, const std::string &formClickType, const int32_t userId);
 
+    void DiscardRouterEventUri(const FormRecord &record, Want &want);
+
+    int32_t StartAbilityForRouter(const int64_t formId, const Want &want,
+        const sptr<IRemoteObject> &callerToken, const int32_t callerUserId, const int32_t accessTokenId);
+
     /**
      * @brief Check if the app has permission to keep background running
      * @param bundleName Bundle name of the app

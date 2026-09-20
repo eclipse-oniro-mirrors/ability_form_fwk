@@ -254,12 +254,7 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         }
     }
 
-    bool enableRouteSecondPage = want.GetBoolParam(Constants::PARAM_ENABLE_ROUTE_SECOND_PAGE, false);
-    if (!(enableRouteSecondPage && record.isSystemApp) && !want.GetUriString().empty()
-        && !want.GetElement().GetAbilityName().empty()) {
-        HILOG_WARN("abilityName and uri both exist, abilityName first and discard uri");
-        want.SetUri("");
-    }
+    DiscardRouterEventUri(record, want);
 
     if (record.bundleName != want.GetBundle() && want.GetUriString().empty()) {
         if (!record.isSystemApp) {
@@ -273,7 +268,6 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         return ERR_OK;
     }
     ApplicationInfo appInfo;
-    int32_t result;
     int32_t callerUserId = FormCommonAdapter::GetInstance().GetCallingUserId();
     if (FormBmsHelper::GetInstance().GetApplicationInfo(record.bundleName, callerUserId, appInfo) != ERR_OK) {
         HILOG_ERROR("Get app info failed");
@@ -292,29 +286,21 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         }
     }
 
-    // Log the full want (routing target and passed-through params) before entering AMS for
-    // troubleshooting; the want may carry form business data, so log it entirely as private.
-    HILOG_INFO("RouterEvent send to ams, want: %{private}s", want.ToString().c_str());
+    // Log the routing target (abilityName and uri) before entering AMS for troubleshooting;
+    // other want params may carry form business data and are not logged.
+    HILOG_DEBUG("RouterEvent send to ams, abilityName: %{public}s, uri: %{public}s",
+        want.GetElement().GetAbilityName().c_str(), want.GetUriString().c_str());
 
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
-        int32_t result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerToken,
-            appInfo.accessTokenId, callerUserId);
-        if (result != ERR_OK && result != START_ABILITY_WAITING) {
-            HILOG_ERROR("fail StartAbility, result:%{public}d", result);
-            return result;
-        }
-        NotifyFormClickEvent(formId, FORM_CLICK_ROUTER, callerUserId);
-        return ERR_OK;
+        return StartAbilityForRouter(formId, want, callerToken, callerUserId, appInfo.accessTokenId);
     }
-    result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerToken, appInfo.accessTokenId,
-        callerUserId);
-    if (result != ERR_OK && result != START_ABILITY_WAITING) {
-        HILOG_ERROR("fail StartAbility, result:%{public}d", result);
+
+    int32_t result = StartAbilityForRouter(formId, want, callerToken, callerUserId, appInfo.accessTokenId);
+    if (result != ERR_OK) {
         return result;
     }
 
-    NotifyFormClickEvent(formId, FORM_CLICK_ROUTER, callerUserId);
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     if (!FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
@@ -322,6 +308,29 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         DeviceUsageStats::BundleActiveClient::GetInstance().ReportEvent(event, callerUserId);
     }
 #endif
+    return ERR_OK;
+}
+
+void FormEventAdapter::DiscardRouterEventUri(const FormRecord &record, Want &want)
+{
+    bool enableRouteSecondPage = want.GetBoolParam(Constants::PARAM_ENABLE_ROUTE_SECOND_PAGE, false);
+    if (!(enableRouteSecondPage && record.isSystemApp) && !want.GetUriString().empty()
+        && !want.GetElement().GetAbilityName().empty()) {
+        HILOG_WARN("abilityName and uri both exist, abilityName first and discard uri");
+        want.SetUri("");
+    }
+}
+
+int32_t FormEventAdapter::StartAbilityForRouter(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &callerToken, const int32_t callerUserId, const int32_t accessTokenId)
+{
+    int32_t result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerToken,
+        accessTokenId, callerUserId);
+    if (result != ERR_OK && result != START_ABILITY_WAITING) {
+        HILOG_ERROR("fail StartAbility, result:%{public}d", result);
+        return result;
+    }
+    NotifyFormClickEvent(formId, FORM_CLICK_ROUTER, callerUserId);
     return ERR_OK;
 }
 
