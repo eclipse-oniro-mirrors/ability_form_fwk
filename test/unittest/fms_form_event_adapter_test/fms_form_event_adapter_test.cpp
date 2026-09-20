@@ -1042,7 +1042,7 @@ HWTEST_F(FmsFormEventAdapterTest, RouterEvent_014, TestSize.Level1)
     GTEST_LOG_(INFO) << "RouterEvent_014 end";
 }
 
-// ========== Method 9: OpenByOpenType Additional Branch Tests ==========
+// ========== Method 9: OpenByOpenType Additional Branch Test ==========
 
 /**
  * @tc.name: OpenByOpenType_004

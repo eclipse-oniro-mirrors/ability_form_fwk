@@ -51,6 +51,7 @@ constexpr int32_t MAX_LENGTH = 256;
 constexpr int64_t MAX_FORM_ID = 10000;
 constexpr int64_t MIN_FORM_ID = 0;
 constexpr int64_t MIN_NEG_FORM_ID = -10000;
+constexpr int32_t PROVIDER_USER_ID = 100;
 
 std::string GenerateSafeString(FuzzedDataProvider *fdp, int32_t maxLength)
 {
@@ -97,7 +98,7 @@ void AddFormRecordForFuzz(int64_t formId)
     record.bundleName = "com.example.fuzzer";
     record.moduleName = "entry";
     record.abilityName = "FormAbility";
-    record.providerUserId = 100;
+    record.providerUserId = PROVIDER_USER_ID;
     record.isSystemApp = true;
     FormDataMgr::GetInstance().formRecords_[formId] = record;
 }
@@ -134,7 +135,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    constexpr int32_t sleepSeconds = 2;
+    std::this_thread::sleep_for(std::chrono::seconds(sleepSeconds));
     return 0;
 }
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)

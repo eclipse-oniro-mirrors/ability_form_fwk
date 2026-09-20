@@ -53,6 +53,7 @@ using namespace FormAdapterConstants;
 namespace {
 constexpr int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 constexpr const char* PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
+constexpr int32_t TOKEN_ATTR_SHIFT_BITS = 32;
 
 uint64_t GetProviderSpecifiedFullTokenId(const std::string &bundleName, const int32_t userId)
 {
@@ -69,7 +70,7 @@ uint64_t GetProviderSpecifiedFullTokenId(const std::string &bundleName, const in
     uint64_t specifiedFullTokenId = hapTokenId;
     if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(hapTokenId, hapInfo) ==
         Security::AccessToken::AccessTokenKitRet::RET_SUCCESS) {
-        specifiedFullTokenId = (static_cast<uint64_t>(hapInfo.tokenAttr) << 32) + hapTokenId;
+        specifiedFullTokenId = (static_cast<uint64_t>(hapInfo.tokenAttr) << TOKEN_ATTR_SHIFT_BITS) + hapTokenId;
     }
     return specifiedFullTokenId;
 }

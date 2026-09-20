@@ -36,6 +36,24 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr int32_t BIG_DATA = 32 * 1024; // 32K
+
+// Mock parcel that makes ReadFileDescriptor return -1 to cover the fd < 0 branch in ReadFdFromParcel
+class FaultyReadFdParcel : public MessageParcel {
+public:
+    int ReadFileDescriptor() override
+    {
+        return -1;
+    }
+};
+
+// Mock parcel that makes WriteFileDescriptor fail to cover WriteObject failure in WriteFdToParcel
+class FailWriteFdParcel : public MessageParcel {
+public:
+    bool WriteFileDescriptor(int fd) override
+    {
+        return false;
+    }
+};
 }
 extern void MockConvertRawImageData(bool mockRet);
 extern void MockGetImageDataMap(bool mockRet);
@@ -1077,6 +1095,128 @@ HWTEST_F(FmsFormJsInfoTest, Unmarshalling_Success_001, TestSize.Level1)
     EXPECT_EQ(result->isDynamic, false);
     EXPECT_EQ(result->transparencyEnabled, true);
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end Unmarshalling_Success_001";
+}
+
+/**
+ * @tc.name: WriteFdToParcel_DupFail_001
+ * @tc.desc: Verify WriteFdToParcel returns false when dup(fd) fails (closed fd).
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormJsInfoTest, WriteFdToParcel_DupFail_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-begin WriteFdToParcel_DupFail_001";
+    FormJsInfo formJsInfo;
+    int fd = AshmemCreate("DupFailTest", 4096);
+    ASSERT_GE(fd, 0);
+    fdsan_exchange_owner_tag(fd, 0, Constants::FORM_DOMAIN_ID);
+    fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
+    // fd is closed; dup(fd) returns -1 (EBADF), triggering dupFd < 0 branch
+    MessageParcel parcel;
+    EXPECT_FALSE(formJsInfo.WriteFdToParcel(parcel, fd));
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end WriteFdToParcel_DupFail_001";
+}
+
+/**
+ * @tc.name: WriteFdToParcel_WriteObjectFail_001
+ * @tc.desc: Verify WriteFdToParcel returns false when WriteObject fails (WriteFileDescriptor returns false).
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormJsInfoTest, WriteFdToParcel_WriteObjectFail_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-begin WriteFdToParcel_WriteObjectFail_001";
+    FailWriteFdParcel parcel;
+    FormJsInfo formJsInfo;
+    int fd = AshmemCreate("WriteObjectFailTest", 4096);
+    ASSERT_GE(fd, 0);
+    fdsan_exchange_owner_tag(fd, 0, Constants::FORM_DOMAIN_ID);
+    // WriteFileDescriptor (mock) returns false -> Marshalling fails -> WriteObject fails -> !result branch
+    EXPECT_FALSE(formJsInfo.WriteFdToParcel(parcel, fd));
+    fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end WriteFdToParcel_WriteObjectFail_001";
+}
+
+/**
+ * @tc.name: ReadFdFromParcel_InvalidFdInDescriptor_001
+ * @tc.desc: Verify ReadFdFromParcel returns -1 when descriptor's GetFd() < 0.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormJsInfoTest, ReadFdFromParcel_InvalidFdInDescriptor_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-begin ReadFdFromParcel_InvalidFdInDescriptor_001";
+    FaultyReadFdParcel parcel;
+    int fd = AshmemCreate("ReadFdInvalidTest", 4096);
+    ASSERT_GE(fd, 0);
+    fdsan_exchange_owner_tag(fd, 0, Constants::FORM_DOMAIN_ID);
+    FormJsInfo writeJsInfo;
+    // Write succeeds: WriteFileDescriptor (mock) returns true
+    ASSERT_TRUE(writeJsInfo.WriteFdToParcel(parcel, fd));
+    fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
+
+    FormJsInfo readJsInfo;
+    // ReadFileDescriptor (mock override) returns -1 -> GetFd() < 0 -> fd < 0 branch
+    int readFd = readJsInfo.ReadFdFromParcel(parcel);
+    EXPECT_LT(readFd, 0);
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end ReadFdFromParcel_InvalidFdInDescriptor_001";
+}
+
+/**
+ * @tc.name: ReadAshmemFormData_SizeMismatch_001
+ * @tc.desc: Verify ReadAshmemFormData returns false when formDataLength != ashmem size.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormJsInfoTest, ReadAshmemFormData_SizeMismatch_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-begin ReadAshmemFormData_SizeMismatch_001";
+    int32_t writeSize = 4096;
+    std::string data(writeSize, 'X');
+    FormJsInfo writeJsInfo;
+    MessageParcel parcel;
+    ASSERT_TRUE(writeJsInfo.WriteAshmemFormData(parcel, writeSize, data.c_str()));
+
+    FormJsInfo readJsInfo;
+    std::string outFormData;
+    int32_t mismatchSize = writeSize + 1024;
+    EXPECT_FALSE(readJsInfo.ReadAshmemFormData(parcel, mismatchSize, outFormData));
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end ReadAshmemFormData_SizeMismatch_001";
+}
+
+/**
+ * @tc.name: ReadAshmemFormData_SizeMismatch_Smaller_001
+ * @tc.desc: Verify ReadAshmemFormData returns false when formDataLength < ashmem size.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormJsInfoTest, ReadAshmemFormData_SizeMismatch_Smaller_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-begin ReadAshmemFormData_SizeMismatch_Smaller_001";
+    int32_t writeSize = 4096;
+    std::string data(writeSize, 'X');
+    FormJsInfo writeJsInfo;
+    MessageParcel parcel;
+    ASSERT_TRUE(writeJsInfo.WriteAshmemFormData(parcel, writeSize, data.c_str()));
+
+    FormJsInfo readJsInfo;
+    std::string outFormData;
+    int32_t mismatchSize = writeSize / 2;
+    EXPECT_FALSE(readJsInfo.ReadAshmemFormData(parcel, mismatchSize, outFormData));
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end ReadAshmemFormData_SizeMismatch_Smaller_001";
+}
+
+/**
+ * @tc.name: WriteAshmemFormData_WriteFdToParcelFail_001
+ * @tc.desc: Verify WriteAshmemFormData returns false when WriteFdToParcel fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormJsInfoTest, WriteAshmemFormData_WriteFdToParcelFail_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-begin WriteAshmemFormData_WriteFdToParcelFail_001";
+    FailWriteFdParcel parcel;
+    FormJsInfo formJsInfo;
+    int32_t dataSize = 4096;
+    std::string data(dataSize, 'X');
+    // AshmemCreate/mmap/memcpy succeed, but WriteFdToParcel fails (WriteFileDescriptor returns false)
+    // -> !WriteFdToParcel branch at form_js_info.cpp:263
+    EXPECT_FALSE(formJsInfo.WriteAshmemFormData(parcel, dataSize, data.c_str()));
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end WriteAshmemFormData_WriteFdToParcelFail_001";
 }
 
 } // namespace AppExecFwk
