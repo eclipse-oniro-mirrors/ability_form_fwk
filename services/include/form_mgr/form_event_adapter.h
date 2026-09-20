@@ -67,8 +67,8 @@ private:
 
     void DiscardRouterEventUri(const FormRecord &record, Want &want);
 
-    int32_t StartAbilityForRouter(const int64_t formId, const Want &want,
-        const sptr<IRemoteObject> &callerToken, const int32_t callerUserId, const int32_t accessTokenId);
+    int32_t StartAbilityForRouter(const int64_t formId, Want &want,
+        const sptr<IRemoteObject> &callerToken, const int32_t callerUserId, const uint32_t accessTokenId);
 
     /**
      * @brief Check if the app has permission to keep background running

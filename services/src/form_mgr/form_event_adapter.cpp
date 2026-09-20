@@ -286,8 +286,6 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         }
     }
 
-    // Log the routing target (abilityName and uri) before entering AMS for troubleshooting;
-    // other want params may carry form business data and are not logged.
     HILOG_DEBUG("RouterEvent send to ams, abilityName: %{public}s, uri: %{public}s",
         want.GetElement().GetAbilityName().c_str(), want.GetUriString().c_str());
 
@@ -321,8 +319,8 @@ void FormEventAdapter::DiscardRouterEventUri(const FormRecord &record, Want &wan
     }
 }
 
-int32_t FormEventAdapter::StartAbilityForRouter(const int64_t formId, const Want &want,
-    const sptr<IRemoteObject> &callerToken, const int32_t callerUserId, const int32_t accessTokenId)
+int32_t FormEventAdapter::StartAbilityForRouter(const int64_t formId, Want &want,
+    const sptr<IRemoteObject> &callerToken, const int32_t callerUserId, const uint32_t accessTokenId)
 {
     int32_t result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerToken,
         accessTokenId, callerUserId);

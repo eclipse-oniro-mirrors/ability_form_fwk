@@ -928,7 +928,7 @@ HWTEST_F(FmsFormEventAdapterTest, RouterEvent_010, TestSize.Level1)
 
 /**
  * @tc.name: RouterEvent_011
- * @tc.desc: Verify uri is passed through when enableRouteSecondePage is true and
+ * @tc.desc: Verify uri is passed through when enableRouteSecondPage is true and
  *           the form provider is a system app (uri and abilityName coexist)
  * @tc.type: FUNC
  */
@@ -966,7 +966,7 @@ HWTEST_F(FmsFormEventAdapterTest, RouterEvent_011, TestSize.Level1)
 
 /**
  * @tc.name: RouterEvent_012
- * @tc.desc: Verify uri is discarded when enableRouteSecondePage is true but the
+ * @tc.desc: Verify uri is discarded when enableRouteSecondPage is true but the
  *           form provider is not a system app (abilityName takes priority)
  * @tc.type: FUNC
  */
@@ -1004,7 +1004,7 @@ HWTEST_F(FmsFormEventAdapterTest, RouterEvent_012, TestSize.Level1)
 
 /**
  * @tc.name: RouterEvent_013
- * @tc.desc: Verify uri is discarded when enableRouteSecondePage is false even if
+ * @tc.desc: Verify uri is discarded when enableRouteSecondPage is false even if
  *           the form provider is a system app (abilityName takes priority)
  * @tc.type: FUNC
  */
@@ -1041,7 +1041,7 @@ HWTEST_F(FmsFormEventAdapterTest, RouterEvent_013, TestSize.Level1)
 
 /**
  * @tc.name: RouterEvent_014
- * @tc.desc: Verify uri is discarded when enableRouteSecondePage is not set
+ * @tc.desc: Verify uri is discarded when enableRouteSecondPage is not set
  *           (default false) even if the form provider is a system app
  * @tc.type: FUNC
  */
