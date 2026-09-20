@@ -926,6 +926,155 @@ HWTEST_F(FmsFormEventAdapterTest, RouterEvent_010, TestSize.Level1)
     GTEST_LOG_(INFO) << "RouterEvent_010 end";
 }
 
+/**
+ * @tc.name: RouterEvent_011
+ * @tc.desc: Verify uri is passed through when enableRouteSecondePage is true and
+ *           the form provider is a system app (uri and abilityName coexist)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, RouterEvent_011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RouterEvent_011 start";
+
+    Want want;
+    want.SetUri("test://uri");
+    want.SetElementName("com.other.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_ENABLE_ROUTE_SECOND_PAGE, true);
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+    record.isSystemApp = true;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+
+    auto result = FormEventAdapter::GetInstance().RouterEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_EQ(want.GetUriString(), "test://uri");
+    EXPECT_EQ(want.GetBundle(), "com.other.bundle");
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+
+    GTEST_LOG_(INFO) << "RouterEvent_011 end";
+}
+
+/**
+ * @tc.name: RouterEvent_012
+ * @tc.desc: Verify uri is discarded when enableRouteSecondePage is true but the
+ *           form provider is not a system app (abilityName takes priority)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, RouterEvent_012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RouterEvent_012 start";
+
+    Want want;
+    want.SetUri("test://uri");
+    want.SetElementName("com.other.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_ENABLE_ROUTE_SECOND_PAGE, true);
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+    record.isSystemApp = false;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+
+    auto result = FormEventAdapter::GetInstance().RouterEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_TRUE(want.GetUriString().empty());
+    EXPECT_EQ(want.GetBundle(), "com.test.bundle");
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+
+    GTEST_LOG_(INFO) << "RouterEvent_012 end";
+}
+
+/**
+ * @tc.name: RouterEvent_013
+ * @tc.desc: Verify uri is discarded when enableRouteSecondePage is false even if
+ *           the form provider is a system app (abilityName takes priority)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, RouterEvent_013, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RouterEvent_013 start";
+
+    Want want;
+    want.SetUri("test://uri");
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_ENABLE_ROUTE_SECOND_PAGE, false);
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+    record.isSystemApp = true;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+
+    auto result = FormEventAdapter::GetInstance().RouterEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_TRUE(want.GetUriString().empty());
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+
+    GTEST_LOG_(INFO) << "RouterEvent_013 end";
+}
+
+/**
+ * @tc.name: RouterEvent_014
+ * @tc.desc: Verify uri is discarded when enableRouteSecondePage is not set
+ *           (default false) even if the form provider is a system app
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, RouterEvent_014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RouterEvent_014 start";
+
+    Want want;
+    want.SetUri("test://uri");
+    want.SetElementName("com.test.bundle", "MainAbility");
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+    record.isSystemApp = true;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+
+    auto result = FormEventAdapter::GetInstance().RouterEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_TRUE(want.GetUriString().empty());
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+
+    GTEST_LOG_(INFO) << "RouterEvent_014 end";
+}
+
 // ========== Method 9: OpenByOpenType Additional Branch Tests ==========
 
 /**

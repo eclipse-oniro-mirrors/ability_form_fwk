@@ -254,6 +254,13 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         }
     }
 
+    bool enableRouteSecondPage = want.GetBoolParam(Constants::PARAM_ENABLE_ROUTE_SECOND_PAGE, false);
+    if (!(enableRouteSecondPage && record.isSystemApp) && !want.GetUriString().empty()
+        && !want.GetElement().GetAbilityName().empty()) {
+        HILOG_WARN("abilityName and uri both exist, abilityName first and discard uri");
+        want.SetUri("");
+    }
+
     if (record.bundleName != want.GetBundle() && want.GetUriString().empty()) {
         if (!record.isSystemApp) {
             HILOG_WARN("Only system apps can launch the ability of the other apps");
