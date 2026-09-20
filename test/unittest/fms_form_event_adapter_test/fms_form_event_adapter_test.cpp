@@ -1416,11 +1416,9 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_010, TestSize.Level1)
 
     auto result = FormEventAdapter::GetInstance().InsightIntentEvent(TEST_FORM_ID, want, callerToken);
     EXPECT_EQ(result, ERR_OK);
-    // Provider triple backfilled into the want element.
     EXPECT_EQ(want.GetElement().GetBundleName(), "com.test.bundle");
     EXPECT_EQ(want.GetElement().GetModuleName(), "entry");
     EXPECT_EQ(want.GetElement().GetAbilityName(), "EntryAbility");
-    // Form identity param set with the system reserved key.
     EXPECT_TRUE(want.HasParameter(Constants::PARAM_FORM_IDENTITY_KEY));
 
     GTEST_LOG_(INFO) << "InsightIntentEvent_010 end";
@@ -1470,7 +1468,6 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_011, TestSize.Level1)
     auto result = FormEventAdapter::GetInstance().InsightIntentEvent(TEST_FORM_ID, want, callerToken);
     EXPECT_EQ(result, ERR_OK);
 
-    // Restore the default mocked tokenAttr so other cases are not affected.
     MockGetHapTokenInfoAttr(0);
     GTEST_LOG_(INFO) << "InsightIntentEvent_011 end";
 }
@@ -1494,8 +1491,6 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_012, TestSize.Level1)
     record.providerUserId = TEST_USER_ID;
     record.isSystemApp = true;
 
-    // Non-zero mock proves the failure comes from the empty-bundleName early return
-    // rather than a failed GetHapTokenID lookup.
     MockGetHapTokenID(TEST_PROVIDER_HAP_TOKEN_ID);
 
     EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
@@ -1531,8 +1526,6 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_013, TestSize.Level1)
     record.isSystemApp = true;
 
     MockGetHapTokenID(TEST_PROVIDER_HAP_TOKEN_ID);
-    // Non-RET_SUCCESS forces the zero-extended hap token id fallback (no tokenAttr in
-    // the high 32 bits).
     MockGetHapTokenInfoRet(Security::AccessToken::AccessTokenKitRet::RET_FAILED);
 
     EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
@@ -1546,7 +1539,6 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_013, TestSize.Level1)
     auto result = FormEventAdapter::GetInstance().InsightIntentEvent(TEST_FORM_ID, want, callerToken);
     EXPECT_EQ(result, ERR_OK);
 
-    // Restore the default mocked result so other cases are not affected.
     MockGetHapTokenInfoRet(Security::AccessToken::AccessTokenKitRet::RET_SUCCESS);
     GTEST_LOG_(INFO) << "InsightIntentEvent_013 end";
 }
@@ -1563,14 +1555,11 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_014, TestSize.Level1)
 
     Want want;
     want.SetParam(INSIGHT_INTENT_EXECUTE_PARAM_NAME, std::string("TestIntent"));
-    // Host want already carries bundleName/moduleName (passed through by postCardAction);
-    // only the abilityName is missing.
     ElementName element;
     element.SetBundleName("com.host.bundle");
     element.SetModuleName("hostModule");
     want.SetElement(element);
     sptr<IRemoteObject> callerToken = new MockIRemoteObject();
-    // Provider record values differ from the host ones to tell kept values from backfilled.
     FormRecord record;
     record.formId = TEST_FORM_ID;
     record.bundleName = "com.test.bundle";
@@ -1598,7 +1587,6 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_014, TestSize.Level1)
 
     auto result = FormEventAdapter::GetInstance().InsightIntentEvent(TEST_FORM_ID, want, callerToken);
     EXPECT_EQ(result, ERR_OK);
-    // Host-provided fields are kept; only the missing abilityName is backfilled.
     EXPECT_EQ(want.GetElement().GetBundleName(), "com.host.bundle");
     EXPECT_EQ(want.GetElement().GetModuleName(), "hostModule");
     EXPECT_EQ(want.GetElement().GetAbilityName(), "EntryAbility");
@@ -1627,8 +1615,6 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_015, TestSize.Level1)
     record.moduleName = "entry";
     record.isSystemApp = true;
 
-    // MAX_NUMBER_OF_JS (2^53): at or beyond this limit the form identity params go
-    // through the string branch instead of the int branch.
     constexpr int64_t beyondJsNumber = 0x20000000000000;
 
     MockGetHapTokenID(TEST_PROVIDER_HAP_TOKEN_ID);
@@ -1643,7 +1629,6 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_015, TestSize.Level1)
 
     auto result = FormEventAdapter::GetInstance().InsightIntentEvent(TEST_FORM_ID, want, callerToken);
     EXPECT_EQ(result, ERR_OK);
-    // The oversized formId is serialized as a string to avoid JS precision overflow.
     EXPECT_EQ(want.GetStringParam(Constants::PARAM_FORM_ID), "9007199254740992");
     EXPECT_EQ(want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY), "9007199254740992");
 

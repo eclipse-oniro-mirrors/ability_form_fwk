@@ -21,8 +21,6 @@
 #include "bundle_info.h"
 #include "bundle_mgr_interface.h"
 #include "hitrace_meter.h"
-// For the INSIGHT_INTENT_EXECUTE_PARAM_* reserved keys carried in the want; the execute param
-// itself uses the lite variant below (AMS no longer parses the want on its side).
 #include "insight_intent/insight_intent_execute_param.h"
 #include "insight_intent/insight_intent_execute_lite_param.h"
 #include "insight_intent_host_client.h"
@@ -56,8 +54,6 @@ namespace {
 constexpr int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 constexpr const char* PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
 
-// Get the provider specified full token id for permission checking: the high 32 bits
-// carry tokenAttr and the low 32 bits the hap token id; returns 0 on failure.
 uint64_t GetProviderSpecifiedFullTokenId(const std::string &bundleName, const int32_t userId)
 {
     if (bundleName.empty()) {
@@ -69,10 +65,6 @@ uint64_t GetProviderSpecifiedFullTokenId(const std::string &bundleName, const in
             userId, bundleName.c_str());
         return 0;
     }
-    // Rebuild the full token id from the 32-bit hap token id so that downstream
-    // permission checks can read tokenAttr from the high 32 bits and correctly
-    // determine system-app status; fall back to the zero-extended hap token id
-    // when token info is unavailable.
     Security::AccessToken::HapTokenInfo hapInfo;
     uint64_t specifiedFullTokenId = hapTokenId;
     if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(hapTokenId, hapInfo) ==
@@ -82,15 +74,10 @@ uint64_t GetProviderSpecifiedFullTokenId(const std::string &bundleName, const in
     return specifiedFullTokenId;
 }
 
-// The intent execution target is the provider module's entry UIAbility (mainElement in
-// module.json5, e.g. EntryAbility), not the FormExtensionAbility providing the form
-// (record.abilityName). AMS sets the element with this abilityName and strictly matches
-// it with the declared one; backfilling the FormExtensionAbility name causes mismatch.
 std::string GetProviderMainElement(const FormRecord &record)
 {
     BundleInfo bundleInfo;
     const int32_t flags = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_HAP_MODULE);
-    // Query in the provider's user space; in multi-user scenarios it may differ from the caller user.
     if (!FormBmsHelper::GetInstance().GetBundleInfoByFlags(
         record.bundleName, flags, record.providerUserId, bundleInfo)) {
         HILOG_ERROR("GetBundleInfoByFlags failed, bundleName:%{public}s", record.bundleName.c_str());
@@ -106,9 +93,6 @@ std::string GetProviderMainElement(const FormRecord &record)
     return "";
 }
 
-// Extract the intent name and params from the host want into the lite param (AMS reads them
-// only from the param on its side) and backfill the provider triple into the want element,
-// which AMS reads via want.GetElement(); returns ERR_OK or an error code.
 int PrepareInsightIntentParam(Want &want, const FormRecord &record, InsightIntentExecuteLiteParam &executeParam)
 {
     const WantParams &wantParams = want.GetParams();
@@ -122,9 +106,6 @@ int PrepareInsightIntentParam(Want &want, const FormRecord &record, InsightInten
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     executeParam.insightIntentParam = wantParams.GetWantParams(INSIGHT_INTENT_EXECUTE_PARAM_PARAM);
-    // The host want may carry the target triple passed through by postCardAction: fields
-    // already provided keep the user values; only missing ones are backfilled from
-    // FormRecord (AMS requires all three to be non-empty in the end).
     ElementName element = want.GetElement();
     if (element.GetBundleName().empty()) {
         element.SetBundleName(record.bundleName);
@@ -145,8 +126,6 @@ int PrepareInsightIntentParam(Want &want, const FormRecord &record, InsightInten
     return ERR_OK;
 }
 
-// Put form identity params into the want with system reserved keys, same as RouterEvent
-// (int/string branches prevent JS precision overflow).
 void SetFormIdentityParams(Want &want, const int64_t formId)
 {
     if (formId < MAX_NUMBER_OF_JS) {
@@ -412,7 +391,6 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
         HILOG_ERROR("not exist such form:%{public}" PRId64 "", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    // insightIntent is only open to preset system app form providers, not system-signed apps.
     if (!record.isSystemApp) {
         HILOG_ERROR("insightIntent rejected, provider is not system app, "
             "bundleName:%{public}s", record.bundleName.c_str());
@@ -437,8 +415,6 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
         HILOG_ERROR("null insightIntentHostClient");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    // matchedFormId serves as the intent execute callback key; formId goes into want
-    // via the system reserved key (same as router).
     SetFormIdentityParams(want, matchedFormId);
     result = FormAmsHelper::GetInstance().ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(
         want, callerToken, executeParam, specifiedFullTokenId);

@@ -66,8 +66,6 @@ std::string GenerateSafeString(FuzzedDataProvider *fdp, int32_t maxLength)
     return safeResult.empty() ? "default" : safeResult;
 }
 
-// Build a want whose element triple fields are fuzzily blanked to cover the
-// record-backfill branches in PrepareInsightIntentParam.
 Want GenerateInsightIntentWant(FuzzedDataProvider *fdp)
 {
     Want want;
@@ -88,9 +86,6 @@ Want GenerateInsightIntentWant(FuzzedDataProvider *fdp)
     return want;
 }
 
-// Seed FormDataMgr with a valid system-app FormRecord so InsightIntentEvent can pass
-// the GetFormRecord/isSystemApp checks and reach PrepareInsightIntentParam and the
-// AMS invocation path.
 void AddFormRecordForFuzz(int64_t formId)
 {
     if (formId <= 0) {
@@ -115,8 +110,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     auto &adapter = FormEventAdapter::GetInstance();
 
-    // Fuzz InsightIntentEvent with the intent name param set
-    // (covers intent name parsing and element backfill in PrepareInsightIntentParam)
     int64_t formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
     Want want = GenerateInsightIntentWant(fdp);
     want.SetParam(INSIGHT_INTENT_EXECUTE_PARAM_NAME, GenerateSafeString(fdp, MAX_LENGTH));
@@ -124,13 +117,11 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     sptr<IRemoteObject> callerToken = nullptr;
     adapter.InsightIntentEvent(formId, want, callerToken);
 
-    // Fuzz InsightIntentEvent without the intent name param (covers HasParam false branch)
     int64_t absentFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_FORM_ID, MAX_FORM_ID);
     Want absentWant = GenerateInsightIntentWant(fdp);
     AddFormRecordForFuzz(absentFormId);
     adapter.InsightIntentEvent(absentFormId, absentWant, callerToken);
 
-    // Fuzz InsightIntentEvent with a negative or zero formId (covers invalid formId branch)
     int64_t invalidFormId = fdp->ConsumeIntegralInRange<int64_t>(MIN_NEG_FORM_ID, 0);
     Want invalidWant = GenerateInsightIntentWant(fdp);
     invalidWant.SetParam(INSIGHT_INTENT_EXECUTE_PARAM_NAME, GenerateSafeString(fdp, MAX_LENGTH));
