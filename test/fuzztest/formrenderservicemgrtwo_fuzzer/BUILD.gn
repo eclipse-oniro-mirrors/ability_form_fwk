@@ -25,6 +25,7 @@ ohos_fuzztest("FormRenderServiceMgrTwoFuzzTest") {
 
   include_dirs = [
     "${form_fwk_path}/interfaces/kits/native/include",
+    "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/form_render_service/include",
     "${form_fwk_path}/services/include",
   ]
@@ -51,6 +52,7 @@ ohos_fuzztest("FormRenderServiceMgrTwoFuzzTest") {
 
   external_deps = [
     "ability_base:base",
+    "ability_base:configuration",
     "ability_base:want",
     "ability_runtime:ability_connect_callback_stub",
     "ability_runtime:ability_manager",

@@ -23,6 +23,8 @@
 #include "form_constants.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/database/form_db_cache.h"
+#include "data_center/form_cache_mgr.h"
+#include "feature/bundle_lock/form_exempt_lock_mgr.h"
 #include "data_center/form_info/form_info_mgr.h"
 #include "form_mgr_errors.h"
 #include "form_mgr/form_mgr_adapter_facade.h"
@@ -174,6 +176,9 @@ void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
         std::vector<int64_t>::iterator itRemoved;
         for (itRemoved = removedFormIds.begin(); itRemoved != removedFormIds.end(); ++itRemoved) {
             FormTimerMgr::GetInstance().RemoveFormTimer(*itRemoved);
+            // Only cache cleanup point of user-removed chain; temp forms reachable here only
+            FormCacheMgr::GetInstance().DeleteData(*itRemoved);
+            FormExemptLockMgr::GetInstance().SetExemptLockStatus(*itRemoved, false);
         }
 
         // delete formRenderInner

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,17 +32,17 @@ public:
     std::string moduleName_;
     std::string abilityName_;
     std::string formName_;
-    int32_t specificationId_;
-    int32_t dimensionId_;
-    int64_t formId_;
-    int64_t startAquireTime_;
-    int64_t endAquireTime_;
-    int64_t startBindTime_;
-    int64_t endBindTime_;
-    int64_t startGetTime_;
-    int64_t endGetTime_;
-    int64_t durationStartTime_;
-    int64_t durationEndTime_;
+    int32_t specificationId_ = 0;
+    int32_t dimensionId_ = 0;
+    int64_t formId_ = 0;
+    int64_t startAquireTime_ = 0;
+    int64_t endAquireTime_ = 0;
+    int64_t startBindTime_ = 0;
+    int64_t endBindTime_ = 0;
+    int64_t startGetTime_ = 0;
+    int64_t endGetTime_ = 0;
+    int64_t durationStartTime_ = 0;
+    int64_t durationEndTime_ = 0;
 };
 
 class FormReport final : public DelayedRefSingleton<FormReport> {

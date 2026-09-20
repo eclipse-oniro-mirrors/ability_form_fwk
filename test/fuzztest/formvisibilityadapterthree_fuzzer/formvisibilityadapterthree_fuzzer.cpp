@@ -34,20 +34,24 @@
 #include "form_constants.h"
 #include "form_instance.h"
 #include "want.h"
+#include "ffrt.h"
 
-// Interpose ffrt_queue_submit_h so no ffrt task is ever enqueued. Enqueuing
-// tasks spawns ffrt CPU workers whose threads still run when ffrt's static
-// CPUWorkerGroup is torn down at exit (heap-use-after-free).
 extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
     ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
 {
     return nullptr;
 }
 
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
+
 using namespace OHOS::AppExecFwk;
 using Want = OHOS::AAFwk::Want;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_FORM_ID = 10000;
 constexpr int32_t MIN_FORM_ID = 0;
@@ -69,7 +73,8 @@ std::string GenerateSafeString(FuzzedDataProvider *fdp, int32_t maxLength)
     std::string result = fdp->ConsumeRandomLengthString(maxLength);
     std::string safeResult;
     for (char c : result) {
-        if (std::isalnum(c) || c == '_' || c == '-' || c == '.' || c == '/' || c == ':') {
+        if (std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-' ||
+            c == '.' || c == '/' || c == ':') {
             safeResult += c;
         } else {
             safeResult += '_';
@@ -224,9 +229,9 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
-    std::this_thread::sleep_for(std::chrono::seconds(2));
     return 0;
 }
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     FuzzedDataProvider fdp(data, size);

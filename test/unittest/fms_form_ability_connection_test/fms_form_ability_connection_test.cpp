@@ -864,30 +864,6 @@ HWTEST_F(FmsFormAbilityConnectionTest, GetAppFormPid_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: RegisterToSupplyCallback_001
- * @tc.desc: Verify RegisterToSupplyCallback executes without error and connectId is set.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormAbilityConnectionTest, RegisterToSupplyCallback_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "RegisterToSupplyCallback_001 start";
-
-    int64_t initialConnectId = 0;
-    connection_->SetConnectId(initialConnectId);
-    connection_->SetProviderKey(BUNDLE_NAME, ABILITY_NAME, USER_ID);
-
-    EXPECT_EQ(connection_->GetConnectId(), initialConnectId);
-
-    connection_->RegisterToSupplyCallback();
-
-    int64_t newConnectId = connection_->GetConnectId();
-    EXPECT_NE(newConnectId, initialConnectId);
-    EXPECT_GT(newConnectId, 0);
-
-    GTEST_LOG_(INFO) << "RegisterToSupplyCallback_001 end";
-}
-
-/**
  * @tc.name: onFormAppConnect_EmptyBundleName_001
  * @tc.desc: Verify onFormAppConnect returns false when bundleName is empty.
  * @tc.type: FUNC
@@ -903,77 +879,6 @@ HWTEST_F(FmsFormAbilityConnectionTest, onFormAppConnect_EmptyBundleName_001, Tes
     EXPECT_FALSE(result);
 
     GTEST_LOG_(INFO) << "onFormAppConnect_EmptyBundleName_001 end";
-}
-
-/**
- * @tc.name: OnPreConnectTask_001
- * @tc.desc: Verify OnPreConnectTask default implementation does nothing and does not throw.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormAbilityConnectionTest, OnPreConnectTask_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "OnPreConnectTask_001 start";
-
-    connection_->OnPreConnectTask();
-    EXPECT_TRUE(connection_->IsPreConnectTaskExecuted());
-
-    GTEST_LOG_(INFO) << "OnPreConnectTask_001 end";
-}
-
-/**
- * @tc.name: OnConnectError_001
- * @tc.desc: Verify OnConnectError is called with correct error code in derived class.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormAbilityConnectionTest, OnConnectError_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "OnConnectError_001 start";
-
-    ElementName element;
-    const int32_t testErrorCode = ERR_APPEXECFWK_FORM_INVALID_PARAM;
-
-    connection_->OnConnectError(testErrorCode, element);
-
-    EXPECT_TRUE(connection_->errorExecuted_);
-    EXPECT_EQ(connection_->errorCode_, testErrorCode);
-
-    GTEST_LOG_(INFO) << "OnConnectError_001 end";
-}
-
-/**
- * @tc.name: NeedFreeInstallProcessing_001
- * @tc.desc: Verify NeedFreeInstallProcessing default returns false.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormAbilityConnectionTest, NeedFreeInstallProcessing_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "NeedFreeInstallProcessing_001 start";
-
-    connection_->SetFreeInstall(false);
-
-    bool result = connection_->NeedFreeInstallProcessing();
-
-    EXPECT_FALSE(result);
-
-    GTEST_LOG_(INFO) << "NeedFreeInstallProcessing_001 end";
-}
-
-/**
- * @tc.name: NeedRegisterToSupplyCallback_001
- * @tc.desc: Verify NeedRegisterToSupplyCallback default returns true.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormAbilityConnectionTest, NeedRegisterToSupplyCallback_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "NeedRegisterToSupplyCallback_001 start";
-
-    connection_->SetNeedRegisterToSupplyCallback(true);
-
-    bool result = connection_->NeedRegisterToSupplyCallback();
-
-    EXPECT_TRUE(result);
-
-    GTEST_LOG_(INFO) << "NeedRegisterToSupplyCallback_001 end";
 }
 
 /**

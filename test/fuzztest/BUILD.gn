@@ -18,7 +18,6 @@ group("fuzztest") {
   testonly = true
 
   deps = [
-    "baseformrefresh_fuzzer:fuzztest",
     "bundleforminfo_fuzzer:fuzztest",
     "facrconnectionFourth_fuzzer:fuzztest",
     "facrconnectionThree_fuzzer:fuzztest",
@@ -108,7 +107,9 @@ group("fuzztest") {
     "formcallbackadaptertwo_fuzzer:fuzztest",
     "formcallbackadapterthree_fuzzer:fuzztest",
     "formcallbackadapterfour_fuzzer:fuzztest",
+    "formcallbackadapterfive_fuzzer:fuzztest",
     "formcommonadapter_fuzzer:fuzztest",
+    "formcommonadaptertwo_fuzzer:fuzztest",
     "formdataadapter_fuzzer:fuzztest",
     "formdataadaptertwo_fuzzer:fuzztest",
     "formdataadapterthree_fuzzer:fuzztest",
@@ -119,8 +120,10 @@ group("fuzztest") {
     "formeventadapter_fuzzer:fuzztest",
     "formeventadaptertwo_fuzzer:fuzztest",
     "formeventadapterthree_fuzzer:fuzztest",
+    "formeventadapterfour_fuzzer:fuzztest",
     "formeventadapterfive_fuzzer:fuzztest",
     "formlifecycleadapter_fuzzer:fuzztest",
+    "formlifecycleadaptertwo_fuzzer:fuzztest",
     "formpublishadapter_fuzzer:fuzztest",
     "formpublishadaptertwo_fuzzer:fuzztest",
     "formpublishadapterthree_fuzzer:fuzztest",

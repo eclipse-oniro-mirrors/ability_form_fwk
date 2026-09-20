@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <fuzzer/FuzzedDataProvider.h>
+#include <memory>
 
 #include "form_js_info.h"
 #include "securec.h"
@@ -30,11 +31,6 @@ constexpr int32_t MAX_NUM = 1000;
 constexpr int32_t MIN_NUM = 0;
 constexpr uint8_t NUM_TWO = 2;
 
-uint32_t GetU32Data(const char* ptr)
-{
-    // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
-}
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     FormJsInfo formJsInfo;
@@ -44,21 +40,19 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formJsInfo.abilityName = fdp->ConsumeRandomLengthString();
     formJsInfo.moduleName = fdp->ConsumeRandomLengthString();
     formJsInfo.formTempFlag = fdp->ConsumeRandomLengthString().size() % NUM_TWO;
+
+    // Marshalling/Unmarshalling round-trip tests the full serialization path
+    // without creating real OS file descriptors that leak across iterations.
     Parcel parcel;
-    formJsInfo.Marshalling(parcel);
-    formJsInfo.Unmarshalling(parcel);
-    formJsInfo.ReadImageData(parcel);
-    formJsInfo.ConvertRawImageData();
-    formJsInfo.WriteImageData(parcel);
-
-    // WriteAshmemFormData - test with valid data
-    std::string ashmemData = fdp->ConsumeRandomLengthString(MAX_NUM);
-    int32_t ashmemSize = static_cast<int32_t>(ashmemData.length());
-    formJsInfo.WriteAshmemFormData(parcel, ashmemSize, ashmemData.c_str());
-
-    // WriteFdToParcel - test with valid fd
-    int testFd = fdp->ConsumeIntegralInRange(0, 1024);
-    formJsInfo.WriteFdToParcel(parcel, testFd);
+    if (!formJsInfo.Marshalling(parcel)) {
+        return true;
+    }
+    // Unmarshalling returns a new FormJsInfo* via release(); capture and free
+    // it to avoid leaking on every fuzzer iteration (causes OOM under ASAN).
+    std::unique_ptr<FormJsInfo> unmarshalled(FormJsInfo::Unmarshalling(parcel));
+    if (unmarshalled) {
+        unmarshalled->ConvertRawImageData();
+    }
 
     return true;
 }

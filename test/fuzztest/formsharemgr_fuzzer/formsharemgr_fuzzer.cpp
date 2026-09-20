@@ -26,10 +26,23 @@
 #undef private
 #undef protected
 #include "securec.h"
+#include "ffrt.h"
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr size_t U32_AT_SIZE = 4;
 uint32_t GetU32Data(const char* ptr)
 {
@@ -77,7 +90,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
     return 0;
 }
 

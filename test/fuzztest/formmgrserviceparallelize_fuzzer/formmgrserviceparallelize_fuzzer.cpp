@@ -33,12 +33,25 @@
 #include "strategy/include/form_other_parallelize_fuzz.h"
 #include "securec.h"
 #include "token_setproc.h"
+#include "ffrt.h"
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::FuzzerConstants;
 
 namespace OHOS {
+
 auto g_formMgrService = std::make_shared<FormMgrService>();
 auto g_formParallelizeUtil = std::make_shared<FormParallelizeFuzzUtil>();
 }

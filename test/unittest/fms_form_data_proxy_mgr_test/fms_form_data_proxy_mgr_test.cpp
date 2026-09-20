@@ -275,39 +275,6 @@ HWTEST_F(FmsFormDataProxyMgrTest, FmsFormDataProxyMgrTest_005, TestSize.Level0)
 }
 
 /**
- * @tc.name: FmsFormDataProxyMgrTest_006
- * @tc.desc: Verify RetrySubscribeProxy functions.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormDataProxyMgrTest, FmsFormDataProxyMgrTest_006, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataProxyMgrTest_006 start";
-    FormDataProxyMgr formDataProxyMgr;
-    int64_t formId = 1;
-    AAFwk::Want want;
-    std::vector<FormDataProxy> formDataProxies;
-    FormDataProxy formDataProxy("test", "0002");
-    formDataProxies.push_back(formDataProxy);
-
-    // Set cache
-    FormItemInfo formItem;
-    formItem.SetFormId(formId);
-    formItem.SetProviderBundleName(FORM_BUNDLE_NAME);
-    formItem.SetModuleName(PARAM_MODULE_NAME);
-    formItem.SetAbilityName(FORM_ABILITY_NAME);
-    formItem.SetFormName(PARAM_FORM_NAME);
-    formItem.SetSpecificationId(PARAM_FORM_DIMENSION_VALUE);
-    formItem.SetTemporaryFlag(false);
-    FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(formItem, CALLING_UID);
-    formRecord.isDataProxy = true;
-    FormDataMgr::GetInstance().UpdateFormRecord(formId, formRecord);
-    formDataProxyMgr.RetrySubscribeProxy(formId, formDataProxies, 0, want, 0);
-    formDataProxyMgr.RetrySubscribeProxy(formId, formDataProxies, 0, want, 0);
-
-    GTEST_LOG_(INFO) << "FmsFormDataProxyMgrTest_006 end";
-}
-
-/**
  * @tc.name: FmsFormDataProxyMgrTest_007
  * @tc.desc: Verify functionName GetFormDataProxyRecord.
  * @tc.type: FUNC

@@ -630,10 +630,10 @@ void FormDataProxyRecord::SetSubscribeFormDataState(bool subsState)
         publishSubscribeMap = publishSubscribeMap_;
     }
     if (subsState) {
-        HILOG_INFO("enable subscribe form, formId:%{public}" PRId64 ", rdbSize:%{public}zu, publishSize:%{public}zu",
+        HILOG_WARN("enable subscribe form, formId:%{public}" PRId64 ", rdbSize:%{public}zu, publishSize:%{public}zu",
             formId_, rdbSubscribeMap.size(), publishSubscribeMap.size());
     } else {
-        HILOG_INFO("disable subscribe form, formId:%{public}" PRId64, formId_);
+        HILOG_WARN("disable subscribe form, formId:%{public}" PRId64, formId_);
     }
     SetRdbSubsState(rdbSubscribeMap, subsState);
     SetPublishSubsState(publishSubscribeMap, subsState);
@@ -693,7 +693,7 @@ ErrCode FormDataProxyRecord::SetRdbSubsState(const SubscribeMap &rdbSubscribeMap
     }
 
     if (rdbSubscribeMap.empty()) {
-        HILOG_DEBUG("empty rdbSubscribeMap");
+        HILOG_ERROR("empty rdbSubscribeMap");
         return ERR_OK;
     }
 
@@ -733,7 +733,7 @@ ErrCode FormDataProxyRecord::SetPublishSubsState(const SubscribeMap &publishSubs
     }
 
     if (publishSubscribeMap.empty()) {
-        HILOG_DEBUG("null publishSubscribeMap");
+        HILOG_ERROR("null publishSubscribeMap");
         return ERR_OK;
     }
 

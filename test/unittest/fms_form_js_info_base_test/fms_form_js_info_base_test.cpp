@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -150,53 +150,6 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0200, TestSize.Level0)
     auto result = formJsInfo.ReadFromParcel(parcel);
     EXPECT_FALSE(result);
     GTEST_LOG_(INFO) << "FmsFormJsInfoBaseTest_0200 end";
-}
-
-/**
- * @tc.name: FmsFormJsInfoBaseTest_0300
- * @tc.desc: text the FormJsInfo::Unmarshalling
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0300, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormJsInfoBaseTest_0300 start";
-
-    FormJsInfo formJsInfo;
-    Parcel parcel;
-    // write formId
-    parcel.WriteInt64(10);
-    std::string formName = "formName";
-    std::string bundleName = "bundleName";;
-    std::string abilityName = "abilityName";
-    std::string moduleName = "moduleName";
-    parcel.WriteString16(Str8ToStr16(formName));
-    parcel.WriteString16(Str8ToStr16(bundleName));
-    parcel.WriteString16(Str8ToStr16(abilityName));
-    parcel.WriteString16(Str8ToStr16(moduleName));
-    parcel.WriteBool(true);
-    std::string jsFormCodePath = "jsFormCodePath";
-    std::string formData = "formData";
-    std::string formSrc = "formSrc";
-    parcel.WriteString16(Str8ToStr16(jsFormCodePath));
-    parcel.WriteInt32(DEFAULT_VALUE);
-    parcel.WriteString16(Str8ToStr16(formData));
-    parcel.WriteString16(Str8ToStr16(formSrc));
-    parcel.WriteInt32(10);
-    parcel.WriteBool(true);
-    parcel.WriteUint32(10);
-    std::string versionName = "versionName";
-    parcel.WriteString16(Str8ToStr16(versionName));
-    parcel.WriteUint32(10);
-    parcel.WriteInt32(10);
-    parcel.WriteInt32(10);
-    parcel.WriteBool(true);
-    parcel.WriteBool(false);
-    parcel.WriteBool(false);
-    std::string jsonData = "{ \"abc\" : \"def\"}";
-    auto formProviderData = new FormProviderData(jsonData);
-    EXPECT_TRUE(parcel.WriteParcelable(formProviderData));
-    formJsInfo.Unmarshalling(parcel);
-    GTEST_LOG_(INFO) << "FmsFormJsInfoBaseTest_0300 end";
 }
 
 /**

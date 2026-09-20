@@ -308,10 +308,20 @@ void GetFormsInfo([[maybe_unused]] ani_env *env, ani_object callback, ani_object
     }
 
     ani_object formInfosArray = GetAniArray(env, formInfos.size());
+    if (formInfosArray == nullptr) {
+        HILOG_ERROR("GetAniArray failed");
+        InvokeAsyncWithBusinessError(env, callback, ERR_APPEXECFWK_FORM_COMMON_CODE, nullptr);
+        return;
+    }
 
     ani_size index = 0;
     for (auto &formInfo : formInfos) {
         ani_object formInfoAni = CreateAniObject(env, FORM_INFO_INNER_CLASS_NAME);
+        if (formInfoAni == nullptr) {
+            HILOG_ERROR("CreateAniObject failed");
+            InvokeAsyncWithBusinessError(env, callback, ERR_APPEXECFWK_FORM_COMMON_CODE, nullptr);
+            return;
+        }
         SetFormInfoFields(env, formInfoAni, formInfo);
         ani_status status = env->Object_CallMethodByName_Void(formInfosArray, ANI_SETTER_MARKER,
             PROVIDER_SET_SIGNATURE, index, formInfoAni);
@@ -427,6 +437,12 @@ void IsRequestPublishFormSupported(ani_env *env, ani_object callback)
     bool supported = FormMgr::GetInstance().IsRequestPublishFormSupported();
     HILOG_INFO("IsRequestPublishFormSupported End, supported: %{public}d", supported);
     ani_object callbackArg = CreateBool(env, supported);
+    if (callbackArg == nullptr) {
+        HILOG_ERROR("CreateBool failed");
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
+        return;
+    }
     InvokeAsyncWithBusinessError(env, callback, ERR_OK, callbackArg);
 }
 
@@ -721,9 +737,21 @@ void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
     }
 
     ani_object formInfosArray = GetAniArray(env, formInfos.size());
+    if (formInfosArray == nullptr) {
+        HILOG_ERROR("GetAniArray failed");
+        InvokeAsyncWithBusinessError(env, callback,
+            static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
+        return;
+    }
     ani_size index = 0;
     for (auto &formInfo : formInfos) {
         ani_object runningFormInfoAni = CreateAniObject(env, RUNNING_FORM_INFO_INNER_CLASS_NAME);
+        if (runningFormInfoAni == nullptr) {
+            HILOG_ERROR("CreateAniObject failed");
+            InvokeAsyncWithBusinessError(env, callback, static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE),
+                nullptr);
+            return;
+        }
         SetRunningFormInfoFields(env, runningFormInfoAni, formInfo);
         ani_status status = env->Object_CallMethodByName_Void(
             formInfosArray, ANI_SETTER_MARKER, PROVIDER_SET_SIGNATURE, index, runningFormInfoAni);
@@ -731,7 +759,7 @@ void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
             HILOG_ERROR("Object_CallMethodByName_Void failed, error code: %{public}d", static_cast<int>(status));
             InvokeAsyncWithBusinessError(env, callback, static_cast<int>(ERR_APPEXECFWK_FORM_COMMON_CODE),
                 nullptr);
-            break;
+            return;
         }
         index++;
     }

@@ -126,7 +126,7 @@ void FormSupplyCallback::ProcessFormAcquisition(int64_t formId)
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     if (hasRecord) {
-        int64_t endTime;
+        int64_t endTime = 0;
         FormReport::GetInstance().GetEndAquireTime(formId, endTime);
         if (!endTime) {
             FormReport::GetInstance().SetEndAquireTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());

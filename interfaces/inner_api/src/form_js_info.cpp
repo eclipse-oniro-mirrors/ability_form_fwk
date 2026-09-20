@@ -86,7 +86,7 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     if (!ReadInt32Field(parcel, "formDataLength", formDataLength)) {
         return false;
     }
-    HILOG_INFO("ReadFromParcel data length is %{public}d , formId:%{public}" PRId64, formDataLength, formId);
+    HILOG_INFO("data length is %{public}d , formId:%{public}" PRId64, formDataLength, formId);
     if (formDataLength > BIG_DATA) {
         if (!ReadAshmemFormData(parcel, formDataLength, formData)) {
             return false;

@@ -151,24 +151,12 @@ FormRenderRecord::FormRenderRecord(
 FormRenderRecord::~FormRenderRecord()
 {
     RemoveWatchDogThreadMonitor();
-    std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
-    if (eventHandler == nullptr) {
-        HILOG_WARN("null eventHandler");
-        return;
-    }
- 
-    // Some resources need to be deleted in a JS thread
-    auto syncTask = [weak = weak_from_this()]() {
-        auto renderRecord = weak.lock();
-        if (renderRecord == nullptr) {
-            HILOG_ERROR("null renderRecord");
-            return;
-        }
-        renderRecord->HandleDestroyInJsThread();
-        // Release need rectification
-    };
-    eventHandler->PostSyncTask(syncTask, "Destory FormRenderRecord");
-    Release();
+    /*
+    `weak_from_this` cannot be used within the destructor; `Release()` must be called explicitly beforehand to
+    ensure `formRendererGroupMap_` is cleaned up on the UI thread, leaving only the cleanup of `formRequests_` here
+    */
+    std::lock_guard<std::mutex> lock(formRequestsMutex_);
+    formRequests_.clear();
 }
 
 bool FormRenderRecord::HandleHostDied(const sptr<IRemoteObject> hostRemoteObj)
@@ -406,7 +394,6 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             HILOG_WARN("Form node has been released");
             return ERR_APPEXECFWK_FORM_FORM_NODE_RELEASED;
         }
-        renderFormTasksNum++;
         bool formIsVisible = want.GetBoolParam(Constants::FORM_IS_VISIBLE, false);
         RecordFormVisibility(formJsInfo.formId, formIsVisible);
     }
@@ -444,6 +431,9 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         if (eventHandler == nullptr) {
             HILOG_ERROR("null eventHandler");
             return RENDER_FORM_FAILED;
+        }
+        if (renderType == Constants::RENDER_FORM) {
+            renderFormTasksNum++;
         }
         eventHandler->PostTask(task, "UpdateRenderRecord");
     }
@@ -681,7 +671,7 @@ bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, Abilit
             hapPath = moduleInfos[Constants::MODULE_HAP_PATH_KEY].get<std::string>();
             pkgContextInfoJsonStringMap[modulePkgNamePair.first] = hapPath;
         }
-        HILOG_INFO("SetPkgContextInfoMap module:%{public}s, pkgName:%{public}s, hapPath:%{public}s",
+        HILOG_INFO("module:%{public}s, pkgName:%{public}s, hapPath:%{public}s",
             modulePkgNamePair.first.c_str(), pkgName.c_str(), hapPath.c_str());
     }
     if (!pkgContextInfoJsonStringMap.empty()) {
@@ -762,7 +752,7 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const Form
                 if (apiCompatibleVersion != 0) {
                     applicationInfo->apiCompatibleVersion = apiCompatibleVersion;
                 }
-                HILOG_INFO("GetContext bundleName %{public}s, apiCompatibleVersion = %{public}d",
+                HILOG_INFO("bundleName:%{public}s, apiCompatibleVersion:%{public}d",
                     formJsInfo.bundleName.c_str(),
                     applicationInfo->apiCompatibleVersion);
             }
@@ -1182,6 +1172,7 @@ void FormRenderRecord::Release()
             HILOG_ERROR("null renderRecord");
             return;
         }
+        renderRecord->HandleDestroyInJsThread();
         renderRecord->HandleReleaseInJsThread();
     };
     eventHandler->PostSyncTask(syncTask, "HandleReleaseInJsThread");
@@ -1310,10 +1301,6 @@ void FormRenderRecord::HandleDestroyInJsThread()
 {
     HILOG_INFO("FormRenderService is exiting, destroy some resources in js thread");
     MarkThreadAlive();
-    {
-        std::lock_guard<std::mutex> lock(formRequestsMutex_);
-        formRequests_.clear();
-    }
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     formRendererGroupMap_.clear();
 }

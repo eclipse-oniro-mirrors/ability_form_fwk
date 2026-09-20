@@ -41,6 +41,7 @@
 #include "feature/bundle_lock/form_exempt_lock_mgr.h"
 #include "feature/param_update/param_control.h"
 #include "form_constants.h"
+#include "form_file_util.h"
 #include "form_mgr_errors.h"
 #include "fms_log_wrapper.h"
 
@@ -368,7 +369,7 @@ void FormCommonAdapter::SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo
     auto hapPath = hapModuleInfo.hapPath;
     auto moduleName = hapModuleInfo.moduleName;
     HILOG_INFO("module [%{public}s] packageName is %{public}s, hap path is %{public}s", moduleName.c_str(),
-        hapModuleInfo.packageName.c_str(), hapPath.c_str());
+        hapModuleInfo.packageName.c_str(), FormFileUtil::GetMaskedPath(hapPath).c_str());
     if (hapPath.find(Constants::ABS_CODE_PATH) != std::string::npos) {
         hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH),
                                         Constants::LOCAL_BUNDLES);

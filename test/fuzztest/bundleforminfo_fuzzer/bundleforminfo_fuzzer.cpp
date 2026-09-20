@@ -15,26 +15,42 @@
 
 #include "bundleforminfo_fuzzer.h"
 
-#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <fuzzer/FuzzedDataProvider.h>
-#include <thread>
 
 #define private public
 #define protected public
 #include "data_center/form_info/bundle_form_info.h"
 #include "data_center/form_info/form_info_mgr.h"
+#include "data_center/form_info/form_info_helper.h"
+#include "ffrt.h"
 #undef private
 #undef protected
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_NUM = 10000;
 constexpr int32_t MIN_NUM = 0;
 constexpr int32_t MAX_LOOP_COUNT = 10;
+constexpr int32_t TEST_TYPE_BASIC = 0;
+constexpr int32_t TEST_TYPE_UPDATE_CONFIGS = 1;
+constexpr int32_t TEST_TYPE_FORM_INFO_MGR = 2;
+constexpr int32_t NUM_TEST_SCENARIOS = 3;
 
 FormInfo GenerateFuzzedFormInfo(FuzzedDataProvider *fdp)
 {
@@ -46,6 +62,8 @@ FormInfo GenerateFuzzedFormInfo(FuzzedDataProvider *fdp)
     formInfo.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     formInfo.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     formInfo.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formInfo.versionCode = fdp->ConsumeIntegral<uint32_t>();
+    formInfo.isDynamic = fdp->ConsumeBool();
     return formInfo;
 }
 
@@ -59,7 +77,92 @@ FormCustomConfig GenerateFuzzedFormCustomConfig(FuzzedDataProvider *fdp)
     config.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     config.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     config.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    config.relatedBundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    config.isShowInFormCenter = fdp->ConsumeBool();
+    config.isRepeatAdditionSupported = fdp->ConsumeBool();
     return config;
+}
+
+void TestBundleFormInfoBasic(FuzzedDataProvider *fdp)
+{
+    std::string bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    BundleFormInfo bundleFormInfo(bundleName);
+
+    std::string jsonStr = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    bundleFormInfo.InitFromJson(jsonStr);
+
+    bundleFormInfo.Empty();
+
+    int32_t userId = fdp->ConsumeIntegralInRange<int32_t>(MIN_NUM, MAX_NUM);
+    std::vector<FormInfo> formInfos;
+    bundleFormInfo.GetAllFormsInfo(formInfos, userId);
+    bundleFormInfo.GetAllTemplateFormsInfo(formInfos, userId);
+    bundleFormInfo.GetVersionCode(userId);
+
+    std::string moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    bundleFormInfo.GetFormsInfoByModule(moduleName, formInfos, userId);
+    bundleFormInfo.GetTemplateFormsInfoByModule(moduleName, formInfos, userId);
+
+    FormInfoFilter filter;
+    filter.bundleName = bundleName;
+    filter.moduleName = moduleName;
+    bundleFormInfo.GetFormsInfoByFilter(filter, formInfos, userId);
+
+    bundleFormInfo.UpdateStaticFormInfos(formInfos, userId);
+    bundleFormInfo.Remove(userId);
+
+    FormInfo formInfo = GenerateFuzzedFormInfo(fdp);
+    bundleFormInfo.AddDynamicFormInfo(formInfo, userId);
+
+    std::string formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    bundleFormInfo.RemoveDynamicFormInfo(moduleName, formName, userId);
+    bundleFormInfo.RemoveAllDynamicFormsInfo(userId);
+}
+
+void TestBundleFormInfoUpdateConfigs(FuzzedDataProvider *fdp)
+{
+    std::string bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    BundleFormInfo bundleFormInfo(bundleName);
+
+    std::vector<FormCustomConfig> configs;
+    int32_t configSize = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_LOOP_COUNT);
+    for (int32_t i = 0; i < configSize; i++) {
+        configs.push_back(GenerateFuzzedFormCustomConfig(fdp));
+    }
+    bundleFormInfo.UpdateFormShowConfigs(configs);
+}
+
+void TestFormInfoMgrWithBundleFormInfo(FuzzedDataProvider *fdp)
+{
+    FormInfoMgr formInfoMgr;
+    formInfoMgr.Start();
+
+    std::string bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    int32_t userId = fdp->ConsumeIntegralInRange<int32_t>(MIN_NUM, MAX_NUM);
+
+    formInfoMgr.UpdateStaticFormInfos(bundleName, userId);
+    formInfoMgr.Remove(bundleName, userId);
+
+    std::vector<FormInfo> formInfos;
+    formInfoMgr.GetAllFormsInfo(formInfos);
+    formInfoMgr.GetFormsInfoByBundle(bundleName, formInfos);
+
+    std::string moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formInfoMgr.GetFormsInfoByModule(bundleName, moduleName, formInfos);
+
+    FormInfo formInfo = GenerateFuzzedFormInfo(fdp);
+    formInfoMgr.AddDynamicFormInfo(formInfo, userId);
+
+    std::string formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    formInfoMgr.RemoveDynamicFormInfo(bundleName, moduleName, formName, userId);
+    formInfoMgr.RemoveAllDynamicFormsInfo(bundleName, userId);
+
+    std::vector<FormCustomConfig> configs;
+    int32_t configSize = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_LOOP_COUNT);
+    for (int32_t i = 0; i < configSize; i++) {
+        configs.push_back(GenerateFuzzedFormCustomConfig(fdp));
+    }
+    formInfoMgr.UpdateFormShowConfigs(configs);
 }
 
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
@@ -68,113 +171,23 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
         return true;
     }
 
-    // Initialize FormInfoMgr to ensure necessary singletons and database are initialized
-    FormInfoMgr formInfoMgr;
-    formInfoMgr.Start();
-
-    std::string bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    BundleFormInfo bundleFormInfo(bundleName);
-
-    std::string formInfoStoragesJson = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    bundleFormInfo.InitFromJson(formInfoStoragesJson);
-
-    int32_t userId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
-
-    std::string moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    std::string formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-
-    bundleFormInfo.Empty();
-
-    std::vector<FormInfo> formInfos;
-    bundleFormInfo.GetAllFormsInfo(formInfos, userId);
-
-    bundleFormInfo.GetAllTemplateFormsInfo(formInfos, userId);
-
-    bundleFormInfo.GetVersionCode(userId);
-
-    bundleFormInfo.GetFormsInfoByModule(moduleName, formInfos, userId);
-
-    bundleFormInfo.GetTemplateFormsInfoByModule(moduleName, formInfos, userId);
-
-    FormInfoFilter filter;
-    filter.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    filter.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    bundleFormInfo.GetFormsInfoByFilter(filter, formInfos, userId);
-
-    bundleFormInfo.UpdateFormInfoStorageLocked();
-
-    std::vector<FormInfo> inFormInfos;
-    std::vector<FormInfo> outFormInfos;
-    std::vector<FormDBInfo> formDBInfos;
-    int32_t numInForms = fdp->ConsumeIntegralInRange(0, 10);
-    int32_t numDBInfos = fdp->ConsumeIntegralInRange(0, 10);
-    for (int32_t i = 0; i < numInForms; i++) {
-        FormInfo info;
-        info.name = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-        inFormInfos.push_back(info);
+    uint8_t testType = fdp->ConsumeIntegral<uint8_t>();
+    switch (testType % NUM_TEST_SCENARIOS) {
+        case TEST_TYPE_BASIC:
+            TestBundleFormInfoBasic(fdp);
+            break;
+        case TEST_TYPE_UPDATE_CONFIGS:
+            TestBundleFormInfoUpdateConfigs(fdp);
+            break;
+        case TEST_TYPE_FORM_INFO_MGR:
+            TestFormInfoMgrWithBundleFormInfo(fdp);
+            break;
+        default:
+            break;
     }
-    for (int32_t i = 0; i < numDBInfos; i++) {
-        FormDBInfo dbInfo;
-        dbInfo.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-        formDBInfos.push_back(dbInfo);
-    }
-    bundleFormInfo.HandleFormInfosMaxLimit(inFormInfos, outFormInfos, formDBInfos);
-
-    std::set<std::string> formDBNames;
-    int32_t numDBNames = fdp->ConsumeIntegralInRange(0, 10);
-    for (int32_t i = 0; i < numDBNames; i++) {
-        formDBNames.insert(fdp->ConsumeRandomLengthString(MAX_LENGTH));
-    }
-    bundleFormInfo.GetAllUsedFormName(formDBInfos, inFormInfos, formDBNames);
-
-    bundleFormInfo.ClearDistributedFormInfos(userId);
-
-    // NEW: UpdateStaticFormInfos
-    std::vector<FormInfo> updateFormInfos;
-    int32_t updateSize = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_LOOP_COUNT);
-    for (int32_t i = 0; i < updateSize; i++) {
-        updateFormInfos.push_back(GenerateFuzzedFormInfo(fdp));
-    }
-    bundleFormInfo.UpdateStaticFormInfos(updateFormInfos, userId);
-
-    // NEW: IsFormInfoMatched
-    FormInfo matchFormInfo = GenerateFuzzedFormInfo(fdp);
-    FormCustomConfig matchConfig;
-    matchConfig.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    matchConfig.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    matchConfig.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    matchConfig.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    bundleFormInfo.IsFormInfoMatched(matchFormInfo, matchConfig);
-
-    // NEW: UpdateFormShowConfigInCustomizeDatas
-    FormInfo showFormInfo = GenerateFuzzedFormInfo(fdp);
-    bool isShow = fdp->ConsumeBool();
-    bundleFormInfo.UpdateFormShowConfigInCustomizeDatas(showFormInfo, isShow);
-
-    // NEW: ApplyConfigToStorages
-    FormCustomConfig applyConfig;
-    applyConfig.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    applyConfig.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    applyConfig.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    applyConfig.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    bundleFormInfo.ApplyConfigToStorages(applyConfig);
-
-    // NEW: UpdateFormShowConfigs
-    std::vector<FormCustomConfig> showConfigs;
-    int32_t showSize = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_LOOP_COUNT);
-    for (int32_t i = 0; i < showSize; i++) {
-        showConfigs.push_back(GenerateFuzzedFormCustomConfig(fdp));
-    }
-    bundleFormInfo.UpdateFormShowConfigs(showConfigs);
 
     return true;
 }
-}
-
-extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
-{
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    return 0;
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)

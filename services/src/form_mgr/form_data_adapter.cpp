@@ -140,17 +140,17 @@ ErrCode FormDataAdapter::UpdateFormCrossBundle(const int64_t formId, const int32
     const FormProviderData &formProviderData)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
- 
+
     int64_t matchedFormId = 0;
     FormRecord formRecord;
     ErrCode err = ValidateAndGetFormRecord(formId, matchedFormId, formRecord);
     if (err != ERR_OK) {
         return err;
     }
- 
+
     HILOG_INFO("cross-bundle update: real caller uid=%{public}d, form provider uid=%{public}d, "
         "formId:%{public}" PRId64, callingUid, formRecord.uid, matchedFormId);
- 
+
     RefreshData data;
     data.formId = matchedFormId;
     data.record = formRecord;
@@ -183,14 +183,15 @@ int FormDataAdapter::RequestForm(const int64_t formId,
     }
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    UpdateFormRenderParam(matchedFormId, callerToken, want);
-    FormDataMgr::GetInstance().UpdateHostWant(formId, want, true);
     FormRecord record;
     bool result = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!result) {
         HILOG_ERROR("not exist such formId:%{public}" PRId64 ".", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
+
+    UpdateFormRenderParam(matchedFormId, callerToken, want);
+    FormDataMgr::GetInstance().UpdateHostWant(formId, want, true);
 
     RefreshData data;
     data.callingUid = IPCSkeleton::GetCallingUid();
@@ -745,9 +746,10 @@ void FormDataAdapter::PostEnterpriseAppInstallFailedRetryTask(const FormRecord &
 {
     HILOG_INFO("start");
     auto refreshForm = [record, want]() {
-        RefreshData data;
+        RefreshData data {};
         data.formId = record.formId;
         data.record = record;
+        data.callingUid = record.uid;
         data.want = want;
         FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_APP_UPGRADE);
     };
@@ -818,29 +820,23 @@ int64_t FormDataAdapter::GetUpdateDurationFromAdditionalInfo(const std::string &
 void FormDataAdapter::DeleteInvalidFormCacheIfNeed()
 {
     auto deleteInvalidFormCache = []() {
-        bool isDirtyDataCleaned = false;
         if (FormCacheMgr::GetInstance().IsDirtyDataCleaned()) {
             HILOG_INFO("no dirty data");
             return;
         }
         FormCacheMgr::GetInstance().SetIsDirtyDataCleaned();
-        std::unordered_set<int64_t> invalidIds;
-        if (!FormCacheMgr::GetInstance().GetFormCacheIds(invalidIds)) {
-            HILOG_WARN("no find cache data");
-            return;
-        }
-        std::vector<FormDBInfo> formDBInfos;
-        FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
-        for (const auto &validFormInfo : formDBInfos) {
-            auto iter = invalidIds.find(validFormInfo.formId);
-            if (iter != invalidIds.end()) {
-                invalidIds.erase(iter);
+        // Level 1: reconcile whole cards, delete cache of dead forms
+        std::unordered_set<int64_t> formIds;
+        FormCacheMgr::GetInstance().GetFormCacheIds(formIds);
+        for (const auto &formId : formIds) {
+            if (FormDbCache::GetInstance().HasDBRecord(formId)) {
+                continue;
             }
+            HILOG_INFO("delete invalid formId: %{public}" PRId64, formId);
+            FormCacheMgr::GetInstance().DeleteData(formId);
         }
-        std::for_each(invalidIds.begin(), invalidIds.end(), [](const int64_t invalidId) {
-            HILOG_INFO("delete invalid formId: %{public}" PRId64, invalidId);
-            FormCacheMgr::GetInstance().DeleteData(invalidId);
-        });
+        // Level 2: sweep img_cache rows not referenced by any FORM_IMAGES
+        FormCacheMgr::GetInstance().DeleteInvalidImgCache();
     };
     FormMgrQueue::GetInstance().ScheduleTask(0, deleteInvalidFormCache);
 }

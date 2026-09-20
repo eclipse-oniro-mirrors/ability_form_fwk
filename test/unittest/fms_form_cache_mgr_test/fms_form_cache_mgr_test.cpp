@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,8 @@
  */
 
 #include <gtest/gtest.h>
+
+#include <algorithm>
 
 #define private public
 #include "data_center/form_cache_mgr.h"
@@ -203,21 +205,6 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_006, TestSize.Level0)
 
 /*
  * Feature: FormCacheMgr
- * Function: AddCacheData
- * FunctionPoints: FormCacheMgr AddCacheData interface
- * EnvConditions: Mobile that can run ohos test framework
- */
-HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_007, TestSize.Level0)
-{
-    HILOG_INFO("fms_form_cache_mgr_test_007 start");
-    FormProviderData formProviderData;
-    FormCache formCache;
-    EXPECT_TRUE(formCacheMgr_.AddCacheData(formProviderData, formCache));
-    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_007 end";
-}
-
-/*
- * Feature: FormCacheMgr
  * Function: AddImgDataToDb
  * FunctionPoints: FormCacheMgr AddImgDataToDb interface
  * EnvConditions: Mobile that can run ohos test framework
@@ -231,7 +218,8 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_008, TestSize.Level0)
     std::pair<sptr<FormAshmem>, int32_t> loadForm = std::make_pair(formAshmemPtr, 1);
     formProviderData.imageDataMap_[bundle] = loadForm;
     nlohmann::json imgDataJson;
-    EXPECT_FALSE(formCacheMgr_.AddImgDataToDb(formProviderData, imgDataJson));
+    std::vector<std::string> newRowIds;
+    EXPECT_FALSE(formCacheMgr_.AddImgDataToDb(formProviderData, imgDataJson, newRowIds));
     GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_008 end";
 }
 
@@ -420,7 +408,8 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_020, TestSize.Level1)
     FormProviderData formProviderData;
     FormCache formCache;
     formCache.imgCache = "{\"test_key\":123}";
-    EXPECT_TRUE(formCacheMgr_.AddImgData(formProviderData, formCache));
+    std::vector<std::string> newRowIds;
+    EXPECT_TRUE(formCacheMgr_.AddImgData(formProviderData, formCache, newRowIds));
     GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_020 end";
 }
 
@@ -441,7 +430,8 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_021, TestSize.Level1)
     formProviderData.imageDataMap_["test"] = std::make_pair(formAshmemPtr, 1);
     FormCache formCache;
     formCache.imgCache = "invalid_json";
-    EXPECT_FALSE(formCacheMgr_.AddImgData(formProviderData, formCache));
+    std::vector<std::string> newRowIds;
+    EXPECT_FALSE(formCacheMgr_.AddImgData(formProviderData, formCache, newRowIds));
     GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_021 end";
 }
 
@@ -456,7 +446,8 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_022, TestSize.Level1)
     HILOG_INFO("FmsFormCacheMgrTest_022 start");
     FormProviderData formProviderData;
     nlohmann::json imgDataJson;
-    EXPECT_TRUE(formCacheMgr_.AddImgDataToDb(formProviderData, imgDataJson));
+    std::vector<std::string> newRowIds;
+    EXPECT_TRUE(formCacheMgr_.AddImgDataToDb(formProviderData, imgDataJson, newRowIds));
     EXPECT_TRUE(imgDataJson.empty());
     GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_022 end";
 }
@@ -497,7 +488,171 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_024, TestSize.Level1)
     FormProviderData formProviderData;
     FormCache formCache;
     formCache.imgCache = "";
-    EXPECT_TRUE(formCacheMgr_.AddImgData(formProviderData, formCache));
+    std::vector<std::string> newRowIds;
+    EXPECT_TRUE(formCacheMgr_.AddImgData(formProviderData, formCache, newRowIds));
     GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_024 end";
+}
+
+/*
+ * @tc.name: FmsFormCacheMgrTest_025
+ * @tc.desc: Verify AddData with invalid json data returns false and persists nothing.
+ * @tc.type: FUNC
+ * @tc.level: Level1
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_025, TestSize.Level1)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_025 start");
+    int64_t formId = 10025;
+    std::string invalidJson = "invalid_json";
+    FormProviderData formProviderData(invalidJson);
+    EXPECT_FALSE(formCacheMgr_.AddData(formId, formProviderData));
+    std::unordered_set<int64_t> formIds;
+    formCacheMgr_.GetFormCacheIds(formIds);
+    EXPECT_EQ(formIds.find(formId), formIds.end());
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_025 end";
+}
+
+/*
+ * @tc.name: FmsFormCacheMgrTest_026
+ * @tc.desc: Verify AddData rolls back newly inserted image rows when AddCacheData fails.
+ * @tc.type: FUNC
+ * @tc.level: Level1
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_026, TestSize.Level1)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_026 start");
+    int64_t formId = 10026;
+    std::vector<int64_t> imgIdsBefore;
+    formCacheMgr_.GetAllImgIds(imgIdsBefore);
+
+    FormProviderData formProviderData("invalid_json");
+    std::string imgData = "image_content";
+    sptr<FormAshmem> formAshmemPtr = new (std::nothrow) FormAshmem();
+    ASSERT_NE(formAshmemPtr, nullptr);
+    EXPECT_TRUE(formAshmemPtr->WriteToAshmem("test_pic", const_cast<char *>(imgData.c_str()), imgData.size()));
+    formProviderData.imageDataMap_["test_pic"] = std::make_pair(formAshmemPtr, imgData.size());
+
+    // AddImgDataToDb succeeds, AddCacheData fails, rollback must remove the new image row
+    EXPECT_FALSE(formCacheMgr_.AddData(formId, formProviderData));
+    std::vector<int64_t> imgIdsAfter;
+    formCacheMgr_.GetAllImgIds(imgIdsAfter);
+    EXPECT_EQ(imgIdsAfter.size(), imgIdsBefore.size());
+    std::sort(imgIdsBefore.begin(), imgIdsBefore.end());
+    std::sort(imgIdsAfter.begin(), imgIdsAfter.end());
+    EXPECT_EQ(imgIdsAfter, imgIdsBefore);
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_026 end";
+}
+
+/*
+ * @tc.name: FmsFormCacheMgrTest_027
+ * @tc.desc: Verify RollbackNewImgCaches deletes the given image rows.
+ * @tc.type: FUNC
+ * @tc.level: Level1
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_027, TestSize.Level1)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_027 start");
+    std::vector<uint8_t> value = {1, 2, 3};
+    int64_t rowId = -1;
+    EXPECT_TRUE(formCacheMgr_.SaveImgCacheToDb(value, value.size(), rowId));
+    ASSERT_NE(rowId, -1);
+    std::vector<uint8_t> blob;
+    int32_t size = 0;
+    EXPECT_TRUE(formCacheMgr_.GetImgCacheFromDb(rowId, blob, size));
+    EXPECT_EQ(size, static_cast<int32_t>(value.size()));
+    EXPECT_EQ(blob, value);
+
+    formCacheMgr_.RollbackNewImgCaches({std::to_string(rowId)});
+    EXPECT_FALSE(formCacheMgr_.GetImgCacheFromDb(rowId, blob, size));
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_027 end";
+}
+
+/*
+ * @tc.name: FmsFormCacheMgrTest_028
+ * @tc.desc: Verify DeleteImgCachesInDb with empty and valid rowIds.
+ * @tc.type: FUNC
+ * @tc.level: Level1
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_028, TestSize.Level1)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_028 start");
+    std::vector<std::string> emptyRowIds;
+    EXPECT_FALSE(formCacheMgr_.DeleteImgCachesInDb(emptyRowIds));
+
+    std::vector<uint8_t> value = {4, 5, 6};
+    int64_t rowId1 = -1;
+    int64_t rowId2 = -1;
+    EXPECT_TRUE(formCacheMgr_.SaveImgCacheToDb(value, value.size(), rowId1));
+    EXPECT_TRUE(formCacheMgr_.SaveImgCacheToDb(value, value.size(), rowId2));
+    std::vector<std::string> rowIds = {std::to_string(rowId1), std::to_string(rowId2)};
+    EXPECT_TRUE(formCacheMgr_.DeleteImgCachesInDb(rowIds));
+
+    std::vector<uint8_t> blob;
+    int32_t size = 0;
+    EXPECT_FALSE(formCacheMgr_.GetImgCacheFromDb(rowId1, blob, size));
+    EXPECT_FALSE(formCacheMgr_.GetImgCacheFromDb(rowId2, blob, size));
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_028 end";
+}
+
+/*
+ * @tc.name: FmsFormCacheMgrTest_029
+ * @tc.desc: Verify IsDirtyDataCleaned returns false for legacy-format sentinel row.
+ * @tc.type: FUNC
+ * @tc.level: Level1
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_029, TestSize.Level1)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_029 start");
+    // simulate a device cleaned by the legacy one-shot sweep (empty DATA_CACHE, legacy format)
+    formCacheMgr_.SetIsDirtyDataCleaned();
+    EXPECT_TRUE(FormRdbDataMgr::GetInstance().ExecuteSql(
+        "UPDATE form_cache SET DATA_CACHE = '' WHERE FORM_ID = 'isDirtyDataCleaned'") == ERR_OK);
+    EXPECT_FALSE(formCacheMgr_.IsDirtyDataCleaned());
+    // sweep again upgrades the stored version
+    formCacheMgr_.SetIsDirtyDataCleaned();
+    EXPECT_TRUE(formCacheMgr_.IsDirtyDataCleaned());
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_029 end";
+}
+
+/*
+ * @tc.name: FmsFormCacheMgrTest_030
+ * @tc.desc: Verify DeleteInvalidImgCache removes orphan rows and keeps referenced rows.
+ * @tc.type: FUNC
+ * @tc.level: Level1
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_030, TestSize.Level1)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_030 start");
+    int64_t formId = 10031;
+    // referenced row
+    std::vector<uint8_t> value = {7, 8, 9};
+    int64_t refRowId = -1;
+    EXPECT_TRUE(formCacheMgr_.SaveImgCacheToDb(value, value.size(), refRowId));
+    // orphan row without any FORM_IMAGES reference
+    int64_t orphanRowId = -1;
+    EXPECT_TRUE(formCacheMgr_.SaveImgCacheToDb(value, value.size(), orphanRowId));
+
+    // build a form_cache row whose FORM_IMAGES references refRowId only
+    FormCache formCache;
+    formCache.formId = std::to_string(formId);
+    formCache.imgCache = "{\"test_pic\":" + std::to_string(refRowId) + "}";
+    EXPECT_TRUE(formCacheMgr_.SaveDataCacheToDb(formId, formCache));
+
+    std::unordered_set<int64_t> referencedIds;
+    EXPECT_TRUE(formCacheMgr_.GetReferencedImgIds(referencedIds));
+    EXPECT_NE(referencedIds.find(refRowId), referencedIds.end());
+    std::vector<int64_t> allImgIds;
+    EXPECT_TRUE(formCacheMgr_.GetAllImgIds(allImgIds));
+
+    formCacheMgr_.DeleteInvalidImgCache();
+
+    std::vector<uint8_t> blob;
+    int32_t size = 0;
+    EXPECT_FALSE(formCacheMgr_.GetImgCacheFromDb(orphanRowId, blob, size));
+    EXPECT_TRUE(formCacheMgr_.GetImgCacheFromDb(refRowId, blob, size));
+    // DeleteData removes the form_cache row and its referenced image rows
+    EXPECT_TRUE(formCacheMgr_.DeleteData(formId));
+    EXPECT_FALSE(formCacheMgr_.GetImgCacheFromDb(refRowId, blob, size));
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_030 end";
 }
 }

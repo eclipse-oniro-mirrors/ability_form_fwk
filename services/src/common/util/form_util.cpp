@@ -66,6 +66,7 @@ int64_t FormUtil::GenerateFormId(int64_t udidHash)
     size_t elapsedHash = 0;
     uint64_t unsignedUdidHash = 0;
     uint64_t formId = 0;
+    // Keep -1 unless a unique id is inserted; callers treat negative as failure.
     int64_t ret = -1;
     struct timespec t;
     t.tv_sec = 0;
@@ -76,16 +77,16 @@ int64_t FormUtil::GenerateFormId(int64_t udidHash)
         elapsedHash = std::hash<std::string>()(std::to_string(elapsedTime));
         unsignedUdidHash = static_cast<uint64_t>(udidHash);
         formId = unsignedUdidHash | (uint32_t)(elapsedHash & 0x000000007fffffffL);
-        ret = static_cast<int64_t>(formId);
         bool needRetry = false;
         {
             std::lock_guard<std::mutex> lock(s_memFormIdsMutex);
             it = s_memFormIds.find(formId);
             if (it != s_memFormIds.end()) {
-                HILOG_INFO("repeated formId:%{public}" PRId64, ret);
+                HILOG_INFO("repeated formId:%{public}" PRId64, static_cast<int64_t>(formId));
                 needRetry = true;
             } else {
                 s_memFormIds.insert(formId);
+                ret = static_cast<int64_t>(formId);
                 break;
             }
         }
@@ -354,10 +355,12 @@ bool FormUtil::ConvertStringToInt(std::string_view strInfo, int &intValue, int r
     if (strInfo.empty()) {
         return false;
     }
+    std::string strInfoStr(strInfo);
     char *endPtr = nullptr;
     errno = 0;
-    long result = strtol(std::string(strInfo).c_str(), &endPtr, radix);
-    if (errno == ERANGE || endPtr == strInfo.data() || *endPtr != '\0' || result < INT32_MIN || result > INT32_MAX) {
+    long result = strtol(strInfoStr.c_str(), &endPtr, radix);
+    if (errno == ERANGE || endPtr == strInfoStr.c_str() || *endPtr != '\0' ||
+        result < INT32_MIN || result > INT32_MAX) {
         return false;
     }
     intValue = static_cast<int>(result);

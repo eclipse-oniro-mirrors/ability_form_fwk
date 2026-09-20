@@ -433,8 +433,8 @@ private:
             HILOG_ERROR("get aniVM failed");
             return;
         }
-        EtsFormStateObserver::GetInstance()->
-            RegisterFormInstanceCallback(aniVM, callback, isVisibility, bundleName, formObserver);
+        formObserver->RegisterFormInstanceCallback(
+            aniVM, callback, isVisibility, bundleName, formObserver);
     }
 
     static void OnRegisterClickEventCallback(ani_env* env, const std::string &type,

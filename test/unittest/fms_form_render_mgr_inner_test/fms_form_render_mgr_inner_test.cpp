@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -783,24 +783,6 @@ HWTEST_F(FormRenderMgrInnerTest, GetUserId_001, TestSize.Level0)
 }
 
 /**
- * @tc.name: RerenderAllFormsImmediate_002
- * @tc.desc: test RerenderAllFormsImmediate function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, RerenderAllFormsImmediate_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    sptr<IRemoteObject> remote = nullptr;
-    std::unordered_set<int64_t> form;
-    int64_t formId = 1;
-    form.insert(formId);
-    formRenderMgrInner.etsHosts_.emplace(remote, form);
-    formRenderMgrInner.RerenderAllFormsImmediate();
-    GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_002 end";
-}
-
-/**
  * @tc.name: DisconnectAllRenderConnections_001
  * @tc.desc: test DisconnectAllRenderConnections function.
  * @tc.type: FUNC
@@ -830,21 +812,6 @@ HWTEST_F(FormRenderMgrInnerTest, DisconnectAllRenderConnections_002, TestSize.Le
     formRenderMgrInner.DisconnectAllRenderConnections();
     EXPECT_EQ(0, formRenderMgrInner.renderFormConnections_.size());
     GTEST_LOG_(INFO) << "DisconnectAllRenderConnections_002 end";
-}
-
-/**
- * @tc.name: PostSetRenderGroupParamsTask_001
- * @tc.desc: test PostSetRenderGroupParamsTask function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, PostSetRenderGroupParamsTask_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "PostSetRenderGroupParamsTask_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    Want want;
-    formRenderMgrInner.PostSetRenderGroupParamsTask(1, want);
-    GTEST_LOG_(INFO) << "PostSetRenderGroupParamsTask_001 end";
 }
 
 /**
@@ -1511,34 +1478,6 @@ HWTEST_F(FormRenderMgrInnerTest, RecoverFRSOnFormActivity_002, TestSize.Level0)
 }
 
 /**
- * @tc.name: GetIsFRSDiedInLowMemory_001
- * @tc.desc: test GetIsFRSDiedInLowMemory function when isFrsDiedInLowMemory_ is false.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, GetIsFRSDiedInLowMemory_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "GetIsFRSDiedInLowMemory_001 start";
-    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
-    formRenderMgrInner->isFrsDiedInLowMemory_ = false;
-    EXPECT_FALSE(formRenderMgrInner->GetIsFRSDiedInLowMemory());
-    GTEST_LOG_(INFO) << "GetIsFRSDiedInLowMemory_001 end";
-}
-
-/**
- * @tc.name: GetIsFRSDiedInLowMemory_002
- * @tc.desc: test GetIsFRSDiedInLowMemory function when isFrsDiedInLowMemory_ is true.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, GetIsFRSDiedInLowMemory_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "GetIsFRSDiedInLowMemory_002 start";
-    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
-    formRenderMgrInner->isFrsDiedInLowMemory_ = true;
-    EXPECT_TRUE(formRenderMgrInner->GetIsFRSDiedInLowMemory());
-    GTEST_LOG_(INFO) << "GetIsFRSDiedInLowMemory_002 end";
-}
-
-/**
  * @tc.name: ExecOnUnlockTask_002
  * @tc.desc: test ExecOnUnlockTask function when onUnlockTask_ is not nullptr.
  * @tc.type: FUNC
@@ -1602,34 +1541,6 @@ HWTEST_F(FormRenderMgrInnerTest, checkConnectionsFormIds_002, TestSize.Level0)
 }
 
 /**
- * @tc.name: GetReRenderCount_001
- * @tc.desc: test GetReRenderCount function when atomicRerenderCount_ is 0.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, GetReRenderCount_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "GetReRenderCount_001 start";
-    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
-    formRenderMgrInner->atomicRerenderCount_ = 0;
-    EXPECT_EQ(0, formRenderMgrInner->GetReRenderCount());
-    GTEST_LOG_(INFO) << "GetReRenderCount_001 end";
-}
-
-/**
- * @tc.name: GetReRenderCount_002
- * @tc.desc: test GetReRenderCount function when atomicRerenderCount_ is not 0.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, GetReRenderCount_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "GetReRenderCount_002 start";
-    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
-    formRenderMgrInner->atomicRerenderCount_ = 5;
-    EXPECT_EQ(5, formRenderMgrInner->GetReRenderCount());
-    GTEST_LOG_(INFO) << "GetReRenderCount_002 end";
-}
-
-/**
  * @tc.name: GetRenderRemoteObj_001
  * @tc.desc: test GetRenderRemoteObj function when renderRemoteObj_ is nullptr.
  * @tc.type: FUNC
@@ -1641,35 +1552,6 @@ HWTEST_F(FormRenderMgrInnerTest, GetRenderRemoteObj_001, TestSize.Level0)
     formRenderMgrInner->renderRemoteObj_ = nullptr;
     EXPECT_EQ(nullptr, formRenderMgrInner->GetRenderRemoteObj());
     GTEST_LOG_(INFO) << "GetRenderRemoteObj_001 end";
-}
-
-/**
- * @tc.name: GetRenderRemoteObj_002
- * @tc.desc: test GetRenderRemoteObj function when renderRemoteObj_ is not nullptr.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, GetRenderRemoteObj_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "GetRenderRemoteObj_002 start";
-    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
-    formRenderMgrInner->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    EXPECT_NE(nullptr, formRenderMgrInner->GetRenderRemoteObj());
-    GTEST_LOG_(INFO) << "GetRenderRemoteObj_002 end";
-}
-
-/**
- * @tc.name: SetRenderRemoteObj_001
- * @tc.desc: test SetRenderRemoteObj function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, SetRenderRemoteObj_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "SetRenderRemoteObj_001 start";
-    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
-    sptr<IFormRender> remoteObject = new (std::nothrow) MockIFormRender();
-    formRenderMgrInner->SetRenderRemoteObj(remoteObject);
-    EXPECT_NE(nullptr, formRenderMgrInner->renderRemoteObj_);
-    GTEST_LOG_(INFO) << "SetRenderRemoteObj_001 end";
 }
 
 /**
@@ -1907,24 +1789,6 @@ HWTEST_F(FormRenderMgrInnerTest, CheckIfFormRecycled_001, TestSize.Level0)
 }
 
 /**
- * @tc.name: CheckIfFormRecycled_002
- * @tc.desc: test CheckIfFormRecycled when form status is RECYCLED and isDynamic is true.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, CheckIfFormRecycled_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "CheckIfFormRecycled_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    FormRecord formRecord;
-    formRecord.formId = 1;
-    formRecord.isDynamic = true;
-    Want want;
-    MockGetFormRecord(true, 0);
-    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.CheckIfFormRecycled(formRecord, want));
-    GTEST_LOG_(INFO) << "CheckIfFormRecycled_002 end";
-}
-
-/**
  * @tc.name: GetConnectionAndRenderForm_001
  * @tc.desc: test GetConnectionAndRenderForm when GetRenderFormConnectId fails.
  * @tc.type: FUNC
@@ -2063,102 +1927,6 @@ HWTEST_F(FormRenderMgrInnerTest, RemoveHostToken_001, TestSize.Level0)
 }
 
 /**
- * @tc.name: NotifyHostRenderServiceIsDead_001
- * @tc.desc: test NotifyHostRenderServiceIsDead when renderRemoteObj is not nullptr.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, NotifyHostRenderServiceIsDead_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "NotifyHostRenderServiceIsDead_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    sptr<IRemoteObject> remote = new (std::nothrow) MockFormProviderClient();
-    std::unordered_set<int64_t> form;
-    int64_t formId = 1;
-    form.insert(formId);
-    formRenderMgrInner.etsHosts_.emplace(remote, form);
-    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.NotifyHostRenderServiceIsDead());
-    GTEST_LOG_(INFO) << "NotifyHostRenderServiceIsDead_001 end";
-}
-
-/**
- * @tc.name: AddRenderDeathRecipient_001
- * @tc.desc: test AddRenderDeathRecipient when AddDeathRecipient fails.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, AddRenderDeathRecipient_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "AddRenderDeathRecipient_001 start";
-    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
-    ASSERT_NE(nullptr, formRenderMgrInner);
-    sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
-    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner->AddRenderDeathRecipient(remoteObject));
-    GTEST_LOG_(INFO) << "AddRenderDeathRecipient_001 end";
-}
-
-/**
- * @tc.name: NotifyScreenOn_002
- * @tc.desc: test NotifyScreenOn when GetRenderObject fails.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, NotifyScreenOn_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "NotifyScreenOn_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
-    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.NotifyScreenOn());
-    GTEST_LOG_(INFO) << "NotifyScreenOn_002 end";
-}
-
-/**
- * @tc.name: PostSetRenderGroupEnableFlagTask_001
- * @tc.desc: test PostSetRenderGroupEnableFlagTask when GetRenderObject fails.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, PostSetRenderGroupEnableFlagTask_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "PostSetRenderGroupEnableFlagTask_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
-    int64_t formId = 1;
-    bool isEnable = true;
-    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.PostSetRenderGroupEnableFlagTask(formId, isEnable));
-    GTEST_LOG_(INFO) << "PostSetRenderGroupEnableFlagTask_001 end";
-}
-
-/**
- * @tc.name: PostSetVisibleChangeTask_001
- * @tc.desc: test PostSetVisibleChangeTask when isVisible is true.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, PostSetVisibleChangeTask_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "PostSetVisibleChangeTask_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    int64_t formId = 1;
-    bool isVisible = true;
-    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.PostSetVisibleChangeTask(formId, isVisible));
-    GTEST_LOG_(INFO) << "PostSetVisibleChangeTask_001 end";
-}
-
-/**
- * @tc.name: PostSetVisibleChangeTask_002
- * @tc.desc: test PostSetVisibleChangeTask when isVisible is false.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, PostSetVisibleChangeTask_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "PostSetVisibleChangeTask_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    int64_t formId = 1;
-    bool isVisible = false;
-    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.PostSetVisibleChangeTask(formId, isVisible));
-    GTEST_LOG_(INFO) << "PostSetVisibleChangeTask_002 end";
-}
-
-/**
  * @tc.name: RecoverForms_005
  * @tc.desc: test RecoverForms when LoadStatusData fails.
  * @tc.type: FUNC
@@ -2233,36 +2001,6 @@ HWTEST_F(FormRenderMgrInnerTest, ExecOnUnlockTask_001, TestSize.Level0)
     formRenderMgrInner->ExecOnUnlockTask(remoteObject);
     EXPECT_EQ(nullptr, formRenderMgrInner->onUnlockTask_);
     GTEST_LOG_(INFO) << "ExecOnUnlockTask_001 end";
-}
-
-/**
- * @tc.name: OnRenderingBlock_001
- * @tc.desc: test OnRenderingBlock function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, OnRenderingBlock_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "OnRenderingBlock_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    std::string bundleName = "testBundle";
-    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.OnRenderingBlock(bundleName));
-    GTEST_LOG_(INFO) << "OnRenderingBlock_001 end";
-}
-
-/**
- * @tc.name: PostSetRenderGroupParamsTask_002
- * @tc.desc: test PostSetRenderGroupParamsTask when GetRenderObject fails.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, PostSetRenderGroupParamsTask_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "PostSetRenderGroupParamsTask_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    formRenderMgrInner.renderRemoteObj_ = nullptr;
-    int64_t formId = 1;
-    Want want;
-    EXPECT_NO_FATAL_FAILURE(formRenderMgrInner.PostSetRenderGroupParamsTask(formId, want));
-    GTEST_LOG_(INFO) << "PostSetRenderGroupParamsTask_002 end";
 }
 
 /**

@@ -28,16 +28,29 @@
 #undef protected
 #include "message_parcel.h"
 #include "securec.h"
+#include "ffrt.h"
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_NUM = 10000;
 constexpr int32_t MIN_NUM = 0;
 constexpr int32_t MAX_LOOP_COUNT = 10;
 constexpr int32_t MAX_SCENE_TYPE = 1;
-constexpr int32_t MAX_EVENT_NAME = 10;
+constexpr int32_t MAX_EVENT_NAME = 38; // FORM_EXCEEDS_DISTRIBUTION
 
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {

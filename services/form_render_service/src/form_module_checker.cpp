@@ -229,6 +229,10 @@ bool FormModuleChecker::CheckApiWithSuffix(const std::string& apiPath, const std
 bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
     std::unique_ptr<ApiAllowListChecker> &apiAllowListChecker, bool isAppModule)
 {
+    if (moduleName == nullptr || moduleName[0] == '\0') {
+        HILOG_ERROR("invalid module name");
+        return false;
+    }
     if (isAppModule) {
         HILOG_DEBUG("module is not system, moduleName= %{public}s", moduleName);
         return false;

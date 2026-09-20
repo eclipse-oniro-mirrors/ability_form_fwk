@@ -25,10 +25,23 @@
 #undef protected
 #include "message_parcel.h"
 #include "securec.h"
+#include "ffrt.h"
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr size_t U32_AT_SIZE = 4;
 constexpr size_t MESSAGE_BASE = 3001;
 constexpr size_t MESSAGE_MAX = 3077;

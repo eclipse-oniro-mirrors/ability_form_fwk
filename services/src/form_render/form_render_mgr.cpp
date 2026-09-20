@@ -109,8 +109,6 @@ ErrCode FormRenderMgr::RenderForm(
         want.SetParam(Constants::FORM_RENDER_WITHOUT_UNLOCK_STATE, true);
     }
 
-    bool formIsVisible = FormDataMgr::GetInstance().GetFormVisible(formRecord.formId);
-    want.SetParam(Constants::FORM_IS_VISIBLE, formIsVisible);
     want.SetParam(Constants::FORM_LOCATION_KEY, static_cast<int32_t>(formRecord.formLocation));
 
     if (formRecord.privacyLevel > 0) {
@@ -432,7 +430,6 @@ void FormRenderMgr::SetRenderGroupEnableFlag(int64_t formId, bool isEnable)
 
 void FormRenderMgr::SetVisibleChange(int64_t formId, bool isVisible, int32_t userId)
 {
-    HILOG_INFO("call.");
     if (userId == Constants::INVALID_USER_ID) {
         userId = FormUtil::GetCurrentAccountId();
     }

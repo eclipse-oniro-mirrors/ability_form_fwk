@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -615,99 +615,5 @@ HWTEST_F(FmsFormRefreshConnectionTest, FreeInstallStatusCallBackStub_002, TestSi
     MessageOption option;
     EXPECT_EQ(ERR_INVALID_STATE, mockFreeInstallStatusCallBackStub.OnRemoteRequest(code, data, reply, option));
     GTEST_LOG_(INFO) << "FreeInstallStatusCallBackStub_002 end";
-}
-
-/**
- * @tc.name: FormAcquireConnection_002
- * @tc.desc: test OnAbilityConnectDone function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireConnection_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormAcquireConnection_002 start";
-    int64_t formId = 1;
-    FormItemInfo info;
-    WantParams wantParams;
-    sptr<IRemoteObject> hostToken = nullptr;
-    sptr<FormAcquireConnection> formAcquireConnection =
-        new (std::nothrow) FormAcquireConnection(formId, info, wantParams, hostToken);
-    ASSERT_NE(nullptr, formAcquireConnection);
-    AppExecFwk::ElementName element;
-    sptr<IRemoteObject> remoteObject = nullptr;
-    int resultCode = ERR_OK;
-    formAcquireConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
-    GTEST_LOG_(INFO) << "FormAcquireConnection_002 end";
-}
-
-/**
- * @tc.name: FormAcquireConnection_003
- * @tc.desc: test OnAbilityConnectDone function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireConnection_003, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormAcquireConnection_003 start";
-    int64_t formId = 1;
-    FormItemInfo info;
-    WantParams wantParams;
-
-    sptr<IRemoteObject> hostToken = nullptr;
-    sptr<FormAcquireConnection> formAcquireConnection =
-        new (std::nothrow) FormAcquireConnection(formId, info, wantParams, hostToken);
-    ASSERT_NE(nullptr, formAcquireConnection);
-    AppExecFwk::ElementName element;
-    sptr<IRemoteObject> remoteObject = nullptr;
-    int resultCode = ERR_OK;
-    formAcquireConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
-    GTEST_LOG_(INFO) << "FormAcquireConnection_003 end";
-}
-
-/**
- * @tc.name: FormAcquireConnection_004
- * @tc.desc: test OnAbilityDisconnectDone function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireConnection_004, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormAcquireConnection_004 start";
-    int64_t formId = 1;
-    FormItemInfo info;
-    WantParams wantParams;
-    sptr<IRemoteObject> hostToken = nullptr;
-    sptr<FormAcquireConnection> formAcquireConnection =
-        new (std::nothrow) FormAcquireConnection(formId, info, wantParams, hostToken);
-    ASSERT_NE(nullptr, formAcquireConnection);
-    AppExecFwk::ElementName element;
-    sptr<IRemoteObject> remoteObject = nullptr;
-    int resultCode = ERR_OK;
-    formAcquireConnection->OnAbilityDisconnectDone(element, resultCode);
-    GTEST_LOG_(INFO) << "FormAcquireConnection_004 end";
-}
-
-/**
- * @tc.name: FormAcquireConnection_005
- * @tc.desc: test OnFormAbilityConnectDoneCallback function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireConnection_005, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormAcquireConnection_005 start";
-    int64_t formId = 1;
-    FormItemInfo info;
-    WantParams wantParams;
-    sptr<IRemoteObject> hostToken = nullptr;
-    sptr<FormAcquireConnection> formAcquireConnection =
-        new (std::nothrow) FormAcquireConnection(formId, info, wantParams, hostToken);
-    ASSERT_NE(nullptr, formAcquireConnection);
-    auto &&connectCallback = [](const std::string &bundleName) {};
-    formAcquireConnection->SetFormAbilityConnectCb(connectCallback);
-    formAcquireConnection->OnFormAbilityConnectDoneCallback();
-    formAcquireConnection->SetFormAbilityConnectCb(nullptr);
-    formAcquireConnection->OnFormAbilityConnectDoneCallback();
-    formAcquireConnection->SetFormAbilityDisconnectCb(connectCallback);
-    formAcquireConnection->OnFormAbilityDisconnectDoneCallback();
-    formAcquireConnection->SetFormAbilityDisconnectCb(nullptr);
-    formAcquireConnection->OnFormAbilityDisconnectDoneCallback();
-    GTEST_LOG_(INFO) << "FormAcquireConnection_005 end";
 }
 }

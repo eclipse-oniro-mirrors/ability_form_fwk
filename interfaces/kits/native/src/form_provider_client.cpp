@@ -417,7 +417,11 @@ int FormProviderClient::HandleAcquire(
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
-    formSupplyClient->OnAcquire(formProviderInfo, newWant);
+    int32_t ret = formSupplyClient->OnAcquire(formProviderInfo, newWant);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("OnAcquire failed:%{public}d", ret);
+        return ret;
+    }
     return ERR_OK;
 }
 

@@ -414,14 +414,7 @@ ErrCode FormLifecycleAdapter::HandleDeleteForm(const int64_t formId, const sptr<
         HILOG_ERROR("not exist such db form:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    FormRecord record;
-    FormDataMgr::GetInstance().GetFormRecord(formId, record);
-    FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
 
-#ifdef DEVICE_USAGE_STATISTICS_ENABLE
-    DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
-        record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_REMOVED);
-#endif
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     bool isSelfDbFormId = (userId == dbRecord.providerUserId) && ((std::find(dbRecord.formUserUids.begin(),
@@ -430,6 +423,15 @@ ErrCode FormLifecycleAdapter::HandleDeleteForm(const int64_t formId, const sptr<
         HILOG_ERROR("not self form:%{public}" PRId64 ", callingUid:%{public}d", formId, callingUid);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
+
+    FormRecord record;
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
+
+#ifdef DEVICE_USAGE_STATISTICS_ENABLE
+    DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
+        record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_REMOVED);
+#endif
 
     ErrCode result = HandleDeleteFormCache(dbRecord, callingUid, formId);
     if (result != ERR_OK) {
@@ -481,6 +483,7 @@ ErrCode FormLifecycleAdapter::HandleDeleteFormCache(FormRecord &dbRecord, const 
             HILOG_ERROR("fail remove cache data");
             deleteFormError = deleteFormError != ERR_OK ? deleteFormError : ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
+        FormExemptLockMgr::GetInstance().SetExemptLockStatus(formId, false);
         if (!FormTimerMgr::GetInstance().RemoveFormTimer(formId)) {
             HILOG_ERROR("remove timer error");
             deleteFormError = deleteFormError != ERR_OK ? deleteFormError : ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -894,7 +897,9 @@ int FormLifecycleAdapter::CreateForm(const Want &want, RunningFormInfo &runningF
 
         ret = AddThemeDBRecord(want, formId);
         if (ret != ERR_OK) {
-            HILOG_ERROR("AddThemeDBRecord failed");
+            HILOG_ERROR("AddThemeDBRecord failed, rollback ThemeManager");
+            ThemeFormClient::GetInstance().DeleteForms({formId});
+            return ret;
         }
 
         runningFormInfo.formId = formId;
@@ -952,6 +957,9 @@ int FormLifecycleAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds
                 FormRenderMgr::GetInstance().DeleteAcquireForbiddenTaskByFormId(removedForm.first);
                 RefreshCacheMgr::GetInstance().DelRenderTask(removedForm.first);
                 FormDataMgr::GetInstance().DeleteFormVisible(removedForm.first);
+                // second==true means the form is deleted, clean its cache
+                FormCacheMgr::GetInstance().DeleteData(removedForm.first);
+                FormExemptLockMgr::GetInstance().SetExemptLockStatus(removedForm.first, false);
             }
         }
     }
@@ -1045,7 +1053,6 @@ ErrCode FormLifecycleAdapter::EnableForms(const std::string &bundleName, const i
 // Implementation of ProtectLockForms
 ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, int32_t userId, const bool protect)
 {
-    HILOG_INFO("ProtectLockForms entry");
     if (FormBundleLockMgr::GetInstance().IsLockServiceInitialized() &&
         FormBundleLockMgr::GetInstance().IsBundleProtect(bundleName, userId) == protect) {
         HILOG_INFO("No need to change protect status, bundleName = %{public}s, protect = %{public}d",
@@ -1246,7 +1253,6 @@ bool FormLifecycleAdapter::IsFormRenderServiceCall(int callingUid)
 // Implementation of SwitchLockForms
 ErrCode FormLifecycleAdapter::SwitchLockForms(const std::string &bundleName, int32_t userId, const bool lock)
 {
-    HILOG_INFO("SwitchLockForms entry");
     if (FormBundleLockMgr::GetInstance().IsBundleLock(bundleName, userId) == lock) {
         HILOG_INFO("No need to change lock status, bundleName = %{public}s, lock = %{public}d",
             bundleName.c_str(), lock);
@@ -1300,7 +1306,7 @@ ErrCode FormLifecycleAdapter::BatchNotifyFormsConfigurationUpdate(const AppExecF
         visibleFormRecords.size(), invisibleFormRecords.size());
     Want reqWant;
     for (const auto &formRecord : visibleFormRecords) {
-        std::string key = formRecord.bundleName + formRecord.abilityName;
+        std::string key = formRecord.bundleName + "::" + formRecord.abilityName;
         if (notified.find(key) != notified.end()) {
             continue;
         }
@@ -1308,7 +1314,7 @@ ErrCode FormLifecycleAdapter::BatchNotifyFormsConfigurationUpdate(const AppExecF
         FormProviderMgr::GetInstance().ConnectForConfigUpdate(configuration, formRecord, reqWant);
     }
     for (const auto &formRecord : invisibleFormRecords) {
-        std::string key = formRecord.bundleName + formRecord.abilityName;
+        std::string key = formRecord.bundleName + "::" + formRecord.abilityName;
         if (notified.find(key) != notified.end()) {
             continue;
         }
@@ -1463,7 +1469,7 @@ ErrCode FormLifecycleAdapter::HandleCastTempForm(const int64_t formId, const For
 int FormLifecycleAdapter::ReleaseRenderer(const int64_t formId, const std::string &compId)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("FormLifecycleAdapter::ReleaseRenderer called, formId:%{public}" PRId64, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
 
     if (formId <= 0 || compId.empty()) {
         HILOG_ERROR("Release invalid param");
@@ -1484,7 +1490,7 @@ int FormLifecycleAdapter::ReleaseRenderer(const int64_t formId, const std::strin
 #ifdef RES_SCHEDULE_ENABLE
 void FormLifecycleAdapter::SetTimerTaskNeeded(bool isTimerTaskNeeded)
 {
-    HILOG_INFO("FormLifecycleAdapter::SetTimerTaskNeeded called, isTimerTaskNeeded:%{public}d", isTimerTaskNeeded);
+    HILOG_INFO("isTimerTaskNeeded:%{public}d", isTimerTaskNeeded);
     RefreshControlMgr::GetInstance().SetSystemOverloadFlag(!isTimerTaskNeeded);
 }
 #endif // RES_SCHEDULE_ENABLE

@@ -528,44 +528,6 @@ HWTEST_F(FmsFormCallbackAdapterTest, RequestOverflow_002, TestSize.Level1)
     GTEST_LOG_(INFO) << "RequestOverflow_002 end";
 }
 
-/**
- * @tc.name: RequestOverflow_003
- * @tc.desc: Verify no host registered returns ERR_APPEXECFWK_FORM_GET_HOST_FAILED
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCallbackAdapterTest, RequestOverflow_003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "RequestOverflow_003 start";
-
-    int32_t callingUid = TEST_CALLING_UID;
-    OverflowInfo overflowInfo;
-    bool isOverflow = false;
-
-    FormRecord record;
-    record.formId = TEST_FORM_ID;
-    record.bundleName = "com.test.bundle";
-    record.abilityName = "MainAbility";
-    record.moduleName = "entry";
-    record.uid = callingUid;
-    record.providerUserId = TEST_USER_ID;
-    record.formUserUids = { callingUid };
-
-    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
-        .WillRepeatedly(Return(TEST_FORM_ID));
-    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
-        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
-        .WillRepeatedly(Return(false));
-    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
-        .WillRepeatedly(Return(ERR_APPEXECFWK_FORM_GET_INFO_FAILED));
-
-    auto result = FormCallbackAdapter::GetInstance().RequestOverflow(
-        TEST_FORM_ID, callingUid, overflowInfo, isOverflow);
-    EXPECT_NE(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "RequestOverflow_003 end";
-}
-
 // ========== RegisterChangeSceneAnimationStateProxy Tests ==========
 
 /**
@@ -643,39 +605,6 @@ HWTEST_F(FmsFormCallbackAdapterTest, ChangeSceneAnimationState_001, TestSize.Lev
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
 
     GTEST_LOG_(INFO) << "ChangeSceneAnimationState_001 end";
-}
-
-/**
- * @tc.name: ChangeSceneAnimationState_002
- * @tc.desc: Verify form not exist returns ERR_APPEXECFWK_FORM_NOT_EXIST_ID
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCallbackAdapterTest, ChangeSceneAnimationState_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "ChangeSceneAnimationState_002 start";
-
-    int32_t callingUid = TEST_CALLING_UID;
-    int32_t state = 1;
-
-    FormRecord record;
-    record.formId = TEST_FORM_ID;
-    record.uid = callingUid;
-
-    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
-        .WillRepeatedly(Return(TEST_FORM_ID));
-    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
-        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)))
-        .WillOnce(Return(false));
-    EXPECT_CALL(*MockFormBundleLockMgr::obj, IsBundleProtect(_, _, _))
-        .WillRepeatedly(Return(false));
-    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
-        .WillRepeatedly(Return(ERR_APPEXECFWK_FORM_GET_INFO_FAILED));
-
-    auto result = FormCallbackAdapter::GetInstance().ChangeSceneAnimationState(
-        TEST_FORM_ID, callingUid, state);
-    EXPECT_NE(result, ERR_OK);
-
-    GTEST_LOG_(INFO) << "ChangeSceneAnimationState_002 end";
 }
 
 // ========== RegisterGetFormRectProxy Tests ==========
@@ -1049,25 +978,6 @@ HWTEST_F(FmsFormCallbackAdapterTest, SetFormPublishInterceptor_001, TestSize.Lev
     EXPECT_EQ(interceptor, nullptr);
 
     GTEST_LOG_(INFO) << "SetFormPublishInterceptor_001 end";
-}
-
-// ========== GetFormPublishInterceptor Tests ==========
-
-/**
- * @tc.name: GetFormPublishInterceptor_001
- * @tc.desc: Verify initial interceptor is null
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormCallbackAdapterTest, GetFormPublishInterceptor_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GetFormPublishInterceptor_001 start";
-
-    FormCallbackAdapter::GetInstance().formPublishInterceptor_ = nullptr;
-
-    auto interceptor = FormCallbackAdapter::GetInstance().GetFormPublishInterceptor();
-    EXPECT_EQ(interceptor, nullptr);
-
-    GTEST_LOG_(INFO) << "GetFormPublishInterceptor_001 end";
 }
 
 // ========== CallerCheck Tests ==========

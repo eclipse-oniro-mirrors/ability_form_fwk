@@ -85,7 +85,7 @@ int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)
 int32_t FormRefreshMgr::BatchRequestRefresh(const int32_t refreshType,
     const StaggerStrategyType strategyType, std::vector<RefreshData> &batch)
 {
-    HILOG_INFO("BatchRequestRefresh: batch size = %{public}zu, refreshType = %{public}d, strategyType = %{public}d",
+    HILOG_INFO("batchSize:%{public}zu, refreshType:%{public}d, strategyType:%{public}d",
         batch.size(), refreshType, static_cast<int>(strategyType));
 
     if (batch.empty()) {

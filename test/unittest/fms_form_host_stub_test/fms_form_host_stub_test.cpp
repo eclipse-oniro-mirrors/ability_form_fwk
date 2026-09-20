@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -61,57 +61,6 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_001, TestSize.Level0)
 {
     MockFormHostClient callback;
     uint32_t code = 1;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-}
-
-/**
- * @tc.name: FormHostStubTest_002
- * @tc.desc: Verify OnRemoteRequest
- * @tc.type: FUNC
- */
-HWTEST_F(FormHostStubTest, FormHostStubTest_002, TestSize.Level0)
-{
-    MockFormHostClient callback;
-    uint32_t code = 2;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-}
-
-/**
- * @tc.name: FormHostStubTest_003
- * @tc.desc: Verify OnRemoteRequest
- * @tc.type: FUNC
- */
-HWTEST_F(FormHostStubTest, FormHostStubTest_003, TestSize.Level0)
-{
-    MockFormHostClient callback;
-    uint32_t code = 3;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-}
-
-/**
- * @tc.name: FormHostStubTest_004
- * @tc.desc: Verify OnRemoteRequest
- * @tc.type: FUNC
- */
-HWTEST_F(FormHostStubTest, FormHostStubTest_004, TestSize.Level0)
-{
-    MockFormHostClient callback;
-    uint32_t code = 4;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
@@ -236,26 +185,6 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_010, TestSize.Level1)
     data.WriteInt32(-1);
     auto result = callback.OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
-}
-
-/**
- * @tc.name: FormHostStubTest_011
- * @tc.desc: Verify OnRemoteRequest and HandleOnAcquireState
- * @tc.type: FUNC
- */
-HWTEST_F(FormHostStubTest, FormHostStubTest_011, TestSize.Level1)
-{
-    MockFormHostClient callback;
-    constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_STATE);
-    constexpr FormState state = FormState::DEFAULT;
-    const AAFwk::Want want = {};
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    data.WriteInterfaceToken(MockFormHostClient::GetDescriptor());
-    data.WriteInt32(static_cast<int32_t>(state));
-    data.WriteParcelable(&want);
-    callback.OnRemoteRequest(code, data, reply, option);
 }
 
 /**

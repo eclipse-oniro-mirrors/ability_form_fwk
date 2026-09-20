@@ -47,6 +47,8 @@ public:
 
     void RemoveCallback(ani_object call);
 
+    std::shared_ptr<EtsFormEventCallbackList> CopyCallbacks() const;
+
     void HandleFormEvent(const AppExecFwk::RunningFormInfo &runningFormInfo) const;
 
     std::string BindHostBundleName() const

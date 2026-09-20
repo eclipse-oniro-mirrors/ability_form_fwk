@@ -28,11 +28,14 @@
 #undef private
 #undef protected
 #include "form_constants.h"
+#include "ffrt.h"
 
-// The fuzz target links the real form service stack, whose FormDataMgr registers a
-// memory-watermark parameter watcher. Its IPC-thread callback can submit ffrt tasks
-// after the global scheduler is torn down at process exit (heap-use-after-free). The
-// watcher path is not reachable from fuzz input, so stub the registration as no-op.
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
 extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
 {
     return 0;
@@ -42,6 +45,7 @@ using namespace OHOS::AppExecFwk;
 using OHOS::AAFwk::Want;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_FORM_ID = 10000;
 constexpr int32_t MIN_FORM_ID = 0;
@@ -164,7 +168,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
-    std::this_thread::sleep_for(std::chrono::seconds(2));
     return 0;
 }
 

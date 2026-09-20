@@ -21,6 +21,8 @@
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
+// Match the IDL-generated IFormHostDelegate map size limit.
+constexpr size_t MAX_RECORD_ENTRIES = 102400;
 constexpr const char *DELEGATOR_RECORD_KEY = "keys";
 constexpr const char *DELEGATOR_RECORD_NEXT = "next";
 constexpr const char *DELEGATOR_RECORD_DONE = "done";
@@ -150,6 +152,7 @@ bool ParseRecordString(ani_env *env, ani_object aniMockList, std::unordered_map<
     }
     ani_ref next = nullptr;
     ani_boolean done = false;
+    size_t entryCount = 0;
     while (ANI_OK == env->Object_CallMethodByName_Ref(
         static_cast<ani_object>(iter), DELEGATOR_RECORD_NEXT, nullptr, &next)) {
         status = env->Object_GetFieldByName_Boolean(static_cast<ani_object>(next), DELEGATOR_RECORD_DONE, &done);
@@ -161,6 +164,11 @@ bool ParseRecordString(ani_env *env, ani_object aniMockList, std::unordered_map<
             HILOG_DEBUG("[forEachMapEntry] done break");
             return true;
         }
+        if (entryCount >= MAX_RECORD_ENTRIES) {
+            HILOG_ERROR("Record entry count exceeds the limit");
+            return false;
+        }
+        ++entryCount;
         ani_ref aniKey = nullptr;
         ani_ref aniValue = nullptr;
         if (!ParseRecordStringInner(env, next, aniMockList, aniKey, aniValue)) {

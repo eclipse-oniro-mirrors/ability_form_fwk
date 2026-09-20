@@ -97,6 +97,10 @@ void FormCallerMgr::OnHostCallBackDied(const wptr<IRemoteObject> &remote)
     };
 
     auto handler = GetEventHandler();
+    if (handler == nullptr) {
+        HILOG_ERROR("get event handler failed");
+        return;
+    }
     handler->PostTask(hostCallBackDiedFunc, FORM_TASK_DELAY_TIME);
 }
 
@@ -185,6 +189,10 @@ void FormCallerMgr::OnProviderCallBackDied(const wptr<IRemoteObject> &remote)
     };
 
     auto handler = GetEventHandler();
+    if (handler == nullptr) {
+        HILOG_ERROR("get event handler failed");
+        return;
+    }
     handler->PostTask(providerCallBackDiedFunc, FORM_TASK_DELAY_TIME);
 }
 

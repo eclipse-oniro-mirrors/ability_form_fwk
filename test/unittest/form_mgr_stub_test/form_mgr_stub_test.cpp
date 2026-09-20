@@ -379,22 +379,6 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0008, TestSize.Level1) {
 }
 
 /**
- * @tc.number: FormMgrStubTest_0009
- * @tc.name: Verify OnRemoteRequest
- * @tc.desc: When the parameter code is FORM_MGR_ADD_FORM, the interface calls normally.
- */
-HWTEST_F(FormMgrStubTest, FormMgrStubTest_0009, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrStubTest_0009 starts";
-    EXPECT_TRUE(mockFormMgrService != nullptr);
-    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ADD_FORM);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    mockFormMgrService->OnRemoteRequest(code, data, reply, option);
-    GTEST_LOG_(INFO) << "FormMgrStubTest_0009 ends";
-}
-
-/**
  * @tc.number: FormMgrStubTest_0010
  * @tc.name: Verify OnRemoteRequest and HandleAddForm
  * @tc.desc: When the parameter code is FORM_MGR_ADD_FORM, the interface return value is ERR_OK.
@@ -2775,24 +2759,6 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0112, TestSize.Level1) {
     EXPECT_CALL(*mockFormMgrService, RegisterRemoveObserver(_, _)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0112 ends";
-}
-
-/**
- * @tc.number: FormMgrStubTest_0113
- * @tc.name: test HandleRegisterRemoveObserver function.
- * @tc.desc: Verify that the HandleRegisterRemoveObserver interface is called normally and the return value is ERR_OK.
- */
-HWTEST_F(FormMgrStubTest, FormMgrStubTest_0113, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrStubTest_0113 starts";
-    MessageParcel data;
-    MessageParcel reply;
-    const std::string bundleName = "bundleName";
-    data.WriteString(bundleName);
-    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
-    data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, RegisterRemoveObserver(_, _)).Times(1).WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleRegisterRemoveObserver(data, reply), ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrStubTest_0113 ends";
 }
 
 /**

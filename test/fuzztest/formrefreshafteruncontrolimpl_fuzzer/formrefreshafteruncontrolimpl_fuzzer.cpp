@@ -20,17 +20,32 @@
 #include <chrono>
 #include <thread>
 #include <fuzzer/FuzzedDataProvider.h>
+#include "form_constants.h"
+#include "form_provider_data.h"
 
 #define private public
 #define protected public
 #include "form_refresh/refresh_impl/form_refresh_after_uncontrol_impl.h"
 #include "form_refresh/strategy/refresh_config.h"
+#include "ffrt.h"
 #undef private
 #undef protected
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
 
 using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
+
 constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_NUM = 10000;
 constexpr int32_t MIN_NUM = 0;
@@ -71,11 +86,12 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, refreshType);
 
     refreshData.want = want;
-    FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormRequest(refreshData);
 
-    bool isCountTimerRefresh = fdp->ConsumeBool();
-    bool isTimerRefresh = fdp->ConsumeBool();
-    FormRefreshAfterUncontrolImpl::GetInstance().DetectControlPoint(refreshData, isCountTimerRefresh, isTimerRefresh);
+    std::string jsonDataString = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    FormProviderData providerData(jsonDataString);
+    refreshData.providerData = providerData;
+
+    FormRefreshAfterUncontrolImpl::GetInstance().RefreshFormRequest(refreshData);
 
     return true;
 }
@@ -83,7 +99,6 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
 extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
-    std::this_thread::sleep_for(std::chrono::seconds(2));
     return 0;
 }
 
