@@ -47,6 +47,7 @@ ohos_unittest("FmsFormServiceProxyTest") {
     "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}:form_manager",
   ]
 
   external_deps = [
@@ -57,7 +58,6 @@ ohos_unittest("FmsFormServiceProxyTest") {
     "c_utils:utils",
     "device_manager:devicemanagersdk",
     "ffrt:libffrt",
-    "form_fwk:form_manager",
     "googletest:gtest_main",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
