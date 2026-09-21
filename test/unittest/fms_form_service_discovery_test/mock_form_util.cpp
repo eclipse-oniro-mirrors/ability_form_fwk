@@ -14,10 +14,10 @@
  */
 
 #include <gtest/gtest.h>
+#include <cstdint>
 #include <string>
 
 #include "common/util/form_util.h"
-#include "bundle_constants.h"
 #include "fms_log_wrapper.h"
 
 namespace {

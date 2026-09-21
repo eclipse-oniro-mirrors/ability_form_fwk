@@ -23,10 +23,8 @@
 #include "form_service_info.h"
 
 #define private public
-#define protected public
 #include "feature/service_discovery/form_service_proxy.h"
 #undef private
-#undef protected
 
 #include "inner/mock_dm_service_adapter.h"
 #include "inner/mock_form_util.h"
@@ -70,7 +68,7 @@ DmRegisterServiceInfo MakeRegInfo()
     regInfo.serviceName = TEST_SERVICE_NAME;
     regInfo.serviceDisplayName = TEST_DISPLAY_NAME;
     regInfo.customData = "{}";
-    regInfo.dataLen = 2;
+    regInfo.dataLen = static_cast<uint32_t>(regInfo.customData.size());
     regInfo.description = TEST_DISPLAY_NAME;
     regInfo.serviceCode = TEST_SERVICE_NAME;
     return regInfo;

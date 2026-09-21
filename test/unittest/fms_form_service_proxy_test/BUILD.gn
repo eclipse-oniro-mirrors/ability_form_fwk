@@ -23,7 +23,7 @@ ohos_unittest("FmsFormServiceProxyTest") {
     "${form_fwk_path}/services/src/feature/service_discovery/form_service_proxy.cpp",
     "${form_fwk_path}/test/unittest/fms_form_service_proxy_test/fms_form_service_proxy_test.cpp",
     "${form_fwk_path}/test/unittest/fms_form_service_proxy_test/mock_dm_service_adapter.cpp",
-    "${form_fwk_path}/test/unittest/fms_form_service_proxy_test/mock_form_bms_helper.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_service_discovery_test/mock_form_bms_helper.cpp",
     "${form_fwk_path}/test/unittest/fms_form_service_proxy_test/mock_form_util.cpp",
   ]
 
@@ -31,6 +31,7 @@ ohos_unittest("FmsFormServiceProxyTest") {
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
     "${form_fwk_path}/test/unittest/fms_form_service_proxy_test",
+    "${form_fwk_path}/test/unittest/fms_form_service_discovery_test",
   ]
 
   configs = [
@@ -47,6 +48,7 @@ ohos_unittest("FmsFormServiceProxyTest") {
     "${form_fwk_path}:libfms_internal_static",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_manager",
   ]
 

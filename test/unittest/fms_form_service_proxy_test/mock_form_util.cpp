@@ -14,9 +14,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <cerrno>
-#include <cstdlib>
-#include <cstring>
+#include <cstdint>
 #include <string>
 
 #include "common/util/form_util.h"
@@ -59,28 +57,6 @@ bool FormUtil::IsSACall()
 
 bool FormUtil::VerifyCallingPermission(std::string_view permissionName)
 {
-    return true;
-}
-
-int64_t FormUtil::GetCurrentMillisecond()
-{
-    return 1000;
-}
-
-bool FormUtil::ConvertStringToInt64(std::string_view strInfo, int64_t &int64Value)
-{
-    if (strInfo.empty()) {
-        int64Value = 0;
-        return true;
-    }
-    std::string s(strInfo);
-    errno = 0;
-    char *end = nullptr;
-    long long val = strtoll(s.c_str(), &end, 10);
-    if (errno != 0 || end == s.c_str() || *end != '\0') {
-        return false;
-    }
-    int64Value = static_cast<int64_t>(val);
     return true;
 }
 

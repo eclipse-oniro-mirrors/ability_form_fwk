@@ -25,11 +25,9 @@
 #include "form_service_info.h"
 
 #define private public
-#define protected public
 #include "feature/service_discovery/form_service_discovery.h"
 #include "feature/service_discovery/form_service_proxy.h"
 #undef private
-#undef protected
 
 #include "inner/mock_dm_service_adapter.h"
 #include "inner/mock_form_util.h"
@@ -52,10 +50,10 @@ const std::string TEST_BUNDLE_NAME = "com.test.bundle";
 DmDeviceInfo MakeDeviceInfo(const std::string &networkId, DmAuthForm authForm)
 {
     DmDeviceInfo dev;
-    memset(&dev, 0, sizeof(dev));
-    strncpy(dev.networkId, networkId.c_str(), sizeof(dev.networkId) - 1);
-    strncpy(dev.deviceId, "dev-id", sizeof(dev.deviceId) - 1);
-    strncpy(dev.deviceName, "dev-name", sizeof(dev.deviceName) - 1);
+    (void)memset_s(&dev, sizeof(dev), 0, sizeof(dev));
+    (void)strncpy_s(dev.networkId, sizeof(dev.networkId), networkId.c_str(), sizeof(dev.networkId) - 1);
+    (void)strncpy_s(dev.deviceId, sizeof(dev.deviceId), "dev-id", sizeof(dev.deviceId) - 1);
+    (void)strncpy_s(dev.deviceName, sizeof(dev.deviceName), "dev-name", sizeof(dev.deviceName) - 1);
     dev.authForm = authForm;
     return dev;
 }
