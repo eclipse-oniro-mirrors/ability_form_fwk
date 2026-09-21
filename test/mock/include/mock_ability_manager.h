@@ -325,7 +325,7 @@ public:
     }
 
     int32_t ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(const AAFwk::Want &want,
-        const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteParam &param,
+        const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteLiteParam &param,
         uint64_t specifiedFullTokenId) override
     {
         return 0;
@@ -830,7 +830,7 @@ public:
     }
 
     int32_t ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(const AAFwk::Want &want,
-        const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteParam &param,
+        const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteLiteParam &param,
         uint64_t specifiedFullTokenId) override
     {
         return 0;
