@@ -60,6 +60,7 @@ ohos_unittest("FmsFormServiceProxyTest") {
     "c_utils:utils",
     "device_manager:devicemanagersdk",
     "dsoftbus:softbus_client",
+    "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "googletest:gtest_main",
     "hilog:libhilog",
