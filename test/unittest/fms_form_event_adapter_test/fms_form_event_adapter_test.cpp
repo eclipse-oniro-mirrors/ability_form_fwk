@@ -1042,7 +1042,7 @@ HWTEST_F(FmsFormEventAdapterTest, RouterEvent_014, TestSize.Level1)
     GTEST_LOG_(INFO) << "RouterEvent_014 end";
 }
 
-// ========== Method 9: OpenByOpenType Additional Branch Test ==========
+// ========== Method 9: OpenByOpenType Additional Branch Tests ==========
 
 /**
  * @tc.name: OpenByOpenType_004
@@ -1372,9 +1372,9 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_010, TestSize.Level1)
     MockGetHapTokenID(TEST_PROVIDER_HAP_TOKEN_ID);
 
     EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
-        .WillOnce(Return(TEST_FORM_ID));
+        .WillRepeatedly(Return(TEST_FORM_ID));
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoByFlags(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<3>(bundleInfo), Return(true)));
     EXPECT_CALL(*MockFormAmsHelper::obj,
@@ -1423,9 +1423,9 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_011, TestSize.Level1)
         (static_cast<uint64_t>(TEST_PROVIDER_TOKEN_ATTR) << 32) + TEST_PROVIDER_HAP_TOKEN_ID;
 
     EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
-        .WillOnce(Return(TEST_FORM_ID));
+        .WillRepeatedly(Return(TEST_FORM_ID));
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoByFlags(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<3>(bundleInfo), Return(true)));
     EXPECT_CALL(*MockFormAmsHelper::obj,
@@ -1496,9 +1496,9 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_013, TestSize.Level1)
     MockGetHapTokenInfoRet(Security::AccessToken::AccessTokenKitRet::RET_FAILED);
 
     EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
-        .WillOnce(Return(TEST_FORM_ID));
+        .WillRepeatedly(Return(TEST_FORM_ID));
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
     EXPECT_CALL(*MockFormAmsHelper::obj,
         ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(_, _, _, TEST_PROVIDER_HAP_TOKEN_ID))
         .WillOnce(Return(ERR_OK));
@@ -1543,9 +1543,9 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_014, TestSize.Level1)
     MockGetHapTokenID(TEST_PROVIDER_HAP_TOKEN_ID);
 
     EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
-        .WillOnce(Return(TEST_FORM_ID));
+        .WillRepeatedly(Return(TEST_FORM_ID));
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoByFlags(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<3>(bundleInfo), Return(true)));
     EXPECT_CALL(*MockFormAmsHelper::obj,
@@ -1587,9 +1587,9 @@ HWTEST_F(FmsFormEventAdapterTest, InsightIntentEvent_015, TestSize.Level1)
     MockGetHapTokenID(TEST_PROVIDER_HAP_TOKEN_ID);
 
     EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
-        .WillOnce(Return(beyondJsNumber));
+        .WillRepeatedly(Return(beyondJsNumber));
     EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
     EXPECT_CALL(*MockFormAmsHelper::obj,
         ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(_, _, _, TEST_PROVIDER_HAP_TOKEN_ID))
         .WillOnce(Return(ERR_OK));

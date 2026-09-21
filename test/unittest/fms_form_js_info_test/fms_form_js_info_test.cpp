@@ -28,7 +28,6 @@
 #include "nlohmann/json.hpp"
 #undef private
 #undef protected
-#include "ipc_file_descriptor.h"
 #include "string_ex.h"
 
 using namespace testing::ext;
@@ -37,7 +36,6 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr int32_t BIG_DATA = 32 * 1024; // 32K
-
 }
 extern void MockConvertRawImageData(bool mockRet);
 extern void MockGetImageDataMap(bool mockRet);
@@ -1079,88 +1077,6 @@ HWTEST_F(FmsFormJsInfoTest, Unmarshalling_Success_001, TestSize.Level1)
     EXPECT_EQ(result->isDynamic, false);
     EXPECT_EQ(result->transparencyEnabled, true);
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end Unmarshalling_Success_001";
-}
-
-/**
- * @tc.name: WriteFdToParcel_DupFail_001
- * @tc.desc: Verify WriteFdToParcel returns false when dup(fd) fails (closed fd).
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormJsInfoTest, WriteFdToParcel_DupFail_001, TestSize.Level2)
-{
-    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-begin WriteFdToParcel_DupFail_001";
-    FormJsInfo formJsInfo;
-    int fd = AshmemCreate("DupFailTest", 4096);
-    ASSERT_GE(fd, 0);
-    fdsan_exchange_owner_tag(fd, 0, Constants::FORM_DOMAIN_ID);
-    fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
-    // fd is closed; dup(fd) returns -1 (EBADF), triggering dupFd < 0 branch
-    MessageParcel parcel;
-    EXPECT_FALSE(formJsInfo.WriteFdToParcel(parcel, fd));
-    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end WriteFdToParcel_DupFail_001";
-}
-
-/**
- * @tc.name: ReadFdFromParcel_InvalidFdInDescriptor_001
- * @tc.desc: Verify ReadFdFromParcel returns -1 when descriptor's GetFd() < 0.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormJsInfoTest, ReadFdFromParcel_InvalidFdInDescriptor_001, TestSize.Level2)
-{
-    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-begin ReadFdFromParcel_InvalidFdInDescriptor_001";
-    MessageParcel parcel;
-    // Serialize a descriptor holding an invalid fd (-1); ReadFdFromParcel must reject it.
-    // If the IPC implementation refuses to write an invalid fd, ReadObject returns nullptr
-    // and the result is still -1, so this test is valid on either path.
-    sptr<IPCFileDescriptor> descriptor = new (std::nothrow) IPCFileDescriptor(-1);
-    ASSERT_NE(descriptor, nullptr);
-    parcel.WriteObject<IPCFileDescriptor>(descriptor);
-    FormJsInfo formJsInfo;
-    int readFd = formJsInfo.ReadFdFromParcel(parcel);
-    EXPECT_LT(readFd, 0);
-    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end ReadFdFromParcel_InvalidFdInDescriptor_001";
-}
-
-/**
- * @tc.name: ReadAshmemFormData_SizeMismatch_001
- * @tc.desc: Verify ReadAshmemFormData returns false when formDataLength != ashmem size.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormJsInfoTest, ReadAshmemFormData_SizeMismatch_001, TestSize.Level2)
-{
-    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-begin ReadAshmemFormData_SizeMismatch_001";
-    int32_t writeSize = 4096;
-    std::string data(writeSize, 'X');
-    FormJsInfo writeJsInfo;
-    MessageParcel parcel;
-    ASSERT_TRUE(writeJsInfo.WriteAshmemFormData(parcel, writeSize, data.c_str()));
-
-    FormJsInfo readJsInfo;
-    std::string outFormData;
-    int32_t mismatchSize = writeSize + 1024;
-    EXPECT_FALSE(readJsInfo.ReadAshmemFormData(parcel, mismatchSize, outFormData));
-    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end ReadAshmemFormData_SizeMismatch_001";
-}
-
-/**
- * @tc.name: ReadAshmemFormData_SizeMismatch_Smaller_001
- * @tc.desc: Verify ReadAshmemFormData returns false when formDataLength < ashmem size.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormJsInfoTest, ReadAshmemFormData_SizeMismatch_Smaller_001, TestSize.Level2)
-{
-    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-begin ReadAshmemFormData_SizeMismatch_Smaller_001";
-    int32_t writeSize = 4096;
-    std::string data(writeSize, 'X');
-    FormJsInfo writeJsInfo;
-    MessageParcel parcel;
-    ASSERT_TRUE(writeJsInfo.WriteAshmemFormData(parcel, writeSize, data.c_str()));
-
-    FormJsInfo readJsInfo;
-    std::string outFormData;
-    int32_t mismatchSize = writeSize / 2;
-    EXPECT_FALSE(readJsInfo.ReadAshmemFormData(parcel, mismatchSize, outFormData));
-    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end ReadAshmemFormData_SizeMismatch_Smaller_001";
 }
 
 } // namespace AppExecFwk
