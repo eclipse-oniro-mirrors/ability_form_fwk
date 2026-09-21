@@ -57,6 +57,7 @@ ohos_unittest("FmsFormServiceDiscoveryTest") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
+    "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "googletest:gtest_main",
     "hilog:libhilog",
