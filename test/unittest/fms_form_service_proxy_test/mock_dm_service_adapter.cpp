@@ -130,7 +130,9 @@ int32_t DmServiceAdapter::RegisterServiceInfo(
     const DistributedHardware::DmRegisterServiceInfo &regInfo, int64_t &serviceId)
 {
     GTEST_LOG_(INFO) << "Mock RegisterServiceInfo ret=" << g_registerServiceInfoRet;
-    serviceId = g_registerServiceInfoId;
+    if (g_registerServiceInfoRet == 0) {
+        serviceId = g_registerServiceInfoId;
+    }
     return g_registerServiceInfoRet;
 }
 
