@@ -37,6 +37,8 @@ public:
     virtual ErrCode ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(
         const Want &want, const sptr<IRemoteObject> &callerAbilityToken,
         const InsightIntentExecuteLiteParam &param, uint64_t specifiedFullTokenId) = 0;
+    virtual ErrCode StartAbilityOnlyUIAbility(Want &want, const sptr<IRemoteObject> &callerToken,
+        uint32_t specifyTokenId, const int32_t userId) = 0;
 };
 
 class MockFormAmsHelper : public AbstractMockFormAmsHelper {
@@ -52,6 +54,8 @@ public:
     MOCK_METHOD4(ExecuteUIAbilityForegroundIntentWithSpecifyTokenId, ErrCode(const Want &want,
         const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteLiteParam &param,
         uint64_t specifiedFullTokenId));
+    MOCK_METHOD4(StartAbilityOnlyUIAbility, ErrCode(Want &want, const sptr<IRemoteObject> &callerToken,
+        uint32_t specifyTokenId, const int32_t userId));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -64,5 +64,16 @@ ErrCode FormAmsHelper::ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(const 
     }
     return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
 }
+
+ErrCode FormAmsHelper::StartAbilityOnlyUIAbility(Want &want, const sptr<IRemoteObject> &callerToken,
+    uint32_t specifyTokenId, const int32_t userId)
+{
+    GTEST_LOG_(INFO) << "StartAbilityOnlyUIAbility called";
+    if (AppExecFwk::MockFormAmsHelper::obj) {
+        return AppExecFwk::MockFormAmsHelper::obj->StartAbilityOnlyUIAbility(
+            want, callerToken, specifyTokenId, userId);
+    }
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

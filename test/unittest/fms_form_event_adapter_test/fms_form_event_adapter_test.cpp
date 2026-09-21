@@ -27,6 +27,7 @@
 #include "form_mgr_errors.h"
 #include "want.h"
 #include "accesstoken_kit.h"
+#include "application_info.h"
 #include "data_center/form_record/form_record.h"
 #include "insight_intent/insight_intent_execute_param.h"
 
@@ -1040,6 +1041,57 @@ HWTEST_F(FmsFormEventAdapterTest, RouterEvent_014, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
 
     GTEST_LOG_(INFO) << "RouterEvent_014 end";
+}
+
+/**
+ * @tc.name: RouterEvent_015
+ * @tc.desc: Verify the success path when GetApplicationInfo and StartAbilityOnlyUIAbility
+ *           both succeed: StartAbilityForRouter invokes StartAbilityOnlyUIAbility once and
+ *           NotifyFormClickEvent is triggered (GetRunningFormInfosByFormId called) and uri
+ *           is kept for a system app when enableRouteSecondPage is true
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventAdapterTest, RouterEvent_015, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RouterEvent_015 start";
+
+    Want want;
+    want.SetUri("test://uri");
+    want.SetBundle("com.test.bundle");
+    want.SetParam(Constants::PARAM_ENABLE_ROUTE_SECOND_PAGE, true);
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    sptr<IBundleMgr> mockBundleMgr = new MockBundleMgrStub();
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "com.test.bundle";
+    record.isSystemApp = true;
+
+    ApplicationInfo appInfo;
+    appInfo.accessTokenId = TEST_PROVIDER_HAP_TOKEN_ID;
+
+    RunningFormInfo runningFormInfo;
+    runningFormInfo.hostBundleName = "com.test.host";
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(_))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
+        .WillOnce(Return(mockBundleMgr));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetApplicationInfo(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(appInfo), Return(ERR_OK)));
+    // Verify StartAbilityForRouter is invoked.
+    EXPECT_CALL(*MockFormAmsHelper::obj, StartAbilityOnlyUIAbility(_, _, _, _))
+        .WillOnce(Return(ERR_OK));
+    // Verify NotifyFormClickEvent is triggered after StartAbility succeeds.
+    EXPECT_CALL(*MockFormDataMgr::obj, GetRunningFormInfosByFormId(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<1>(runningFormInfo), Return(ERR_OK)));
+
+    auto result = FormEventAdapter::GetInstance().RouterEvent(TEST_FORM_ID, want, callerToken);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(want.GetUriString(), "test://uri");
+
+    GTEST_LOG_(INFO) << "RouterEvent_015 end";
 }
 
 // ========== Method 9: OpenByOpenType Additional Branch Tests ==========
