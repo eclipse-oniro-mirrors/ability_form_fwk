@@ -43,5 +43,14 @@ std::string FormDistributedMgr::GetUiModuleName(const std::string &bundleName, i
     }
     return "";
 }
+void FormDistributedMgr::SetBundleDistributedStatus(const std::string &bundleName, bool isDistributed,
+    const DistributedModule &distributedModule)
+{
+    GTEST_LOG_(INFO) << "SetBundleDistributedStatus called";
+    if (AppExecFwk::MockFormDistributedMgr::obj) {
+        AppExecFwk::MockFormDistributedMgr::obj->SetBundleDistributedStatus(
+            bundleName, isDistributed, distributedModule);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -74,6 +74,7 @@ ohos_unittest("FmsFormMgrRequestFormTest") {
     "ipc:ipc_core",
     "libxml2:libxml2",
     "memmgr:memmgrclient",
+    "os_account:os_account_innerkits",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "selinux_adapter:librestorecon",

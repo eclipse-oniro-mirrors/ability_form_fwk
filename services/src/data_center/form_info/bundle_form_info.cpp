@@ -60,10 +60,8 @@ ErrCode BundleFormInfo::InitFromJson(const std::string &formInfoStoragesJson)
     return ERR_OK;
 }
 
-ErrCode BundleFormInfo::UpdateStaticFormInfos(std::vector<FormInfo> &formInfos, int32_t userId)
+ErrCode BundleFormInfo::MergeStaticFormInfosLocked(std::vector<FormInfo> &formInfos, int32_t userId)
 {
-    HILOG_INFO("userId is %{public}d", userId);
-    std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     if (!formInfos.empty()) {
         std::vector<FormDBInfo> formDBInfos;
         std::vector<FormInfo> finalFormInfos;
@@ -80,7 +78,7 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(std::vector<FormInfo> &formInfos, 
             HILOG_DEBUG("Add new userId, user:%{public}d", userId);
             formInfoStorages_.emplace_back(userId, finalFormInfos);
         }
-        return UpdateFormInfoStorageLocked();
+        return ERR_OK;
     }
 
     bool IsBundleDistributed = FormDistributedMgr::GetInstance().IsBundleDistributed(bundleName_, userId);
@@ -92,7 +90,41 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(std::vector<FormInfo> &formInfos, 
         HILOG_INFO("clear normal app formInfos, bundleName: %{public}s", bundleName_.c_str());
         formInfoStorages_.clear();
     }
+    return ERR_OK;
+}
+
+ErrCode BundleFormInfo::UpdateStaticFormInfos(std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    HILOG_INFO("userId is %{public}d", userId);
+    std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
+    ErrCode errCode = MergeStaticFormInfosLocked(formInfos, userId);
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
     return UpdateFormInfoStorageLocked();
+}
+
+ErrCode BundleFormInfo::UpdateStaticFormInfosBatch(std::vector<FormInfo> &formInfos, int32_t userId,
+    std::string &formInfoStoragesJson, bool &needRemoveStorage)
+{
+    HILOG_INFO("userId is %{public}d", userId);
+    std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
+    ErrCode errCode = MergeStaticFormInfosLocked(formInfos, userId);
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    needRemoveStorage = formInfoStorages_.empty();
+    if (needRemoveStorage) {
+        formInfoStoragesJson.clear();
+        return ERR_OK;
+    }
+    nlohmann::json jsonObject = formInfoStorages_;
+    if (jsonObject.is_discarded()) {
+        HILOG_ERROR("bad form infos");
+        return ERR_APPEXECFWK_PARSE_BAD_PROFILE;
+    }
+    formInfoStoragesJson = jsonObject.dump(Constants::DUMP_INDENT);
+    return ERR_OK;
 }
 
 ErrCode BundleFormInfo::Remove(int32_t userId)

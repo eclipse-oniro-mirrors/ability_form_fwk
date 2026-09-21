@@ -37,6 +37,10 @@ public:
 
     ErrCode UpdateStaticFormInfos(std::vector<FormInfo> &formInfos, int32_t userId);
 
+    // Memory merge only: the caller commits all bundles of the batch in one RDB transaction.
+    ErrCode UpdateStaticFormInfosBatch(std::vector<FormInfo> &formInfos, int32_t userId,
+        std::string &formInfoStoragesJson, bool &needRemoveStorage);
+
     ErrCode Remove(int32_t userId);
 
     ErrCode AddDynamicFormInfo(const FormInfo &formInfo, int32_t userId);
@@ -66,6 +70,8 @@ public:
 
 private:
     ErrCode UpdateFormInfoStorageLocked();
+
+    ErrCode MergeStaticFormInfosLocked(std::vector<FormInfo> &formInfos, int32_t userId);
 
     void HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
         std::vector<FormInfo> &outFormInfos, const std::vector<FormDBInfo> &formDBInfos);

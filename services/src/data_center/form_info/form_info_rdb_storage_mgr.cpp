@@ -115,6 +115,25 @@ ErrCode FormInfoRdbStorageMgr::UpdateBundleFormInfos(const std::string &bundleNa
     return ERR_OK;
 }
 
+ErrCode FormInfoRdbStorageMgr::BatchUpdateBundleFormInfos(
+    std::vector<std::pair<std::string, std::string>> &&bundleStorages)
+{
+    if (bundleStorages.empty()) {
+        return ERR_OK;
+    }
+    // Prefix keys in place: rebuilding the pairs would copy every storage value (tens of KB each).
+    // Producers guarantee non-empty bundleName (skipped at merge time) and valid JSON.
+    for (auto &item : bundleStorages) {
+        item.first.insert(0, FORM_INFO_PREFIX);
+    }
+    ErrCode result = FormRdbDataMgr::GetInstance().BatchInsert(Constants::FORM_RDB_TABLE_NAME, bundleStorages);
+    if (result != ERR_OK) {
+        HILOG_ERROR("batch update formInfoStorages to rdbStore error, size:%{public}zu", bundleStorages.size());
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return ERR_OK;
+}
+
 void FormInfoRdbStorageMgr::SaveEntries(
     const std::unordered_map<std::string, std::string> &value, std::vector<InnerFormInfo> &innerFormInfos)
 {

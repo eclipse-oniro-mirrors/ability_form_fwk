@@ -526,5 +526,24 @@ ErrCode FormDataMgr::HandleFormRemoveObserver(const std::string hostBundleName, 
     }
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
+const std::string &FormDataMgr::GetTransparencyFormCapabilityKey()
+{
+    GTEST_LOG_(INFO) << "GetTransparencyFormCapabilityKey called";
+    static std::string emptyKey;
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetTransparencyFormCapabilityKey();
+    }
+    return emptyKey;
+}
+
+const std::string &FormDataMgr::GetFormStandbyCapabilityKey()
+{
+    GTEST_LOG_(INFO) << "GetFormStandbyCapabilityKey called";
+    static std::string emptyKey;
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetFormStandbyCapabilityKey();
+    }
+    return emptyKey;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

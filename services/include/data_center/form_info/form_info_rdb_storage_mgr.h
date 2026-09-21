@@ -55,6 +55,15 @@ public:
     ErrCode UpdateBundleFormInfos(const std::string &bundleName, const std::string &formInfoStorages);
 
     /**
+     * @brief Save or update multiple bundles' form info in DB in one transaction.
+     * @param bundleStorages The pairs of bundleName and serialized form info produced by
+     *        UpdateStaticFormInfosBatch (non-empty bundleName and valid JSON guaranteed
+     *        by the producer). The vector is consumed: keys get the storage prefix in place.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode BatchUpdateBundleFormInfos(std::vector<std::pair<std::string, std::string>> &&bundleStorages);
+
+    /**
      * @brief Load all form data from DB to innerFormInfos.
      * @param innerFormInfos Storage all form data.
      * @return Returns ERR_OK on success, others on failure.

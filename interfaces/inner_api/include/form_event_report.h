@@ -46,8 +46,6 @@ public:
         const NewFormEventInfo &eventInfo);
     static void SendFormRefreshCountEvent(const FormEventName &eventName, HiSysEventType type,
         const NewFormEventInfo &eventInfo);
-    static void SendLoadStageFormConfigInfoEvent(const FormEventName &eventName, HiSysEventType type,
-        const NewFormEventInfo &eventInfo);
     static void SendDiskUseEvent();
     static void SendRequestPublicFormEvent(const std::string &callerBundleName, const std::string &formName,
         RequestFormType funcType);

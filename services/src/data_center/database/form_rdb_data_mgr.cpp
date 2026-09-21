@@ -301,6 +301,51 @@ ErrCode FormRdbDataMgr::DeleteData(const std::string &tableName, const std::stri
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
+ErrCode FormRdbDataMgr::BatchInsert(const std::string &tableName,
+    const std::vector<std::pair<std::string, std::string>> &kvPairs)
+{
+    HILOG_DEBUG("BatchInsert start, size:%{public}zu", kvPairs.size());
+    if (kvPairs.empty()) {
+        return ERR_OK;
+    }
+    if (!CheckFormRdbTable(tableName)) {
+        HILOG_ERROR("Form rdb hasn't initialized this table:%{public}s", tableName.c_str());
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        HILOG_ERROR("null FormInfoRdbStore");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    if (rdbStore->BeginTransaction() != NativeRdb::E_OK) {
+        HILOG_ERROR("BeginTransaction failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    for (const auto &[key, value] : kvPairs) {
+        NativeRdb::ValuesBucket valuesBucket;
+        valuesBucket.PutString(FORM_KEY, key);
+        valuesBucket.PutString(FORM_VALUE, value);
+        int64_t rowId = -1;
+        int32_t ret = rdbStore->InsertWithConflictResolution(rowId, tableName, valuesBucket,
+            NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
+        if (ret != NativeRdb::E_OK) {
+            HILOG_ERROR("batch insert failed at key:%{public}s, rollback", key.c_str());
+            rdbStore->RollBack();
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+    }
+    if (rdbStore->Commit() != NativeRdb::E_OK) {
+        HILOG_ERROR("Commit failed");
+        rdbStore->RollBack();
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    if (rdbStore->IsSlaveDiffFromMaster()) {
+        auto backupRet = rdbStore->Backup("");
+        HILOG_WARN("rdb slave corrupt, backup from master, ret=%{public}" PRId32, backupRet);
+    }
+    return ERR_OK;
+}
+
 ErrCode FormRdbDataMgr::QueryData(const std::string &tableName, const std::string &key,
     std::string &value)
 {

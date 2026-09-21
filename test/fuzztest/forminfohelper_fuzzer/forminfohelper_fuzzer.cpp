@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <unordered_map>
 #include <chrono>
 #include <thread>
 #include <fuzzer/FuzzedDataProvider.h>
@@ -47,9 +48,8 @@ namespace OHOS {
 
 constexpr int32_t MAX_STR_LEN = 256;
 
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+static void TestFormInfoLoadAPIs(FuzzedDataProvider &fdp)
 {
-    FuzzedDataProvider fdp(reinterpret_cast<const uint8_t*>(data), size);
     // Test LoadStageFormConfigInfo
     BundleInfo bundleInfo;
     bundleInfo.appId = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
@@ -63,15 +63,13 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     // Test GetResourceManager
     auto resourceManager = FormInfoHelper::GetResourceManager(bundleInfo);
 
-    // Test GetFormInfoDescription
+    // Test GetFormInfoDescription / GetFormInfoDisplayName
     FormInfo formInfo;
     formInfo.name = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
     formInfo.bundleName = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
     formInfo.moduleName = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
     formInfo.descriptionId = fdp.ConsumeIntegral<int32_t>();
     FormInfoHelper::GetFormInfoDescription(resourceManager, formInfo);
-
-    // Test GetFormInfoDisplayName
     formInfo.displayName = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
     FormInfoHelper::GetFormInfoDisplayName(resourceManager, formInfo);
 
@@ -85,41 +83,61 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     extensionInfo.moduleName = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
     extensionInfo.name = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
     extensionInfo.description = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
-
     std::string profileInfo = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
     ExtraFormInfo extraFormInfo;
     extraFormInfo.isDistributedForm = fdp.ConsumeBool();
     extraFormInfo.moduleName = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
     extraFormInfo.isTemplateForm = fdp.ConsumeBool();
-
     FormInfoHelper::LoadFormInfos(formInfos, bundleInfo, extensionInfo, profileInfo, extraFormInfo);
 
-    // Test PrintLoadStageFormConfigInfo
+    // Test PrintLoadStageFormConfigInfo / SetDistributedBundleStatus
     bool hasDistributedForm = fdp.ConsumeBool();
     FormInfoHelper::PrintLoadStageFormConfigInfo(formInfo, hasDistributedForm);
+    FormInfoHelper::SetDistributedBundleStatus(userId, fdp.ConsumeRandomLengthString(MAX_STR_LEN),
+        fdp.ConsumeRandomLengthString(MAX_STR_LEN), fdp.ConsumeRandomLengthString(MAX_STR_LEN),
+        hasDistributedForm);
+}
 
-    // Test SetDistributedBundleStatus
-    std::string entryModule = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
-    std::string uiModule = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
-    std::string bundleInfoName = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
-    FormInfoHelper::SetDistributedBundleStatus(userId, entryModule, uiModule, bundleInfoName, hasDistributedForm);
+static void TestFormInfoUpdateAPIs(FuzzedDataProvider &fdp)
+{
+    BundleInfo bundleInfo;
+    bundleInfo.name = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
+    std::vector<FormInfo> formInfos;
+    int32_t userId = fdp.ConsumeIntegral<int32_t>();
 
-    // Test SendLoadStageFormConfigEvent
-    FormInfoHelper::SendLoadStageFormConfigEvent(formInfo);
-
-    // Test SendLoadStageFormConUpdateFormInfoByAppServicesCapabilityfigEvent
     FormInfoHelper::UpdateFormInfoByAppServicesCapability(bundleInfo, userId, formInfos);
-    // Test UpdateFormInfoTransparencyEnabled
-    FormInfoHelper::UpdateFormInfoTransparencyEnabled(bundleInfo, userId, formInfos);
-    // Test UpdateFormInfoFormStandby
-    FormInfoHelper::UpdateFormInfoFormStandby(bundleInfo, userId, formInfos);
+    FormInfoHelper::UpdateFormInfoTransparencyEnabled(bundleInfo, formInfos, fdp.ConsumeBool());
+    FormInfoHelper::UpdateFormInfoFormStandby(bundleInfo, formInfos, fdp.ConsumeBool());
+
+    // Test CheckAppServicesCapabilities and per-bundle ResourceManager reuse
+    bool isTransparencyEnabled = false;
+    bool isStandbyEnabled = false;
+    FormInfoHelper::CheckAppServicesCapabilities(userId, bundleInfo.name,
+        fdp.ConsumeRandomLengthString(MAX_STR_LEN), fdp.ConsumeRandomLengthString(MAX_STR_LEN),
+        isTransparencyEnabled, isStandbyEnabled);
+
+    ExtensionAbilityInfo extensionInfo;
+    std::string profileInfo = fdp.ConsumeRandomLengthString(MAX_STR_LEN);
+    ExtraFormInfo extraFormInfo;
+
+    std::unordered_map<std::string, std::shared_ptr<Global::Resource::ResourceManager>> resMgrCache;
+    auto resMgr = FormInfoHelper::GetResMgr(resMgrCache, extensionInfo);
+    std::vector<std::string> profilesFromMgr;
+    FormInfoHelper::GetProfilesByResMgr(resMgr, extensionInfo,
+        fdp.ConsumeRandomLengthString(MAX_STR_LEN), profilesFromMgr);
 
     // Test LoadProfileFormInfos
     std::vector<std::string> profileInfos;
     profileInfos.push_back(profileInfo);
     profileInfos.push_back(fdp.ConsumeRandomLengthString(MAX_STR_LEN));
     FormInfoHelper::LoadProfileFormInfos(formInfos, bundleInfo, extensionInfo, profileInfos, extraFormInfo);
+}
 
+bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+{
+    FuzzedDataProvider fdp(reinterpret_cast<const uint8_t*>(data), size);
+    TestFormInfoLoadAPIs(fdp);
+    TestFormInfoUpdateAPIs(fdp);
     return true;
 }
 }

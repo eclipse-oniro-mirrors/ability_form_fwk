@@ -84,6 +84,7 @@
 #include "res_type.h"
 #endif // RES_SCHEDULE_ENABLE
 #include "form_mgr/form_mgr_queue.h"
+#include "common/event/system_event/form_os_account_subscriber.h"
 #include "common/util/form_task_common.h"
 #include "scene_board_judgement.h"
 #include "form_provider/form_provider_mgr.h"
@@ -857,6 +858,11 @@ void FormMgrService::OnStop()
 
     state_ = ServiceRunningState::STATE_NOT_START;
 
+    if (osAccountSubscriber_ != nullptr) {
+        AccountSA::OsAccountManager::UnsubscribeOsAccount(osAccountSubscriber_);
+        osAccountSubscriber_ = nullptr;
+    }
+
     DelayedSingleton<FormShareMgr>::GetInstance()->UnregisterObserver();
 
     if (serialQueue_) {
@@ -935,6 +941,15 @@ ErrCode FormMgrService::Init()
     HILOG_INFO("FMS onStart publish done, time:%{public}s", onStartPublishTime_.c_str());
 
     SubscribeSysEventReceiver();
+
+    // Direct CREATED subscription triggers reload earlier than the CES broadcast.
+    AccountSA::OsAccountSubscribeInfo subscribeInfo(
+        std::set<AccountSA::OsAccountState>{ AccountSA::OsAccountState::CREATED });
+    osAccountSubscriber_ = std::make_shared<FormOsAccountSubscriber>(subscribeInfo);
+    ErrCode subscribeRet = AccountSA::OsAccountManager::SubscribeOsAccount(osAccountSubscriber_);
+    if (subscribeRet != ERR_OK) {
+        HILOG_ERROR("SubscribeOsAccount failed, fallback to broadcast only, err:%{public}d", subscribeRet);
+    }
 #ifdef MEM_MGR_ENABLE
     memStatusListener_ = std::make_shared<MemStatusListener>();
     Memory::MemMgrClient::GetInstance().SubscribeAppState(*memStatusListener_);

@@ -18,10 +18,15 @@
 
 #include <cstdint>
 #include <memory>
+#include <string>
+#include <vector>
 #include "gmock/gmock.h"
+#include "app_provision_info.h"
 #include "bundle_mgr_interface.h"
 #include "bundle_info.h"
 #include "ability_info.h"
+#include "extension_ability_info.h"
+#include "form_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -29,6 +34,7 @@ class AbstractMockFormBmsHelper {
 public:
     virtual ~AbstractMockFormBmsHelper() = default;
     virtual sptr<IBundleMgr> GetBundleMgr() = 0;
+    virtual bool IsBundleMgrValid() = 0;
     virtual ErrCode GetBundleInfoV9(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo) = 0;
     virtual int32_t GetCallerBundleName(std::string &callerBundleName) = 0;
     virtual ErrCode GetApplicationInfo(const std::string &bundleName, int32_t userId, ApplicationInfo &appInfo) = 0;
@@ -39,6 +45,17 @@ public:
     virtual ErrCode GetEnabledCloneIndex(int32_t userId, const std::string &bundleName,
         int32_t &appIndex) = 0;
     virtual int32_t GetUidByBundleName(const std::string &bundleName, int32_t userId, int32_t appIndex) = 0;
+    virtual bool QueryExtensionAbilityInfosByType(ExtensionAbilityType type, int32_t userId,
+        std::vector<ExtensionAbilityInfo> &infos) = 0;
+    virtual bool GetBundleInfos(int32_t flag, std::vector<BundleInfo> &bundleInfos, int32_t userId) = 0;
+    virtual bool GetBundleInfoByFlags(const std::string &bundleName, int32_t flags,
+        int32_t userId, BundleInfo &bundleInfo) = 0;
+    virtual ErrCode BatchGetBundleInfo(const std::vector<std::string> &bundleNames, int32_t flag,
+        std::vector<BundleInfo> &bundleInfos, int32_t userId) = 0;
+    virtual bool GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
+        std::vector<FormInfo> &formInfos) = 0;
+    virtual ErrCode GetAppProvisionInfo(const std::string &bundleName, int32_t userId,
+        AppProvisionInfo &appProvisionInfo) = 0;
 };
 
 class MockFormBmsHelper : public AbstractMockFormBmsHelper {
@@ -47,6 +64,7 @@ public:
     MockFormBmsHelper() = default;
     ~MockFormBmsHelper() override = default;
     MOCK_METHOD0(GetBundleMgr, sptr<IBundleMgr>());
+    MOCK_METHOD0(IsBundleMgrValid, bool());
     MOCK_METHOD3(GetBundleInfoV9, ErrCode(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo));
     MOCK_METHOD1(GetCallerBundleName, int32_t(std::string &callerBundleName));
     MOCK_METHOD3(GetApplicationInfo, ErrCode(const std::string &bundleName, int32_t userId, ApplicationInfo &appInfo));
@@ -56,6 +74,18 @@ public:
         BundleInfo &bundleInfo));
     MOCK_METHOD3(GetEnabledCloneIndex, ErrCode(int32_t userId, const std::string &bundleName, int32_t &appIndex));
     MOCK_METHOD3(GetUidByBundleName, int32_t(const std::string &bundleName, int32_t userId, int32_t appIndex));
+    MOCK_METHOD3(QueryExtensionAbilityInfosByType,
+        bool(ExtensionAbilityType type, int32_t userId, std::vector<ExtensionAbilityInfo> &infos));
+    MOCK_METHOD3(GetBundleInfos, bool(int32_t flag, std::vector<BundleInfo> &bundleInfos, int32_t userId));
+    MOCK_METHOD4(GetBundleInfoByFlags,
+        bool(const std::string &bundleName, int32_t flags, int32_t userId, BundleInfo &bundleInfo));
+    MOCK_METHOD4(BatchGetBundleInfo,
+        ErrCode(const std::vector<std::string> &bundleNames, int32_t flag,
+            std::vector<BundleInfo> &bundleInfos, int32_t userId));
+    MOCK_METHOD3(GetFormsInfoByModule,
+        bool(const std::string &bundleName, const std::string &moduleName, std::vector<FormInfo> &formInfos));
+    MOCK_METHOD3(GetAppProvisionInfo,
+        ErrCode(const std::string &bundleName, int32_t userId, AppProvisionInfo &appProvisionInfo));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

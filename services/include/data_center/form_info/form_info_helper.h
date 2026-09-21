@@ -18,6 +18,7 @@
 
 #include <shared_mutex>
 #include <singleton.h>
+#include <unordered_map>
 
 #include "appexecfwk_errors.h"
 #include "bundle_info.h"
@@ -27,6 +28,8 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+class BundleMgrClient;
+
 struct ExtraFormInfo {
     bool isDistributedForm = false;
     std::string moduleName = "";
@@ -36,7 +39,7 @@ struct ExtraFormInfo {
 class FormInfoHelper {
 public:
     static ErrCode LoadFormConfigInfoByBundleNames(const std::vector<std::string> &bundleNames, int32_t userId,
-        std::map<std::string, std::vector<FormInfo>> &formInfosMap);
+        std::unordered_map<std::string, std::vector<FormInfo>> &formInfosMap);
 
 private:
     static ErrCode LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos);
@@ -54,6 +57,11 @@ private:
 
     static bool LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModuleInfo &shared);
 
+    static void LoadFormsForExtension(const std::shared_ptr<BundleMgrClient> &client,
+        const BundleInfo &bundleInfo, const ExtensionAbilityInfo &extensionInfo, int32_t userId,
+        std::vector<FormInfo> &formInfos,
+        std::unordered_map<std::string, std::shared_ptr<Global::Resource::ResourceManager>> &resMgrCache);
+
     static void LoadFormInfos(std::vector<FormInfo> &formInfos, const BundleInfo &bundleInfo,
         const ExtensionAbilityInfo &extensionInfo, const std::string &profileInfo,
         const ExtraFormInfo &extraFormInfo);
@@ -63,8 +71,6 @@ private:
     static void SetDistributedBundleStatus(int32_t userId, const std::string &entryModule, const std::string &uiModule,
         const std::string &bundleInfoName, bool hasDistributedForm);
 
-    static void SendLoadStageFormConfigEvent(const FormInfo& formInfo);
-
     static void LoadProfileFormInfos(std::vector<FormInfo> &formInfos, const BundleInfo &bundleInfo,
         const ExtensionAbilityInfo &extensionInfo, const std::vector<std::string> &profileInfos,
         const ExtraFormInfo &extraFormInfo);
@@ -72,16 +78,31 @@ private:
     static void UpdateFormInfoByAppServicesCapability(const BundleInfo &bundleInfo, int32_t userId,
         std::vector<FormInfo> &formInfos);
 
-    static void UpdateFormInfoTransparencyEnabled(const BundleInfo &bundleInfo, int32_t userId,
-        std::vector<FormInfo> &formInfos);
+    static void UpdateFormInfoTransparencyEnabled(const BundleInfo &bundleInfo,
+        std::vector<FormInfo> &formInfos, bool isTransparencyEnabled);
 
-    static void UpdateFormInfoFormStandby(const BundleInfo &bundleInfo, int32_t userId,
-        std::vector<FormInfo> &formInfos);
+    static void UpdateFormInfoFormStandby(const BundleInfo &bundleInfo,
+        std::vector<FormInfo> &formInfos, bool isStandbyEnabled);
 
-    static bool CheckAppServicesCapability(int32_t userId, const std::string &bundleName,
-        const std::string &capabilityKey);
+    // Fetches the app provision once and checks both capability keys against it,
+    // replacing the previous per-consumer fetch (two IPCs per bundle).
+    static bool CheckAppServicesCapabilities(int32_t userId, const std::string &bundleName,
+        const std::string &transparencyCapabilityKey, const std::string &standbyCapabilityKey,
+        bool &isTransparencyEnabled, bool &isStandbyEnabled);
 
-    static void LoadExtensionInfos(const BundleInfo &bundleInfo, std::vector<ExtensionAbilityInfo> &extensionInfos);
+    static std::shared_ptr<Global::Resource::ResourceManager> GetResMgr(
+        std::unordered_map<std::string, std::shared_ptr<Global::Resource::ResourceManager>> &resMgrCache,
+        const ExtensionAbilityInfo &extensionInfo);
+
+    static bool GetProfilesByResMgr(const std::shared_ptr<Global::Resource::ResourceManager> &resMgr,
+        const ExtensionAbilityInfo &extensionInfo, const std::string &metadataName,
+        std::vector<std::string> &profileInfos);
+
+    static bool GetCompressedProfile(const std::shared_ptr<Global::Resource::ResourceManager> &resMgr,
+        const std::string &profileName, std::string &profile);
+
+    static bool GetRawFileProfile(const std::shared_ptr<Global::Resource::ResourceManager> &resMgr,
+        const std::string &profileName, std::string &profile);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

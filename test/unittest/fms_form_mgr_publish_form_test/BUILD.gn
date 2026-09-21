@@ -84,6 +84,7 @@ ohos_unittest("FmsFormMgrPublishFormTest") {
     "kv_store:distributeddata_inner",
     "libxml2:libxml2",
     "memmgr:memmgrclient",
+    "os_account:os_account_innerkits",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "selinux_adapter:librestorecon",

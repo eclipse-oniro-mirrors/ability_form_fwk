@@ -34,6 +34,15 @@ sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
     return nullptr;
 }
 
+bool FormBmsHelper::IsBundleMgrValid()
+{
+    GTEST_LOG_(INFO) << "IsBundleMgrValid called";
+    if (AppExecFwk::MockFormBmsHelper::obj) {
+        return AppExecFwk::MockFormBmsHelper::obj->IsBundleMgrValid();
+    }
+    return false;
+}
+
 ErrCode FormBmsHelper::GetBundleInfoV9(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo)
 {
     GTEST_LOG_(INFO) << "GetBundleInfoV9 called";
@@ -98,6 +107,65 @@ int32_t FormBmsHelper::GetUidByBundleName(const std::string &bundleName, int32_t
         return AppExecFwk::MockFormBmsHelper::obj->GetUidByBundleName(bundleName, userId, appIndex);
     }
     return static_cast<int32_t>(INVALID_UID);
+}
+
+bool FormBmsHelper::QueryExtensionAbilityInfosByType(ExtensionAbilityType type, int32_t userId,
+    std::vector<ExtensionAbilityInfo> &infos)
+{
+    GTEST_LOG_(INFO) << "QueryExtensionAbilityInfosByType called";
+    if (AppExecFwk::MockFormBmsHelper::obj) {
+        return AppExecFwk::MockFormBmsHelper::obj->QueryExtensionAbilityInfosByType(type, userId, infos);
+    }
+    return false;
+}
+
+bool FormBmsHelper::GetBundleInfos(int32_t flag, std::vector<BundleInfo> &bundleInfos, int32_t userId)
+{
+    GTEST_LOG_(INFO) << "GetBundleInfos called";
+    if (AppExecFwk::MockFormBmsHelper::obj) {
+        return AppExecFwk::MockFormBmsHelper::obj->GetBundleInfos(flag, bundleInfos, userId);
+    }
+    return false;
+}
+
+bool FormBmsHelper::GetBundleInfoByFlags(const std::string &bundleName, int32_t flags,
+    int32_t userId, BundleInfo &bundleInfo)
+{
+    GTEST_LOG_(INFO) << "GetBundleInfoByFlags called";
+    if (AppExecFwk::MockFormBmsHelper::obj) {
+        return AppExecFwk::MockFormBmsHelper::obj->GetBundleInfoByFlags(bundleName, flags, userId, bundleInfo);
+    }
+    return false;
+}
+
+ErrCode FormBmsHelper::BatchGetBundleInfo(const std::vector<std::string> &bundleNames, int32_t flag,
+    std::vector<BundleInfo> &bundleInfos, int32_t userId)
+{
+    GTEST_LOG_(INFO) << "BatchGetBundleInfo called";
+    if (AppExecFwk::MockFormBmsHelper::obj) {
+        return AppExecFwk::MockFormBmsHelper::obj->BatchGetBundleInfo(bundleNames, flag, bundleInfos, userId);
+    }
+    return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+}
+
+bool FormBmsHelper::GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
+    std::vector<FormInfo> &formInfos)
+{
+    GTEST_LOG_(INFO) << "GetFormsInfoByModule called";
+    if (AppExecFwk::MockFormBmsHelper::obj) {
+        return AppExecFwk::MockFormBmsHelper::obj->GetFormsInfoByModule(bundleName, moduleName, formInfos);
+    }
+    return false;
+}
+
+ErrCode FormBmsHelper::GetAppProvisionInfo(const std::string &bundleName, int32_t userId,
+    AppProvisionInfo &appProvisionInfo)
+{
+    GTEST_LOG_(INFO) << "GetAppProvisionInfo called";
+    if (AppExecFwk::MockFormBmsHelper::obj) {
+        return AppExecFwk::MockFormBmsHelper::obj->GetAppProvisionInfo(bundleName, userId, appProvisionInfo);
+    }
+    return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

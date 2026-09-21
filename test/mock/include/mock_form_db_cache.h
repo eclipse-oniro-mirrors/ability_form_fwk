@@ -31,6 +31,8 @@ public:
     virtual ErrCode GetDBRecord(const int64_t formId, FormRecord &record) const = 0;
     virtual ErrCode UpdateDBRecord(const int64_t formId, const FormRecord &record) const = 0;
     virtual void GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos) = 0;
+    virtual void GetAllFormDBInfoByBundleName(const std::string &bundleName, const int32_t userId,
+        std::vector<FormDBInfo> &formDBInfos, const int32_t appIndex) = 0;
 };
 
 class MockFormDbCache : public AbstractMockFormDbCache {
@@ -41,6 +43,8 @@ public:
     MOCK_CONST_METHOD2(GetDBRecord, ErrCode(const int64_t formId, FormRecord &record));
     MOCK_CONST_METHOD2(UpdateDBRecord, ErrCode(const int64_t formId, const FormRecord &record));
     MOCK_METHOD1(GetAllFormInfo, void(std::vector<FormDBInfo> &formDBInfos));
+    MOCK_METHOD4(GetAllFormDBInfoByBundleName, void(const std::string &bundleName, const int32_t userId,
+        std::vector<FormDBInfo> &formDBInfos, const int32_t appIndex));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

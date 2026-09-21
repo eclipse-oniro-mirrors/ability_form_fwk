@@ -239,6 +239,7 @@ ohos_static_library("libfms_internal_static") {
     "services/src/form_mgr/form_lifecycle_adapter.cpp",
     "services/src/form_mgr/form_mgr_adapter_facade.cpp",
     "services/src/form_mgr/form_mgr_service.cpp",
+    "services/src/common/event/system_event/form_os_account_subscriber.cpp",
     "services/src/form_mgr/form_observer_adapter.cpp",
     "services/src/form_mgr/form_publish_adapter.cpp",
     "services/src/form_mgr/form_query_adapter.cpp",

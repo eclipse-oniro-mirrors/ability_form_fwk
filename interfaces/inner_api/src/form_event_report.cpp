@@ -61,7 +61,6 @@ constexpr const char *EVENT_KEY_CLIENT_BUNDLE_NAME = "CLIENT_BUNDLE_NAME";
 constexpr const char *EVENT_KEY_FORM_BUNDLE_NAME = "FORM_BUNDLE_NAME";
 constexpr const char *EVENT_KEY_FORM_APP_PID = "FORM_APP_PID";
 constexpr const char *EVENT_KEY_TIMESTAMP = "TIMESTAMP";
-constexpr const char *EVENT_KEY_RENDERING_MODE = "RENDERING_MODE";
 constexpr const char *EVENT_KEY_CONDITION_TYPE = "CONDITION_TYPE";
 constexpr const char *EVENT_KEY_BUNDLE_FORMNAME = "BUNDLE_FORMNAME";
 constexpr const char *EVENT_KEY_IS_DISTRIBUTED_FORM = "IS_DISTRIBUTED_FORM";
@@ -100,7 +99,6 @@ static const std::unordered_map<FormEventName, const char*> EVENT_NAME_MAP = {
     {FormEventName::INVALID_PUBLISH_FORM_TO_HOST, "INVALID_PUBLISH_FORM_TO_HOST"},
     {FormEventName::UNBIND_FORM_APP, "UNBIND_FORM_APP"},
     {FormEventName::CONDITION_UPDATE_FORM, "CONDITION_UPDATE_FORM"},
-    {FormEventName::LOAD_STAGE_FORM_CONFIG_INFO, "LOAD_STAGE_FORM_CONFIG_INFO"},
     {FormEventName::DELETE_FORM_FAILED, "DELETE_FORM_FAILED"},
     {FormEventName::UPDATE_FORM_FAILED, "UPDATE_FORM_FAILED"},
     {FormEventName::RECYCLE_RECOVER_FORM_FAILED, "RECYCLE_RECOVER_FORM_FAILED"},
@@ -418,23 +416,6 @@ void FormEventReport::SendConditonUpdateFormEvent(const FormEventName &eventName
         FormHiSysEventBuilder builder;
         builder.InsertParam(EVENT_KEY_CONDITION_TYPE, static_cast<int32_t>(eventInfo.conditionType));
         builder.InsertParam(EVENT_KEY_BUNDLE_FORMNAME, eventInfo.bundleAndFormName);
-        builder.Write("FORM_MANAGER", name, static_cast<HiSysEventEventType>(type));
-    }
-}
-
-void FormEventReport::SendLoadStageFormConfigInfoEvent(const FormEventName &eventName, HiSysEventType type,
-    const NewFormEventInfo &eventInfo)
-{
-    std::string name = ConvertEventName(eventName);
-    if (name == INVALIDEVENTNAME) {
-        HILOG_ERROR("invalid eventName");
-        return;
-    }
-    if (eventName == FormEventName::LOAD_STAGE_FORM_CONFIG_INFO) {
-        FormHiSysEventBuilder builder;
-        builder.InsertParam(EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName);
-        builder.InsertParam(EVENT_KEY_FORM_NAME, eventInfo.formName);
-        builder.InsertParam(EVENT_KEY_RENDERING_MODE, static_cast<int32_t>(eventInfo.renderingMode));
         builder.Write("FORM_MANAGER", name, static_cast<HiSysEventEventType>(type));
     }
 }
