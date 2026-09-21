@@ -14,7 +14,9 @@
  */
 
 #include <gtest/gtest.h>
-#include <chrono>
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
 #include <string>
 
 #include "common/util/form_util.h"
@@ -62,24 +64,24 @@ bool FormUtil::VerifyCallingPermission(std::string_view permissionName)
 
 int64_t FormUtil::GetCurrentMillisecond()
 {
-    auto now = std::chrono::steady_clock::now();
-    return std::chrono::duration_cast<std::chrono::milliseconds>(
-        now.time_since_epoch()).count();
+    return 1000;
 }
 
 bool FormUtil::ConvertStringToInt64(std::string_view strInfo, int64_t &int64Value)
 {
     if (strInfo.empty()) {
+        int64Value = 0;
+        return true;
+    }
+    std::string s(strInfo);
+    errno = 0;
+    char *end = nullptr;
+    long long val = strtoll(s.c_str(), &end, 10);
+    if (errno != 0 || end == s.c_str() || *end != '\0') {
         return false;
     }
-    try {
-        size_t pos = 0;
-        std::string s(strInfo);
-        int64Value = std::stoll(s, &pos);
-        return pos == s.length();
-    } catch (...) {
-        return false;
-    }
+    int64Value = static_cast<int64_t>(val);
+    return true;
 }
 
 } // namespace AppExecFwk
