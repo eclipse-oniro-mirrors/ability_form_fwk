@@ -398,7 +398,7 @@ napi_value JsLiveFormExtensionContext::OnDisconnectAbility(napi_env env, NapiCal
     GetConnectionInfo(want, connection, connectId);
     // begin disconnect
     NapiAsyncTask::CompleteCallback complete =
-        [weak = context_, want, connection](napi_env env, NapiAsyncTask &task, int32_t status) {
+        [weak = context_, want, connection, connectId](napi_env env, NapiAsyncTask &task, int32_t status) {
             auto context = weak.lock();
             if (!context) {
                 HILOG_ERROR("null context");
@@ -417,6 +417,7 @@ napi_value JsLiveFormExtensionContext::OnDisconnectAbility(napi_env env, NapiCal
                 task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
                     FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)));
             } else {
+                RemoveConnection(connectId);
                 task.Resolve(env, CreateJsUndefined(env));
             }
         };

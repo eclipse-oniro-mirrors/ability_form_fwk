@@ -19,7 +19,6 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 bool g_mockConvertRawImageDataRet = true;
-bool g_mockGetImageDataMapRet = true;
 }
 
 void MockConvertRawImageData(bool mockRet)
@@ -27,33 +26,9 @@ void MockConvertRawImageData(bool mockRet)
     g_mockConvertRawImageDataRet = mockRet;
 }
 
-void MockGetImageDataMap(bool mockRet)
-{
-    g_mockGetImageDataMapRet = mockRet;
-}
-
 bool FormProviderData::ConvertRawImageData()
 {
     return g_mockConvertRawImageDataRet;
-}
-
-std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> FormProviderData::GetImageDataMap() const
-{
-    sptr<FormAshmem> formAshmem = new (std::nothrow) FormAshmem();
-    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-    int32_t a = 1;
-    int32_t maxNumber = 130;
-    int32_t normalNumber = 100;
-    if (g_mockGetImageDataMapRet) {
-        for (int32_t i = 0; i < maxNumber; i++) {
-            imageDataMap.emplace("aa" + std::to_string(i), std::make_pair(formAshmem, a));
-        }
-    } else {
-        for (int32_t i = 0; i < normalNumber; i++) {
-            imageDataMap.emplace("aa" + std::to_string(i), std::make_pair(formAshmem, a));
-        }
-    }
-    return imageDataMap;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

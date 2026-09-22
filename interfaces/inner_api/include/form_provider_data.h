@@ -28,6 +28,8 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+constexpr int IMAGE_DATA_THRESHOLD = 128;
+
 /**
  * @class FormProviderData
  * Defines form provider data.

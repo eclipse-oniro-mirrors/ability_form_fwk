@@ -183,14 +183,15 @@ int FormDataAdapter::RequestForm(const int64_t formId,
     }
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    UpdateFormRenderParam(matchedFormId, callerToken, want);
-    FormDataMgr::GetInstance().UpdateHostWant(formId, want, true);
     FormRecord record;
     bool result = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!result) {
         HILOG_ERROR("not exist such formId:%{public}" PRId64 ".", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
+
+    UpdateFormRenderParam(matchedFormId, callerToken, want);
+    FormDataMgr::GetInstance().UpdateHostWant(formId, want, true);
 
     RefreshData data;
     data.callingUid = IPCSkeleton::GetCallingUid();

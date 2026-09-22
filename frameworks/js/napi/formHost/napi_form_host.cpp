@@ -1237,6 +1237,7 @@ napi_value NapiFormHost::OnShareForm(napi_env env, size_t argc, napi_value* argv
 
     ShareFormTask task = [env, asyncTask](int32_t code) {
         HILOG_DEBUG("task complete code: %{public}d", code);
+        AbilityRuntime::HandleScope scopeGuard(env);
         if (code == ERR_OK) {
             asyncTask->Resolve(env, CreateJsUndefined(env));
         } else {
@@ -1822,9 +1823,13 @@ napi_value NapiFormHost::OnDeleteInvalidForms(napi_env env, size_t argc, napi_va
             onDeleteInvalidForms->iFormIds.push_back(formIdValue);
         }
     }
-    auto execute = [data = onDeleteInvalidForms] {
+    auto execute = [data = onDeleteInvalidForms, errCode] {
         if (data == nullptr) {
             HILOG_ERROR("onDeleteInvalidForms is nullptr.");
+            return;
+        }
+        if (errCode != ERR_OK) {
+            HILOG_ERROR("parse param failed, code is %{public}d", errCode);
             return;
         }
         data->result = FormMgr::GetInstance().DeleteInvalidForms(

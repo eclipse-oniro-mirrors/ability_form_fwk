@@ -51,7 +51,11 @@ int32_t FormPublishInterceptorProxy::ProcessPublishForm(const AAFwk::Want &want)
         HILOG_ERROR("SendRequest:%{public}d failed", error);
         return error;
     }
-    int32_t result = reply.ReadInt32();
+    int32_t result = 0;
+    if (!reply.ReadInt32(result)) {
+        HILOG_ERROR("read replyResult failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     HILOG_DEBUG("get result from server data = %{public}d", result);
     return result;
 }

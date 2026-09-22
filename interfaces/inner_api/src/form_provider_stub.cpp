@@ -109,7 +109,11 @@ int FormProviderStub::HandleAcquireProviderFormInfo(MessageParcel &data, Message
  */
 int FormProviderStub::HandleNotifyFormDelete(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
         HILOG_ERROR("ReadParcelable<FormReqInfo> failed");
@@ -164,7 +168,11 @@ int FormProviderStub::HandleNotifyFormsDelete(MessageParcel &data, MessageParcel
  */
 int FormProviderStub::HandleNotifyFormUpdate(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
 
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
@@ -228,7 +236,11 @@ int FormProviderStub::HandleEventNotify(MessageParcel &data, MessageParcel &repl
  */
 int FormProviderStub::HandleNotifyFormCastTempForm(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
 
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {

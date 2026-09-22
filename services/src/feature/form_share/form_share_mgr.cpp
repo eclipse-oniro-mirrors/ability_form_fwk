@@ -37,9 +37,19 @@ namespace {
 constexpr int64_t FORM_SHARE_INFO_DELAY_TIMER = 50000;
 constexpr int64_t FORM_PACKAGE_FREE_INSTALL_TIMER = 40000;
 constexpr int64_t FORM_SHARE_INFO_MAX_SIZE = 32;
-// The specification limits for bundleName, moduleName, abilityName, and formName are 128, 128, 127, and 127.
-constexpr size_t MAX_FORM_SHARE_INFO_KEY_LENGTH = 510;
 constexpr const char* ACTION_SHARE_FORM = "action.form.share";
+
+std::string BuildFormShareInfoKey(const std::string &bundleName, const std::string &moduleName,
+    const std::string &abilityName, const std::string &formName)
+{
+    // Length-prefixed encoding prevents collisions from concatenation without separators.
+    std::string key;
+    key.append(std::to_string(bundleName.length())).append(":").append(bundleName);
+    key.append(std::to_string(moduleName.length())).append(":").append(moduleName);
+    key.append(std::to_string(abilityName.length())).append(":").append(abilityName);
+    key.append(std::to_string(formName.length())).append(":").append(formName);
+    return key;
+}
 }
 
 FormShareMgr::FormShareMgr()
@@ -69,16 +79,15 @@ int32_t FormShareMgr::ShareForm(int64_t formId, const std::string &deviceId, con
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    {
-        std::unique_lock<std::shared_mutex> guard(requestMapMutex_);
-        requestMap_.emplace(requestCode, callerToken);
-    }
-
     sptr<FormShareConnection> formShareConnection = new (std::nothrow) FormShareConnection(
         formId, formRecord.bundleName, formRecord.abilityName, deviceId, requestCode, formRecord.providerUserId);
     if (formShareConnection == nullptr) {
         HILOG_ERROR("create formShareConnection failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    {
+        std::unique_lock<std::shared_mutex> guard(requestMapMutex_);
+        requestMap_.emplace(requestCode, callerToken);
     }
     Want want;
     want.SetElementName(formRecord.bundleName, formRecord.abilityName);
@@ -214,6 +223,13 @@ bool FormShareMgr::CheckFormShareInfo(const FormShareInfo &info)
         info.abilityName.empty() || info.formName.empty() || info.deviceId.empty()) {
         return false;
     }
+    if (info.bundleName.length() > Constants::MAX_BUNDLE_NAME_LENGTH ||
+        info.moduleName.length() > Constants::MAX_MODULE_NAME_LENGTH ||
+        info.abilityName.length() > Constants::MAX_ABILITY_NAME_LENGTH ||
+        info.formName.length() > Constants::MAX_FORM_NAME_LENGTH) {
+        HILOG_ERROR("form share info field length exceeds limit");
+        return false;
+    }
     if (info.providerShareData.Size() > FORM_SHARE_INFO_MAX_SIZE) {
         HILOG_ERROR("providerShareData too many keys: %{public}d", info.providerShareData.Size());
         return false;
@@ -230,12 +246,7 @@ bool FormShareMgr::CheckFormShareInfo(const FormShareInfo &info)
 
 std::string FormShareMgr::MakeFormShareInfoKey(const FormShareInfo &info)
 {
-    std::string key = info.bundleName + info.moduleName + info.abilityName + info.formName;
-    if (key.length() > MAX_FORM_SHARE_INFO_KEY_LENGTH) {
-        HILOG_ERROR("FormShareInfoKey length %{public}zu exceeds limit, truncate it.", key.length());
-        key = "";
-    }
-    return key;
+    return BuildFormShareInfoKey(info.bundleName, info.moduleName, info.abilityName, info.formName);
 }
 
 std::string FormShareMgr::MakeFormShareInfoKey(const Want &want)
@@ -244,12 +255,7 @@ std::string FormShareMgr::MakeFormShareInfoKey(const Want &want)
     std::string abilityName = want.GetElement().GetAbilityName();
     std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    std::string key = bundleName + moduleName + abilityName + formName;
-    if (key.length() > MAX_FORM_SHARE_INFO_KEY_LENGTH) {
-        HILOG_ERROR("FormShareInfoKey length %{public}zu exceeds limit, truncate it.", key.length());
-        key = "";
-    }
-    return key;
+    return BuildFormShareInfoKey(bundleName, moduleName, abilityName, formName);
 }
 
 void FormShareMgr::StartFormUser(const FormShareInfo &info, const int32_t userId)
@@ -523,9 +529,11 @@ void FormShareMgr::HandleProviderShareData(int64_t formId, const std::string &re
     formShareInfo.dimensionId = formRecord.specification;
     formShareInfo.providerShareData = wantParams;
 
-    if (formDmsClient_ == nullptr) {
-        formDmsClient_ = std::make_unique<FormDistributedClient>();
-    }
+    std::call_once(formDmsClientInitFlag_, [this]() {
+        if (formDmsClient_ == nullptr) {
+            formDmsClient_ = std::make_unique<FormDistributedClient>();
+        }
+    });
     int32_t retval = formDmsClient_->ShareForm(remoteDeviceId, formShareInfo);
     if (retval != ERR_OK) {
         HILOG_ERROR("fail share form from DMS retval = %{public}d", retval);

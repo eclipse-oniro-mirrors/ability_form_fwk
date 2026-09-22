@@ -2243,9 +2243,13 @@ ErrCode FormMgrProxy::GetFormInstance(IFormMgr::Message code, MessageParcel &dat
     if (error != ERR_OK) {
         return error;
     }
-    error = reply.ReadInt32();
-    if (error != ERR_OK) {
+    error = 0;
+    if (!reply.ReadInt32(error)) {
         HILOG_ERROR("read replyResult failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (error != ERR_OK) {
+        HILOG_ERROR("GetFormInstance failed, error: %{public}d", error);
         return error;
     }
     auto ret = GetParcelableInfos<FormInstance>(reply, formInstances);

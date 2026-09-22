@@ -38,7 +38,6 @@ namespace {
 constexpr int32_t BIG_DATA = 32 * 1024; // 32K
 }
 extern void MockConvertRawImageData(bool mockRet);
-extern void MockGetImageDataMap(bool mockRet);
 
 class FmsFormJsInfoTest : public testing::Test {
 public:
@@ -121,8 +120,15 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_003, TestSize.Level0)
     FormJsInfo formJsInfo;
     // mock ConvertRawImageData is true
     MockConvertRawImageData(true);
-    // mock GetImageDataMap size is 110
-    MockGetImageDataMap(false);
+    // GetImageDataMap size is 100, not exceeding IMAGE_DATA_THRESHOLD
+    sptr<FormAshmem> formAshmem = new (std::nothrow) FormAshmem();
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    int32_t a = 1;
+    int32_t normalNumber = 100;
+    for (int32_t i = 0; i < normalNumber; i++) {
+        imageDataMap.emplace("aa" + std::to_string(i), std::make_pair(formAshmem, a));
+    }
+    formJsInfo.formProviderData.SetImageDataMap(imageDataMap);
     EXPECT_EQ(true, formJsInfo.ConvertRawImageData());
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_003 end";
 }
@@ -674,7 +680,7 @@ HWTEST_F(FmsFormJsInfoTest, WriteImageData_STATE_ADDED_OverThreshold_001, TestSi
     sptr<FormAshmem> formAshmem = new (std::nothrow) FormAshmem();
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
     int32_t a = 1;
-    for (int32_t i = 0; i < FormJsInfo::IMAGE_DATA_THRESHOLD + 1; i++) {
+    for (int32_t i = 0; i < IMAGE_DATA_THRESHOLD + 1; i++) {
         imageDataMap.emplace("aa" + std::to_string(i), std::make_pair(formAshmem, a));
     }
     writeJsInfo.formProviderData.SetImageDataMap(imageDataMap);
@@ -749,7 +755,7 @@ HWTEST_F(FmsFormJsInfoTest, ReadImageData_STATE_ADDED_OverThreshold_001, TestSiz
     FormJsInfo formJsInfo;
     MessageParcel parcel;
     parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_ADDED);
-    parcel.WriteInt32(FormJsInfo::IMAGE_DATA_THRESHOLD + 1);
+    parcel.WriteInt32(IMAGE_DATA_THRESHOLD + 1);
     formJsInfo.ReadImageData(parcel);
     EXPECT_TRUE(formJsInfo.imageDataMap.empty());
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end ReadImageData_STATE_ADDED_OverThreshold_001";

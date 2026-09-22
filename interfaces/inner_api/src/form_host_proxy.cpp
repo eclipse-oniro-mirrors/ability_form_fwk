@@ -189,7 +189,11 @@ void FormHostProxy::OnAcquireDataResponse(const AAFwk::WantParams &wantParams, i
 template<typename T>
 int  FormHostProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos)
 {
-    int32_t infoSize = reply.ReadInt32();
+    int32_t infoSize = 0;
+    if (!reply.ReadInt32(infoSize)) {
+        HILOG_ERROR("read size failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     if (infoSize < 0 || infoSize > MAX_ALLOW_SIZE) {
         HILOG_ERROR("invalid size:%{public}d", infoSize);
         return ERR_APPEXECFWK_PARCEL_ERROR;

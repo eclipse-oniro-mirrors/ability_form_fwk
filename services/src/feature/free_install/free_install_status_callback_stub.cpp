@@ -25,14 +25,26 @@ FreeInstallStatusCallBackStub::FreeInstallStatusCallBackStub()
 
 int32_t FreeInstallStatusCallBackStub::OnInstallFinishedInner(MessageParcel &data, MessageParcel &reply)
 {
-    auto resultCode = data.ReadInt32();
+    int32_t resultCode = 0;
+    if (!data.ReadInt32(resultCode)) {
+        HILOG_ERROR("read resultCode failed");
+        return ERR_INVALID_VALUE;
+    }
     std::unique_ptr<AAFwk::Want> want(data.ReadParcelable<AAFwk::Want>());
     if (want == nullptr) {
         HILOG_ERROR("null want");
         return ERR_INVALID_VALUE;
     }
 
-    auto userId = data.ReadInt32();
+    int32_t userId = 0;
+    if (!data.ReadInt32(userId)) {
+        HILOG_ERROR("read userId failed");
+        return ERR_INVALID_VALUE;
+    }
+    if (userId < 0) {
+        HILOG_ERROR("invalid userId:%{public}d", userId);
+        return ERR_INVALID_VALUE;
+    }
     OnInstallFinished(resultCode, *want, userId);
     return NO_ERROR;
 }

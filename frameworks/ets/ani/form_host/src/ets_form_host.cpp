@@ -2060,7 +2060,12 @@ void GetFormsInfoByFilter([[maybe_unused]] ani_env *env, ani_object filterObj, a
     }
 
     if (!isUndefined) {
-        AniParseIntArray(env, supportDimensionAni, filter.supportDimensions);
+        if (!AniParseIntArray(env, supportDimensionAni, filter.supportDimensions)) {
+            HILOG_ERROR("Cannot parse supportedDimensions");
+            InvokeAsyncWithBusinessError(env, callback,
+                static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+            return;
+        }
         if (VectorHasNegativeValue(filter.supportDimensions)) {
             HILOG_ERROR("Dimensions value should not be negative.");
             InvokeAsyncWithBusinessError(env, callback,
@@ -2084,7 +2089,12 @@ void GetFormsInfoByFilter([[maybe_unused]] ani_env *env, ani_object filterObj, a
     }
 
     if (!isUndefined) {
-        AniParseIntArray(env, supportedShapes, filter.supportShapes);
+        if (!AniParseIntArray(env, supportedShapes, filter.supportShapes)) {
+            HILOG_ERROR("Cannot parse supportedShapes");
+            InvokeAsyncWithBusinessError(env, callback,
+                static_cast<int32_t>(ERR_APPEXECFWK_FORM_INVALID_PARAM), nullptr);
+            return;
+        }
         if (VectorHasNegativeValue(filter.supportShapes)) {
             HILOG_ERROR("Shapes value should not be negative.");
             InvokeAsyncWithBusinessError(env, callback,
