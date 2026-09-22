@@ -59,10 +59,12 @@ napi_value JsFormEditExtensionContext::CreateJsFormEditExtensionContext(
 
     napi_value objValue = CreateJsExtensionContext(env, context, abilityInfo);
     std::unique_ptr<JsFormEditExtensionContext> jsContext = std::make_unique<JsFormEditExtensionContext>(context);
-    napi_status status = napi_wrap(env, objValue, jsContext.release(), Finalizer, nullptr, nullptr);
+    napi_status status = napi_wrap(env, objValue, jsContext.get(), Finalizer, nullptr, nullptr);
     if (status != napi_ok) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "Failed to do napi wrap");
+        TAG_LOGE(AAFwkTag::UI_EXT, "Failed to do napi wrap:%{public}d", status);
+        return nullptr;
     }
+    jsContext.release();
 
     const char *moduleName = "JsFormEditExtensionContext";
     BindNativeFunction(env, objValue, "startSecondPage", moduleName, StartSecondPage);

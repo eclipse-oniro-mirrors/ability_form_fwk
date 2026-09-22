@@ -30,7 +30,6 @@ namespace AppExecFwk {
  * Defines form js info.
  */
 struct FormJsInfo : public Parcelable {
-    static constexpr int IMAGE_DATA_THRESHOLD = 128;
     static constexpr int BIG_DATA = 32 * 1024;
     int64_t formId;
     std::string formName;

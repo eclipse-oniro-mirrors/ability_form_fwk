@@ -19,6 +19,7 @@
 #include "app_scheduler_interface.h"
 #include "errors.h"
 #include "fms_log_wrapper.h"
+#include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
@@ -195,7 +196,11 @@ int32_t FormHostStub::HandleOnAcquireDataResponse(MessageParcel &data, MessagePa
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    auto requestCode = data.ReadInt64();
+    int64_t requestCode = 0;
+    if (!data.ReadInt64(requestCode)) {
+        HILOG_ERROR("read requestCode failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
 
     OnAcquireDataResponse(*wantParams, requestCode);
     reply.WriteInt32(ERR_OK);
@@ -218,7 +223,11 @@ int32_t FormHostStub::HandleOnEnableForm(MessageParcel &data, MessageParcel &rep
         HILOG_ERROR("fail ReadInt64Vector<formIds>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    bool enable = data.ReadBool();
+    bool enable = false;
+    if (!data.ReadBool(enable)) {
+        HILOG_ERROR("read enable failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     OnEnableForm(formIds, enable);
     reply.WriteInt32(ERR_OK);
     return ERR_OK;
@@ -232,7 +241,11 @@ int32_t FormHostStub::HandleOnLockForm(MessageParcel &data, MessageParcel &reply
         HILOG_ERROR("fail ReadInt64Vector<formIds>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    bool enable = data.ReadBool();
+    bool enable = false;
+    if (!data.ReadBool(enable)) {
+        HILOG_ERROR("read enable failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     OnLockForm(formIds, enable);
     reply.WriteInt32(ERR_OK);
     return ERR_OK;
@@ -240,12 +253,25 @@ int32_t FormHostStub::HandleOnLockForm(MessageParcel &data, MessageParcel &reply
  
 int32_t FormHostStub::HandleOnErrorForms(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t errorCode = data.ReadInt32();
-    std::string errorMsg = Str16ToStr8(data.ReadString16());
+    int32_t errorCode = 0;
+    if (!data.ReadInt32(errorCode)) {
+        HILOG_ERROR("read errorCode failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::u16string errorMsgU16;
+    if (!data.ReadString16(errorMsgU16)) {
+        HILOG_ERROR("read errorMsg failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::string errorMsg = Str16ToStr8(errorMsgU16);
     std::vector<int64_t> formIds;
     bool ret = data.ReadInt64Vector(&formIds);
     if (!ret) {
         HILOG_ERROR("fail ReadInt64Vector<formIds>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (formIds.size() > Constants::ONE_HOST_MAX_FORM_SIZE) {
+        HILOG_ERROR("formIds size exceeds max size");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     OnError(errorCode, errorMsg, formIds);
@@ -262,8 +288,20 @@ int32_t FormHostStub::HandleOnDueControlForm(MessageParcel &data, MessageParcel 
         HILOG_ERROR("fail ReadInt64Vector<formIds>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    bool isDisablePolicy = data.ReadBool();
-    bool isControl = data.ReadBool();
+    if (formIds.size() > Constants::ONE_HOST_MAX_FORM_SIZE) {
+        HILOG_ERROR("formIds size exceeds max size");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    bool isDisablePolicy = false;
+    if (!data.ReadBool(isDisablePolicy)) {
+        HILOG_ERROR("read isDisablePolicy failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    bool isControl = false;
+    if (!data.ReadBool(isControl)) {
+        HILOG_ERROR("read isControl failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     OnDueControlForm(formIds, isDisablePolicy, isControl);
     reply.WriteInt32(ERR_OK);
     return ERR_OK;
@@ -276,6 +314,10 @@ int32_t FormHostStub::HandleOnCheckForm(MessageParcel &data, MessageParcel &repl
     bool ret = data.ReadInt64Vector(&formIds);
     if (!ret) {
         HILOG_ERROR("fail ReadInt64Vector<formIds>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (formIds.size() > Constants::ONE_HOST_MAX_FORM_SIZE) {
+        HILOG_ERROR("formIds size exceeds max size");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     OnCheckForm(formIds);

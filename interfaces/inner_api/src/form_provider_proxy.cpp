@@ -555,12 +555,7 @@ int32_t FormProviderProxy::AcquireShareFormData(int64_t formId, const std::strin
         return result;
     }
 
-    auto retval = reply.ReadInt32();
-    if (retval != ERR_OK) {
-        HILOG_ERROR("fail replyData:%{public}d", retval);
-    }
-
-    return retval;
+    return result;
 }
 
 int FormProviderProxy::SendTransactCmd(IFormProvider::Message code, MessageParcel &data,

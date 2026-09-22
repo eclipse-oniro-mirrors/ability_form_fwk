@@ -17,6 +17,7 @@
 #define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_SHARE_MGR_H
 
 #include <map>
+#include <mutex>
 #include <shared_mutex>
 #include <singleton.h>
 #include "ability_info.h"
@@ -160,6 +161,7 @@ private:
     DECLARE_DELAYED_SINGLETON(FormShareMgr);
     std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
     std::unique_ptr<FormDistributedClient> formDmsClient_ = nullptr;
+    std::once_flag formDmsClientInitFlag_;
     // map for <formShareInfoKey, FormShareInfo>
     std::map<std::string, FormShareInfo> shareInfo_;
     // map for <eventId, formShareInfoKey>

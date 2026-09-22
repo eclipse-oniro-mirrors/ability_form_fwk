@@ -38,6 +38,53 @@ constexpr const char *DUE_PARAM_UPDATE_DURATION = "updateDuration";
 constexpr const char *DUE_PARAM_POLICY = "policy";
 constexpr const char *DUE_POLICY_DISABLE = "disable";
 constexpr const char *DUE_POLICY_REMOVE = "remove";
+
+void ParseStringField(const nlohmann::json &jsonObject, const char *key, std::string &value)
+{
+    if (!jsonObject.contains(key) || !jsonObject.at(key).is_string()) {
+        return;
+    }
+    value = jsonObject.at(key).get<std::string>();
+}
+
+void ParseInt32Field(const nlohmann::json &jsonObject, const char *key, int32_t &value)
+{
+    if (!jsonObject.contains(key) || !jsonObject.at(key).is_number_integer()) {
+        return;
+    }
+    int64_t fieldValue = jsonObject.at(key).get<int64_t>();
+    if (fieldValue >= INT32_MIN && fieldValue <= INT32_MAX) {
+        value = static_cast<int32_t>(fieldValue);
+    }
+}
+
+void ParseUint32Field(const nlohmann::json &jsonObject, const char *key, uint32_t &value)
+{
+    if (!jsonObject.contains(key) || !jsonObject.at(key).is_number_integer()) {
+        return;
+    }
+    int64_t fieldValue = jsonObject.at(key).get<int64_t>();
+    if (fieldValue >= 0 && fieldValue <= UINT32_MAX) {
+        value = static_cast<uint32_t>(fieldValue);
+    }
+}
+
+void ParseDimensionsField(const nlohmann::json &jsonObject, const char *key, std::vector<int32_t> &dimensions)
+{
+    if (!jsonObject.contains(key) || !jsonObject.at(key).is_array()) {
+        return;
+    }
+    for (const auto &dimension : jsonObject.at(key)) {
+        if (!dimension.is_number_integer()) {
+            continue;
+        }
+        int64_t dimensionValue = dimension.get<int64_t>();
+        if (dimensionValue >= INT32_MIN && dimensionValue <= INT32_MAX) {
+            dimensions.push_back(static_cast<int32_t>(dimensionValue));
+        }
+    }
+}
+
 }
 
 ParamControl::ParamControl() {}
@@ -424,15 +471,18 @@ void from_json(const nlohmann::json &jsonObject, ParamCtrl &paramCtrl)
         HILOG_ERROR("paramCtrl jsonObject not object");
         return;
     }
-    paramCtrl.bundleName = jsonObject.value(DUE_PARAM_BUNDLENAME, "");
-    paramCtrl.moduleName = jsonObject.value(DUE_PARAM_MODULENAME, "");
-    paramCtrl.abilityName = jsonObject.value(DUE_PARAM_ABILITYNAME, "");
-    paramCtrl.formName = jsonObject.value(DUE_PARAM_FORMNAME, "");
-    paramCtrl.dimensions = jsonObject.value(DUE_PARAM_DIMENSION, std::vector<int32_t>());
-    paramCtrl.appVersionStart = jsonObject.value(DUE_PARAM_APP_VERSION_START, 0);
-    paramCtrl.appVersionEnd = jsonObject.value(DUE_PARAM_APP_VERSION_END, 0);
-    paramCtrl.updateDuration = jsonObject.value(DUE_PARAM_UPDATE_DURATION, Constants::DUE_INVALID_UPDATE_DURATION);
-    paramCtrl.policy = jsonObject.value(DUE_PARAM_POLICY, "");
+    ParseStringField(jsonObject, DUE_PARAM_BUNDLENAME, paramCtrl.bundleName);
+    ParseStringField(jsonObject, DUE_PARAM_MODULENAME, paramCtrl.moduleName);
+    ParseStringField(jsonObject, DUE_PARAM_ABILITYNAME, paramCtrl.abilityName);
+    ParseStringField(jsonObject, DUE_PARAM_FORMNAME, paramCtrl.formName);
+    ParseDimensionsField(jsonObject, DUE_PARAM_DIMENSION, paramCtrl.dimensions);
+    paramCtrl.appVersionStart = 0;
+    paramCtrl.appVersionEnd = 0;
+    ParseUint32Field(jsonObject, DUE_PARAM_APP_VERSION_START, paramCtrl.appVersionStart);
+    ParseUint32Field(jsonObject, DUE_PARAM_APP_VERSION_END, paramCtrl.appVersionEnd);
+    paramCtrl.updateDuration = Constants::DUE_INVALID_UPDATE_DURATION;
+    ParseInt32Field(jsonObject, DUE_PARAM_UPDATE_DURATION, paramCtrl.updateDuration);
+    ParseStringField(jsonObject, DUE_PARAM_POLICY, paramCtrl.policy);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

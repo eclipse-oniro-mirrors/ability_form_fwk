@@ -1384,10 +1384,12 @@ bool AniParseIntArray(ani_env *env, const ani_array &array, std::vector<int32_t>
         status = env->Array_Get(array, i, &elementRef);
         if (status != ANI_OK) {
             HILOG_ERROR("Array_Get failed at index %{public}zu!", i);
+            out.clear();
             return false;
         }
         int32_t value;
         if (!AniParseInt32(env, elementRef, value)) {
+            out.clear();
             return false;
         }
         out.emplace_back(value);

@@ -2422,7 +2422,7 @@ int32_t FormMgrStub::HandleLockForms(MessageParcel &data, MessageParcel &reply)
         HILOG_ERROR("read infoSize failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (infoSize > static_cast<int32_t>(MAX_ALLOW_SIZE)) {
+    if (infoSize < 0 || infoSize > static_cast<int32_t>(MAX_ALLOW_SIZE)) {
         HILOG_ERROR("infoSize exceeds limit: %{public}d", infoSize);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }

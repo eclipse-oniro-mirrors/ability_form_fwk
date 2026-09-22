@@ -641,6 +641,10 @@ bool FormProviderData::WriteImageDataToParcel(Parcel &parcel, const std::string 
 bool FormProviderData::ConvertRawImageData()
 {
     HILOG_INFO("call");
+    if (rawImageBytesMap_.size() > IMAGE_DATA_THRESHOLD) {
+        HILOG_ERROR("unexpected image number %{public}zu", rawImageBytesMap_.size());
+        return false;
+    }
     for (auto &entry : rawImageBytesMap_) {
         sptr<FormAshmem> formAshmem = new (std::nothrow) FormAshmem();
         if (formAshmem == nullptr) {

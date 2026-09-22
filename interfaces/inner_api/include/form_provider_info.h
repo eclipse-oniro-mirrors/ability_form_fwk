@@ -126,7 +126,7 @@ public:
     static FormProviderInfo *Unmarshalling(Parcel &parcel);
 private:
     FormProviderData jsBindingData_;
-    bool upgradeFlg_;
+    bool upgradeFlg_ = false;
     std::vector<FormDataProxy> formDataProxies_;
 };
 }  // namespace AppExecFwk

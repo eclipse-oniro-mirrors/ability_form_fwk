@@ -19,6 +19,7 @@
 #include <cerrno>
 #include <climits>
 #include <cmath>
+#include <memory>
 #include <regex>
 #include <uv.h>
 #include <vector>
@@ -388,9 +389,12 @@ void InnerCreatePromiseRetMsg(napi_env env, int32_t code, napi_value* result)
     HILOG_DEBUG("end");
 }
 
-napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
+napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo *rawCallbackInfo)
 {
     HILOG_INFO("call");
+
+    // Take ownership so all failure paths below release automatically.
+    std::unique_ptr<AsyncErrMsgCallbackInfo> asyncCallbackInfo(rawCallbackInfo);
 
     napi_env env = asyncCallbackInfo->env;
     napi_value value = asyncCallbackInfo->callbackValue;
@@ -409,7 +413,8 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
         env, nullptr, resourceName,
         [](napi_env env, void *data) {},
         [](napi_env env, napi_status status, void *data) {
-            AsyncErrMsgCallbackInfo *callbackInfo = static_cast<AsyncErrMsgCallbackInfo*>(data);
+            // Take ownership of the object transferred by RetErrMsgForCallback.
+            std::unique_ptr<AsyncErrMsgCallbackInfo> callbackInfo(static_cast<AsyncErrMsgCallbackInfo*>(data));
             HILOG_INFO("complete");
             if (callbackInfo->callback != nullptr) {
                 napi_value callback;
@@ -425,9 +430,8 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
             if (callbackInfo->asyncWork != nullptr) {
                 napi_delete_async_work(env, callbackInfo->asyncWork);
             }
-            delete callbackInfo;
         },
-        static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
+        asyncCallbackInfo.get(), &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         HILOG_ERROR("async work failed!");
@@ -437,9 +441,10 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
         if (asyncCallbackInfo->callback != nullptr) {
             napi_delete_reference(env, asyncCallbackInfo->callback);
         }
-        delete asyncCallbackInfo;
         return nullptr;
     }
+    // Transfer ownership to the complete callback, which always runs after queue succeeds.
+    asyncCallbackInfo.release();
     return NapiGetResult(env, 1);
 }
 

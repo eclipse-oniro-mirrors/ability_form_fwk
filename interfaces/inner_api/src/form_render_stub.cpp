@@ -159,16 +159,28 @@ int FormRenderStub::HandleCleanFormHost(MessageParcel &data, MessageParcel &repl
 
 int32_t FormRenderStub::HandleReleaseRenderer(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
-    std::string compId = data.ReadString();
-    std::string uid = data.ReadString();
-    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_ReleaseRenderer",
-        FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::string compId;
+    if (!data.ReadString(compId)) {
+        HILOG_ERROR("read compId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::string uid;
+    if (!data.ReadString(uid)) {
+        HILOG_ERROR("read uid failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
         HILOG_ERROR("ReadParcelable<Want> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_ReleaseRenderer",
+        FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = ReleaseRenderer(formId, compId, uid, *want);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);

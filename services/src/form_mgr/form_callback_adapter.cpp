@@ -408,7 +408,7 @@ bool FormCallbackAdapter::PublishFormCrossBundleControl(const PublishFormCrossBu
             iface_cast<IFormProviderDelegate>(callerToken);
         if (remoteFormProviderDelegateProxy == nullptr) {
             HILOG_ERROR("Failed to cast IFormProviderDelegate");
-            continue;
+            return false;
         }
         bool isCanOpen = false;
         ErrCode result = remoteFormProviderDelegateProxy->PublishFormCrossBundleControl(bundleInfo, isCanOpen);

@@ -474,7 +474,7 @@ napi_value JsFormProvider::OnSetFormNextRefreshTime(napi_env env, size_t argc, n
     if (paramOneType != napi_number) {
         errCode = ERR_APPEXECFWK_FORM_REFRESH_TIME_NUM_ERR;
     }
-    int32_t time;
+    int32_t time = 0;
     bool res = ConvertFromJsValue(env, argv[PARAM1], time);
     if (!res) {
         HILOG_ERROR("ConvertFromJsValue failed.");
