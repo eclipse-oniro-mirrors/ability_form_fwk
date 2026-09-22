@@ -98,6 +98,8 @@ public:
         std::unique_ptr<FormProviderData> &formProviderData) = 0;
     virtual ErrCode RemoveRequestPublishFormInfo(int64_t formId) = 0;
     virtual ErrCode HandleFormRemoveObserver(const std::string &, const RunningFormInfo &) = 0;
+    virtual const std::string &GetTransparencyFormCapabilityKey() = 0;
+    virtual const std::string &GetFormStandbyCapabilityKey() = 0;
 };
 
 class MockFormDataMgr : public AbstractMockFormDataMgr {
@@ -170,6 +172,8 @@ public:
         std::unique_ptr<FormProviderData> &formProviderData));
     MOCK_METHOD1(RemoveRequestPublishFormInfo, ErrCode(int64_t formId));
     MOCK_METHOD2(HandleFormRemoveObserver, ErrCode(const std::string &, const RunningFormInfo &));
+    MOCK_METHOD0(GetTransparencyFormCapabilityKey, const std::string &());
+    MOCK_METHOD0(GetFormStandbyCapabilityKey, const std::string &());
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -109,15 +109,19 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formInfoMgr.IsCaller(bundleName);
     formInfoMgr.CheckBundlePermission();
 
-    // NEW method: AddBundleFormInfos
-    std::map<std::string, std::uint32_t> bundleVersionMap;
+    // ProcessBundleBatch with new bundles
+    std::unordered_map<std::string, std::uint32_t> bundleVersionMap;
     int32_t mapSize = fdp->ConsumeIntegralInRange<int32_t>(0, MAX_LOOP_COUNT);
     for (int32_t i = 0; i < mapSize; i++) {
         std::string key = fdp->ConsumeRandomLengthString(MAX_LENGTH);
         uint32_t value = fdp->ConsumeIntegral<uint32_t>();
         bundleVersionMap[key] = value;
     }
-    formInfoMgr.AddBundleFormInfos(bundleVersionMap, userId);
+    std::vector<std::string> newBundles;
+    for (const auto &entry : bundleVersionMap) {
+        newBundles.push_back(entry.first);
+    }
+    formInfoMgr.ProcessBundleBatch(newBundles, userId);
 
     // NEW method: UpdateFormShowConfigs
     std::vector<FormCustomConfig> configs;

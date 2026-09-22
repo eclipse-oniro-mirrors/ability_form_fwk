@@ -15,10 +15,14 @@
 
 #include "data_center/form_info/form_info_helper.h"
 
+#include <fstream>
+
 #include "bms_mgr/form_bms_helper.h"
 #include "bundle_mgr_client.h"
+#include "common/util/file_utils.h"
 #include "extension_form_profile.h"
 #include "feature/bundle_distributed/form_distributed_mgr.h"
+#include "ffrt.h"
 #include "fms_log_wrapper.h"
 #include "form_event_report.h"
 #include "form_mgr_errors.h"
@@ -26,6 +30,7 @@
 #include "in_process_call_wrapper.h"
 #include "data_center/form_data_mgr.h"
 #include "json_util_form.h"
+#include "res_config.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -33,6 +38,9 @@ namespace {
 constexpr int DISTRIBUTED_BUNDLE_MODULE_LENGTH = 2;
 constexpr const char *FORM_METADATA_NAME = "ohos.extension.form";
 constexpr const char *TEMPLATE_FORM_METADATA_NAME = "ohos.extension.templateForm";
+// Matches BundleMgrClientImpl::PROFILE_FILE_PREFIX (bundle_mgr_client_impl.cpp:41).
+constexpr const char *PROFILE_FILE_PREFIX = "$profile:";
+constexpr size_t PROFILE_FILE_PREFIX_LEN = 9;
 constexpr uint32_t GET_BUNDLE_INFO_WITH_ALL_EXTENSIONS =
     static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_ABILITY) |
     static_cast<uint32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_EXTENSION_ABILITY) |
@@ -71,7 +79,7 @@ bool FormInfoHelper::LoadSharedModuleInfo(const BundleInfo &bundleInfo, HapModul
 }
 
 ErrCode FormInfoHelper::LoadFormConfigInfoByBundleNames(const std::vector<std::string> &bundleNames,
-    int32_t userId, std::map<std::string, std::vector<FormInfo>> &formInfosMap)
+    int32_t userId, std::unordered_map<std::string, std::vector<FormInfo>> &formInfosMap)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     if (bundleNames.empty()) {
@@ -87,7 +95,7 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleNames(const std::vector<std::s
         HILOG_ERROR("batch get bundleInfo failed, erroCode:%{public}d", ret);
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
-    for (const auto &bundleInfo : bundleInfos) {
+    for (auto &bundleInfo : bundleInfos) {
         if (bundleInfo.hapModuleInfos.empty()) {
             continue;
         }
@@ -112,9 +120,123 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleNames(const std::vector<std::s
         } else {
             LoadAbilityFormConfigInfo(bundleInfo, formInfos);
         }
-        formInfosMap[bundleInfo.name] = formInfos;
+        formInfosMap.emplace(std::move(bundleInfo.name), std::move(formInfos));
     }
     return ERR_OK;
+}
+
+std::shared_ptr<Global::Resource::ResourceManager> FormInfoHelper::GetResMgr(
+    std::unordered_map<std::string, std::shared_ptr<Global::Resource::ResourceManager>> &resMgrCache,
+    const ExtensionAbilityInfo &extensionInfo)
+{
+    bool isCompressed = !extensionInfo.hapPath.empty();
+    std::string resourcePath = isCompressed ? extensionInfo.hapPath : extensionInfo.resourcePath;
+    if (resourcePath.empty()) {
+        HILOG_ERROR("resource path is empty, bundleName:%{public}s", extensionInfo.bundleName.c_str());
+        return nullptr;
+    }
+    auto it = resMgrCache.find(resourcePath);
+    if (it != resMgrCache.end()) {
+        return it->second;
+    }
+    // Per-hapPath ResourceManager shared by extensions of one bundle; deviates from
+    // InitResMgr on purpose: no systemres, and PROF|STRING-only parsing.
+    std::shared_ptr<Global::Resource::ResourceManager> resMgr(Global::Resource::CreateResourceManager(false));
+    if (resMgr == nullptr) {
+        HILOG_ERROR("create ResourceManager failed, bundleName:%{public}s", extensionInfo.bundleName.c_str());
+        return nullptr;
+    }
+    std::unique_ptr<Global::Resource::ResConfig> resConfig(Global::Resource::CreateResConfig());
+    if (resConfig == nullptr) {
+        HILOG_ERROR("create ResConfig failed, bundleName:%{public}s", extensionInfo.bundleName.c_str());
+        return nullptr;
+    }
+    resMgr->UpdateResConfig(*resConfig);
+    if (!resMgr->AddResource(resourcePath.c_str(),
+        Global::Resource::SELECT_PROF | Global::Resource::SELECT_STRING)) {
+        HILOG_ERROR("AddResource failed, bundleName:%{public}s", extensionInfo.bundleName.c_str());
+        return nullptr;
+    }
+    resMgrCache.emplace(resourcePath, resMgr);
+    return resMgr;
+}
+
+bool FormInfoHelper::GetProfilesByResMgr(const std::shared_ptr<Global::Resource::ResourceManager> &resMgr,
+    const ExtensionAbilityInfo &extensionInfo, const std::string &metadataName,
+    std::vector<std::string> &profileInfos)
+{
+    if (resMgr == nullptr || extensionInfo.metadata.empty()) {
+        return false;
+    }
+    bool isCompressed = !extensionInfo.hapPath.empty();
+    for (const auto &data : extensionInfo.metadata) {
+        if (metadataName.compare(data.name) != 0) {
+            continue;
+        }
+        const std::string &resName = data.resource;
+        size_t pos = resName.rfind(PROFILE_FILE_PREFIX);
+        if ((pos == std::string::npos) || (pos == resName.length() - PROFILE_FILE_PREFIX_LEN)) {
+            HILOG_WARN("invalid profile resource name");
+            continue;
+        }
+        std::string profileName = resName.substr(pos + PROFILE_FILE_PREFIX_LEN);
+        std::string profile;
+        bool ret = isCompressed ? GetCompressedProfile(resMgr, profileName, profile)
+            : GetRawFileProfile(resMgr, profileName, profile);
+        if (!ret) {
+            continue;
+        }
+        profileInfos.emplace_back(profile);
+    }
+    return !profileInfos.empty();
+}
+
+bool FormInfoHelper::GetCompressedProfile(const std::shared_ptr<Global::Resource::ResourceManager> &resMgr,
+    const std::string &profileName, std::string &profile)
+{
+    std::unique_ptr<uint8_t[]> fileContentPtr = nullptr;
+    size_t len = 0;
+    if (resMgr->GetProfileDataByName(profileName.c_str(), len, fileContentPtr)
+        != Global::Resource::SUCCESS) {
+        HILOG_WARN("GetProfileDataByName failed");
+        return false;
+    }
+    if (fileContentPtr == nullptr || len == 0) {
+        HILOG_WARN("invalid profile data");
+        return false;
+    }
+    // Neither resmgr nor BMS bounds the profile size; reject len > 1MB here if needed.
+    // Raw bytes pass through: ExtensionFormProfile::TransformTo is the single JSON parser.
+    profile.assign(fileContentPtr.get(), fileContentPtr.get() + len);
+    return true;
+}
+
+bool FormInfoHelper::GetRawFileProfile(const std::shared_ptr<Global::Resource::ResourceManager> &resMgr,
+    const std::string &profileName, std::string &profile)
+{
+    std::string resPath;
+    if (resMgr->GetProfileByName(profileName.c_str(), resPath) != Global::Resource::SUCCESS) {
+        HILOG_WARN("profile cannot be found");
+        return false;
+    }
+    if (!FileUtils::IsFileExists(resPath)) {
+        HILOG_WARN("invalid profile path");
+        return false;
+    }
+    std::ifstream inFile(resPath, std::ios_base::in | std::ios_base::binary);
+    if (!inFile.is_open()) {
+        HILOG_WARN("open profile file failed");
+        return false;
+    }
+    // Neither resmgr nor BMS bounds the profile size; check file size (reject > 1MB)
+    // before reading if needed.
+    profile.assign((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
+    inFile.close();
+    if (profile.empty()) {
+        HILOG_WARN("empty profile file");
+        return false;
+    }
+    return true;
 }
 
 ErrCode FormInfoHelper::LoadStageFormConfigInfo(
@@ -126,46 +248,61 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(
         HILOG_ERROR("fail get BundleMgrClient");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
-    std::vector<ExtensionAbilityInfo> extensionInfos;
-    // In the new interface, extensionInfos needs to be obtained from bundleInfo.hapModuleInfos
-    LoadExtensionInfos(bundleInfo, extensionInfos);
-    for (const auto &extensionInfo: extensionInfos) {
-        if (extensionInfo.type != ExtensionAbilityType::FORM) {
-            continue;
-        }
-        HapModuleInfo sharedModule;
-        bool hasDistributedForm = LoadSharedModuleInfo(bundleInfo, sharedModule);
-        SetDistributedBundleStatus(userId, bundleInfo.entryModuleName, sharedModule.moduleName,
-            bundleInfo.name, hasDistributedForm);
-        std::vector<std::string> profileInfos {};
-        std::vector<std::string> templateProfileInfos {};
-        ExtraFormInfo extraFormInfo { hasDistributedForm, sharedModule.moduleName, false };
-        if  (hasDistributedForm) {
-            if (!client->GetProfileFromSharedHap(sharedModule, extensionInfo, profileInfos)) {
-                HILOG_WARN("fail get profile info from shared hap");
+    // Per-bundle ResourceManager cache: extensions sharing one hapPath reuse a single
+    // instance instead of re-initializing per SDK GetResConfigFile call.
+    std::unordered_map<std::string, std::shared_ptr<Global::Resource::ResourceManager>> resMgrCache;
+    for (const auto &moduleInfo : bundleInfo.hapModuleInfos) {
+        for (const auto &extensionInfo : moduleInfo.extensionInfos) {
+            if (extensionInfo.type != ExtensionAbilityType::FORM) {
                 continue;
             }
-            LoadProfileFormInfos(formInfos, bundleInfo, extensionInfo, profileInfos, extraFormInfo);
-        } else {
-            auto metaData = !client->GetResConfigFile(extensionInfo, FORM_METADATA_NAME, profileInfos);
-            bool templateMetaData = true;
-            if (bundleInfo.applicationInfo.isSystemApp) {
-                templateMetaData = !client->GetResConfigFile(extensionInfo, TEMPLATE_FORM_METADATA_NAME,
-                    templateProfileInfos);
-            }
-            if (metaData && templateMetaData) {
-                HILOG_ERROR("fail get form metadata : %{public}d, %{public}d", metaData, templateMetaData);
-                continue;
-            }
-            LoadProfileFormInfos(formInfos, bundleInfo, extensionInfo, profileInfos, extraFormInfo);
-            ExtraFormInfo templateExtraFormInfo { hasDistributedForm, sharedModule.moduleName, true };
-            LoadProfileFormInfos(formInfos, bundleInfo, extensionInfo, templateProfileInfos, templateExtraFormInfo);
+            LoadFormsForExtension(client, bundleInfo, extensionInfo, userId, formInfos, resMgrCache);
         }
     }
 
     UpdateFormInfoByAppServicesCapability(bundleInfo, userId, formInfos);
 
+    // Index destruction is pure deallocation; run it on ffrt workers off the reload chain.
+    ffrt::submit([cache = std::move(resMgrCache)]() {
+        HILOG_DEBUG("retired %{public}zu resource managers", cache.size());
+    });
     return ERR_OK;
+}
+
+void FormInfoHelper::LoadFormsForExtension(const std::shared_ptr<BundleMgrClient> &client,
+    const BundleInfo &bundleInfo, const ExtensionAbilityInfo &extensionInfo, int32_t userId,
+    std::vector<FormInfo> &formInfos,
+    std::unordered_map<std::string, std::shared_ptr<Global::Resource::ResourceManager>> &resMgrCache)
+{
+    HapModuleInfo sharedModule;
+    bool hasDistributedForm = LoadSharedModuleInfo(bundleInfo, sharedModule);
+    SetDistributedBundleStatus(userId, bundleInfo.entryModuleName, sharedModule.moduleName,
+        bundleInfo.name, hasDistributedForm);
+    std::vector<std::string> profileInfos {};
+    std::vector<std::string> templateProfileInfos {};
+    ExtraFormInfo extraFormInfo { hasDistributedForm, sharedModule.moduleName, false };
+    if  (hasDistributedForm) {
+        if (!client->GetProfileFromSharedHap(sharedModule, extensionInfo, profileInfos)) {
+            HILOG_WARN("fail get profile info from shared hap");
+            return;
+        }
+        LoadProfileFormInfos(formInfos, bundleInfo, extensionInfo, profileInfos, extraFormInfo);
+        return;
+    }
+    auto resMgr = GetResMgr(resMgrCache, extensionInfo);
+    auto metaData = !GetProfilesByResMgr(resMgr, extensionInfo, FORM_METADATA_NAME, profileInfos);
+    bool templateMetaData = true;
+    if (bundleInfo.applicationInfo.isSystemApp) {
+        templateMetaData = !GetProfilesByResMgr(resMgr, extensionInfo,
+            TEMPLATE_FORM_METADATA_NAME, templateProfileInfos);
+    }
+    if (metaData && templateMetaData) {
+        HILOG_ERROR("fail get form metadata : %{public}d, %{public}d", metaData, templateMetaData);
+        return;
+    }
+    LoadProfileFormInfos(formInfos, bundleInfo, extensionInfo, profileInfos, extraFormInfo);
+    ExtraFormInfo templateExtraFormInfo { hasDistributedForm, sharedModule.moduleName, true };
+    LoadProfileFormInfos(formInfos, bundleInfo, extensionInfo, templateProfileInfos, templateExtraFormInfo);
 }
 
 void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const BundleInfo &bundleInfo,
@@ -190,8 +327,7 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
         formInfo.privacyLevel = privacyLevel;
         formInfo.isTemplateForm = extraFormInfo.isTemplateForm;
         PrintLoadStageFormConfigInfo(formInfo, extraFormInfo.isDistributedForm);
-        SendLoadStageFormConfigEvent(formInfo);
-        formInfos.emplace_back(formInfo);
+        formInfos.emplace_back(std::move(formInfo));
     }
 }
 
@@ -220,16 +356,6 @@ void FormInfoHelper::SetDistributedBundleStatus(int32_t userId, const std::strin
     FormDistributedMgr::GetInstance().SetBundleDistributedStatus(bundleInfoName, hasDistributedForm, distributedModule);
 }
 
-void FormInfoHelper::SendLoadStageFormConfigEvent(const FormInfo &formInfo)
-{
-    NewFormEventInfo eventInfo;
-    eventInfo.bundleName = formInfo.bundleName;
-    eventInfo.formName = formInfo.name;
-    eventInfo.renderingMode = static_cast<int32_t>(formInfo.renderingMode);
-    FormEventReport::SendLoadStageFormConfigInfoEvent(FormEventName::LOAD_STAGE_FORM_CONFIG_INFO,
-        HiSysEventType::BEHAVIOR, eventInfo);
-}
-
 ErrCode FormInfoHelper::LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos)
 {
     const std::string &bundleName = bundleInfo.name;
@@ -242,7 +368,7 @@ ErrCode FormInfoHelper::LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, 
         for (auto &formInfo: formInfoVec) {
             formInfo.versionCode = bundleInfo.versionCode;
             formInfo.bundleType = bundleInfo.applicationInfo.bundleType;
-            formInfos.emplace_back(formInfo);
+            formInfos.emplace_back(std::move(formInfo));
         }
     }
     return ERR_OK;
@@ -301,73 +427,74 @@ ErrCode FormInfoHelper::GetFormInfoDescription(std::shared_ptr<Global::Resource:
 void FormInfoHelper::UpdateFormInfoByAppServicesCapability(const BundleInfo &bundleInfo, int32_t userId,
     std::vector<FormInfo> &formInfos)
 {
-    UpdateFormInfoTransparencyEnabled(bundleInfo, userId, formInfos);
-    UpdateFormInfoFormStandby(bundleInfo, userId, formInfos);
+    bool isTransparencyEnabled = false;
+    bool isStandbyEnabled = false;
+    const std::string &transparencyCapabilityKey = FormDataMgr::GetInstance().GetTransparencyFormCapabilityKey();
+    const std::string &standbyCapabilityKey = FormDataMgr::GetInstance().GetFormStandbyCapabilityKey();
+    bool needTransparency = !bundleInfo.applicationInfo.isSystemApp && !transparencyCapabilityKey.empty();
+    bool needStandby = !standbyCapabilityKey.empty();
+    if (needTransparency || needStandby) {
+        // One provision fetch shared by both capability checks; previously each consumer
+        // fetched independently (two IPCs per non-system bundle).
+        CheckAppServicesCapabilities(userId, bundleInfo.applicationInfo.bundleName,
+            needTransparency ? transparencyCapabilityKey : "",
+            needStandby ? standbyCapabilityKey : "",
+            isTransparencyEnabled, isStandbyEnabled);
+    }
+    UpdateFormInfoTransparencyEnabled(bundleInfo, formInfos, isTransparencyEnabled);
+    UpdateFormInfoFormStandby(bundleInfo, formInfos, isStandbyEnabled);
 }
 
-void FormInfoHelper::UpdateFormInfoTransparencyEnabled(const BundleInfo &bundleInfo, int32_t userId,
-    std::vector<FormInfo> &formInfos)
+void FormInfoHelper::UpdateFormInfoTransparencyEnabled(const BundleInfo &bundleInfo,
+    std::vector<FormInfo> &formInfos, bool isTransparencyEnabled)
 {
     if (bundleInfo.applicationInfo.isSystemApp) {
         return;
     }
-
-    bool isTransparencyEnabled = false;
-    const std::string &transparencyFormCapabilityKey = FormDataMgr::GetInstance().GetTransparencyFormCapabilityKey();
-    if (!transparencyFormCapabilityKey.empty()) {
-        isTransparencyEnabled = CheckAppServicesCapability(userId, bundleInfo.applicationInfo.bundleName,
-            transparencyFormCapabilityKey);
-    }
-    HILOG_DEBUG("isTransparencyEnabled: %{public}d", isTransparencyEnabled);
     if (isTransparencyEnabled) {
         return;
     }
-
     for (auto &formInfo: formInfos) {
         formInfo.transparencyEnabled = false;
     }
 }
 
-void FormInfoHelper::UpdateFormInfoFormStandby(const BundleInfo &bundleInfo, int32_t userId,
-    std::vector<FormInfo> &formInfos)
+void FormInfoHelper::UpdateFormInfoFormStandby(const BundleInfo &bundleInfo,
+    std::vector<FormInfo> &formInfos, bool isStandbyEnabled)
 {
-    bool isStandbyEnabled = false;
-    const std::string &standbyCapabilityKey = FormDataMgr::GetInstance().GetFormStandbyCapabilityKey();
-    if (!standbyCapabilityKey.empty()) {
-        isStandbyEnabled = CheckAppServicesCapability(userId, bundleInfo.applicationInfo.bundleName,
-            standbyCapabilityKey);
-    }
-    HILOG_DEBUG("isStandbyEnabled: %{public}d", isStandbyEnabled);
     if (isStandbyEnabled) {
         return;
     }
-
     for (auto &formInfo: formInfos) {
         formInfo.standby.isSupported = false;
         formInfo.standby.isAdapted = false;
     }
 }
 
-bool FormInfoHelper::CheckAppServicesCapability(int32_t userId, const std::string &bundleName,
-    const std::string &capabilityKey)
+bool FormInfoHelper::CheckAppServicesCapabilities(int32_t userId, const std::string &bundleName,
+    const std::string &transparencyCapabilityKey, const std::string &standbyCapabilityKey,
+    bool &isTransparencyEnabled, bool &isStandbyEnabled)
 {
+    isTransparencyEnabled = false;
+    isStandbyEnabled = false;
     AppProvisionInfo appProvisionInfo;
     ErrCode ret = FormBmsHelper::GetInstance().GetAppProvisionInfo(bundleName, userId, appProvisionInfo);
     if (ret != ERR_OK) {
         HILOG_ERROR("get AppProvisionInfo failed");
         return false;
-    } else {
-        nlohmann::json jsonObject = SafeJsonParse(appProvisionInfo.appServiceCapabilities);
-        if (jsonObject.is_discarded()) {
-            HILOG_ERROR("fail parse appServiceCapabilities");
-            return false;
-        }
-        if (!jsonObject.is_object()) {
-            HILOG_ERROR("appServiceCapabilities is not object");
-            return false;
-        }
-        return jsonObject.contains(capabilityKey);
     }
+    nlohmann::json jsonObject = SafeJsonParse(appProvisionInfo.appServiceCapabilities);
+    if (jsonObject.is_discarded() || !jsonObject.is_object()) {
+        HILOG_ERROR("fail parse appServiceCapabilities");
+        return false;
+    }
+    if (!transparencyCapabilityKey.empty()) {
+        isTransparencyEnabled = jsonObject.contains(transparencyCapabilityKey);
+    }
+    if (!standbyCapabilityKey.empty()) {
+        isStandbyEnabled = jsonObject.contains(standbyCapabilityKey);
+    }
+    return true;
 }
 
 void FormInfoHelper::LoadProfileFormInfos(std::vector<FormInfo> &formInfos, const BundleInfo &bundleInfo,
@@ -379,13 +506,5 @@ void FormInfoHelper::LoadProfileFormInfos(std::vector<FormInfo> &formInfos, cons
     }
 }
 
-void FormInfoHelper::LoadExtensionInfos(const BundleInfo &bundleInfo, std::vector<ExtensionAbilityInfo> &extensionInfos)
-{
-    for (const auto &moduleInfo : bundleInfo.hapModuleInfos) {
-        for (const auto &extensionInfo : moduleInfo.extensionInfos) {
-            extensionInfos.push_back(extensionInfo);
-        }
-    }
-}
 }  // namespace AppExecFwk
 }  // namespace OHOS

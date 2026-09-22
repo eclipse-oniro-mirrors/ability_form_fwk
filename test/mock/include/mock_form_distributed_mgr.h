@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 #include "gmock/gmock.h"
+#include "feature/bundle_distributed/form_distributed_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -28,6 +29,8 @@ public:
     virtual ~AbstractMockFormDistributedMgr() = default;
     virtual bool IsBundleDistributed(const std::string &bundleName, int32_t userId) = 0;
     virtual std::string GetUiModuleName(const std::string &bundleName, int32_t userId) = 0;
+    virtual void SetBundleDistributedStatus(const std::string &bundleName, bool isDistributed,
+        const DistributedModule &distributedModule) = 0;
 };
 
 class MockFormDistributedMgr : public AbstractMockFormDistributedMgr {
@@ -37,6 +40,8 @@ public:
     ~MockFormDistributedMgr() override = default;
     MOCK_METHOD2(IsBundleDistributed, bool(const std::string &bundleName, int32_t userId));
     MOCK_METHOD2(GetUiModuleName, std::string(const std::string &bundleName, int32_t userId));
+    MOCK_METHOD3(SetBundleDistributedStatus, void(const std::string &bundleName, bool isDistributed,
+        const DistributedModule &distributedModule));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

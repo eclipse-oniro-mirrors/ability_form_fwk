@@ -112,9 +112,11 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formInfoMgr.IsDeleteCacheInUpgradeScene(testFormInfo);
 
     // Test private methods with different inputs
-    std::map<std::string, std::uint32_t> bundleVersionMap;
+    std::unordered_map<std::string, std::uint32_t> bundleVersionMap;
     formInfoMgr.GetBundleVersionMap(bundleVersionMap, userId);
-    formInfoMgr.UpdateBundleFormInfos(bundleVersionMap, userId);
+    FormInfoMgr::BundleClassifyResult classify = formInfoMgr.ClassifyBundles(false, userId, bundleVersionMap);
+    formInfoMgr.ProcessBundleBatch(classify.updateBundles, userId);
+    formInfoMgr.ProcessBundleBatch(classify.newBundles, userId);
 
     return true;
 }

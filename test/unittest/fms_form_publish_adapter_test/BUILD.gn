@@ -99,6 +99,7 @@ ohos_unittest("FmsFormPublishAdapterTest") {
     "data_share:datashare_consumer",
     "ffrt:libffrt",
     "googletest:gmock_main",
+    "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",

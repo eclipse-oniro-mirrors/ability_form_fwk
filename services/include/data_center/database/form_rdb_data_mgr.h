@@ -83,6 +83,9 @@ public:
      */
     ErrCode InsertData(const std::string &tableName, const std::string &key, const std::string &value);
 
+    ErrCode BatchInsert(const std::string &tableName,
+        const std::vector<std::pair<std::string, std::string>> &kvPairs);
+
     /**
      * @brief Delete the form data in DB.
      * @param tableName The name of table to be excute deleted action.

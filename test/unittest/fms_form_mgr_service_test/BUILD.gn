@@ -86,6 +86,7 @@ ohos_unittest("FmsFormMgrServiceTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "googletest:gmock_main",
+    "os_account:os_account_innerkits",
   ]
   if (device_manager_enable) {
     external_deps += [ "device_manager:devicemanagersdk" ]
@@ -186,6 +187,7 @@ ohos_unittest("FmsFormMgrServiceTest2") {
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "libxml2:libxml2",
+    "os_account:os_account_innerkits",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

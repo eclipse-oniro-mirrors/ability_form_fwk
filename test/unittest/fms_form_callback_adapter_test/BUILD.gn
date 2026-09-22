@@ -91,6 +91,7 @@ ohos_unittest("FmsFormCallbackAdapterTest") {
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "googletest:gmock_main",
+    "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",

@@ -55,5 +55,13 @@ ErrCode FormDbCache::UpdateFormLocation(const int64_t formId, const int32_t form
     GTEST_LOG_(INFO) << "UpdateFormLocation called";
     return ERR_OK;
 }
+void FormDbCache::GetAllFormDBInfoByBundleName(const std::string &bundleName, const int32_t userId,
+    std::vector<FormDBInfo> &formDBInfos, const int32_t appIndex)
+{
+    GTEST_LOG_(INFO) << "GetAllFormDBInfoByBundleName called";
+    if (AppExecFwk::MockFormDbCache::obj) {
+        AppExecFwk::MockFormDbCache::obj->GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos, appIndex);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

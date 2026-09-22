@@ -84,6 +84,7 @@ ohos_unittest("FmsFormObserverAdapterTest") {
     "c_utils:utils",
     "ffrt:libffrt",
     "googletest:gmock_main",
+    "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",

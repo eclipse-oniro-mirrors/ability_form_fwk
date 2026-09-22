@@ -63,6 +63,7 @@ ohos_unittest("FmsFormProviderMgrTest") {
     "ipc:ipc_core",
     "libxml2:libxml2",
     "memmgr:memmgrclient",
+    "os_account:os_account_innerkits",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

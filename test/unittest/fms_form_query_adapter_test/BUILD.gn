@@ -94,6 +94,7 @@ ohos_unittest("FmsFormQueryAdapterTest") {
     "data_share:datashare_consumer",
     "ffrt:libffrt",
     "googletest:gmock_main",
+    "hicollie:libhicollie",
     "hilog:libhilog",
     "ipc:ipc_core",
     "libxml2:libxml2",

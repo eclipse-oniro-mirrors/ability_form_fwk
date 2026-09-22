@@ -28,6 +28,7 @@
 #include "form_provider_data.h"
 #include "common/util/form_serial_queue.h"
 #include "common/event/system_event/form_sys_event_receiver.h"
+#include "common/event/system_event/form_os_account_subscriber.h"
 #include "common/util/mem_status_listener.h"
 #include "running_form_info.h"
 #include "template_form_detail_info.h"
@@ -1103,6 +1104,7 @@ private:
     std::string GetOnKvDataServiceAddTime() const;
 
 private:
+    std::shared_ptr<FormOsAccountSubscriber> osAccountSubscriber_;
     std::mutex snapshotSetMutex_;
     static const int32_t ENABLE_FORM_UPDATE = 5;
     const static std::map<std::string, DumpKey> dumpKeyMap_;

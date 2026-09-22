@@ -183,6 +183,9 @@ void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
 
         // delete formRenderInner
         FormRenderMgr::GetInstance().DeleteRenderInner(userId);
+
+        // delete form info storages (fifth cleanup, was missing)
+        FormInfoMgr::GetInstance().RemoveUserId(userId);
     });
 }
 
@@ -286,9 +289,11 @@ void FormSysEventReceiver::HandleUserStarted(const int32_t userId)
     }
 
     HILOG_INFO("user started userId: %{public}d", userId);
+    // doneCallback fires after the reload chain completes, so rerender always follows fresh data.
     auto task = [userId]() {
-        FormInfoMgr::GetInstance().ReloadFormInfos(userId);
-        FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
+        FormInfoMgr::GetInstance().ReloadFormInfos(userId, [userId]() {
+            FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
+        });
     };
     FormMgrQueue::GetInstance().ScheduleTask(0, task, Common::TaskQos::QOS_DEADLINE_REQUEST);
 }

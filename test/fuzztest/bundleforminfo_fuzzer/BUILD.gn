@@ -58,6 +58,7 @@ ohos_fuzztest("BundleFormInfoFuzzTest") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
+    "hicollie:libhicollie",
   ]
 }
 

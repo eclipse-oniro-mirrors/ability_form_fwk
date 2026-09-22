@@ -152,7 +152,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     std::string bundleName = fdp->ConsumeRandomLengthString();
     std::vector<std::string> bundleNames;
     bundleNames.push_back(bundleName);
-    std::map<std::string, std::vector<FormInfo>> formInfosMap;
+    std::unordered_map<std::string, std::vector<FormInfo>> formInfosMap;
     formInfoHelper.LoadFormConfigInfoByBundleNames(bundleNames, userId, formInfosMap);
     return formTimerMgr.IsActiveUser(userId);
 }

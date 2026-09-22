@@ -61,6 +61,7 @@ ohos_unittest("FmsFormUtilPermissionVerifyTest") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "memmgr:memmgrclient",
+    "os_account:os_account_innerkits",
     "safwk:system_ability_fwk",
     "googletest:gmock_main",
   ]

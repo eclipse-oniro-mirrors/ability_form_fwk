@@ -26,7 +26,7 @@ const std::vector<FormEventName> EVENT_NAME_LIST = {FormEventName::ADD_FORM, For
     FormEventName::FIRST_UPDATE_FORM_DURATION, FormEventName::UPDATE_FORM_REFRESH_TIMES,
     FormEventName::PROXY_UPDATE_FORM, FormEventName::INVALID_PUBLISH_FORM_TO_HOST,
     FormEventName::LAUNCH_FORM_APP, FormEventName::CONDITION_UPDATE_FORM, FormEventName::UNBIND_FORM_APP,
-    FormEventName::LOAD_STAGE_FORM_CONFIG_INFO, FormEventName::DELETE_FORM_FAILED,
+    FormEventName::DELETE_FORM_FAILED,
     FormEventName::UPDATE_FORM_FAILED, FormEventName::RECYCLE_RECOVER_FORM_FAILED,
     FormEventName::REQUEST_PUBLIC_FORM, FormEventName::CONNECT_FORM_ABILITY_FAILED,
     FormEventName::RELOAD_FORM_FAILED, FormEventName::FORM_NODE_ERROR, FormEventName::FORM_STATUS_ERROR,
@@ -60,7 +60,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     FormEventReport::SendFourthFormEvent(eventName, HiSysEventType::STATISTIC, newEventInfo, want);
     FormEventReport::SendConditonUpdateFormEvent(eventName, HiSysEventType::BEHAVIOR, newEventInfo);
     FormEventReport::SendFormRefreshCountEvent(eventName, HiSysEventType::STATISTIC, newEventInfo);
-    FormEventReport::SendLoadStageFormConfigInfoEvent(eventName, HiSysEventType::BEHAVIOR, newEventInfo);
     FormEventReport::SendDiskUseEvent();
     std::string formName = provider.ConsumeRandomLengthString();
     int64_t formId = provider.ConsumeIntegral<int64_t>();
