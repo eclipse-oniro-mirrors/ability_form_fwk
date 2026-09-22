@@ -2925,7 +2925,7 @@ HWTEST_F(FmsFormShareMgrTest, MakeFormShareInfoKey_001, TestSize.Level1)
     info.abilityName = "ability";
     info.formName = "form";
     auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(info);
-    EXPECT_EQ(key, "bundlemoduleabilityform");
+    EXPECT_EQ(key, "6:bundle6:module7:ability4:form");
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest MakeFormShareInfoKey_001 end";
 }
 
@@ -2944,7 +2944,7 @@ HWTEST_F(FmsFormShareMgrTest, MakeFormShareInfoKey_002, TestSize.Level1)
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, module);
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, form);
     auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(want);
-    EXPECT_EQ(key, "bundlemoduleabilityform");
+    EXPECT_EQ(key, "6:bundle6:module7:ability4:form");
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest MakeFormShareInfoKey_002 end";
 }
 
