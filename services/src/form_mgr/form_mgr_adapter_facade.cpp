@@ -517,6 +517,12 @@ int FormMgrAdapterFacade::BackgroundEvent(const int64_t formId, Want &want,
     return FormEventAdapter::GetInstance().BackgroundEvent(formId, want, callerToken);
 }
 
+int FormMgrAdapterFacade::InsightIntentEvent(const int64_t formId, Want &want,
+    const sptr<IRemoteObject> &callerToken)
+{
+    return FormEventAdapter::GetInstance().InsightIntentEvent(formId, want, callerToken);
+}
+
 void FormMgrAdapterFacade::SetFreeInstallFlag(const FormRecord &record, Want &want)
 {
     HILOG_INFO("called");

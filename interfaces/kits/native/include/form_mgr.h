@@ -235,11 +235,20 @@ public:
     int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken);
 
     /**
+     * @brief Process js insight intent event, launch the target ability by insight intent.
+     * @param formId Indicates the unique id of form.
+     * @param want the want which carries the insight intent execute param.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int InsightIntentEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken);
+
+    /**
      * @brief Process Background event.
      * @param formId Indicates the unique id of form.
      * @param want the want of the ability to start.
      * @param callerToken Caller ability token.
-     * @return Returns true if execute success, false otherwise.
+     * @return Returns ERR_OK on success, others on failure.
      */
     int BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken);
 

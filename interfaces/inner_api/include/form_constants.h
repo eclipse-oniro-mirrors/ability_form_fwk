@@ -480,6 +480,8 @@ namespace Constants {
     };
     constexpr const char* PARAM_OPEN_TYPE = "ohos.form.action.key.open_type";
 
+    constexpr const char* PARAM_ENABLE_ROUTE_SECOND_PAGE = "ohos.form.action.key.enable_route_second_page";
+
     constexpr char DISTRIBUTE_FORM_MODULE[] = "widgetUiModule";
 
     constexpr const char* FORM_MANAGER_SHOW_SINGLE_FORM_KEY = "ohos.extra.param.key.form_manager_show_single_form";

@@ -837,7 +837,7 @@ int FormMgrProxy::DumpFormTimerByFormId(const std::int64_t formId, std::string &
  * @param formId Indicates the unique id of form.
  * @param want information passed to supplier.
  * @param callerToken Caller ability token.
- * @return Returns true if execute success, false otherwise.
+ * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrProxy::MessageEvent(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken)
 {
@@ -876,7 +876,7 @@ int FormMgrProxy::MessageEvent(const int64_t formId, const Want &want, const spt
  * @param formId Indicates the unique id of form.
  * @param want the want of the ability to start.
  * @param callerToken Caller ability token.
- * @return Returns true if execute success, false otherwise.
+ * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrProxy::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
@@ -920,7 +920,7 @@ int FormMgrProxy::BackgroundEvent(const int64_t formId, Want &want, const sptr<I
  * @param formId Indicates the unique id of form.
  * @param want the want of the ability to start.
  * @param callerToken Caller ability token.
- * @return Returns true if execute success, false otherwise.
+ * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrProxy::RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
@@ -946,6 +946,50 @@ int FormMgrProxy::RouterEvent(const int64_t formId, Want &want, const sptr<IRemo
     MessageParcel reply;
     MessageOption option;
     int error = SendTransactCmd(IFormMgr::Message::FORM_MGR_ROUTER_EVENT,
+        data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    int32_t result = 0;
+    if (!reply.ReadInt32(result)) {
+        HILOG_ERROR("read result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+/**
+ * @brief Process js insight intent event, launch the target ability by insight intent.
+ * @param formId Indicates the unique id of form.
+ * @param want the want which carries the insight intent execute param.
+ * @param callerToken Caller ability token.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrProxy::InsightIntentEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interfaceToken failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("write formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("write want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("write callerToken failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(IFormMgr::Message::FORM_MGR_INSIGHT_INTENT_EVENT,
         data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("SendRequest:%{public}d failed", error);

@@ -71,6 +71,8 @@ public:
     virtual int32_t GetHostFormsCount(const std::string &bundleName, int32_t &formCount) = 0;
     virtual ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName,
         bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos, int32_t userId) = 0;
+    virtual ErrCode GetRunningFormInfosByFormId(const int64_t formId,
+        RunningFormInfo &runningFormInfo, const int32_t userId) = 0;
     virtual ErrCode GetFormInstancesByFilter(const FormInstancesFilter &filter,
         std::vector<FormInstance> &formInstances) = 0;
     virtual bool CreateFormStateRecord(std::string &provider, const FormItemInfo &info,
@@ -145,6 +147,8 @@ public:
     MOCK_METHOD2(GetHostFormsCount, int32_t(const std::string &bundleName, int32_t &formCount));
     MOCK_METHOD4(GetRunningFormInfosByBundleName, ErrCode(const std::string &bundleName,
         bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos, int32_t userId));
+    MOCK_METHOD3(GetRunningFormInfosByFormId, ErrCode(const int64_t formId,
+        RunningFormInfo &runningFormInfo, const int32_t userId));
     MOCK_METHOD2(GetFormInstancesByFilter, ErrCode(const FormInstancesFilter &filter,
         std::vector<FormInstance> &formInstances));
     MOCK_METHOD4(CreateFormStateRecord, bool(std::string &provider, const FormItemInfo &info,

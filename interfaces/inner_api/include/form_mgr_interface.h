@@ -256,7 +256,7 @@ public:
      * @param formId Indicates the unique id of form.
      * @param want information passed to supplier.
      * @param callerToken Caller ability token.
-     * @return Returns true if execute success, false otherwise.
+     * @return Returns ERR_OK on success, others on failure.
      */
     virtual int MessageEvent(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken) = 0;
 
@@ -265,7 +265,7 @@ public:
      * @param formId Indicates the unique id of form.
      * @param want the want of the ability to start.
      * @param callerToken Caller ability token.
-     * @return Returns true if execute success, false otherwise.
+     * @return Returns ERR_OK on success, others on failure.
      */
     virtual int BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) = 0;
 
@@ -274,9 +274,21 @@ public:
      * @param formId Indicates the unique id of form.
      * @param want the want of the ability to start.
      * @param callerToken Caller ability token.
-     * @return Returns true if execute success, false otherwise.
+     * @return Returns ERR_OK on success, others on failure.
      */
     virtual int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) = 0;
+
+    /**
+     * @brief Process js insight intent event, launch the target ability by insight intent.
+     * @param formId Indicates the unique id of form.
+     * @param want the want which carries the insight intent execute param.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int InsightIntentEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
+    {
+        return ERR_OK;
+    }
 
     /**
      * @brief Delete the invalid forms.
@@ -1351,6 +1363,7 @@ public:
         FORM_MGR_UNREGISTER_FORM_HOST_SERVICE,
         FORM_MGR_GET_AVAILABLE_FORM_HOST_SERVICES,
         FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_DEVICE,
+        FORM_MGR_INSIGHT_INTENT_EVENT,
     };
 };
 }  // namespace AppExecFwk

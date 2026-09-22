@@ -279,6 +279,10 @@ public:
     {
         return number_;
     }
+    int InsightIntentEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override
+    {
+        return number_;
+    }
     int DeleteInvalidForms(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
         int32_t &numFormsDeleted) override
     {

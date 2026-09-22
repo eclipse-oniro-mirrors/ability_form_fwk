@@ -54,6 +54,9 @@ public:
     int BackgroundEvent(const int64_t formId, Want &want,
         const sptr<IRemoteObject> &callerToken);
 
+    int InsightIntentEvent(const int64_t formId, Want &want,
+        const sptr<IRemoteObject> &callerToken);
+
     void SetFreeInstallFlag(const FormRecord &record, Want &want);
 
     bool OpenByOpenType(const int32_t openType, const FormRecord &record,
@@ -61,6 +64,11 @@ public:
 
 private:
     void NotifyFormClickEvent(int64_t formId, const std::string &formClickType, const int32_t userId);
+
+    void DiscardRouterEventUri(const FormRecord &record, Want &want);
+
+    int32_t StartAbilityForRouter(const int64_t formId, Want &want,
+        const sptr<IRemoteObject> &callerToken, const int32_t callerUserId, const uint32_t accessTokenId);
 
     /**
      * @brief Check if the app has permission to keep background running

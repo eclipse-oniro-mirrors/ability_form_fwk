@@ -415,6 +415,8 @@ int FormMgrStub::OnRemoteRequestSeventh(uint32_t code, MessageParcel &data, Mess
             return HandleGetAvailableFormHostServices(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_DEVICE):
             return HandleRequestPublishFormCrossDevice(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_INSIGHT_INTENT_EVENT):
+            return HandleInsightIntentEvent(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1123,6 +1125,38 @@ int32_t FormMgrStub::HandleBackgroundEvent(MessageParcel &data, MessageParcel &r
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = BackgroundEvent(formId, *want, client);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+/**
+ * @brief Handle InsightIntentEvent message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleInsightIntentEvent(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("ReadParcelable<Want> failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    sptr<IRemoteObject> client = data.ReadRemoteObject();
+    if (client == nullptr) {
+        HILOG_ERROR("get remote object failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = InsightIntentEvent(formId, *want, client);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

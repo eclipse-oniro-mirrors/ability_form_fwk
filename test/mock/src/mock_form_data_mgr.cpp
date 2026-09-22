@@ -255,6 +255,17 @@ ErrCode FormDataMgr::GetRunningFormInfosByBundleName(const std::string &bundleNa
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
+ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId,
+    RunningFormInfo &runningFormInfo, const int32_t userId)
+{
+    GTEST_LOG_(INFO) << "GetRunningFormInfosByFormId called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetRunningFormInfosByFormId(
+            formId, runningFormInfo, userId);
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
 ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &filter,
     std::vector<FormInstance> &formInstances)
 {

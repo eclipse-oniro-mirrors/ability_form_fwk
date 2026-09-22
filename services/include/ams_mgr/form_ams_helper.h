@@ -23,6 +23,7 @@
 #include "common/event/form_event_handler.h"
 #include "common/util/form_serial_queue.h"
 #include "iconfiguration_observer.h"
+#include "insight_intent/insight_intent_execute_lite_param.h"
 #include "start_options.h"
 #include "uri.h"
 
@@ -142,6 +143,21 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode StartAbilityByCallerToken(const Want &want, const sptr<IRemoteObject> &callerToken);
+    /**
+     * @brief ExecuteUIAbilityForegroundIntentWithSpecifyTokenId, execute insight intent with AMS.
+     * @param want The want of the intent execution; carries the form identity params
+     *        (ohos.extra.param.key.form_identity / formID) of the clicked card and the target
+     *        triple (bundle/module/ability) in its element, which AMS reads via want.GetElement().
+     * @param callerAbilityToken The caller ability token.
+     * @param param The insight intent execute lite param, whose key and insightIntentHostClient
+     *        carry the execute-done callback info of the form scenario.
+     * @param specifiedFullTokenId The specified full token id for permission checking,
+     *        with tokenAttr in the high 32 bits and the hap token id in the low 32 bits.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(const AAFwk::Want &want,
+        const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteLiteParam &param,
+        uint64_t specifiedFullTokenId);
 private:
     /**
      * @brief acquire a form ability manager, if it not existed,

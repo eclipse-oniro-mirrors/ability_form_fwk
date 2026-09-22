@@ -29,6 +29,7 @@ ohos_unittest("FmsFormEventAdapterTest") {
     "${form_fwk_path}/test/mock/src/mock_form_data_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_info_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_bms_helper.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_ams_helper.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_timer_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_db_cache.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_bundle_forbid_mgr.cpp",
@@ -39,6 +40,7 @@ ohos_unittest("FmsFormEventAdapterTest") {
     "${form_fwk_path}/test/mock/src/mock_form_observer_record.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_background_connection.cpp",
     "${form_fwk_path}/test/mock/src/mock_ipc_skeleton.cpp",
+    "mock_accesstoken_kit.cpp",
     "fms_form_event_adapter_test.cpp",
   ]
 
@@ -88,6 +90,7 @@ ohos_unittest("FmsFormEventAdapterTest") {
     "ability_runtime:ability_manager",
     "ability_runtime:ability_start_options",
     "ability_runtime:app_manager",
+    "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",

@@ -17,10 +17,13 @@
 
 #include <algorithm>
 
+#include "accesstoken_kit.h"
 #include "bundle_info.h"
 #include "bundle_mgr_interface.h"
 #include "hitrace_meter.h"
-#include "in_process_call_wrapper.h"
+#include "insight_intent/insight_intent_execute_param.h"
+#include "insight_intent/insight_intent_execute_lite_param.h"
+#include "insight_intent_host_client.h"
 #include "running_form_info.h"
 #include "start_options.h"
 
@@ -32,7 +35,6 @@
 
 #include "ams_mgr/form_ams_helper.h"
 #include "bms_mgr/form_bms_helper.h"
-#include "common/util/form_util.h"
 #include "data_center/form_data_mgr.h"
 #include "feature/route_proxy/form_router_proxy_mgr.h"
 #include "form_constants.h"
@@ -51,6 +53,90 @@ using namespace FormAdapterConstants;
 namespace {
 constexpr int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 constexpr const char* PARAM_FREE_INSTALL_CALLING_UID = "ohos.freeinstall.params.callingUid";
+constexpr int32_t TOKEN_ATTR_SHIFT_BITS = 32;
+
+uint64_t GetProviderSpecifiedFullTokenId(const std::string &bundleName, const int32_t userId)
+{
+    if (bundleName.empty()) {
+        return 0;
+    }
+    const auto hapTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(userId, bundleName, 0);
+    if (hapTokenId == 0) {
+        HILOG_ERROR("GetHapTokenID failed, userId:%{public}d, bundleName:%{public}s",
+            userId, bundleName.c_str());
+        return 0;
+    }
+    Security::AccessToken::HapTokenInfo hapInfo;
+    uint64_t specifiedFullTokenId = hapTokenId;
+    if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(hapTokenId, hapInfo) ==
+        Security::AccessToken::AccessTokenKitRet::RET_SUCCESS) {
+        specifiedFullTokenId = (static_cast<uint64_t>(hapInfo.tokenAttr) << TOKEN_ATTR_SHIFT_BITS) + hapTokenId;
+    }
+    return specifiedFullTokenId;
+}
+
+std::string GetProviderMainElement(const FormRecord &record)
+{
+    BundleInfo bundleInfo;
+    const int32_t flags = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_HAP_MODULE);
+    if (!FormBmsHelper::GetInstance().GetBundleInfoByFlags(
+        record.bundleName, flags, record.providerUserId, bundleInfo)) {
+        HILOG_ERROR("GetBundleInfoByFlags failed, bundleName:%{public}s", record.bundleName.c_str());
+        return "";
+    }
+    for (const auto &hapModuleInfo : bundleInfo.hapModuleInfos) {
+        if (hapModuleInfo.name == record.moduleName) {
+            return hapModuleInfo.mainElementName;
+        }
+    }
+    HILOG_ERROR("module not found, bundleName:%{public}s, moduleName:%{public}s",
+        record.bundleName.c_str(), record.moduleName.c_str());
+    return "";
+}
+
+int PrepareInsightIntentParam(Want &want, const FormRecord &record, InsightIntentExecuteLiteParam &executeParam)
+{
+    const WantParams &wantParams = want.GetParams();
+    if (!wantParams.HasParam(INSIGHT_INTENT_EXECUTE_PARAM_NAME)) {
+        HILOG_ERROR("no intent name in want");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    executeParam.insightIntentName = wantParams.GetStringParam(INSIGHT_INTENT_EXECUTE_PARAM_NAME);
+    if (executeParam.insightIntentName.empty()) {
+        HILOG_ERROR("empty intent name");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    executeParam.insightIntentParam = wantParams.GetWantParams(INSIGHT_INTENT_EXECUTE_PARAM_PARAM);
+    ElementName element = want.GetElement();
+    if (element.GetBundleName().empty()) {
+        element.SetBundleName(record.bundleName);
+    }
+    if (element.GetModuleName().empty()) {
+        element.SetModuleName(record.moduleName);
+    }
+    if (element.GetAbilityName().empty()) {
+        const std::string mainElement = GetProviderMainElement(record);
+        if (mainElement.empty()) {
+            HILOG_ERROR("empty mainElement, bundleName:%{public}s, moduleName:%{public}s",
+                record.bundleName.c_str(), record.moduleName.c_str());
+            return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+        }
+        element.SetAbilityName(mainElement);
+    }
+    want.SetElement(element);
+    return ERR_OK;
+}
+
+void SetFormIdentityParams(Want &want, const int64_t formId)
+{
+    if (formId < MAX_NUMBER_OF_JS) {
+        want.SetParam(Constants::PARAM_FORM_ID, formId);
+        want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
+    } else {
+        want.SetParam(Constants::PARAM_FORM_ID, std::to_string(formId));
+        want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(formId));
+    }
+}
 } // namespace
 
 FormEventAdapter::FormEventAdapter()
@@ -148,6 +234,8 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         }
     }
 
+    DiscardRouterEventUri(record, want);
+
     if (record.bundleName != want.GetBundle() && want.GetUriString().empty()) {
         if (!record.isSystemApp) {
             HILOG_WARN("Only system apps can launch the ability of the other apps");
@@ -160,7 +248,6 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         return ERR_OK;
     }
     ApplicationInfo appInfo;
-    int32_t result;
     int32_t callerUserId = FormCommonAdapter::GetInstance().GetCallingUserId();
     if (FormBmsHelper::GetInstance().GetApplicationInfo(record.bundleName, callerUserId, appInfo) != ERR_OK) {
         HILOG_ERROR("Get app info failed");
@@ -179,25 +266,19 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         }
     }
 
+    HILOG_DEBUG("RouterEvent send to ams, abilityName: %{public}s, uri: %{public}s",
+        want.GetElement().GetAbilityName().c_str(), want.GetUriString().c_str());
+
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
-        int32_t result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerToken,
-            appInfo.accessTokenId, callerUserId);
-        if (result != ERR_OK && result != START_ABILITY_WAITING) {
-            HILOG_ERROR("fail StartAbility, result:%{public}d", result);
-            return result;
-        }
-        NotifyFormClickEvent(formId, FORM_CLICK_ROUTER, callerUserId);
-        return ERR_OK;
+        return StartAbilityForRouter(formId, want, callerToken, callerUserId, appInfo.accessTokenId);
     }
-    result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerToken, appInfo.accessTokenId,
-        callerUserId);
-    if (result != ERR_OK && result != START_ABILITY_WAITING) {
-        HILOG_ERROR("fail StartAbility, result:%{public}d", result);
+
+    int32_t result = StartAbilityForRouter(formId, want, callerToken, callerUserId, appInfo.accessTokenId);
+    if (result != ERR_OK) {
         return result;
     }
 
-    NotifyFormClickEvent(formId, FORM_CLICK_ROUTER, callerUserId);
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     if (!FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
@@ -205,6 +286,29 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         DeviceUsageStats::BundleActiveClient::GetInstance().ReportEvent(event, callerUserId);
     }
 #endif
+    return ERR_OK;
+}
+
+void FormEventAdapter::DiscardRouterEventUri(const FormRecord &record, Want &want)
+{
+    bool enableRouteSecondPage = want.GetBoolParam(Constants::PARAM_ENABLE_ROUTE_SECOND_PAGE, false);
+    if (!(enableRouteSecondPage && record.isSystemApp) && !want.GetUriString().empty()
+        && !want.GetElement().GetAbilityName().empty()) {
+        HILOG_WARN("abilityName and uri both exist, abilityName first and discard uri");
+        want.SetUri("");
+    }
+}
+
+int32_t FormEventAdapter::StartAbilityForRouter(const int64_t formId, Want &want,
+    const sptr<IRemoteObject> &callerToken, const int32_t callerUserId, const uint32_t accessTokenId)
+{
+    int32_t result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerToken,
+        accessTokenId, callerUserId);
+    if (result != ERR_OK && result != START_ABILITY_WAITING) {
+        HILOG_ERROR("fail StartAbility, result:%{public}d", result);
+        return result;
+    }
+    NotifyFormClickEvent(formId, FORM_CLICK_ROUTER, callerUserId);
     return ERR_OK;
 }
 
@@ -271,6 +375,55 @@ int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
         return result;
     }
     NotifyFormClickEvent(formId, FORM_CLICK_CALL, FormCommonAdapter::GetInstance().GetCallingUserId());
+    return ERR_OK;
+}
+
+int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("call");
+    if (formId <= 0) {
+        HILOG_ERROR("invalid formId");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    const int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    FormRecord record;
+    if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
+        HILOG_ERROR("not exist such form:%{public}" PRId64 "", matchedFormId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    if (!record.isSystemApp) {
+        HILOG_ERROR("insightIntent rejected, provider is not system app, "
+            "bundleName:%{public}s", record.bundleName.c_str());
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    const uint64_t specifiedFullTokenId =
+        GetProviderSpecifiedFullTokenId(record.bundleName, record.providerUserId);
+    if (specifiedFullTokenId == 0) {
+        HILOG_ERROR("get provider specifiedFullTokenId failed, bundleName:%{public}s",
+            record.bundleName.c_str());
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+    InsightIntentExecuteLiteParam executeParam;
+    int32_t result = PrepareInsightIntentParam(want, record, executeParam);
+    if (result != ERR_OK) {
+        return result;
+    }
+    executeParam.key = static_cast<uint64_t>(matchedFormId);
+    executeParam.insightIntentHostClient =
+        new (std::nothrow) AbilityRuntime::InsightIntentHostClient();
+    if (executeParam.insightIntentHostClient == nullptr) {
+        HILOG_ERROR("null insightIntentHostClient");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    SetFormIdentityParams(want, matchedFormId);
+    result = FormAmsHelper::GetInstance().ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(
+        want, callerToken, executeParam, specifiedFullTokenId);
+    if (result != ERR_OK) {
+        HILOG_ERROR("fail ExecuteUIAbilityForegroundIntentWithSpecifyTokenId, result:%{public}d", result);
+        return result;
+    }
+    NotifyFormClickEvent(formId, FORM_CLICK_INSIGHT_INTENT, FormCommonAdapter::GetInstance().GetCallingUserId());
     return ERR_OK;
 }
 
