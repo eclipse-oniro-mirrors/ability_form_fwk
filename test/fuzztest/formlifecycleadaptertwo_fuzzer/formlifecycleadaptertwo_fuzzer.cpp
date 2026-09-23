@@ -16,6 +16,7 @@
 #include <cctype>
 #include "formlifecycleadaptertwo_fuzzer.h"
 
+#include <cstdlib>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -25,9 +26,20 @@
 
 #include "rdb_helper.h"
 
+extern "C" void* ffrt_alloc_auto_managed_function_storage_base(ffrt_function_kind_t kind)
+{
+    return malloc(ffrt_auto_managed_function_storage_size);
+}
+
 extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
     ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
 {
+    if (f != nullptr) {
+        if (f->destroy != nullptr) {
+            f->destroy(f);
+        }
+        free(f);
+    }
     return nullptr;
 }
 
@@ -182,6 +194,7 @@ static void ScenarioA(FuzzedDataProvider *fdp)
     constexpr int64_t DEL_ID = SCENARIO_A_BASE + 1;
     constexpr int64_t REL_ID = SCENARIO_A_BASE + 2;
     constexpr int64_t CAST_ID = SCENARIO_A_BASE + 3;
+    constexpr int64_t REL_ID_NO_RECORD = SCENARIO_A_BASE + 12;
 
     auto &adapter = FormLifecycleAdapter::GetInstance();
     auto &dataMgr = FormDataMgr::GetInstance();
@@ -228,15 +241,16 @@ static void ScenarioA(FuzzedDataProvider *fdp)
     //   L429 isSelfDbFormId likely fails (uid mismatch) -> error branch
     adapter.DeleteForm(DEL_ID, callerToken);
 
-    // Call 2: ReleaseForm with delCache=true -> HandleReleaseForm path
+    // Call 2: ReleaseForm with fuzz-derived delCache -> HandleReleaseForm path
     //   L732 pass -> L740 ExistTempForm false -> L749 GetDBRecord success
     //   L759 isSelfDbFormId check -> L764 delCache true -> HandleReleaseForm
     //   L507 ExistFormRecord success -> L514 GetMatchedHostClient success
-    adapter.ReleaseForm(REL_ID, callerToken, true);
+    bool delCache = fdp->ConsumeBool();
+    adapter.ReleaseForm(REL_ID, callerToken, delCache);
 
-    // Call 3: ReleaseForm with delCache=false -> skip HandleReleaseForm
+    // Call 3: ReleaseForm with opposite delCache -> alternate branch
     //   L764 delCache false -> L772 DeleteHostRecord
-    adapter.ReleaseForm(REL_ID + 10, callerToken, false);
+    adapter.ReleaseForm(REL_ID_NO_RECORD, callerToken, !delCache);
 
     // Call 4: CastTempForm -> deep branches
     //   L793 pass -> L799 ExistFormRecord+ExistTempForm both true
@@ -349,25 +363,30 @@ static void ScenarioC(FuzzedDataProvider *fdp)
     r2.lockForm = true;
     dataMgr.formRecords_[FORM_ID_2] = r2;
 
-    // Call 1: EnableForms with enable=true
+    // Fuzz-derived booleans exercise both true/false branches of each API.
+    bool enable = fdp->ConsumeBool();
+    bool protect = fdp->ConsumeBool();
+    bool lock = fdp->ConsumeBool();
+
+    // Call 1: EnableForms with fuzz-derived enable
     //   L1015 GetFormRecord(bundleName) success (seeded records match)
     //   L1021 loop body entry
-    //   L1027 r1: enableForm(false)!=enable(true) && providerUserId==userId -> process
-    //   L1027 r2: enableForm(true)==enable(true) -> erase+continue (skip branch)
-    adapter.EnableForms(TEST_BUNDLE_C, TEST_USER_ID, true);
+    //   L1027 r1: enableForm(false)!=enable && providerUserId==userId -> process
+    //   L1027 r2: enableForm(true)==enable -> erase+continue (skip branch)
+    adapter.EnableForms(TEST_BUNDLE_C, TEST_USER_ID, enable);
 
-    // Call 2: ProtectLockForms with protect=true
+    // Call 2: ProtectLockForms with fuzz-derived protect
     //   L1057 GetFormRecord(bundleName, formInfos, userId) success
     //   L1078 loop body entry
     //   L1081 IsExemptLock check -> L1085-1090 update branches
-    adapter.ProtectLockForms(TEST_BUNDLE_C, TEST_USER_ID, true);
+    adapter.ProtectLockForms(TEST_BUNDLE_C, TEST_USER_ID, protect);
 
-    // Call 3: SwitchLockForms with lock=true
+    // Call 3: SwitchLockForms with fuzz-derived lock
     //   L1257 GetFormRecord(bundleName, formInfos, userId) success
     //   L1263 loop body entry
-    //   L1270 r1: lockForm(false)!=lock(true) -> process
+    //   L1270 r1: lockForm(false)!=lock -> process
     //   L1283 unconditional ProtectLockForms call
-    adapter.SwitchLockForms(TEST_BUNDLE_C, TEST_USER_ID, true);
+    adapter.SwitchLockForms(TEST_BUNDLE_C, TEST_USER_ID, lock);
 }
 
 // ===================================================================
