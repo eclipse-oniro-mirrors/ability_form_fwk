@@ -20,6 +20,8 @@
 #include "js_form_edit_extension_context.h"
 #include "js_ui_extension_content_session.h"
 #include "napi_common_want.h"
+#include "form_constants.h"
+#include "res_common.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -130,5 +132,30 @@ void JsFormEditExtensionImpl::BindContext()
     }
 }
 
+bool JsFormEditExtensionImpl::HandleSessionCreate(const Want &want, const sptr<AAFwk::SessionInfo> &sessionInfo)
+{
+    TAG_LOGI(AAFwkTag::UI_EXT, "JsFormEditExtensionImpl HandleSessionCreate called");
+    // Apply color mode before base class creates the window (no flicker).
+    if (context_ != nullptr) {
+        // Color mode is passed by caller (e.g. desktop) via want parameter to override system setting.
+        int32_t colorMode = want.GetIntParam(Constants::PARAM_FORM_EDIT_COLOR_MODE,
+            static_cast<int32_t>(OHOS::Global::Resource::ColorMode::COLOR_MODE_NOT_SET));
+        TAG_LOGI(AAFwkTag::UI_EXT, "FormEdit GetIntParam colorMode result: %{public}d", colorMode);
+        // Only apply valid DARK/LIGHT values; ignore COLOR_MODE_NOT_SET to avoid overriding system default.
+        if (colorMode == static_cast<int32_t>(OHOS::Global::Resource::ColorMode::DARK) ||
+            colorMode == static_cast<int32_t>(OHOS::Global::Resource::ColorMode::LIGHT)) {
+            TAG_LOGI(AAFwkTag::UI_EXT, "FormEdit colorMode from want: %{public}d", colorMode);
+            context_->SetAbilityColorMode(colorMode);
+            TAG_LOGI(AAFwkTag::UI_EXT, "FormEdit SetAbilityColorMode done, colorMode: %{public}d", colorMode);
+        } else {
+            TAG_LOGI(AAFwkTag::UI_EXT, "FormEdit colorMode not DARK/LIGHT, skip SetAbilityColorMode: %{public}d",
+                colorMode);
+        }
+    } else {
+        TAG_LOGW(AAFwkTag::UI_EXT, "FormEdit context_ is null");
+    }
+    TAG_LOGI(AAFwkTag::UI_EXT, "FormEdit call JsUIExtensionBase::HandleSessionCreate");
+    return JsUIExtensionBase::HandleSessionCreate(want, sessionInfo);
+}
 } // namespace AbilityRuntime
 } // namespace OHOS

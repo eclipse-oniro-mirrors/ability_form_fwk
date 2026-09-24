@@ -46,6 +46,7 @@ group("unittest") {
     "unittest/fms_form_data_proxy_mgr_test:unittest",
     "unittest/fms_form_data_proxy_record_test:unittest",
     "unittest/fms_form_db_info_test:unittest",
+    "unittest/fms_form_edit_extension_test:unittest",
     "unittest/fms_form_db_record_test:unittest",
     "unittest/fms_form_distributed_client_test:unittest",
     "unittest/fms_form_event_notify_connection_test:unittest",
