@@ -38,8 +38,8 @@ public:
 
 protected:
     void BindContext() override;
-    // Intercept session create to apply color mode from want before window creation.
-    bool HandleSessionCreate(const Want &want, const sptr<AAFwk::SessionInfo> &sessionInfo);
+    // Apply color mode from want before base class creates the window (no flicker).
+    void OnForeground(const Want &want, sptr<AAFwk::SessionInfo> sessionInfo) override;
 
 protected:
     std::shared_ptr<FormEditExtensionContext> context_ = nullptr;

@@ -132,10 +132,10 @@ void JsFormEditExtensionImpl::BindContext()
     }
 }
 
-bool JsFormEditExtensionImpl::HandleSessionCreate(const Want &want, const sptr<AAFwk::SessionInfo> &sessionInfo)
+void JsFormEditExtensionImpl::OnForeground(const Want &want, sptr<AAFwk::SessionInfo> sessionInfo)
 {
-    TAG_LOGI(AAFwkTag::UI_EXT, "JsFormEditExtensionImpl HandleSessionCreate called");
-    // Apply color mode before base class creates the window (no flicker).
+    TAG_LOGI(AAFwkTag::UI_EXT, "JsFormEditExtensionImpl OnForeground called");
+    // Apply color mode before base class to let window inherit context config on creation (no flicker).
     if (context_ != nullptr) {
         // Color mode is passed by caller (e.g. desktop) via want parameter to override system setting.
         int32_t colorMode = want.GetIntParam(Constants::PARAM_FORM_EDIT_COLOR_MODE,
@@ -154,8 +154,8 @@ bool JsFormEditExtensionImpl::HandleSessionCreate(const Want &want, const sptr<A
     } else {
         TAG_LOGW(AAFwkTag::UI_EXT, "FormEdit context_ is null");
     }
-    TAG_LOGI(AAFwkTag::UI_EXT, "FormEdit call JsUIExtensionBase::HandleSessionCreate");
-    return JsUIExtensionBase::HandleSessionCreate(want, sessionInfo);
+    TAG_LOGI(AAFwkTag::UI_EXT, "FormEdit call JsUIExtensionBase::OnForeground");
+    JsUIExtensionBase::OnForeground(want, sessionInfo);
 }
 } // namespace AbilityRuntime
 } // namespace OHOS
