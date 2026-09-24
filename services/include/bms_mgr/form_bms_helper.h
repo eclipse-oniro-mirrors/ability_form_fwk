@@ -102,6 +102,20 @@ public:
     bool GetBundleInfo(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo);
 
     /**
+     * @brief Query all ability and extension infos implicitly matching the want (e.g. by uri).
+     * @param want The want containing uri to look for.
+     * @param userId Indicates the user ID.
+     * @param withDefault Whether to query the default application first.
+     * @param abilityInfos Indicates the obtained AbilityInfo vector.
+     * @param extensionInfos Indicates the obtained ExtensionAbilityInfo vector.
+     * @param findDefaultApp Indicates whether a default application is found.
+     * @return Returns true on success, false on failure.
+     */
+    bool ImplicitQueryInfos(const Want &want, int32_t userId, bool withDefault,
+        std::vector<AbilityInfo> &abilityInfos, std::vector<ExtensionAbilityInfo> &extensionInfos,
+        bool &findDefaultApp);
+
+    /**
      * @brief Obtains the BundleInfo with Permission based on a given bundle name.
      * @param bundleName Indicates the application bundle name to be queried.
      * @param userId Indicates the user ID.
