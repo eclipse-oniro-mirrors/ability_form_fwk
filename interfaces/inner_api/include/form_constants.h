@@ -99,7 +99,7 @@ namespace Constants {
     constexpr const char* PARAM_CLOSE_FORM_EDIT_SEC_PAGE_VIEW = "closeFormEditSecPageView";
     constexpr const char* PARAM_PAGE_ROUTER_SERVICE_CODE = "pageRouterServiceCode";
     constexpr const char* PARAM_SEC_PAGE_ABILITY_NAME = "secPageAbilityName";
-    constexpr const char* PARAM_FORM_EDIT_COLOR_MODE = "ohos.extra.param.form_edit_color_mode";
+    constexpr const char* PARAM_FORM_EDIT_COLOR_MODE = "ohos.extra.param.key.form_edit_color_mode";
     constexpr const char* PARAM_DEVICE_ID_KEY = "ohos.extra.param.key.device_id";
     constexpr const char* PARAM_FORM_HOST_TOKEN = "ohos.extra.param.form.host.token";
     constexpr const char* PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY = "ohos.extra.param.key.form_host_bundle_name";
