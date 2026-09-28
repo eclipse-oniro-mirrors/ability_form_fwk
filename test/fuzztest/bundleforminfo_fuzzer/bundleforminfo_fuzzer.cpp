@@ -97,23 +97,29 @@ static std::string SanitizeUtf8(const std::string &input)
             ++i;
         } else if (c >= UTF8_TWO_BYTE_LEAD_MIN && c <= UTF8_TWO_BYTE_LEAD_MAX &&
                    remaining >= UTF8_TWO_BYTE_LEN &&
-                   (static_cast<unsigned char>(input[i + UTF8_FIRST_CONT_OFFSET]) & UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE) {
+                   (static_cast<unsigned char>(input[i + UTF8_FIRST_CONT_OFFSET]) &
+                   UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE) {
             out += input[i];
             out += input[i + UTF8_FIRST_CONT_OFFSET];
             i += UTF8_TWO_BYTE_LEN;
         } else if (c >= UTF8_THREE_BYTE_LEAD_MIN && c <= UTF8_THREE_BYTE_LEAD_MAX &&
                    remaining >= UTF8_THREE_BYTE_LEN &&
-                   (static_cast<unsigned char>(input[i + UTF8_FIRST_CONT_OFFSET]) & UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE &&
-                   (static_cast<unsigned char>(input[i + UTF8_SECOND_CONT_OFFSET]) & UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE) {
+                   (static_cast<unsigned char>(input[i + UTF8_FIRST_CONT_OFFSET]) &
+                   UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE &&
+                   (static_cast<unsigned char>(input[i + UTF8_SECOND_CONT_OFFSET]) &
+                   UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE) {
             out += input[i];
             out += input[i + UTF8_FIRST_CONT_OFFSET];
             out += input[i + UTF8_SECOND_CONT_OFFSET];
             i += UTF8_THREE_BYTE_LEN;
         } else if (c >= UTF8_FOUR_BYTE_LEAD_MIN && c <= UTF8_FOUR_BYTE_LEAD_MAX &&
                    remaining >= UTF8_FOUR_BYTE_LEN &&
-                   (static_cast<unsigned char>(input[i + UTF8_FIRST_CONT_OFFSET]) & UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE &&
-                   (static_cast<unsigned char>(input[i + UTF8_SECOND_CONT_OFFSET]) & UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE &&
-                   (static_cast<unsigned char>(input[i + UTF8_THIRD_CONT_OFFSET]) & UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE) {
+                   (static_cast<unsigned char>(input[i + UTF8_FIRST_CONT_OFFSET]) &
+                   UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE &&
+                   (static_cast<unsigned char>(input[i + UTF8_SECOND_CONT_OFFSET]) &
+                   UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE &&
+                   (static_cast<unsigned char>(input[i + UTF8_THIRD_CONT_OFFSET]) &
+                   UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE) {
             out += input[i];
             out += input[i + UTF8_FIRST_CONT_OFFSET];
             out += input[i + UTF8_SECOND_CONT_OFFSET];
