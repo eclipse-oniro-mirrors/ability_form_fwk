@@ -64,71 +64,13 @@ constexpr int32_t TEST_TYPE_UPDATE_CONFIGS = 1;
 constexpr int32_t TEST_TYPE_FORM_INFO_MGR = 2;
 constexpr int32_t NUM_TEST_SCENARIOS = 3;
 
-// UTF-8 encoding byte boundaries per RFC 3629
-static constexpr unsigned char UTF8_ASCII_MAX = 0x7F;
-static constexpr unsigned char UTF8_TWO_BYTE_LEAD_MIN = 0xC2;
-static constexpr unsigned char UTF8_TWO_BYTE_LEAD_MAX = 0xDF;
-static constexpr unsigned char UTF8_THREE_BYTE_LEAD_MIN = 0xE0;
-static constexpr unsigned char UTF8_THREE_BYTE_LEAD_MAX = 0xEF;
-static constexpr unsigned char UTF8_FOUR_BYTE_LEAD_MIN = 0xF0;
-static constexpr unsigned char UTF8_FOUR_BYTE_LEAD_MAX = 0xF4;
-static constexpr unsigned char UTF8_CONTINUATION_MASK = 0xC0;
-static constexpr unsigned char UTF8_CONTINUATION_VALUE = 0x80;
-static constexpr int32_t UTF8_TWO_BYTE_LEN = 2;
-static constexpr int32_t UTF8_THREE_BYTE_LEN = 3;
-static constexpr int32_t UTF8_FOUR_BYTE_LEN = 4;
-static constexpr size_t UTF8_FIRST_CONT_OFFSET = 1;
-static constexpr size_t UTF8_SECOND_CONT_OFFSET = 2;
-static constexpr size_t UTF8_THIRD_CONT_OFFSET = 3;
-
 // nlohmann::json::dump() with default strict error_handler aborts on invalid UTF-8.
-// Fuzz-generated strings can contain arbitrary bytes, so sanitize to valid UTF-8
-// before feeding them into any struct that gets JSON-serialized.
+// Strip non-ASCII to guarantee valid UTF-8 for json serialization.
 static std::string SanitizeUtf8(const std::string &input)
 {
     std::string out;
-    auto len = input.length();
-    out.reserve(len);
-    for (size_t i = 0; i < len;) {
-        unsigned char c = static_cast<unsigned char>(input[i]);
-        int32_t remaining = static_cast<int32_t>(len) - static_cast<int32_t>(i);
-        if (c <= UTF8_ASCII_MAX) {
-            out += static_cast<char>(c);
-            ++i;
-        } else if (c >= UTF8_TWO_BYTE_LEAD_MIN && c <= UTF8_TWO_BYTE_LEAD_MAX &&
-                   remaining >= UTF8_TWO_BYTE_LEN &&
-                   (static_cast<unsigned char>(input[i + UTF8_FIRST_CONT_OFFSET]) &
-                   UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE) {
-            out += input[i];
-            out += input[i + UTF8_FIRST_CONT_OFFSET];
-            i += UTF8_TWO_BYTE_LEN;
-        } else if (c >= UTF8_THREE_BYTE_LEAD_MIN && c <= UTF8_THREE_BYTE_LEAD_MAX &&
-                   remaining >= UTF8_THREE_BYTE_LEN &&
-                   (static_cast<unsigned char>(input[i + UTF8_FIRST_CONT_OFFSET]) &
-                   UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE &&
-                   (static_cast<unsigned char>(input[i + UTF8_SECOND_CONT_OFFSET]) &
-                   UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE) {
-            out += input[i];
-            out += input[i + UTF8_FIRST_CONT_OFFSET];
-            out += input[i + UTF8_SECOND_CONT_OFFSET];
-            i += UTF8_THREE_BYTE_LEN;
-        } else if (c >= UTF8_FOUR_BYTE_LEAD_MIN && c <= UTF8_FOUR_BYTE_LEAD_MAX &&
-                   remaining >= UTF8_FOUR_BYTE_LEN &&
-                   (static_cast<unsigned char>(input[i + UTF8_FIRST_CONT_OFFSET]) &
-                   UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE &&
-                   (static_cast<unsigned char>(input[i + UTF8_SECOND_CONT_OFFSET]) &
-                   UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE &&
-                   (static_cast<unsigned char>(input[i + UTF8_THIRD_CONT_OFFSET]) &
-                   UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_VALUE) {
-            out += input[i];
-            out += input[i + UTF8_FIRST_CONT_OFFSET];
-            out += input[i + UTF8_SECOND_CONT_OFFSET];
-            out += input[i + UTF8_THIRD_CONT_OFFSET];
-            i += UTF8_FOUR_BYTE_LEN;
-        } else {
-            out += '_';
-            ++i;
-        }
+    for (char c : input) {
+        out += (static_cast<unsigned char>(c) <= 0x7F) ? c : '_';
     }
     return out;
 }
