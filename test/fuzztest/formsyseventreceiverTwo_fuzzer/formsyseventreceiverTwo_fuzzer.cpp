@@ -57,7 +57,8 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 
 constexpr size_t MAX_LENGTH = 5;
-constexpr int32_t INVALID_USER = -1;
+constexpr int32_t MIN_USER_ID = -1;
+constexpr int32_t MAX_USER_ID = 1000;
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 {
     if (fdp == nullptr) {
@@ -78,26 +79,31 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     std::string bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     FormIdKey formIdKey(bundleName, abilityName);
     std::set<int64_t> formNums;
-    formNums.insert(formId);
+    int64_t batchFormId = fdp->ConsumeIntegral<int64_t>();
+    int batchUid = fdp->ConsumeIntegral<int>();
+    formNums.insert(batchFormId);
     std::map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
     noHostFormDbMap.emplace(formIdKey, formNums);
-    FormEventUtil::BatchDeleteNoHostDBForms(uid, noHostFormDbMap, removedFormsMap);
-    FormEventUtil::BatchDeleteNoHostTempForms(uid, noHostFormDbMap, removedFormsMap);
-    FormEventUtil::ReCreateForm(formId);
+    FormEventUtil::BatchDeleteNoHostDBForms(batchUid, noHostFormDbMap, removedFormsMap);
+    FormEventUtil::BatchDeleteNoHostTempForms(batchUid, noHostFormDbMap, removedFormsMap);
+    int64_t reCreateFormId = fdp->ConsumeIntegral<int64_t>();
+    FormEventUtil::ReCreateForm(reCreateFormId);
     FormTimerCfg cfg;
     FormRecord formRecord;
-    formRecord.formId = formId;
+    int64_t timerFormId = fdp->ConsumeIntegral<int64_t>();
+    formRecord.formId = timerFormId;
     formRecord.isEnableUpdate = fdp->ConsumeBool();
     cfg.enableUpdate = fdp->ConsumeBool();
-    FormEventUtil::HandleTimerUpdate(formId, formRecord, cfg);
-    formSysEventReceiver.HandleUserIdRemoved(INVALID_USER);
+    FormEventUtil::HandleTimerUpdate(timerFormId, formRecord, cfg);
+    formSysEventReceiver.HandleUserIdRemoved(fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID));
     formSysEventReceiver.HandleBundleScanFinished();
     FormInfo formInfo;
     formInfo.bundleName = bundleName;
     BundleInfo bundleInfo;
     std::vector<FormInfo> targetForms;
     targetForms.emplace_back(formInfo);
-    return FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms, bundleInfo);
+    int64_t providerFormId = fdp->ConsumeIntegral<int64_t>();
+    return FormEventUtil::ProviderFormUpdated(providerFormId, formRecord, targetForms, bundleInfo);
 }
 }
 

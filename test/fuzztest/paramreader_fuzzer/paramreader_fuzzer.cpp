@@ -64,7 +64,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     std::string path1 = fdp->ConsumeRandomLengthString(MAX_NUM);
     std::string path2 = fdp->ConsumeRandomLengthString(MAX_NUM);
-    ParamReader::GetInstance().GetPathVersion(Constants::FORM_MGR_CONFIG_DIR);
+    ParamReader::GetInstance().GetPathVersion(fdp->ConsumeRandomLengthString(MAX_NUM));
     ParamReader::GetInstance().VerifyCertSfFile();
     ParamReader::GetInstance().VerifyParamFile(path1);
     ParamReader::GetInstance().GetParamInfoStr(path2);
@@ -84,4 +84,4 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
     OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     return 0;
-}
+}

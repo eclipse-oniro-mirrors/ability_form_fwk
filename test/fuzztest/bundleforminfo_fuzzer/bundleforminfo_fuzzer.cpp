@@ -87,10 +87,11 @@ static constexpr size_t UTF8_THIRD_CONT_OFFSET = 3;
 static std::string SanitizeUtf8(const std::string &input)
 {
     std::string out;
-    out.reserve(input.size());
-    for (size_t i = 0; i < input.size();) {
+    auto len = input.length();
+    out.reserve(len);
+    for (size_t i = 0; i < len;) {
         unsigned char c = static_cast<unsigned char>(input[i]);
-        int32_t remaining = static_cast<int32_t>(input.size()) - static_cast<int32_t>(i);
+        int32_t remaining = static_cast<int32_t>(len) - static_cast<int32_t>(i);
         if (c <= UTF8_ASCII_MAX) {
             out += static_cast<char>(c);
             ++i;
