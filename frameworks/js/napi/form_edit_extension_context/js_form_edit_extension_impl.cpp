@@ -14,12 +14,16 @@
  */
 
 #include "js_form_edit_extension_impl.h"
+#include <cstring>
 #include "hilog_tag_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "js_form_edit_extension_context.h"
 #include "js_ui_extension_content_session.h"
 #include "napi_common_want.h"
+#include "form_constants.h"
+#include "res_common.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -128,6 +132,45 @@ void JsFormEditExtensionImpl::BindContext()
         delete workContext;
         return;
     }
+}
+
+napi_value JsFormEditExtensionImpl::CallObjectMethod(const char *name, napi_value const *argv, size_t argc,
+    bool withResult)
+{
+    if (name != nullptr && strcmp(name, "onSessionCreate") == 0) {
+        napi_env env = jsRuntime_.GetNapiEnv();
+        ProcessOnSessionCreate(env, argv, argc);
+    }
+    return JsUIExtensionBase::CallObjectMethod(name, argv, argc, withResult);
+}
+
+void JsFormEditExtensionImpl::ProcessOnSessionCreate(napi_env env, napi_value const *argv, size_t argc)
+{
+    if (argc < 1 || argv == nullptr) {
+        HILOG_ERROR("invalid argc or argv");
+        return;
+    }
+    AAFwk::Want want;
+    if (!AppExecFwk::UnwrapWant(env, argv[0], want)) {
+        HILOG_ERROR("UnwrapWant failed");
+        return;
+    }
+    int32_t colorMode = want.GetIntParam(Constants::PARAM_FORM_EDIT_COLOR_MODE,
+        static_cast<int32_t>(OHOS::Global::Resource::ColorMode::COLOR_MODE_NOT_SET));
+    if (colorMode == static_cast<int32_t>(OHOS::Global::Resource::ColorMode::COLOR_MODE_NOT_SET)) {
+        return;
+    }
+    if (colorMode < static_cast<int32_t>(OHOS::Global::Resource::ColorMode::DARK) ||
+        colorMode > static_cast<int32_t>(OHOS::Global::Resource::ColorMode::LIGHT)) {
+        HILOG_WARN("FormEdit invalid colorMode: %{public}d", colorMode);
+        return;
+    }
+    if (context_ == nullptr) {
+        HILOG_ERROR("context_ is null");
+        return;
+    }
+    HILOG_INFO("FormEdit colorMode: %{public}d", colorMode);
+    context_->SetAbilityColorMode(colorMode);
 }
 
 } // namespace AbilityRuntime
