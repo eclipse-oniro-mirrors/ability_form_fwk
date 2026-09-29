@@ -15,6 +15,7 @@
 
 #include "paramreader_fuzzer.h"
 
+#include <cstdlib>
 #include <cstddef>
 #include <cstdint>
 #include <fuzzer/FuzzedDataProvider.h>
@@ -27,9 +28,20 @@
 #undef private
 #undef protected
 
+extern "C" void* ffrt_alloc_auto_managed_function_storage_base(ffrt_function_kind_t kind)
+{
+    return malloc(ffrt_auto_managed_function_storage_size);
+}
+
 extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
     ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
 {
+    if (f != nullptr) {
+        if (f->destroy != nullptr) {
+            f->destroy(f);
+        }
+        free(f);
+    }
     return nullptr;
 }
 
@@ -52,7 +64,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 
     std::string path1 = fdp->ConsumeRandomLengthString(MAX_NUM);
     std::string path2 = fdp->ConsumeRandomLengthString(MAX_NUM);
-    ParamReader::GetInstance().GetPathVersion(Constants::FORM_MGR_CONFIG_DIR);
+    ParamReader::GetInstance().GetPathVersion(fdp->ConsumeRandomLengthString(MAX_NUM));
     ParamReader::GetInstance().VerifyCertSfFile();
     ParamReader::GetInstance().VerifyParamFile(path1);
     ParamReader::GetInstance().GetParamInfoStr(path2);
@@ -72,4 +84,4 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
     OHOS::DoSomethingInterestingWithMyAPI(&fdp);
     return 0;
-}
+}

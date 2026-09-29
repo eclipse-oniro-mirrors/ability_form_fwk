@@ -16,6 +16,7 @@
 #include "formproviderinfo_fuzzer.h"
 
 #include <cctype>
+#include <cstdlib>
 #include <cstddef>
 #include <cstdint>
 #include <fuzzer/FuzzedDataProvider.h>
@@ -24,9 +25,20 @@
 #include "form_provider_info.h"
 #include "securec.h"
 
+extern "C" void* ffrt_alloc_auto_managed_function_storage_base(ffrt_function_kind_t kind)
+{
+    return malloc(ffrt_auto_managed_function_storage_size);
+}
+
 extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
     ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
 {
+    if (f != nullptr) {
+        if (f->destroy != nullptr) {
+            f->destroy(f);
+        }
+        free(f);
+    }
     return nullptr;
 }
 
