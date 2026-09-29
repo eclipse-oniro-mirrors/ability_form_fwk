@@ -157,8 +157,16 @@ void JsFormEditExtensionImpl::ProcessOnSessionCreate(napi_env env, napi_value co
     }
     int32_t colorMode = want.GetIntParam(Constants::PARAM_FORM_EDIT_COLOR_MODE,
         static_cast<int32_t>(OHOS::Global::Resource::ColorMode::COLOR_MODE_NOT_SET));
-    if (colorMode < static_cast<int32_t>(OHOS::Global::Resource::ColorMode::COLOR_MODE_NOT_SET) ||
-        colorMode > static_cast<int32_t>(OHOS::Global::Resource::ColorMode::LIGHT) || context_ == nullptr) {
+    if (colorMode == static_cast<int32_t>(OHOS::Global::Resource::ColorMode::COLOR_MODE_NOT_SET)) {
+        return;
+    }
+    if (colorMode < static_cast<int32_t>(OHOS::Global::Resource::ColorMode::DARK) ||
+        colorMode > static_cast<int32_t>(OHOS::Global::Resource::ColorMode::LIGHT)) {
+        HILOG_WARN("FormEdit invalid colorMode: %{public}d", colorMode);
+        return;
+    }
+    if (context_ == nullptr) {
+        HILOG_ERROR("context_ is null");
         return;
     }
     HILOG_INFO("FormEdit colorMode: %{public}d", colorMode);
