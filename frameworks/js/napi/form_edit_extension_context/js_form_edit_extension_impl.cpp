@@ -22,7 +22,6 @@
 #include "js_ui_extension_content_session.h"
 #include "napi_common_want.h"
 #include "form_constants.h"
-#include "res_common.h"
 #include <cstring>
 
 namespace OHOS {
@@ -137,30 +136,30 @@ void JsFormEditExtensionImpl::BindContext()
 napi_value JsFormEditExtensionImpl::CallObjectMethod(const char *name, napi_value const *argv, size_t argc,
     bool withResult)
 {
-    if (name == nullptr || std::strcmp(name, "onSessionCreate") != 0 || context_ == nullptr || argc < 1) {
-        return JsUIExtensionBase::CallObjectMethod(name, argv, argc, withResult);
+    if (name != nullptr && strcmp(name, "onSessionCreate") == 0) {
+        napi_env env = jsRuntime_.GetNapiEnv();
+        ProcessOnSessionCreate(env, argv, argc);
     }
+    return JsUIExtensionBase::CallObjectMethod(name, argv, argc, withResult);
+}
 
-    HandleScope handleScope(jsRuntime_);
-    napi_env env = jsRuntime_.GetNapiEnv();
-    if (env == nullptr || argv == nullptr || argv[0] == nullptr) {
-        return JsUIExtensionBase::CallObjectMethod(name, argv, argc, withResult);
+void JsFormEditExtensionImpl::ProcessOnSessionCreate(napi_env env, napi_value const *argv, size_t argc)
+{
+    if (argc < 1 || argv == nullptr) {
+        HILOG_ERROR("invalid argc or argv");
+        return;
     }
-
     AAFwk::Want want;
     if (!AppExecFwk::UnwrapWant(env, argv[0], want)) {
         HILOG_ERROR("UnwrapWant failed");
-        return JsUIExtensionBase::CallObjectMethod(name, argv, argc, withResult);
+        return;
     }
-
-    int32_t colorMode = want.GetIntParam(Constants::PARAM_FORM_EDIT_COLOR_MODE,
-        static_cast<int32_t>(OHOS::Global::Resource::ColorMode::COLOR_MODE_NOT_SET));
-    if (colorMode == static_cast<int32_t>(OHOS::Global::Resource::ColorMode::DARK) ||
-        colorMode == static_cast<int32_t>(OHOS::Global::Resource::ColorMode::LIGHT)) {
-        HILOG_DEBUG("FormEdit colorMode: %{public}d", colorMode);
-        context_->SetAbilityColorMode(colorMode);
+    int32_t colorMode = want.GetIntParam(Constants::PARAM_FORM_EDIT_COLOR_MODE, -1);
+    if (colorMode < -1 || colorMode > 1) {
+        return;
     }
-    return JsUIExtensionBase::CallObjectMethod(name, argv, argc, withResult);
+    HILOG_INFO("FormEdit colorMode: %{public}d", colorMode);
+    context_->SetAbilityColorMode(colorMode);
 }
 
 } // namespace AbilityRuntime

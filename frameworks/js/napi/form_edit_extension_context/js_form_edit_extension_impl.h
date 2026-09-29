@@ -46,6 +46,7 @@ protected:
 
 private:
     using JsUIExtensionBase::SetContext;
+    void ProcessOnSessionCreate(napi_env env, napi_value const *argv, size_t argc);
 };
 } // namespace AbilityRuntime
 } // namespace OHOS
