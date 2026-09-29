@@ -23,6 +23,7 @@
 #include "js_ui_extension_content_session.h"
 #include "napi_common_want.h"
 #include "form_constants.h"
+#include "res_common.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -154,8 +155,10 @@ void JsFormEditExtensionImpl::ProcessOnSessionCreate(napi_env env, napi_value co
         HILOG_ERROR("UnwrapWant failed");
         return;
     }
-    int32_t colorMode = want.GetIntParam(Constants::PARAM_FORM_EDIT_COLOR_MODE, -1);
-    if (colorMode < -1 || colorMode > 1) {
+    int32_t colorMode = want.GetIntParam(Constants::PARAM_FORM_EDIT_COLOR_MODE,
+        static_cast<int32_t>(OHOS::Global::Resource::ColorMode::COLOR_MODE_NOT_SET));
+    if (colorMode < static_cast<int32_t>(OHOS::Global::Resource::ColorMode::COLOR_MODE_NOT_SET) ||
+        colorMode > static_cast<int32_t>(OHOS::Global::Resource::ColorMode::LIGHT) || context_ == nullptr) {
         return;
     }
     HILOG_INFO("FormEdit colorMode: %{public}d", colorMode);
