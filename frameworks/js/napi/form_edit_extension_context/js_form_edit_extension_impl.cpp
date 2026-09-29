@@ -14,6 +14,7 @@
  */
 
 #include "js_form_edit_extension_impl.h"
+#include <cstring>
 #include "hilog_tag_wrapper.h"
 #include "fms_log_wrapper.h"
 #include "napi/native_api.h"
@@ -22,7 +23,6 @@
 #include "js_ui_extension_content_session.h"
 #include "napi_common_want.h"
 #include "form_constants.h"
-#include <cstring>
 
 namespace OHOS {
 namespace AbilityRuntime {
