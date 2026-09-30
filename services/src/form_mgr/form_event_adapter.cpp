@@ -200,6 +200,33 @@ int FormEventAdapter::MessageEvent(const int64_t formId, const Want &want,
     return ERR_OK;
 }
 
+int FormEventAdapter::CheckRouterUriUnique(const std::string &uri, const int32_t userId)
+{
+    Want uriWant;
+    uriWant.SetUri(uri);
+    std::vector<AbilityInfo> abilityInfos;
+    std::vector<ExtensionAbilityInfo> extensionInfos;
+    bool findDefaultApp = false;
+    if (!FormBmsHelper::GetInstance().ImplicitQueryInfos(uriWant, userId, true,
+        abilityInfos, extensionInfos, findDefaultApp)) {
+        HILOG_ERROR("router uri query failed, uri:%{private}s", uri.c_str());
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+    std::set<std::string> matchedBundles;
+    for (const auto &abilityInfo : abilityInfos) {
+        matchedBundles.insert(abilityInfo.bundleName);
+    }
+    for (const auto &extensionInfo : extensionInfos) {
+        matchedBundles.insert(extensionInfo.bundleName);
+    }
+    if (matchedBundles.size() != 1) {
+        HILOG_ERROR("router uri not unique, matched bundle size:%{public}zu, uri:%{private}s",
+            matchedBundles.size(), uri.c_str());
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    return ERR_OK;
+}
+
 int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
@@ -271,6 +298,11 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
 
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
+        int32_t uriCheckResult = CheckRouterUriUnique(want.GetUriString(), callerUserId);
+        if (uriCheckResult != ERR_OK) {
+            HILOG_INFO("CheckRouterUriUnique is failed, uriCheckResult:%{public}d", uriCheckResult);
+            return uriCheckResult;
+        }
         return StartAbilityForRouter(formId, want, callerToken, callerUserId, appInfo.accessTokenId);
     }
 

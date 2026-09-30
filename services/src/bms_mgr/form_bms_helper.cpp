@@ -187,6 +187,23 @@ bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, Abil
     return IN_PROCESS_CALL(iBundleMgr->QueryAbilityInfo(want, flags, userId, abilityInfo));
 }
 
+bool FormBmsHelper::ImplicitQueryInfos(const AAFwk::Want &want, int32_t userId, bool withDefault,
+    std::vector<AbilityInfo> &abilityInfos, std::vector<ExtensionAbilityInfo> &extensionInfos,
+    bool &findDefaultApp)
+{
+    HILOG_DEBUG("call");
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("null iBundleMgr");
+        return false;
+    }
+    int32_t flags = AbilityInfoFlag::GET_ABILITY_INFO_DEFAULT
+        | AbilityInfoFlag::GET_ABILITY_INFO_WITH_SKILL_URI
+        | AbilityInfoFlag::GET_ABILITY_INFO_WITH_APPLICATION;
+    return IN_PROCESS_CALL(iBundleMgr->ImplicitQueryInfos(want, flags, userId, withDefault,
+        abilityInfos, extensionInfos, findDefaultApp));
+}
+
 bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t userId,
     AbilityInfo &abilityInfo, ExtensionAbilityInfo &extensionAbilityInfo)
 {

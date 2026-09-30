@@ -76,6 +76,8 @@ private:
      * @return true if the app has permission, false otherwise
      */
     bool CheckKeepBackgroundRunningPermission(const std::string &bundleName);
+
+    int CheckRouterUriUnique(const std::string &uri, const int32_t userId);
 };
 
 } // namespace AppExecFwk
