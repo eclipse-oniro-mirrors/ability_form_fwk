@@ -191,8 +191,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
     bool isHicar = (record.moduleName == HICAR_FORM);
     if (!screenOnFlag && !collaborationScreenOnFlag && !isFormProviderUpdate && !isHicar) {
-        FormDataMgr::GetInstance().UpdateRefreshWant(formId, want, record);
-        FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
+        FormDataMgr::GetInstance().MergeRefreshWant(formId, want);
         FormDataMgr::GetInstance().SetHostRefresh(formId, true);
         FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
         HILOG_INFO("screen off, set refresh flag, do not refresh now, formId:%{public}" PRId64 ".", formId);

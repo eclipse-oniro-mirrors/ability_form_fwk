@@ -7285,6 +7285,90 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_BuildFormInstanceByFromRecord_00
 }
 
 /**
+ * @tc.number: FmsFormDataMgrTest_MergeRefreshWant_001
+ * @tc.name: MergeRefreshWant
+ * @tc.desc: Verify MergeRefreshWant with non-existent record has no side effect.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_MergeRefreshWant_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_MergeRefreshWant_001 start";
+    Want want;
+    want.SetParam("key1", std::string("value1"));
+    formDataMgr_.MergeRefreshWant(FORM_ID_ONE, want);
+    EXPECT_EQ(formDataMgr_.formRecords_.count(FORM_ID_ONE), 0u);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_MergeRefreshWant_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_MergeRefreshWant_002
+ * @tc.name: MergeRefreshWant
+ * @tc.desc: Verify stale snapshot's want merge does not roll back versionCode (dirty-write lock).
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_MergeRefreshWant_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_MergeRefreshWant_002 start";
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(FORM_ID_ONE, formItemInfo);
+    formDataMgr_.AllotFormRecord(formItemInfo, 0);
+
+    // Simulate an upgrade task having updated the cached record to a new versionCode.
+    const uint32_t newVersionCode = 20;
+    formDataMgr_.formRecords_[FORM_ID_ONE].versionCode = newVersionCode;
+
+    // The refresh chain holds a stale snapshot whose versionCode has rolled back locally;
+    // a full-record write-back from it would revert the cache.
+    FormRecord staleSnapshot;
+    EXPECT_TRUE(formDataMgr_.GetFormRecord(FORM_ID_ONE, staleSnapshot));
+    staleSnapshot.versionCode = 10;
+
+    // Refresh execution point merges only the want into the cached record in place.
+    Want want;
+    want.SetParam("key1", std::string("value1"));
+    formDataMgr_.MergeRefreshWant(FORM_ID_ONE, want);
+
+    FormRecord current;
+    EXPECT_TRUE(formDataMgr_.GetFormRecord(FORM_ID_ONE, current));
+    EXPECT_EQ(current.versionCode, newVersionCode);
+    EXPECT_EQ(current.refreshWantMap.size(), 1u);
+    EXPECT_EQ(current.refreshWantMap[FORM_ID_ONE].GetWant().GetStringParam("key1"), "value1");
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_MergeRefreshWant_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_MergeRefreshWant_003
+ * @tc.name: MergeRefreshWant
+ * @tc.desc: Verify repeated MergeRefreshWant merges want params instead of replacing.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_MergeRefreshWant_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_MergeRefreshWant_003 start";
+    const int64_t formId = 2;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    formDataMgr_.AllotFormRecord(formItemInfo, 0);
+
+    Want first;
+    first.SetParam("key1", std::string("value1"));
+    formDataMgr_.MergeRefreshWant(formId, first);
+
+    Want second;
+    second.SetParam("key1", std::string("value2"));
+    second.SetParam("key2", std::string("value3"));
+    formDataMgr_.MergeRefreshWant(formId, second);
+
+    FormRecord current;
+    EXPECT_TRUE(formDataMgr_.GetFormRecord(formId, current));
+    EXPECT_EQ(current.refreshWantMap.size(), 1u);
+    Want merged = current.refreshWantMap[formId].GetWant();
+    EXPECT_EQ(merged.GetStringParam("key1"), "value2");
+    EXPECT_EQ(merged.GetStringParam("key2"), "value3");
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_MergeRefreshWant_003 end";
+}
+
+/**
  * @tc.number: FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_001
  * @tc.name: CreateFormJsInfo with isSupportMoreImages=true
  * @tc.desc: Verify isSupportMoreImages is propagated from FormProviderData to FormJsInfo.

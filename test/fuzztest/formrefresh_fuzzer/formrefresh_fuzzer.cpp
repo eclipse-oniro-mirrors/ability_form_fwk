@@ -158,8 +158,8 @@ void RefreshCacheMgrTest(FuzzedDataProvider *fdp)
 
     // Test screen off flag operations
     Want want;
-    FormRecord screenOffRecord = GenerateFuzzedFormRecord(fdp);
-    RefreshCacheMgr::GetInstance().AddFlagByScreenOff(formId, want, screenOffRecord);
+    GenerateFuzzedFormRecord(fdp);
+    RefreshCacheMgr::GetInstance().AddFlagByScreenOff(formId, want);
     RefreshCacheMgr::GetInstance().ConsumeScreenOffFlag();
 
     // Test render task operations
