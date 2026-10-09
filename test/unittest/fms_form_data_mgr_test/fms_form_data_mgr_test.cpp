@@ -7293,10 +7293,22 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_BuildFormInstanceByFromRecord_00
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_MergeRefreshWant_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_MergeRefreshWant_001 start";
+    // Baseline: another record exists with an empty refreshWantMap.
+    const int64_t otherFormId = 2;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(otherFormId, formItemInfo);
+    formDataMgr_.AllotFormRecord(formItemInfo, 0);
+    EXPECT_EQ(formDataMgr_.formRecords_[otherFormId].refreshWantMap.size(), 0u);
+
     Want want;
     want.SetParam("key1", std::string("value1"));
     formDataMgr_.MergeRefreshWant(FORM_ID_ONE, want);
+
+    // No record is created for the non-existent formId.
     EXPECT_EQ(formDataMgr_.formRecords_.count(FORM_ID_ONE), 0u);
+    EXPECT_EQ(formDataMgr_.formRecords_.size(), 1u);
+    // No refreshWantMap of any existing record is written.
+    EXPECT_EQ(formDataMgr_.formRecords_[otherFormId].refreshWantMap.size(), 0u);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_MergeRefreshWant_001 end";
 }
 
