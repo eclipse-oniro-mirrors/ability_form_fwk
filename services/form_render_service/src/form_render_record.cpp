@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -85,6 +85,21 @@ inline std::string GetThreadNameByBundle(const std::string &bundleName)
         return bundleName;
     }
     return bundleName.substr(bundleName.length() - THREAD_NAME_LEN);
+}
+
+// compId is the decimal string of a nanosecond timestamp (form_request_data.h);
+// lexicographic order breaks across digit-count boundaries, e.g. "9900000000" > "11000000000" but is older.
+static bool IsCompIdGreater(const std::string &lhs, const std::string &rhs)
+{
+    auto isDecimal = [](const std::string &s) {
+        return !s.empty() && s.find_first_not_of("0123456789") == std::string::npos;
+    };
+    if (isDecimal(lhs) && isDecimal(rhs)) {
+        if (lhs.size() != rhs.size()) {
+            return lhs.size() > rhs.size();
+        }
+    }
+    return lhs > rhs;
 }
 }
 
@@ -1380,7 +1395,7 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
     UpdateAllFormRequest(formJsInfos, true);
     SetEventHandlerNeedResetFlag(false);
     GetEventHandler(true, true);
-    return ReAddRecycledForms(formJsInfos) == ERR_OK;
+    return ReAddAllReleasedForms() == ERR_OK;
 }
 
 void FormRenderRecord::HandleReleaseAllRendererInJsThread()
@@ -1402,20 +1417,52 @@ void FormRenderRecord::HandleReleaseAllRendererInJsThread()
     formRendererGroupMap_.clear();
 }
 
+// Only the current request participates, symmetric with UpdateAllFormRequest's marking.
+// In-lock dispatch is safe: GetEventHandler only takes eventHandlerMutex_, no reverse nesting.
+int32_t FormRenderRecord::ReAddAllReleasedForms()
+{
+    if (GetEventHandler(false, true) == nullptr) {
+        return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
+    }
+    std::lock_guard<std::mutex> lock(formRequestsMutex_);
+    for (auto &[formId, requests] : formRequests_) {
+        Ace::FormRequest *current = nullptr;
+        for (auto &entry : requests) {
+            if (current == nullptr || IsCompIdGreater(entry.second.compId, current->compId)) {
+                current = &entry.second;
+            }
+        }
+        if (current == nullptr || !current->hasRelease) {
+            continue;
+        }
+        PostReAddRecycledForms(current->formJsInfo, current->want);
+    }
+    return ERR_OK;
+}
+
 void FormRenderRecord::UpdateAllFormRequest(const std::vector<FormJsInfo> &formJsInfos, bool hasRelease)
 {
     std::lock_guard<std::mutex> lock(formRequestsMutex_);
+    std::unordered_map<int64_t, const FormJsInfo *> listed;
     for (const auto &formJsInfo : formJsInfos) {
-        auto iter = formRequests_.find(formJsInfo.formId);
-        if (iter == formRequests_.end()) {
-            HILOG_ERROR("%{public}" PRId64 " doesn't has formRequest", formJsInfo.formId);
-            continue;
+        listed[formJsInfo.formId] = &formJsInfo;
+    }
+    for (auto &[formId, requests] : formRequests_) {
+        auto it = listed.find(formId);
+        Ace::FormRequest *current = nullptr;
+        for (auto &entry : requests) {
+            if (it != listed.end()) {
+                // isDynamic/formJsInfo describe the form shared by all compId requests.
+                entry.second.isDynamic = it->second->isDynamic;
+                entry.second.formJsInfo = it->second->CopyFormJsInfoWithoutFormData();
+            }
+            if (current == nullptr || IsCompIdGreater(entry.second.compId, current->compId)) {
+                current = &entry.second;
+            }
         }
-        for (auto& formRequestIter : iter->second) {
-            auto& formRequest = formRequestIter.second;
-            formRequest.isDynamic = formJsInfo.isDynamic;
-            formRequest.formJsInfo = formJsInfo.CopyFormJsInfoWithoutFormData();
-            formRequest.hasRelease = hasRelease;
+        // hasRelease marks only the current request (the one that can be displayed).
+        if (current != nullptr) {
+            current->hasRelease = hasRelease;
         }
     }
 }
