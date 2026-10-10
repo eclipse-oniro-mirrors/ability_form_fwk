@@ -314,7 +314,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_AllotFormRecord_007, TestSize.Le
  * @tc.desc: Verify that the return value is correct.
  * @tc.details:
  *      SetUpdateDuration is 0.(call ParseAtTimerConfig)
- *      获取配置项scheduledUpdateTime_为无效�?
+ *      获取配置项scheduledUpdateTime_为无效值
  *      不存在hapSourceDirs_
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_AllotFormRecord_008, TestSize.Level0)
@@ -343,7 +343,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_AllotFormRecord_008, TestSize.Le
  * @tc.desc: Verify that the return value is correct.
  * @tc.details:
  *      SetUpdateDuration is 0.(call ParseAtTimerConfig)
- *      获取配置项scheduledUpdateTime_为有效�?
+ *      获取配置项scheduledUpdateTime_为有效值
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_AllotFormRecord_009, TestSize.Level0)
 {

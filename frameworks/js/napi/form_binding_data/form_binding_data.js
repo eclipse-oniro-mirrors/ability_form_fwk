@@ -19,6 +19,7 @@ class FormBindingData {
   }
   createFormBindingDataEx(obj) {
     this.data = obj;
+    // isSupportMoreImages defaults to false, only set to true by createFormBindingDataEx
     this.isSupportMoreImages = true;
   }
 }
