@@ -21,8 +21,8 @@ export default class FormEditExtensionAbility extends UIExtensionAbility {
 
 	private native nativeSetWindowBackgroundColor(color: string): void;
 
-	async setWindowBackgroundColor(color: string): Promise<void> {
-		await taskpool.execute((): void => {
+	setWindowBackgroundColor(color: string): void {
+		taskpool.execute((): void => {
 			this.nativeSetWindowBackgroundColor(color);
 		});
 	}
