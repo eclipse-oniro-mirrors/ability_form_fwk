@@ -314,7 +314,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_AllotFormRecord_007, TestSize.Le
  * @tc.desc: Verify that the return value is correct.
  * @tc.details:
  *      SetUpdateDuration is 0.(call ParseAtTimerConfig)
- *      获取配置项scheduledUpdateTime_为无效值
+ *      获取配置项scheduledUpdateTime_为无效�?
  *      不存在hapSourceDirs_
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_AllotFormRecord_008, TestSize.Level0)
@@ -343,7 +343,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_AllotFormRecord_008, TestSize.Le
  * @tc.desc: Verify that the return value is correct.
  * @tc.details:
  *      SetUpdateDuration is 0.(call ParseAtTimerConfig)
- *      获取配置项scheduledUpdateTime_为有效值
+ *      获取配置项scheduledUpdateTime_为有效�?
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_AllotFormRecord_009, TestSize.Level0)
 {
@@ -7617,5 +7617,53 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_BuildFormInstanceByFromRecord_00
     EXPECT_EQ(instance.bundleName, FORM_HOST_BUNDLE_NAME);
     EXPECT_EQ(instance.appIndex, 1);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_BuildFormInstanceByFromRecord_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_001
+ * @tc.name: CreateFormJsInfo with isSupportMoreImages=true
+ * @tc.desc: Verify isSupportMoreImages is propagated from FormProviderData to FormJsInfo.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_001 start";
+    int64_t formId = 1;
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.AllotFormRecord(formItemInfo, callingUid);
+    nlohmann::json jsonData;
+    jsonData["key"] = "value";
+    FormProviderData formProviderData(jsonData);
+    formProviderData.SetSupportMoreImages(true);
+    record.formProviderInfo.SetFormData(formProviderData);
+    FormJsInfo formJsInfo;
+    formDataMgr_.CreateFormJsInfo(formId, record, formProviderData, formJsInfo);
+    EXPECT_EQ(formJsInfo.formId, formId);
+    EXPECT_TRUE(formJsInfo.isSupportMoreImages);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_002
+ * @tc.name: CreateFormJsInfo with isSupportMoreImages=false
+ * @tc.desc: Verify isSupportMoreImages defaults to false when not set.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_002 start";
+    int64_t formId = 2;
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.AllotFormRecord(formItemInfo, callingUid);
+    nlohmann::json jsonData;
+    jsonData["key"] = "value";
+    FormProviderData formProviderData(jsonData);
+    FormJsInfo formJsInfo;
+    formDataMgr_.CreateFormJsInfo(formId, record, formProviderData, formJsInfo);
+    EXPECT_EQ(formJsInfo.formId, formId);
+    EXPECT_FALSE(formJsInfo.isSupportMoreImages);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_002 end";
 }
 }  // namespace

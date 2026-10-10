@@ -17,6 +17,10 @@ class FormBindingData {
   createFormBindingData(obj) {
     this.data = obj;
   }
+  createFormBindingDataEx(obj) {
+    this.data = obj;
+    this.isSupportMoreImages = true;
+  }
 }
 
 export default FormBindingData;

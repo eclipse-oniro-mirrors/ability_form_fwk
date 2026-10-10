@@ -26,12 +26,15 @@ export namespace formBindingData {
   export interface FormBindingData {
     data: RecordData;
     proxies?: Array<ProxyData>;
+    isSupportMoreImages?: boolean;
   }
 
   class FormBindingDataInner implements FormBindingData {
     data: RecordData;
     proxies?: Array<ProxyData>;
+    isSupportMoreImages?: boolean;
   }
 
   native function createFormBindingData(obj?: RecordData): FormBindingData;
+  native function createFormBindingDataEx(obj?: RecordData): FormBindingData;
 }

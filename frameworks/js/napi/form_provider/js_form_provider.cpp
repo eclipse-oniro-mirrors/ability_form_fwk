@@ -553,6 +553,21 @@ napi_value JsFormProvider::OnUpdateForm(napi_env env, size_t argc, napi_value* a
     auto formProviderData = std::make_shared<OHOS::AppExecFwk::FormProviderData>();
     std::string formDataStr = GetStringByProp(env, argv[PARAM1], "data");
     formProviderData->SetDataString(formDataStr);
+
+    bool isSupportMoreImages = false;
+    napi_value supportValue = nullptr;
+    napi_status status = napi_get_named_property(env, argv[PARAM1], "isSupportMoreImages", &supportValue);
+    if (status == napi_ok && supportValue != nullptr) {
+        napi_valuetype valType = napi_undefined;
+        if (napi_typeof(env, supportValue, &valType) == napi_ok && valType == napi_boolean) {
+            if (napi_get_value_bool(env, supportValue, &isSupportMoreImages) != napi_ok) {
+                HILOG_ERROR("Failed to get isSupportMoreImages value");
+                isSupportMoreImages = false;
+            }
+        }
+    }
+    formProviderData->SetSupportMoreImages(isSupportMoreImages);
+
     formProviderData->ParseImagesData();
 
     std::vector<AppExecFwk::FormDataProxy> formDataProxies;

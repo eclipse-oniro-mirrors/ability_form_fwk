@@ -381,6 +381,8 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
     if (FormStatus::GetInstance().GetFormLastStatus(record.formId) != FormFsmStatus::RENDERED) {
         // use db cache to recover form
         (void)FormDataMgr::GetInstance().MergeFormData(record.formId, formProviderData);
+        formProviderData.SetSupportMoreImages(
+            record.formProviderInfo.GetFormData().IsSupportMoreImages());
     }
 
     FormJsInfo formJsInfo;

@@ -67,6 +67,36 @@ static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_objec
     return formBindingDataObj;
 }
 
+static ani_object CreateFormBindingDataEx([[maybe_unused]] ani_env *env, ani_object paramObject)
+{
+    HILOG_INFO("CreateFormBindingDataEx call");
+    ani_object formBindingDataObj = CreateFormBindingData(env, paramObject);
+    if (formBindingDataObj == nullptr) {
+        return nullptr;
+    }
+    ani_status status = ANI_OK;
+    ani_class formBindingDataCls;
+    status = env->FindClass("@ohos.app.form.formBindingData.formBindingData.FormBindingDataInner",
+        &formBindingDataCls);
+    if (status != ANI_OK) {
+        HILOG_ERROR("FindClass failed status %{public}d", static_cast<int>(status));
+        return formBindingDataObj;
+    }
+    ani_method setSupportMethod;
+    status = env->Class_FindMethod(formBindingDataCls, "<set>isSupportMoreImages", "Z:V", &setSupportMethod);
+    if (status != ANI_OK) {
+        HILOG_ERROR("FindMethod <set>isSupportMoreImages failed status %{public}d", static_cast<int>(status));
+        return formBindingDataObj;
+    }
+    status = env->Object_CallMethod_Void(formBindingDataObj, setSupportMethod, ANI_TRUE);
+    if (status != ANI_OK) {
+        HILOG_ERROR("Object_CallMethod_Void <set>isSupportMoreImages failed status %{public}d",
+            static_cast<int>(status));
+    }
+    HILOG_INFO("CreateFormBindingDataEx end");
+    return formBindingDataObj;
+}
+
 extern "C" {
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
@@ -96,6 +126,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 
     std::array methods = {
         ani_native_function { "createFormBindingData", nullptr, reinterpret_cast<void *>(CreateFormBindingData) },
+        ani_native_function { "createFormBindingDataEx", nullptr, reinterpret_cast<void *>(CreateFormBindingDataEx) },
     };
 
     if (env->Namespace_BindNativeFunctions(spc, methods.data(), methods.size()) != ANI_OK) {

@@ -106,6 +106,10 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     formProviderData = *bindingData;
     ReadImageData(parcel);
     ReadPkgNameMap(parcel);
+    if (!parcel.ReadBool(isSupportMoreImages)) {
+        HILOG_ERROR("ReadBool isSupportMoreImages failed");
+        return false;
+    }
     return true;
 }
 
@@ -358,6 +362,9 @@ bool FormJsInfo::WriteObjects(Parcel &parcel) const
     if (!WritePkgNameMap(parcel)) {
         return false;
     }
+    if (!parcel.WriteBool(isSupportMoreImages)) {
+        return false;
+    }
     return true;
 }
 
@@ -552,6 +559,7 @@ FormJsInfo FormJsInfo::CopyFormJsInfoWithoutFormData() const
     copyFormJsInfo.isDynamic = isDynamic;
     copyFormJsInfo.transparencyEnabled = transparencyEnabled;
     copyFormJsInfo.templateFormImperativeFwk = templateFormImperativeFwk;
+    copyFormJsInfo.isSupportMoreImages = isSupportMoreImages;
     return copyFormJsInfo;
 }
 } // namespace AppExecFwk

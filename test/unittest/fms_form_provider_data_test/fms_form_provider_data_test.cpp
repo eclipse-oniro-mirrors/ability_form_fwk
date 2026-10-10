@@ -2248,4 +2248,109 @@ HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_ImageDataNumExceed_002, TestSiz
     GTEST_LOG_(INFO) << "ReadFromParcel_ImageDataNumExceed_002 end";
 }
 
+/**
+ * @tc.name: IsSupportMoreImages_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify isSupportMoreImages_ defaults to false.
+ */
+HWTEST_F(FmsFormProviderDataTest, IsSupportMoreImages_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsSupportMoreImages_001 start";
+    FormProviderData formProviderData("{}");
+    EXPECT_FALSE(formProviderData.IsSupportMoreImages());
+    GTEST_LOG_(INFO) << "IsSupportMoreImages_001 end";
+}
+
+/**
+ * @tc.name: SetSupportMoreImages_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify SetSupportMoreImages changes the value correctly.
+ */
+HWTEST_F(FmsFormProviderDataTest, SetSupportMoreImages_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SetSupportMoreImages_001 start";
+    FormProviderData formProviderData("{}");
+    EXPECT_FALSE(formProviderData.IsSupportMoreImages());
+    formProviderData.SetSupportMoreImages(true);
+    EXPECT_TRUE(formProviderData.IsSupportMoreImages());
+    formProviderData.SetSupportMoreImages(false);
+    EXPECT_FALSE(formProviderData.IsSupportMoreImages());
+    GTEST_LOG_(INFO) << "SetSupportMoreImages_001 end";
+}
+
+/**
+ * @tc.name: Marshalling_IsSupportMoreImages_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify Marshalling writes isSupportMoreImages_ at the end of parcel.
+ */
+HWTEST_F(FmsFormProviderDataTest, Marshalling_IsSupportMoreImages_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Marshalling_IsSupportMoreImages_001 start";
+    FormProviderData formProviderData("{\"key\":\"val\"}");
+    formProviderData.SetSupportMoreImages(true);
+    Parcel parcel;
+    EXPECT_TRUE(formProviderData.Marshalling(parcel));
+    std::unique_ptr<FormProviderData> result(FormProviderData::Unmarshalling(parcel));
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(result->IsSupportMoreImages());
+    GTEST_LOG_(INFO) << "Marshalling_IsSupportMoreImages_001 end";
+}
+
+/**
+ * @tc.name: Marshalling_IsSupportMoreImages_002
+ * @tc.type: FUNC
+ * @tc.desc: Verify Marshalling writes isSupportMoreImages_=false by default.
+ */
+HWTEST_F(FmsFormProviderDataTest, Marshalling_IsSupportMoreImages_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Marshalling_IsSupportMoreImages_002 start";
+    FormProviderData formProviderData("{\"key\":\"val\"}");
+    Parcel parcel;
+    EXPECT_TRUE(formProviderData.Marshalling(parcel));
+    std::unique_ptr<FormProviderData> result(FormProviderData::Unmarshalling(parcel));
+    ASSERT_NE(result, nullptr);
+    EXPECT_FALSE(result->IsSupportMoreImages());
+    GTEST_LOG_(INFO) << "Marshalling_IsSupportMoreImages_002 end";
+}
+
+/**
+ * @tc.name: ReadFromParcel_IsSupportMoreImages_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadFromParcel reads isSupportMoreImages from parcel with true value.
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_IsSupportMoreImages_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFromParcel_IsSupportMoreImages_001 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    std::string dataStr = "{}";
+    parcel.WriteInt32(dataStr.length());
+    parcel.WriteString16(Str8ToStr16(dataStr));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_NO_OPERATION);
+    parcel.WriteBool(true);
+    EXPECT_TRUE(formProviderData.ReadFromParcel(parcel));
+    EXPECT_TRUE(formProviderData.IsSupportMoreImages());
+    GTEST_LOG_(INFO) << "ReadFromParcel_IsSupportMoreImages_001 end";
+}
+
+/**
+ * @tc.name: ReadFromParcel_IsSupportMoreImages_002
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadFromParcel reads isSupportMoreImages from parcel with false value.
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_IsSupportMoreImages_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFromParcel_IsSupportMoreImages_002 start";
+    FormProviderData formProviderData("");
+    Parcel parcel;
+    std::string dataStr = "{}";
+    parcel.WriteInt32(dataStr.length());
+    parcel.WriteString16(Str8ToStr16(dataStr));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_NO_OPERATION);
+    parcel.WriteBool(false);
+    EXPECT_TRUE(formProviderData.ReadFromParcel(parcel));
+    EXPECT_FALSE(formProviderData.IsSupportMoreImages());
+    GTEST_LOG_(INFO) << "ReadFromParcel_IsSupportMoreImages_002 end";
+}
+
 }  // namespace OHOS::AppExecFwk

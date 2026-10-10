@@ -856,6 +856,7 @@ HWTEST_F(FmsFormJsInfoTest, CopyFormJsInfoWithoutFormData_FullVerification_001, 
     formJsInfo.isDynamic = false;
     formJsInfo.transparencyEnabled = true;
     formJsInfo.templateFormImperativeFwk = "lite";
+    formJsInfo.isSupportMoreImages = true;
 
     FormJsInfo copy = formJsInfo.CopyFormJsInfoWithoutFormData();
     EXPECT_EQ(copy.formId, 100);
@@ -880,6 +881,7 @@ HWTEST_F(FmsFormJsInfoTest, CopyFormJsInfoWithoutFormData_FullVerification_001, 
     EXPECT_EQ(copy.isDynamic, false);
     EXPECT_EQ(copy.transparencyEnabled, true);
     EXPECT_EQ(copy.templateFormImperativeFwk, "lite");
+    EXPECT_EQ(copy.isSupportMoreImages, true);
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end CopyFormJsInfoWithoutFormData_FullVerification_001";
 }
 
@@ -912,6 +914,7 @@ HWTEST_F(FmsFormJsInfoTest, Marshalling_Unmarshalling_CompleteFields_001, TestSi
     writeJsInfo.isDynamic = false;
     writeJsInfo.transparencyEnabled = true;
     writeJsInfo.templateFormImperativeFwk = "lite";
+    writeJsInfo.isSupportMoreImages = true;
 
     MessageParcel parcel;
     ASSERT_TRUE(writeJsInfo.Marshalling(parcel));
@@ -939,6 +942,7 @@ HWTEST_F(FmsFormJsInfoTest, Marshalling_Unmarshalling_CompleteFields_001, TestSi
     EXPECT_EQ(readJsInfo->isDynamic, writeJsInfo.isDynamic);
     EXPECT_EQ(readJsInfo->transparencyEnabled, writeJsInfo.transparencyEnabled);
     EXPECT_EQ(readJsInfo->templateFormImperativeFwk, writeJsInfo.templateFormImperativeFwk);
+    EXPECT_EQ(readJsInfo->isSupportMoreImages, writeJsInfo.isSupportMoreImages);
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end Marshalling_Unmarshalling_CompleteFields_001";
 }
 
@@ -1083,6 +1087,65 @@ HWTEST_F(FmsFormJsInfoTest, Unmarshalling_Success_001, TestSize.Level1)
     EXPECT_EQ(result->isDynamic, false);
     EXPECT_EQ(result->transparencyEnabled, true);
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end Unmarshalling_Success_001";
+}
+
+/**
+ * @tc.name: IsSupportMoreImages_Default_001
+ * @tc.desc: Verify isSupportMoreImages defaults to false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormJsInfoTest, IsSupportMoreImages_Default_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-begin IsSupportMoreImages_Default_001";
+    FormJsInfo formJsInfo;
+    EXPECT_FALSE(formJsInfo.isSupportMoreImages);
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end IsSupportMoreImages_Default_001";
+}
+
+/**
+ * @tc.name: Marshalling_Unmarshalling_IsSupportMoreImages_001
+ * @tc.desc: Verify Marshalling and Unmarshalling round-trip preserves isSupportMoreImages=true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormJsInfoTest, Marshalling_Unmarshalling_IsSupportMoreImages_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-begin Marshalling_Unmarshalling_IsSupportMoreImages_001";
+    FormJsInfo writeJsInfo;
+    writeJsInfo.formId = 200;
+    writeJsInfo.formData = "test_data";
+    writeJsInfo.isSupportMoreImages = true;
+
+    MessageParcel parcel;
+    ASSERT_TRUE(writeJsInfo.Marshalling(parcel));
+
+    std::unique_ptr<FormJsInfo> readJsInfo(FormJsInfo::Unmarshalling(parcel));
+    ASSERT_NE(readJsInfo, nullptr);
+    EXPECT_EQ(readJsInfo->formId, writeJsInfo.formId);
+    EXPECT_EQ(readJsInfo->isSupportMoreImages, true);
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end Marshalling_Unmarshalling_IsSupportMoreImages_001";
+}
+
+/**
+ * @tc.name: Marshalling_Unmarshalling_IsSupportMoreImages_002
+ * @tc.desc: Verify Marshalling and Unmarshalling round-trip preserves isSupportMoreImages=false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormJsInfoTest, Marshalling_Unmarshalling_IsSupportMoreImages_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-begin Marshalling_Unmarshalling_IsSupportMoreImages_002";
+    FormJsInfo writeJsInfo;
+    writeJsInfo.formId = 300;
+    writeJsInfo.formData = "test_data";
+    writeJsInfo.isSupportMoreImages = false;
+
+    MessageParcel parcel;
+    ASSERT_TRUE(writeJsInfo.Marshalling(parcel));
+
+    std::unique_ptr<FormJsInfo> readJsInfo(FormJsInfo::Unmarshalling(parcel));
+    ASSERT_NE(readJsInfo, nullptr);
+    EXPECT_EQ(readJsInfo->formId, writeJsInfo.formId);
+    EXPECT_EQ(readJsInfo->isSupportMoreImages, false);
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest-end Marshalling_Unmarshalling_IsSupportMoreImages_002";
 }
 
 } // namespace AppExecFwk

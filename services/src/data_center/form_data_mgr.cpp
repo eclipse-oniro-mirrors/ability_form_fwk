@@ -441,6 +441,7 @@ void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &recor
     formInfo.modulePkgNameMap = record.modulePkgNameMap;
     formInfo.formData = formProviderData.GetDataString();
     formInfo.formProviderData = formProviderData;
+    formInfo.isSupportMoreImages = formProviderData.IsSupportMoreImages();
     formInfo.templateFormImperativeFwk = record.templateFormImperativeFwk;
 }
 
@@ -3785,9 +3786,11 @@ bool FormDataMgr::MergeFormData(const int64_t formId, FormProviderData &formProv
         HILOG_INFO("No cache data found for formId: %{public}" PRId64, formId);
         return false;
     }
+    bool isSupportMoreImages = formProviderData.IsSupportMoreImages();
     FormProviderData formCacheData;
     formCacheData.SetDataString(stringData);
     formCacheData.SetImageDataMap(imageDataMap);
+    formCacheData.SetSupportMoreImages(isSupportMoreImages);
     formCacheData.MergeData(formProviderData.GetData());
     formProviderData = formCacheData;
     return true;

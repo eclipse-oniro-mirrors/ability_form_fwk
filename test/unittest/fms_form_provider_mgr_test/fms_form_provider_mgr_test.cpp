@@ -1613,4 +1613,93 @@ HWTEST_F(FmsFormProviderMgrTest, MessageEvent_002, TestSize.Level1)
     GTEST_LOG_(INFO) << "MessageEvent_002 end";
 }
 
+/**
+ * @tc.name: UpdateForm_IsSupportMoreImages_001
+ * @tc.desc: Verify UpdateForm with versionUpgrade=false propagates isSupportMoreImages=true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderMgrTest, UpdateForm_IsSupportMoreImages_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateForm_IsSupportMoreImages_001 start";
+    int64_t formId = 0x114561aa00000000;
+    int callingUid = 0;
+    FormItemInfo info;
+    info.SetFormId(formId);
+    info.SetModuleName(PARAM_FORM_NAME);
+    info.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
+    FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(info, callingUid);
+    formRecord.versionUpgrade = false;
+    nlohmann::json existingData;
+    existingData["existingKey"] = "existingValue";
+    formRecord.formProviderInfo.SetFormData(FormProviderData(existingData));
+    FormDataMgr::GetInstance().UpdateFormRecord(formId, formRecord);
+    nlohmann::json newData;
+    newData["newKey"] = "newValue";
+    FormProviderData formProviderData(newData);
+    formProviderData.SetSupportMoreImages(true);
+    ErrCode result = FormProviderMgr::GetInstance().UpdateForm(formId, formRecord, formProviderData);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_TRUE(formRecord.formProviderInfo.GetFormData().IsSupportMoreImages());
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+    GTEST_LOG_(INFO) << "UpdateForm_IsSupportMoreImages_001 end";
+}
+
+/**
+ * @tc.name: UpdateForm_IsSupportMoreImages_002
+ * @tc.desc: Verify UpdateForm with versionUpgrade=false keeps isSupportMoreImages=false by default.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderMgrTest, UpdateForm_IsSupportMoreImages_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateForm_IsSupportMoreImages_002 start";
+    int64_t formId = 0x114562aa00000000;
+    int callingUid = 0;
+    FormItemInfo info;
+    info.SetFormId(formId);
+    info.SetModuleName(PARAM_FORM_NAME);
+    info.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
+    FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(info, callingUid);
+    formRecord.versionUpgrade = false;
+    nlohmann::json existingData;
+    existingData["existingKey"] = "existingValue";
+    formRecord.formProviderInfo.SetFormData(FormProviderData(existingData));
+    FormDataMgr::GetInstance().UpdateFormRecord(formId, formRecord);
+    nlohmann::json newData;
+    newData["newKey"] = "newValue";
+    FormProviderData formProviderData(newData);
+    ErrCode result = FormProviderMgr::GetInstance().UpdateForm(formId, formRecord, formProviderData);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_FALSE(formRecord.formProviderInfo.GetFormData().IsSupportMoreImages());
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+    GTEST_LOG_(INFO) << "UpdateForm_IsSupportMoreImages_002 end";
+}
+
+/**
+ * @tc.name: UpdateForm_IsSupportMoreImages_003
+ * @tc.desc: Verify UpdateForm with versionUpgrade=true propagates isSupportMoreImages via SetFormData.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderMgrTest, UpdateForm_IsSupportMoreImages_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateForm_IsSupportMoreImages_003 start";
+    int64_t formId = 0x114563aa00000000;
+    int callingUid = 0;
+    FormItemInfo info;
+    info.SetFormId(formId);
+    info.SetModuleName(PARAM_FORM_NAME);
+    info.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
+    FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(info, callingUid);
+    formRecord.versionUpgrade = true;
+    FormDataMgr::GetInstance().UpdateFormRecord(formId, formRecord);
+    nlohmann::json jsonData;
+    jsonData["key"] = "value";
+    FormProviderData formProviderData(jsonData);
+    formProviderData.SetSupportMoreImages(true);
+    ErrCode result = FormProviderMgr::GetInstance().UpdateForm(formId, formRecord, formProviderData);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_TRUE(formRecord.formProviderInfo.GetFormData().IsSupportMoreImages());
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+    GTEST_LOG_(INFO) << "UpdateForm_IsSupportMoreImages_003 end";
+}
+
 }  // namespace

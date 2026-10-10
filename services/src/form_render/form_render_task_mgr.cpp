@@ -108,6 +108,8 @@ void FormRenderTaskMgr::UpdateFormSize(const int64_t &formId, const FormSurfaceI
     FormJsInfo formJsInfo;
     if (!formRecord.isDynamic) {
         (void)FormDataMgr::GetInstance().MergeFormData(formRecord.formId, formProviderData);
+        formProviderData.SetSupportMoreImages(
+            formRecord.formProviderInfo.GetFormData().IsSupportMoreImages());
         FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formProviderData, formJsInfo);
     }
 

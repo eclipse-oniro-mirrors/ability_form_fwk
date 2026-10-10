@@ -52,6 +52,7 @@ struct FormJsInfo : public Parcelable {
     bool isDynamic = true;
     bool transparencyEnabled = false;
     std::string templateFormImperativeFwk = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
+    bool isSupportMoreImages = false;
 
     bool ReadFromParcel(Parcel &parcel);
     bool ReadFormFields(Parcel &parcel, std::u16string &strValue);

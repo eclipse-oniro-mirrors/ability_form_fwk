@@ -193,6 +193,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
         auto providerData = formRecord.formProviderInfo.GetFormData();
         providerData.SetImageDataState(formProviderData.GetImageDataState());
         providerData.SetImageDataMap(formProviderData.GetImageDataMap());
+        providerData.SetSupportMoreImages(formProviderData.IsSupportMoreImages());
         formRecord.formProviderInfo.SetFormData(providerData);
     } else {
         formRecord.formProviderInfo.SetFormData(formProviderData);
