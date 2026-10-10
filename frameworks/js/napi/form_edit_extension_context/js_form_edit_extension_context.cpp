@@ -15,6 +15,7 @@
 
 #include "js_form_edit_extension_context.h"
 #include "hilog_tag_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "form_histogram_utils.h"
 #include "hitrace_meter.h"
 #include "js_extension_context.h"
@@ -69,6 +70,7 @@ napi_value JsFormEditExtensionContext::CreateJsFormEditExtensionContext(
     const char *moduleName = "JsFormEditExtensionContext";
     BindNativeFunction(env, objValue, "startSecondPage", moduleName, StartSecondPage);
     BindNativeFunction(env, objValue, "startUIAbility", moduleName, StartUIAbility);
+    BindNativeFunction(env, objValue, "setWindowBackgroundColor", moduleName, SetWindowBackgroundColor);
 
     return objValue;
 }
@@ -83,6 +85,12 @@ napi_value JsFormEditExtensionContext::StartUIAbility(napi_env env, napi_callbac
 {
     TAG_LOGI(AAFwkTag::UI_EXT, "StartUIAbility called");
     GET_NAPI_INFO_AND_CALL(env, info, JsFormEditExtensionContext, OnStartUIAbility);
+}
+
+napi_value JsFormEditExtensionContext::SetWindowBackgroundColor(napi_env env, napi_callback_info info)
+{
+    HILOG_DEBUG("called");
+    GET_NAPI_INFO_AND_CALL(env, info, JsFormEditExtensionContext, OnSetWindowBackgroundColor);
 }
 
 napi_value JsFormEditExtensionContext::OnStartSecondPage(napi_env env, NapiCallbackInfo &info)
@@ -184,6 +192,47 @@ napi_value JsFormEditExtensionContext::OnStartUIAbility(napi_env env, NapiCallba
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleHighQos("JsFormEditExtensionContext OnStartUIAbility",
         env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+    return result;
+}
+
+napi_value JsFormEditExtensionContext::OnSetWindowBackgroundColor(napi_env env, NapiCallbackInfo &info)
+{
+    HILOG_DEBUG("OnSetWindowBackgroundColor begin");
+    if (info.argc < ARGC_ONE) {
+        ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_PARAM_ERROR), ERR_MSG_PARAMS_ERROR);
+        return CreateJsUndefined(env);
+    }
+    std::string color;
+    if (!ConvertFromJsValue(env, info.argv[INDEX_ZERO], color)) {
+        HILOG_ERROR("Parse color failed");
+        ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_PARAM_ERROR), ERR_MSG_PARAMS_ERROR);
+        return CreateJsUndefined(env);
+    }
+    NapiAsyncTask::CompleteCallback complete =
+        [weak = context_, color](napi_env env, NapiAsyncTask &task, int32_t status) {
+            HILOG_DEBUG("OnSetWindowBackgroundColor complete begin");
+            auto context = weak.lock();
+            if (!context) {
+                HILOG_ERROR("null context");
+                task.Reject(env, CreateJsError(env,
+                    static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_IPC_ERROR), ERR_MSG_INTERNAL_ERROR));
+                return;
+            }
+
+            bool isSuccess = context->SetWindowBackgroundColor(color);
+            if (!isSuccess) {
+                HILOG_ERROR("SetWindowBackgroundColor failed");
+                task.Reject(env, CreateJsError(env,
+                    static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_IPC_ERROR), ERR_MSG_INTERNAL_ERROR));
+                return;
+            }
+
+            task.ResolveWithNoError(env, CreateJsUndefined(env));
+        };
+
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleHighQos("JsFormEditExtensionContext OnSetWindowBackgroundColor", env,
+        CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
     return result;
 }
 } // namespace AbilityRuntime

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include "form_edit_extension_context.h"
 #include "hilog_tag_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_mgr.h"
 
@@ -26,6 +27,25 @@ void FormEditExtensionContext::SetWant(const std::shared_ptr<AAFwk::Want> &want)
 {
     want_ = want;
     TAG_LOGD(AAFwkTag::UI_EXT, "Set want done");
+}
+
+bool FormEditExtensionContext::SetWindowBackgroundColor(const std::string &color)
+{
+    HILOG_DEBUG("SetWindowBackgroundColor begin, color=%{public}s", color.c_str());
+#ifdef SUPPORT_SCREEN
+    sptr<Rosen::Window> uiWindow = UIExtensionContext::GetWindow();
+    if (uiWindow == nullptr) {
+        HILOG_ERROR("null uiWindow");
+        return false;
+    }
+    Rosen::WMError ret = uiWindow->SetBackgroundColor(color);
+    if (ret != Rosen::WMError::WM_OK) {
+        HILOG_ERROR("SetBackgroundColor failed, ret=%{public}d", ret);
+        return false;
+    }
+#endif // SUPPORT_SCREEN
+    HILOG_DEBUG("SetWindowBackgroundColor end");
+    return true;
 }
 
 ErrCode FormEditExtensionContext::StartAbilityByFms(const AAFwk::Want &want)

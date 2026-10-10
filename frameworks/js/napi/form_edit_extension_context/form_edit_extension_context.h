@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,9 @@ enum class FormEditErrorCode {
     // param error
     ERROR_CODE_PARAM_ERROR = 401,
 
+    // IPC error
+    ERROR_CODE_IPC_ERROR = 16500050,
+
     // internal error
     ERROR_CODE_INTERNAL_ERROR = 16501000
 };
@@ -40,6 +43,8 @@ public:
     void SetWant(const std::shared_ptr<AAFwk::Want> &want);
 
     static const size_t CONTEXT_TYPE_ID;
+
+    bool SetWindowBackgroundColor(const std::string &color);
 
     ErrCode StartAbilityByFms(const AAFwk::Want &want);
 
