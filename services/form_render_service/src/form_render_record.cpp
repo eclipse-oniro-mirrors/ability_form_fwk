@@ -101,6 +101,19 @@ static bool IsCompIdGreater(const std::string &lhs, const std::string &rhs)
     }
     return lhs > rhs;
 }
+
+// Returns the request with the largest compId, or nullptr if the map is empty.
+// Callers holding formRequestsMutex_ must keep holding it across the call.
+static Ace::FormRequest *FindCurrentRequest(std::unordered_map<std::string, Ace::FormRequest> &formRequests)
+{
+    Ace::FormRequest *current = nullptr;
+    for (auto &entry : formRequests) {
+        if (current == nullptr || IsCompIdGreater(entry.second.compId, current->compId)) {
+            current = &entry.second;
+        }
+    }
+    return current;
+}
 }
 
 ThreadState::ThreadState(int32_t maxState) : maxState_(maxState) {}
@@ -921,12 +934,8 @@ int32_t FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const W
         OnNotifyRefreshForm(formJsInfo.formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_FORM_REQUEST;
     }
-    std::string compMaxId = "0";
-    for (const auto& iter : formRequests) {
-        if (iter.second.compId > compMaxId) {
-            compMaxId = iter.second.compId;
-        }
-    }
+    const Ace::FormRequest *currentRequest = FindCurrentRequest(formRequests);
+    std::string compMaxId = (currentRequest != nullptr) ? currentRequest->compId : "0";
 
     bool isDynamicFormNeedRecover = false;
     for (const auto& iter : formRequests) {
@@ -1302,7 +1311,7 @@ int32_t FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &form
                 isNeedUpdate = true;
                 continue;
             }
-            if (iter->first > lastReleasedFormRequest->first) {
+            if (IsCompIdGreater(iter->first, lastReleasedFormRequest->first)) {
                 lastReleasedFormRequest = iter;
             }
         }
@@ -1380,25 +1389,34 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
         return false;
     }
     HILOG_INFO("restart runtime");
-    auto task = [weak = weak_from_this()]() {
+    // PostSyncTask is synchronous, so the stack reference below is safe.
+    std::vector<int64_t> releasedFormIds;
+    auto task = [weak = weak_from_this(), &releasedFormIds]() {
         auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {
             HILOG_ERROR("null renderRecord");
             return;
         }
         FormMemoryGuard memoryGuard;
-        renderRecord->HandleReleaseAllRendererInJsThread();
+        renderRecord->HandleReleaseAllRendererInJsThread(releasedFormIds);
     };
     SetEventHandlerNeedResetFlag(true);
     eventHandler->PostSyncTask(task, "ReleaseAllRenderer");
     Release();
-    UpdateAllFormRequest(formJsInfos, true);
+    UpdateAllFormRequest(formJsInfos, true, releasedFormIds);
     SetEventHandlerNeedResetFlag(false);
     GetEventHandler(true, true);
-    return ReAddAllReleasedForms() == ERR_OK;
+    // Re-add covers the union of forms released by this flow and forms in the update list.
+    std::vector<int64_t> recoverableFormIds;
+    recoverableFormIds.reserve(releasedFormIds.size() + formJsInfos.size());
+    recoverableFormIds.insert(recoverableFormIds.end(), releasedFormIds.begin(), releasedFormIds.end());
+    for (const auto &formJsInfo : formJsInfos) {
+        recoverableFormIds.emplace_back(formJsInfo.formId);
+    }
+    return ReAddAllReleasedForms(recoverableFormIds) == ERR_OK;
 }
 
-void FormRenderRecord::HandleReleaseAllRendererInJsThread()
+void FormRenderRecord::HandleReleaseAllRendererInJsThread(std::vector<int64_t> &releasedFormIds)
 {
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     MarkThreadAlive();
@@ -1408,6 +1426,7 @@ void FormRenderRecord::HandleReleaseAllRendererInJsThread()
             continue;
         }
         int64_t formId = iter.first;
+        releasedFormIds.emplace_back(formId);
         HILOG_INFO("Release renderer which formId:%{public}" PRId64, formId);
         std::pair<std::vector<std::string>, std::string> compIds = iter.second->GetOrderedAndCurrentCompIds();
         iter.second->DeleteForm();
@@ -1417,21 +1436,21 @@ void FormRenderRecord::HandleReleaseAllRendererInJsThread()
     formRendererGroupMap_.clear();
 }
 
-// Only the current request participates, symmetric with UpdateAllFormRequest's marking.
-// In-lock dispatch is safe: GetEventHandler only takes eventHandlerMutex_, no reverse nesting.
-int32_t FormRenderRecord::ReAddAllReleasedForms()
+// Re-add the current request of each recoverable form (released by this flow or in the update
+// list, and marked hasRelease), symmetric with UpdateAllFormRequest's marking. In-lock dispatch
+// is safe: GetEventHandler only takes eventHandlerMutex_, no reverse nesting.
+int32_t FormRenderRecord::ReAddAllReleasedForms(const std::vector<int64_t> &recoverableFormIds)
 {
     if (GetEventHandler(false, true) == nullptr) {
         return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
     }
+    std::unordered_set<int64_t> recoverable(recoverableFormIds.begin(), recoverableFormIds.end());
     std::lock_guard<std::mutex> lock(formRequestsMutex_);
     for (auto &[formId, requests] : formRequests_) {
-        Ace::FormRequest *current = nullptr;
-        for (auto &entry : requests) {
-            if (current == nullptr || IsCompIdGreater(entry.second.compId, current->compId)) {
-                current = &entry.second;
-            }
+        if (recoverable.count(formId) == 0) {
+            continue;
         }
+        Ace::FormRequest *current = FindCurrentRequest(requests);
         if (current == nullptr || !current->hasRelease) {
             continue;
         }
@@ -1440,29 +1459,30 @@ int32_t FormRenderRecord::ReAddAllReleasedForms()
     return ERR_OK;
 }
 
-void FormRenderRecord::UpdateAllFormRequest(const std::vector<FormJsInfo> &formJsInfos, bool hasRelease)
+void FormRenderRecord::UpdateAllFormRequest(const std::vector<FormJsInfo> &formJsInfos, bool hasRelease,
+    const std::vector<int64_t> &releasedFormIds)
 {
     std::lock_guard<std::mutex> lock(formRequestsMutex_);
     std::unordered_map<int64_t, const FormJsInfo *> listed;
     for (const auto &formJsInfo : formJsInfos) {
         listed[formJsInfo.formId] = &formJsInfo;
     }
+    std::unordered_set<int64_t> released(releasedFormIds.begin(), releasedFormIds.end());
     for (auto &[formId, requests] : formRequests_) {
         auto it = listed.find(formId);
-        Ace::FormRequest *current = nullptr;
-        for (auto &entry : requests) {
-            if (it != listed.end()) {
+        if (it != listed.end()) {
+            for (auto &entry : requests) {
                 // isDynamic/formJsInfo describe the form shared by all compId requests.
                 entry.second.isDynamic = it->second->isDynamic;
                 entry.second.formJsInfo = it->second->CopyFormJsInfoWithoutFormData();
             }
-            if (current == nullptr || IsCompIdGreater(entry.second.compId, current->compId)) {
-                current = &entry.second;
-            }
         }
-        // hasRelease marks only the current request (the one that can be displayed).
-        if (current != nullptr) {
-            current->hasRelease = hasRelease;
+        if (released.count(formId) > 0) {
+            Ace::FormRequest *current = FindCurrentRequest(requests);
+            // The current request of a released form is marked for re-add.
+            if (current != nullptr) {
+                current->hasRelease = hasRelease;
+            }
         }
     }
 }

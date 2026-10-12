@@ -278,15 +278,16 @@ private:
 
     bool ReAddIfHapPathChanged(const std::vector<FormJsInfo> &formJsInfos);
 
-    void UpdateAllFormRequest(const std::vector<FormJsInfo> &formJsInfos, bool hasRelease);
+    void UpdateAllFormRequest(const std::vector<FormJsInfo> &formJsInfos, bool hasRelease,
+        const std::vector<int64_t> &releasedFormIds);
 
-    int32_t ReAddAllReleasedForms();
+    int32_t ReAddAllReleasedForms(const std::vector<int64_t> &recoverableFormIds);
 
     void UpdateFormRequestsApiVersion(const Want &want);
 
     void UpdateFormRequestsApiVersionInner(const Want &want);
 
-    void HandleReleaseAllRendererInJsThread();
+    void HandleReleaseAllRendererInJsThread(std::vector<int64_t> &releasedFormIds);
 
     void UpdateGroupRequestsWhenRecover(const int64_t &formId, const FormJsInfo &formJsInfo,
         const std::vector<std::string> &orderedCompIds, const std::string &currentCompId,
