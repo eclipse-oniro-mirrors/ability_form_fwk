@@ -372,10 +372,7 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
             HILOG_WARN("unexpected imageDataState_ %{public}d", imageDataState_);
             break;
     }
-    if (!parcel.ReadBool(isSupportMoreImages_)) {
-        HILOG_ERROR("ReadBool isSupportMoreImages_ failed");
-        return false;
-    }
+    parcel.ReadBool(isSupportMoreImages_);
     return true;
 }
 

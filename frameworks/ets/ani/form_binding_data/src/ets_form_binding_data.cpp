@@ -93,7 +93,6 @@ static ani_object CreateFormBindingDataEx([[maybe_unused]] ani_env *env, ani_obj
         HILOG_ERROR("Object_CallMethod_Void <set>isSupportMoreImages failed status %{public}d",
             static_cast<int>(status));
     }
-    HILOG_INFO("CreateFormBindingDataEx end");
     return formBindingDataObj;
 }
 

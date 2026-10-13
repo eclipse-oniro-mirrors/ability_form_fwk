@@ -43,74 +43,113 @@ public:
         GET_CB_INFO_AND_CALL(env, info, JsFormBindingData, OnCreateFormBindingDataEx);
     }
 private:
-    bool StringifyFormData(napi_env env, size_t argc, napi_value* argv, std::string& formDataStr);
     napi_value OnCreateFormBindingData(napi_env env, size_t argc, napi_value* argv);
     napi_value OnCreateFormBindingDataEx(napi_env env, size_t argc, napi_value* argv);
 };
 
-bool JsFormBindingData::StringifyFormData(napi_env env, size_t argc, napi_value* argv, std::string& formDataStr)
-{
-    formDataStr.clear();
-    if (argc == 0) {
-        return true;
-    }
-    napi_valuetype type = napi_undefined;
-    napi_typeof(env, argv[0], &type);
-    if (type == napi_string) {
-        return ConvertFromJsValue(env, argv[0], formDataStr);
-    }
-    if (type != napi_object) {
-        return true;
-    }
-    napi_value globalValue = nullptr;
-    napi_status status = napi_get_global(env, &globalValue);
-    if (status != napi_ok || globalValue == nullptr) {
-        HILOG_ERROR("Failed to get global object");
-        return false;
-    }
-    napi_value jsonValue = nullptr;
-    status = napi_get_named_property(env, globalValue, "JSON", &jsonValue);
-    if (status != napi_ok || jsonValue == nullptr) {
-        HILOG_ERROR("Failed to get JSON property");
-        return false;
-    }
-    napi_value stringifyValue = nullptr;
-    status = napi_get_named_property(env, jsonValue, "stringify", &stringifyValue);
-    if (status != napi_ok || stringifyValue == nullptr) {
-        HILOG_ERROR("Failed to get stringify property");
-        return false;
-    }
-    napi_value funcArgv[1] = { argv[0] };
-    napi_value transValue = nullptr;
-    status = napi_call_function(env, jsonValue, stringifyValue, 1, funcArgv, &transValue);
-    if (status != napi_ok || transValue == nullptr) {
-        HILOG_ERROR("Failed to call JSON.stringify");
-        return false;
-    }
-    return ConvertFromJsValue(env, transValue, formDataStr);
-}
-
 napi_value JsFormBindingData::OnCreateFormBindingData(napi_env env, size_t argc, napi_value* argv)
 {
+    HILOG_INFO("call");
     std::string formDataStr;
-    if (!StringifyFormData(env, argc, argv, formDataStr)) {
-        return CreateJsUndefined(env);
+    if (argc > 0) {
+        napi_value nativeValue = nullptr;
+        napi_valuetype type = napi_undefined;
+        napi_typeof(env, argv[0], &type);
+        if (type == napi_string) {
+            HILOG_DEBUG("param type is string");
+            nativeValue = argv[0];
+        } else if (type == napi_object) {
+            HILOG_DEBUG("param type is object");
+            napi_value globalValue = nullptr;
+            napi_status status = napi_get_global(env, &globalValue);
+            if (status != napi_ok || globalValue == nullptr) {
+                HILOG_ERROR("Failed to get global object");
+                return CreateJsUndefined(env);
+            }
+            napi_value jsonValue = nullptr;
+            status = napi_get_named_property(env, globalValue, "JSON", &jsonValue);
+            if (status != napi_ok || jsonValue == nullptr) {
+                HILOG_ERROR("Failed to get JSON property");
+                return CreateJsUndefined(env);
+            }
+
+            napi_value stringifyValue = nullptr;
+            status = napi_get_named_property(env, jsonValue, "stringify", &stringifyValue);
+            if (status != napi_ok || stringifyValue == nullptr) {
+                HILOG_ERROR("Failed to get stringify property");
+                return CreateJsUndefined(env);
+            }
+            napi_value funcArgv[1] = { argv[0] };
+            napi_value transValue = nullptr;
+            status = napi_call_function(env, jsonValue, stringifyValue, 1, funcArgv, &transValue);
+            if (status != napi_ok || transValue == nullptr) {
+                HILOG_ERROR("Failed to call JSON.stringify");
+                return CreateJsUndefined(env);
+            }
+            nativeValue = transValue;
+        } else {
+            HILOG_ERROR("param type not string or object");
+            return CreateJsUndefined(env);
+        }
+        if (!ConvertFromJsValue(env, nativeValue, formDataStr)) {
+            HILOG_ERROR("Parse formDataStr failed");
+            return CreateJsUndefined(env);
+        }
     }
     napi_value objValue = nullptr;
-    napi_status status = napi_create_object(env, &objValue);
-    if (status != napi_ok || objValue == nullptr) {
-        HILOG_ERROR("Failed to create object");
-        return CreateJsUndefined(env);
-    }
+    napi_create_object(env, &objValue);
     napi_set_named_property(env, objValue, "data", CreateJsValue(env, formDataStr));
     return objValue;
 }
 
 napi_value JsFormBindingData::OnCreateFormBindingDataEx(napi_env env, size_t argc, napi_value* argv)
 {
+    HILOG_INFO("call");
     std::string formDataStr;
-    if (!StringifyFormData(env, argc, argv, formDataStr)) {
-        return CreateJsUndefined(env);
+    if (argc > 0) {
+        napi_value nativeValue = nullptr;
+        napi_valuetype type = napi_undefined;
+        napi_typeof(env, argv[0], &type);
+        if (type == napi_string) {
+            HILOG_DEBUG("param type is string");
+            nativeValue = argv[0];
+        } else if (type == napi_object) {
+            HILOG_DEBUG("param type is object");
+            napi_value globalValue = nullptr;
+            napi_status status = napi_get_global(env, &globalValue);
+            if (status != napi_ok || globalValue == nullptr) {
+                HILOG_ERROR("Failed to get global object");
+                return CreateJsUndefined(env);
+            }
+            napi_value jsonValue = nullptr;
+            status = napi_get_named_property(env, globalValue, "JSON", &jsonValue);
+            if (status != napi_ok || jsonValue == nullptr) {
+                HILOG_ERROR("Failed to get JSON property");
+                return CreateJsUndefined(env);
+            }
+
+            napi_value stringifyValue = nullptr;
+            status = napi_get_named_property(env, jsonValue, "stringify", &stringifyValue);
+            if (status != napi_ok || stringifyValue == nullptr) {
+                HILOG_ERROR("Failed to get stringify property");
+                return CreateJsUndefined(env);
+            }
+            napi_value funcArgv[1] = { argv[0] };
+            napi_value transValue = nullptr;
+            status = napi_call_function(env, jsonValue, stringifyValue, 1, funcArgv, &transValue);
+            if (status != napi_ok || transValue == nullptr) {
+                HILOG_ERROR("Failed to call JSON.stringify");
+                return CreateJsUndefined(env);
+            }
+            nativeValue = transValue;
+        } else {
+            HILOG_ERROR("param type not string or object");
+            return CreateJsUndefined(env);
+        }
+        if (!ConvertFromJsValue(env, nativeValue, formDataStr)) {
+            HILOG_ERROR("Parse formDataStr failed");
+            return CreateJsUndefined(env);
+        }
     }
     napi_value objValue = nullptr;
     napi_status status = napi_create_object(env, &objValue);
@@ -126,6 +165,8 @@ napi_value JsFormBindingData::OnCreateFormBindingDataEx(napi_env env, size_t arg
 
 napi_value JsFormBindingDataInit(napi_env env, napi_value exportObj)
 {
+    HILOG_INFO("call");
+
     auto formBindingData = std::make_unique<JsFormBindingData>();
     napi_status status = napi_wrap(env, exportObj, formBindingData.get(),
         JsFormBindingData::Finalizer, nullptr, nullptr);

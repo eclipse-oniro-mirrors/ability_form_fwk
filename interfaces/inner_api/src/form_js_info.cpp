@@ -106,10 +106,7 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     formProviderData = *bindingData;
     ReadImageData(parcel);
     ReadPkgNameMap(parcel);
-    if (!parcel.ReadBool(isSupportMoreImages)) {
-        HILOG_ERROR("ReadBool isSupportMoreImages failed");
-        return false;
-    }
+    parcel.ReadBool(isSupportMoreImages);
     return true;
 }
 
