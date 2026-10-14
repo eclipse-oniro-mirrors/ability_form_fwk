@@ -127,7 +127,8 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     // Fuzz CheckPublishForm
     Want checkWant = GenerateWant(fdp);
     bool needCheckFormPermission = fdp->ConsumeBool();
-    adapter.CheckPublishForm(checkWant, needCheckFormPermission);
+    int32_t userId = fdp->ConsumeIntegral<int32_t>();
+    adapter.CheckPublishForm(checkWant, needCheckFormPermission, userId);
 
     // Fuzz CheckFormBundleName (private; bundleName is out-param)
     Want bundleNameWant = GenerateWant(fdp);

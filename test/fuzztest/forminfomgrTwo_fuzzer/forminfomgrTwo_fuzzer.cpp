@@ -71,20 +71,20 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     // Test GetAllTemplateFormsInfo
     std::vector<FormInfo> formInfos;
     formInfoMgr.GetAllTemplateFormsInfo(formInfos, userId);
-    formInfoMgr.GetAllTemplateFormsInfo(formInfos);
+    formInfoMgr.GetAllTemplateFormsInfo(formInfos, userId);
 
     // Test GetTemplateFormsInfoByBundle
     formInfoMgr.GetTemplateFormsInfoByBundle(bundleName, formInfos, userId);
-    formInfoMgr.GetTemplateFormsInfoByBundle(bundleName, formInfos);
+    formInfoMgr.GetTemplateFormsInfoByBundle(bundleName, formInfos, userId);
 
     // Test GetTemplateFormsInfoByModule
     formInfoMgr.GetTemplateFormsInfoByModule(bundleName, moduleName, formInfos, userId);
-    formInfoMgr.GetTemplateFormsInfoByModule(bundleName, moduleName, formInfos);
+    formInfoMgr.GetTemplateFormsInfoByModule(bundleName, moduleName, formInfos, userId);
 
     // Test GetFormsInfoByFilter
     FormInfoFilter filter;
     formInfoMgr.GetFormsInfoByFilter(filter, formInfos, userId);
-    formInfoMgr.GetFormsInfoByFilter(filter, formInfos);
+    formInfoMgr.GetFormsInfoByFilter(filter, formInfos, userId);
 
     // Test GetFormsInfoByRecord
     FormRecord formRecord;
@@ -95,11 +95,11 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 
     // Test GetFormsInfoByModuleWithoutCheck
     formInfoMgr.GetFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos, userId);
-    formInfoMgr.GetFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos);
+    formInfoMgr.GetFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos, userId);
 
     // Test GetTemplateFormsInfoByModuleWithoutCheck
     formInfoMgr.GetTemplateFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos, userId);
-    formInfoMgr.GetTemplateFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos);
+    formInfoMgr.GetTemplateFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos, userId);
 
     // Test PublishFmsReadyEvent
     formInfoMgr.PublishFmsReadyEvent();

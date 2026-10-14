@@ -511,7 +511,7 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0031, TestSize.Level0)
     FormMgrService formMgrService;
     int fd = 1;
     std::vector<std::u16string> args;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrService.Dump(fd, args));
+    EXPECT_EQ(ERR_OK, formMgrService.Dump(fd, args));
     GTEST_LOG_(INFO) << "FormMgrService_0031 end";
 }
 

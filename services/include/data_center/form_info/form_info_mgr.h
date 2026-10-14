@@ -47,32 +47,32 @@ public:
 
     ErrCode Remove(const std::string &bundleName, int32_t userId);
 
-    ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+    ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId);
 
-    ErrCode GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+    ErrCode GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId);
 
     ErrCode GetFormsInfoByBundle(
-        const std::string &bundleName, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+        const std::string &bundleName, std::vector<FormInfo> &formInfos, int32_t userId);
 
     ErrCode GetTemplateFormsInfoByBundle(
-        const std::string &bundleName, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+        const std::string &bundleName, std::vector<FormInfo> &formInfos, int32_t userId);
 
     ErrCode GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
-        std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+        std::vector<FormInfo> &formInfos, int32_t userId);
 
     ErrCode GetTemplateFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
-        std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+        std::vector<FormInfo> &formInfos, int32_t userId);
 
     ErrCode GetFormsInfoByFilter(
-        const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+        const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId);
 
     ErrCode GetFormsInfoByRecord(const FormRecord &formRecord, FormInfo &formInfo);
 
     ErrCode GetFormsInfoByModuleWithoutCheck(const std::string &bundleName, const std::string &moduleName,
-        std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+        std::vector<FormInfo> &formInfos, int32_t userId);
 
     ErrCode GetTemplateFormsInfoByModuleWithoutCheck(const std::string &bundleName, const std::string &moduleName,
-        std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+        std::vector<FormInfo> &formInfos, int32_t userId);
 
     ErrCode AddDynamicFormInfo(FormInfo &formInfo, int32_t userId);
 
@@ -140,7 +140,7 @@ private:
     // ===== Member functions =====
 
     std::shared_ptr<BundleFormInfo> GetOrCreateBundleFromInfo(const std::string &bundleName);
-    static bool IsCaller(const std::string& bundleName);
+    static bool IsCaller(const std::string& bundleName, int32_t userId);
     static bool CheckBundlePermission();
     static ErrCode CheckDynamicFormInfo(FormInfo &formInfo, const BundleInfo &bundleInfo);
     ErrCode LoadFormInfosFromDb();

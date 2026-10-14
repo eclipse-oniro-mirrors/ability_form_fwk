@@ -345,7 +345,7 @@ HWTEST_F(FmsFormPublishAdapterTest, CheckPublishForm_001, TestSize.Level1)
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
         .WillOnce(Return(nullptr));
 
-    auto result = FormPublishAdapter::GetInstance().CheckPublishForm(want, true);
+    auto result = FormPublishAdapter::GetInstance().CheckPublishForm(want, true, 0);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
 
     GTEST_LOG_(INFO) << "CheckPublishForm_001 end";

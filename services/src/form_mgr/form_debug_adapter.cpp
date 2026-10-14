@@ -80,7 +80,8 @@ int FormDebugAdapter::DumpStaticBundleFormInfos(std::string &formInfos) const
 {
     HILOG_INFO("call");
     std::vector<FormInfo> bundleFormInfos;
-    if (FormInfoMgr::GetInstance().GetAllFormsInfo(bundleFormInfos) != ERR_OK) {
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    if (FormInfoMgr::GetInstance().GetAllFormsInfo(bundleFormInfos, userId) != ERR_OK) {
         HILOG_ERROR("GetAllFormsInfo failed");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }

@@ -105,10 +105,10 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formInfoMgr.Remove(bundleName, userId);
 
     std::vector<FormInfo> formInfos;
-    formInfoMgr.GetAllFormsInfo(formInfos);
-    formInfoMgr.GetFormsInfoByBundle(bundleName, formInfos);
+    formInfoMgr.GetAllFormsInfo(formInfos, userId);
+    formInfoMgr.GetFormsInfoByBundle(bundleName, formInfos, userId);
     std::string moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    formInfoMgr.GetFormsInfoByModule(bundleName, moduleName, formInfos);
+    formInfoMgr.GetFormsInfoByModule(bundleName, moduleName, formInfos, userId);
 
     FormInfo formInfo = GenerateFuzzedFormInfo(fdp);
     BundleInfo bundleInfo;
@@ -118,7 +118,7 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formInfoMgr.RemoveDynamicFormInfo(bundleName, moduleName, formName, userId);
     formInfoMgr.RemoveAllDynamicFormsInfo(bundleName, userId);
     formInfoMgr.GetOrCreateBundleFromInfo(bundleName);
-    formInfoMgr.IsCaller(bundleName);
+    formInfoMgr.IsCaller(bundleName, userId);
     formInfoMgr.CheckBundlePermission();
 
     // ProcessBundleBatch with new bundles

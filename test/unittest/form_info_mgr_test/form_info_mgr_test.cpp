@@ -286,7 +286,7 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_GetFormsInfoByModule_0100, TestSize.Lev
     formInfoStorage.userId = USER_ID;
     formInfoStorage.formInfos.push_back(GetTestFormInfo());
     bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
-    EXPECT_EQ(ERR_OK, bundleFormInfo.GetFormsInfoByModule(PARAM_MODULE_NAME_TEST, formInfos));
+    EXPECT_EQ(ERR_OK, bundleFormInfo.GetFormsInfoByModule(PARAM_MODULE_NAME_TEST, formInfos, USER_ID));
     GTEST_LOG_(INFO) << "BundleFormInfo_GetFormsInfoByModule_0100 end";
 }
 
@@ -308,7 +308,7 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_GetFormsInfoByFilter_0100, TestSize.Lev
     filter.bundleName = FORM_BUNDLE_NAME_TEST;
     filter.moduleName = PARAM_MODULE_NAME_TEST;
     filter.supportDimensions = {1, 2};
-    EXPECT_EQ(ERR_OK, bundleFormInfo.GetFormsInfoByFilter(filter, formInfos));
+    EXPECT_EQ(ERR_OK, bundleFormInfo.GetFormsInfoByFilter(filter, formInfos, USER_ID));
     EXPECT_EQ(1, formInfos.size());
     EXPECT_EQ(FORM_BUNDLE_NAME_TEST, formInfos[0].bundleName);
     EXPECT_EQ(PARAM_MODULE_NAME_TEST, formInfos[0].moduleName);
@@ -334,7 +334,7 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_GetFormsInfoByFilter_0200, TestSize.Lev
     filter.bundleName = FORM_BUNDLE_NAME_TEST;
     filter.moduleName = PARAM_MODULE_NAME_TEST;
     filter.supportShapes = {2};
-    EXPECT_EQ(ERR_OK, bundleFormInfo.GetFormsInfoByFilter(filter, formInfos));
+    EXPECT_EQ(ERR_OK, bundleFormInfo.GetFormsInfoByFilter(filter, formInfos, USER_ID));
     EXPECT_EQ(1, formInfos.size());
     EXPECT_EQ(FORM_BUNDLE_NAME_TEST, formInfos[0].bundleName);
     EXPECT_EQ(PARAM_MODULE_NAME_TEST, formInfos[0].moduleName);
@@ -361,7 +361,7 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_GetFormsInfoByFilter_0300, TestSize.Lev
     filter.moduleName = PARAM_MODULE_NAME_TEST;
     filter.supportDimensions = {1, 2};
     filter.supportShapes = {1};
-    EXPECT_EQ(ERR_OK, bundleFormInfo.GetFormsInfoByFilter(filter, formInfos));
+    EXPECT_EQ(ERR_OK, bundleFormInfo.GetFormsInfoByFilter(filter, formInfos, USER_ID));
     EXPECT_EQ(0, formInfos.size());
     GTEST_LOG_(INFO) << "BundleFormInfo_GetFormsInfoByFilter_0300 end";
 }
@@ -385,7 +385,7 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_GetFormsInfoByFilter_0400, TestSize.Lev
     filter.moduleName = PARAM_MODULE_NAME_TEST;
     filter.supportShapes = {2};
     filter.supportDimensions = {1, 2};
-    EXPECT_EQ(ERR_OK, bundleFormInfo.GetFormsInfoByFilter(filter, formInfos));
+    EXPECT_EQ(ERR_OK, bundleFormInfo.GetFormsInfoByFilter(filter, formInfos, USER_ID));
     EXPECT_EQ(1, formInfos.size());
     EXPECT_EQ(FORM_BUNDLE_NAME_TEST, formInfos[0].bundleName);
     EXPECT_EQ(PARAM_MODULE_NAME_TEST, formInfos[0].moduleName);
@@ -463,7 +463,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByBundle_0100, TestSize.Level1
     auto bundleFormInfoPtr = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
     formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfoPtr;
     std::vector<FormInfo> formInfos;
-    EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByBundle(FORM_BUNDLE_NAME_TEST, formInfos));
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByBundle(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
     GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByBundle_0100 end";
 }
 
@@ -479,7 +479,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByModule_0100, TestSize.Level1
     formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfoPtr;
     std::vector<FormInfo> formInfos;
     EXPECT_EQ(ERR_OK,
-        formInfoMgr_.GetFormsInfoByModule(FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST, formInfos));
+        formInfoMgr_.GetFormsInfoByModule(FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST, formInfos, USER_ID));
     GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByModule_0100 end";
 }
 
@@ -611,7 +611,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_IsCaller_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormInfoMgr_IsCaller_0100 start";
     formInfoMgr_.Start();
-    EXPECT_FALSE(formInfoMgr_.IsCaller(FORM_BUNDLE_NAME_TEST));
+    EXPECT_FALSE(formInfoMgr_.IsCaller(FORM_BUNDLE_NAME_TEST, USER_ID));
     GTEST_LOG_(INFO) << "FormInfoMgr_IsCaller_0100 end";
 }
 
@@ -685,7 +685,8 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByFilter_0100, TestSize.Level1
     FormInfoFilter filter;
     MockIsSACall(false);
     MockVerifyCallingPermission(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos,
+        USER_ID));
     GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0100 end";
 }
 
@@ -706,7 +707,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByFilter_0200, TestSize.Level1
     formInfoMgr_.bundleFormInfoMap_.emplace(FORM_BUNDLE_NAME_TEST, bundleFormInfo);
     FormInfoFilter filter;
     MockIsSACall(true);
-    EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos));
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos, USER_ID));
     GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0200 end";
 }
 
@@ -730,7 +731,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByFilter_0300, TestSize.Level1
     filter.moduleName = PARAM_MODULE_NAME_TEST;
     MockIsSACall(false);
     MockVerifyCallingPermission(true);
-    EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos));
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos, USER_ID));
     GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0300 end";
 }
 
@@ -753,7 +754,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByFilter_0400, TestSize.Level1
     filter.bundleName = FORM_BUNDLE_NAME_TEST;
     filter.moduleName = PARAM_MODULE_NAME_TEST;
     MockIsSACall(true);
-    EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos));
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos, USER_ID));
     GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0400 end";
 }
 
@@ -962,13 +963,13 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0003, TestSize.Level1)
     std::shared_ptr<BundleFormInfo> bundleFormInfo = nullptr;
     std::string test = "test";
     formInfoMgr_.bundleFormInfoMap_[test] = bundleFormInfo;
-    auto ret = formInfoMgr_.GetAllFormsInfo(formInfos);
+    auto ret = formInfoMgr_.GetAllFormsInfo(formInfos, USER_ID);
     EXPECT_EQ(ret, ERR_OK);
     formInfoMgr_.bundleFormInfoMap_.clear();
     std::string bundleName = "com.form.provider.service";
     std::shared_ptr<BundleFormInfo> bundleFormInfo2 = std::make_shared<BundleFormInfo>(bundleName);
     formInfoMgr_.bundleFormInfoMap_[test] = bundleFormInfo2;
-    ret = formInfoMgr_.GetAllFormsInfo(formInfos);
+    ret = formInfoMgr_.GetAllFormsInfo(formInfos, USER_ID);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormInfoMgrTest0003 end";
 }
@@ -1172,13 +1173,13 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0014, TestSize.Level1)
     std::shared_ptr<BundleFormInfo> bundleFormInfo = nullptr;
     std::string test = "test";
     formInfoMgr_.bundleFormInfoMap_[test] = bundleFormInfo;
-    auto ret = formInfoMgr_.GetAllFormsInfo(formInfos);
+    auto ret = formInfoMgr_.GetAllFormsInfo(formInfos, USER_ID);
     EXPECT_EQ(ret, ERR_OK);
     formInfoMgr_.bundleFormInfoMap_.clear();
     std::string bundleName = "com.form.provider.service";
     std::shared_ptr<BundleFormInfo> bundleFormInfo2 = std::make_shared<BundleFormInfo>(bundleName);
     formInfoMgr_.bundleFormInfoMap_[test] = bundleFormInfo2;
-    ret = formInfoMgr_.GetAllFormsInfo(formInfos);
+    ret = formInfoMgr_.GetAllFormsInfo(formInfos, USER_ID);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormInfoMgrTest0014 end";
 }

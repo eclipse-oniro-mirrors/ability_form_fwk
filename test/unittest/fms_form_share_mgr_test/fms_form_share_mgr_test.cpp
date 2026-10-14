@@ -1422,7 +1422,7 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_034, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_034 start";
     std::vector<FormInfo> formInfos;
     FormInfoMgr formInfoMgr;
-    EXPECT_EQ(ERR_OK, formInfoMgr.GetAllFormsInfo(formInfos));
+    EXPECT_EQ(ERR_OK, formInfoMgr.GetAllFormsInfo(formInfos, USER_ID));
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_034 end";
 }
 
@@ -1456,7 +1456,7 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_035, TestSize.Level0)
     bundleFormInfoMap.emplace(FORM_PROVIDER_BUNDLE_NAME, bundleFormInfo);
     FormInfoMgr formInfoMgr;
     formInfoMgr.bundleFormInfoMap_ = bundleFormInfoMap;
-    EXPECT_EQ(ERR_OK, formInfoMgr.GetAllFormsInfo(formInfos));
+    EXPECT_EQ(ERR_OK, formInfoMgr.GetAllFormsInfo(formInfos, USER_ID));
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_035 end";
 }
 
@@ -1474,7 +1474,7 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_036, TestSize.Level0)
     bundleFormInfoMap.emplace(FORM_PROVIDER_BUNDLE_NAME, bundleFormInfo);
     FormInfoMgr formInfoMgr;
     formInfoMgr.bundleFormInfoMap_ = bundleFormInfoMap;
-    EXPECT_EQ(ERR_OK, formInfoMgr.GetAllFormsInfo(formInfos));
+    EXPECT_EQ(ERR_OK, formInfoMgr.GetAllFormsInfo(formInfos, USER_ID));
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_036 end";
 }
 
@@ -1489,7 +1489,7 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_037, TestSize.Level0)
     FormInfoMgr formInfoMgr;
     std::string bundleName = "";
     std::vector<FormInfo> formInfos;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formInfoMgr.GetFormsInfoByBundle(bundleName, formInfos));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formInfoMgr.GetFormsInfoByBundle(bundleName, formInfos, USER_ID));
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_037 end";
 }
 
@@ -1504,7 +1504,7 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_038, TestSize.Level0)
     FormInfoMgr formInfoMgr;
     std::string bundleName = "aaa";
     std::vector<FormInfo> formInfos;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formInfoMgr.GetFormsInfoByBundle(bundleName, formInfos));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formInfoMgr.GetFormsInfoByBundle(bundleName, formInfos, USER_ID));
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_038 end";
 }
 
@@ -1520,7 +1520,8 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_039, TestSize.Level0)
     std::string bundleName = "";
     std::string moduleName = "";
     std::vector<FormInfo> formInfos;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formInfoMgr.GetFormsInfoByModule(bundleName, moduleName, formInfos));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formInfoMgr.GetFormsInfoByModule(bundleName, moduleName, formInfos,
+        USER_ID));
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_039 end";
 }
 
@@ -1536,7 +1537,8 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_040, TestSize.Level0)
     std::string bundleName = "aaa";
     std::string moduleName = "";
     std::vector<FormInfo> formInfos;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formInfoMgr.GetFormsInfoByModule(bundleName, moduleName, formInfos));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formInfoMgr.GetFormsInfoByModule(bundleName, moduleName,
+        formInfos, USER_ID));
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_040 end";
 }
 
@@ -1556,7 +1558,7 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_041, TestSize.Level0)
     bundleFormInfoMap.emplace(FORM_PROVIDER_BUNDLE_NAME, bundleFormInfo);
     FormInfoMgr formInfoMgr;
     formInfoMgr.bundleFormInfoMap_ = bundleFormInfoMap;
-    EXPECT_EQ(ERR_OK, formInfoMgr.GetFormsInfoByModule(bundleName, moduleName, formInfos));
+    EXPECT_EQ(ERR_OK, formInfoMgr.GetFormsInfoByModule(bundleName, moduleName, formInfos, USER_ID));
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_041 end";
 }
 
@@ -1635,7 +1637,7 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_048, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_048 start";
     std::string bundleName = FORM_PROVIDER_BUNDLE_NAME;
     FormInfoMgr formInfoMgr;
-    EXPECT_EQ(false, formInfoMgr.IsCaller(bundleName));
+    EXPECT_EQ(false, formInfoMgr.IsCaller(bundleName, USER_ID));
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_048 end";
 }
 

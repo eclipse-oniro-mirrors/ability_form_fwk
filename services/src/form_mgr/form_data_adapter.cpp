@@ -499,6 +499,12 @@ ErrCode FormDataAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     // New acquire request: pre-clear any pending retry for this form (superseded).
     FormProviderErrorHandlerFactory::GetAcquireHandler()->RemoveRetryPolicy(formId);
 
+    FormRecord record;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, record)) {
+        HILOG_ERROR("not found in formRecord");
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+
     Want newWant;
     newWant.SetParams(wantParams);
     auto hostToken = newWant.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
@@ -509,8 +515,8 @@ ErrCode FormDataAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 #ifdef RES_SCHEDULE_ENABLE
-    auto&& connectCallback = [](const std::string &bundleName) {
-        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(bundleName);
+    auto&& connectCallback = [userId = record.providerUserId](const std::string &bundleName) {
+        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(bundleName, userId);
     };
     auto&& disconnectCallback = [](const std::string &bundleName) {
         FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(bundleName);
@@ -518,12 +524,6 @@ ErrCode FormDataAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     formAcquireConnection->SetFormAbilityConnectCb(connectCallback);
     formAcquireConnection->SetFormAbilityDisconnectCb(disconnectCallback);
 #endif
-
-    FormRecord record;
-    if (!FormDataMgr::GetInstance().GetFormRecord(formId, record)) {
-        HILOG_ERROR("not found in formRecord");
-        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-    }
     Want want;
     want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
     if (!info.GetModuleName().empty()) {

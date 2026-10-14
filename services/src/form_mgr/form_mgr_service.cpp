@@ -15,6 +15,7 @@
 
 #include "form_mgr/form_mgr_service.h"
 
+#include <algorithm>
 #include <chrono>
 #include <ctime>
 #include <iomanip>
@@ -187,11 +188,7 @@ int32_t FormMgrService::CheckFMSReady()
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    int32_t userId = FormUtil::GetCurrentAccountId();
-    if (userId == Constants::ANY_USERID) {
-        HILOG_ERROR("empty account");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
+    int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_CheckFMSReady",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     bool result = FormInfoMgr::GetInstance().HasReloadedFormInfos(userId);
@@ -1523,11 +1520,6 @@ int32_t FormMgrService::RecvFormShareInfoFromRemote(const FormShareInfo &info)
 
 int FormMgrService::Dump(int fd, const std::vector<std::u16string> &args)
 {
-    if (CheckFMSReady() != ERR_OK) {
-        HILOG_ERROR("fms not ready");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
     std::string result;
     Dump(args, result);
     int ret = dprintf(fd, "%s\n", result.c_str());
@@ -1802,12 +1794,13 @@ std::string FormMgrService::GetCurrentDateTime()
 
 bool FormMgrService::CheckAcrossLocalAccountsPermission() const
 {
-    // checks whether the current user is inactive
+    // Non-foreground callers require INTERACT_ACROSS_LOCAL_ACCOUNTS.
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId =  FormUtil::GetCallerUserId(callingUid);
-    int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
-    if (userId != currentActiveUserId) {
-        HILOG_INFO("currentActiveUserId:%{public}d, userId:%{public}d", currentActiveUserId, userId);
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    std::vector<int32_t> foregroundUsers;
+    FormUtil::GetForegroundUsers(foregroundUsers);
+    if (std::find(foregroundUsers.begin(), foregroundUsers.end(), userId) == foregroundUsers.end()) {
+        HILOG_INFO("userId:%{public}d not in %{public}zu foreground users", userId, foregroundUsers.size());
         bool isCallingPermAccount =
             FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS);
         if (!isCallingPermAccount) {

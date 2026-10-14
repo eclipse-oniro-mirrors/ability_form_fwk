@@ -27,6 +27,7 @@
 #include "common/util/form_util.h"
 #include "fms_log_wrapper.h"
 #include "hitrace_meter.h"
+#include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -100,7 +101,8 @@ ErrCode FormServiceDiscovery::GetAvailableFormHostServices(std::vector<PeerFormH
     std::unordered_set<std::string> identicalIds = CollectIdenticalNetworkIds(onlineDevices);
 
     std::map<std::string, std::string> param;
-    param[FORM_SERVICE_PARAM_KEY_LOCAL_USER_ID] = std::to_string(FormUtil::GetCurrentAccountId());
+    param[FORM_SERVICE_PARAM_KEY_LOCAL_USER_ID] =
+        std::to_string(FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid()));
     param[FORM_SERVICE_PARAM_KEY_IS_PROXY_QUERY] = "false";
     std::vector<DmServiceInfo> dmServices;
     dmRet = dmAdapter_->GetTrustServiceInfo(FORM_SERVICE_OWNER_PKG, param, dmServices);

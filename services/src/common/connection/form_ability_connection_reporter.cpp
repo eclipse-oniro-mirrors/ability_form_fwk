@@ -18,7 +18,6 @@
 #include "common/connection/form_ability_connection_reporter.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
-#include "common/util/form_util.h"
 #include "iremote_proxy.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -43,7 +42,7 @@ FormAbilityConnectionReporter::~FormAbilityConnectionReporter()
     HILOG_INFO("Call");
 }
 
-void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::string &bundleName)
+void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::string &bundleName, int32_t userId)
 {
     if (bundleName.empty()) {
         HILOG_ERROR("Invalid bundleName");
@@ -62,7 +61,6 @@ void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::strin
         return;
     }
     std::vector<AppExecFwk::RunningProcessInfo> infos;
-    int32_t userId = FormUtil::GetCurrentAccountId();
     int32_t ret = appMgr->GetRunningProcessInformation(bundleName, userId, infos);
     if (ret != ERR_OK) {
         HILOG_ERROR("Get running process info failed");

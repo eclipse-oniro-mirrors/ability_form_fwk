@@ -172,11 +172,11 @@ void TestFormInfoMgrWithBundleFormInfo(FuzzedDataProvider *fdp)
     formInfoMgr.Remove(bundleName, userId);
 
     std::vector<FormInfo> formInfos;
-    formInfoMgr.GetAllFormsInfo(formInfos);
-    formInfoMgr.GetFormsInfoByBundle(bundleName, formInfos);
+    formInfoMgr.GetAllFormsInfo(formInfos, userId);
+    formInfoMgr.GetFormsInfoByBundle(bundleName, formInfos, userId);
 
     std::string moduleName = ConsumeSanitizedString(fdp);
-    formInfoMgr.GetFormsInfoByModule(bundleName, moduleName, formInfos);
+    formInfoMgr.GetFormsInfoByModule(bundleName, moduleName, formInfos, userId);
 
     FormInfo formInfo = GenerateFuzzedFormInfo(fdp);
     formInfoMgr.AddDynamicFormInfo(formInfo, userId);

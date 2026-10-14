@@ -56,7 +56,7 @@ public:
 
     void SetRenderGroupParams(int64_t formId, const Want &want);
 
-    void SetVisibleChange(int64_t formId, bool isVisible, int32_t userId = Constants::INVALID_USER_ID);
+    void SetVisibleChange(int64_t formId, bool isVisible, int32_t userId);
 
     ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord,
         const std::string &compId = "", const sptr<IRemoteObject> &hostToken = nullptr);

@@ -430,9 +430,6 @@ void FormRenderMgr::SetRenderGroupEnableFlag(int64_t formId, bool isEnable)
 
 void FormRenderMgr::SetVisibleChange(int64_t formId, bool isVisible, int32_t userId)
 {
-    if (userId == Constants::INVALID_USER_ID) {
-        userId = FormUtil::GetCurrentAccountId();
-    }
     std::shared_ptr<FormRenderMgrInner> renderInner;
     if (GetFormRenderMgrInner(userId, renderInner)) {
         renderInner->PostSetVisibleChangeTask(formId, isVisible);
@@ -711,9 +708,6 @@ ErrCode FormRenderMgr::RecycleForms(
     int callingUserId = want.GetIntParam(Constants::RECYCLE_FORMS_USER_ID, 0);
     if (callingUserId == 0) {
         callingUserId = IPCSkeleton::GetCallingUid() / Constants::CALLING_UID_TRANSFORM_DIVISOR;
-        if (callingUserId == 0) {
-            callingUserId = FormUtil::GetCurrentAccountId();
-        }
         HILOG_INFO("callingUserId is 0, update callingUserId:%{public}d", callingUserId);
     }
     std::shared_ptr<FormRenderMgrInner> renderInner;

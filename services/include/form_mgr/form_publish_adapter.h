@@ -70,7 +70,7 @@ public:
 
     ErrCode QueryPublishFormToHost(Want &wantToHost, int32_t userId);
 
-    ErrCode CheckPublishForm(Want &want, bool needCheckFormPermission);
+    ErrCode CheckPublishForm(Want &want, bool needCheckFormPermission, int32_t userId);
 
     ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo);
 

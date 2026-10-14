@@ -214,7 +214,7 @@ bool FormPublishAdapter::CheckSnapshotWant(const Want &want)
     }
 }
 
-ErrCode FormPublishAdapter::CheckPublishForm(Want &want, bool needCheckFormPermission)
+ErrCode FormPublishAdapter::CheckPublishForm(Want &want, bool needCheckFormPermission, int32_t userId)
 {
     std::string bundleName;
     ErrCode errCode = CheckFormBundleName(want, bundleName, needCheckFormPermission);
@@ -248,7 +248,7 @@ ErrCode FormPublishAdapter::CheckPublishForm(Want &want, bool needCheckFormPermi
     std::string formName = want.GetStringParam(AppExecFwk::Constants::PARAM_FORM_NAME_KEY);
     std::vector<FormInfo> formInfos {};
     errCode = FormInfoMgr::GetInstance().GetFormsInfoByModuleWithoutCheck(
-        want.GetElement().GetBundleName(), moduleName, formInfos);
+        want.GetElement().GetBundleName(), moduleName, formInfos, userId);
     if (errCode != ERR_OK) {
         HILOG_ERROR("fail get forms info");
         return errCode;
@@ -448,11 +448,11 @@ ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingD
     const std::vector<FormDataProxy> &formDataProxies)
 {
     HILOG_DEBUG("call");
-    ErrCode errCode = CheckPublishForm(want, true);
+    int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
+    ErrCode errCode = CheckPublishForm(want, true, userId);
     if (errCode != ERR_OK) {
         return errCode;
     }
-    int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
     errCode = RequestPublishFormCommon(want, userId, formId);
     if (errCode != ERR_OK) {
         return errCode;
@@ -487,12 +487,12 @@ ErrCode FormPublishAdapter::RequestPublishFormWithSnapshot(Want &want, bool with
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
     HILOG_DEBUG("call");
-    ErrCode errCode = CheckPublishForm(want, false);
+    int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
+    ErrCode errCode = CheckPublishForm(want, false, userId);
     if (errCode != ERR_OK) {
         return errCode;
     }
     // Skip form count pre-check, rely on post-check in AddForm
-    int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
     errCode = RequestPublishFormCommon(want, userId, formId);
     if (errCode != ERR_OK) {
         return errCode;

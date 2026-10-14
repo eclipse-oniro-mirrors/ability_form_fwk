@@ -16,7 +16,6 @@
 #include "data_center/form_info/bundle_form_info.h"
 
 #include "bms_mgr/form_bms_helper.h"
-#include "common/util/form_util.h"
 #include "data_center/database/form_db_cache.h"
 #include "data_center/form_info/form_info_helper.h"
 #include "feature/bundle_distributed/form_distributed_mgr.h"
@@ -233,7 +232,6 @@ ErrCode BundleFormInfo::GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_
 {
     HILOG_DEBUG("begin");
     std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
-    userId = (userId == Constants::INVALID_USER_ID) ? FormUtil::GetCurrentAccountId() : userId;
     for (const auto &item : formInfoStorages_) {
         item.GetAllFormsInfo(userId, formInfos);
     }
@@ -244,7 +242,6 @@ ErrCode BundleFormInfo::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos
 {
     HILOG_DEBUG("begin");
     std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
-    userId = (userId == Constants::INVALID_USER_ID) ? FormUtil::GetCurrentAccountId() : userId;
     for (const auto &item : formInfoStorages_) {
         item.GetAllTemplateFormsInfo(userId, formInfos);
     }
@@ -256,7 +253,6 @@ uint32_t BundleFormInfo::GetVersionCode(int32_t userId)
     HILOG_DEBUG("begin");
     std::vector<FormInfo> formInfos;
     std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
-    userId = (userId == Constants::INVALID_USER_ID) ? FormUtil::GetCurrentAccountId() : userId;
     for (const auto &item : formInfoStorages_) {
         item.GetAllFormsInfo(userId, formInfos);
         for (const auto &info : formInfos) {
@@ -272,7 +268,6 @@ ErrCode BundleFormInfo::GetFormsInfoByModule(const std::string &moduleName, std:
     int32_t userId)
 {
     std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
-    userId = (userId == Constants::INVALID_USER_ID) ? FormUtil::GetCurrentAccountId() : userId;
     for (const auto &item : formInfoStorages_) {
         item.GetFormsInfoByModule(userId, moduleName, formInfos);
     }
@@ -283,7 +278,6 @@ ErrCode BundleFormInfo::GetTemplateFormsInfoByModule(const std::string &moduleNa
     int32_t userId)
 {
     std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
-    userId = (userId == Constants::INVALID_USER_ID) ? FormUtil::GetCurrentAccountId() : userId;
     for (const auto &item : formInfoStorages_) {
         item.GetTemplateFormsInfoByModule(userId, moduleName, formInfos);
     }
@@ -295,10 +289,8 @@ ErrCode BundleFormInfo::GetFormsInfoByFilter(
 {
     HILOG_DEBUG("begin");
     std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
-    auto newUserId = (userId == Constants::INVALID_USER_ID) ? FormUtil::GetCurrentAccountId() : userId;
-
     for (const auto &item : formInfoStorages_) {
-        item.GetFormsInfoByFilter(newUserId, filter, formInfos);
+        item.GetFormsInfoByFilter(userId, filter, formInfos);
     }
     return ERR_OK;
 }
