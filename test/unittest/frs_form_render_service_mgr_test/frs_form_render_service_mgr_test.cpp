@@ -1568,3 +1568,63 @@ HWTEST_F(FormRenderServiceMgrTest, SetConfiguration_004, TestSize.Level0)
     EXPECT_FALSE(formRenderServiceMgr.configuration_);
     GTEST_LOG_(INFO) << "SetConfiguration_004 end";
 }
+
+/**
+ * @tc.name: FormRenderServiceMgrTest_049
+ * @tc.desc: Verify DeleteRenderRecordByUid reports not-exist when record identity mismatch (TOCTOU guard).
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_049, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_049 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    std::string uid = "test_uid_049";
+    auto recordA = FormRenderRecord::Create("bundleName", uid);
+    auto recordB = FormRenderRecord::Create("bundleName", uid);
+    ASSERT_NE(recordA, nullptr);
+    ASSERT_NE(recordB, nullptr);
+    formRenderServiceMgr.renderRecordMap_.clear();
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, recordA);
+    size_t sizeBefore = formRenderServiceMgr.renderRecordMap_.size();
+    int32_t ret = formRenderServiceMgr.DeleteRenderRecordByUid(uid, recordB);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_RENDER_RECORD);
+    EXPECT_EQ(formRenderServiceMgr.renderRecordMap_.size(), sizeBefore);
+    GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_049 end";
+}
+
+/**
+ * @tc.name: FormRenderServiceMgrTest_050
+ * @tc.desc: Verify DeleteRenderRecordByUid when record identity matches, erase succeeds.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_050, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_050 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    std::string uid = "test_uid_050";
+    auto record = FormRenderRecord::Create("bundleName", uid);
+    ASSERT_NE(record, nullptr);
+    formRenderServiceMgr.renderRecordMap_.clear();
+    formRenderServiceMgr.renderRecordMap_.emplace(uid, record);
+    EXPECT_EQ(formRenderServiceMgr.renderRecordMap_.size(), 1);
+    int32_t ret = formRenderServiceMgr.DeleteRenderRecordByUid(uid, record);
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(formRenderServiceMgr.renderRecordMap_.size(), 0);
+    GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_050 end";
+}
+
+/**
+ * @tc.name: FormRenderServiceMgrTest_051
+ * @tc.desc: Verify DeleteRenderRecordByUid when search record is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderServiceMgrTest, FormRenderServiceMgrTest_051, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_051 start";
+    FormRenderServiceMgr formRenderServiceMgr;
+    std::string uid = "test_uid_051";
+    std::shared_ptr<FormRenderRecord> nullRecord = nullptr;
+    int32_t ret = formRenderServiceMgr.DeleteRenderRecordByUid(uid, nullRecord);
+    EXPECT_EQ(ret, RENDER_FORM_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderServiceMgrTest_051 end";
+}

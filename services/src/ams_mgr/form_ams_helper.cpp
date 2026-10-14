@@ -45,10 +45,13 @@ FormAmsHelper::~FormAmsHelper()
 sptr<AAFwk::IAbilityManager> FormAmsHelper::GetAbilityManager()
 {
     HILOG_DEBUG("call");
-    std::lock_guard<std::mutex> lock(abilityManagerMutex_);
-    if (abilityManager_ != nullptr) {
-        return abilityManager_;
+    {
+        std::lock_guard<std::mutex> lock(abilityManagerMutex_);
+        if (abilityManager_ != nullptr) {
+            return abilityManager_;
+        }
     }
+    // Query samgr without holding the lock to avoid blocking concurrent callers.
     sptr<ISystemAbilityManager> systemManager =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemManager == nullptr) {
@@ -60,10 +63,14 @@ sptr<AAFwk::IAbilityManager> FormAmsHelper::GetAbilityManager()
         HILOG_ERROR("fail get ability manager service");
         return nullptr;
     }
-    abilityManager_ = iface_cast<AAFwk::IAbilityManager>(remoteObject);
-    if (abilityManager_ == nullptr) {
+    sptr<AAFwk::IAbilityManager> abilityManager = iface_cast<AAFwk::IAbilityManager>(remoteObject);
+    if (abilityManager == nullptr) {
         HILOG_ERROR("fail iface_cast ability manager service");
         return nullptr;
+    }
+    std::lock_guard<std::mutex> lock(abilityManagerMutex_);
+    if (abilityManager_ == nullptr) {
+        abilityManager_ = abilityManager;
     }
     return abilityManager_;
 }

@@ -7331,4 +7331,70 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreIm
     EXPECT_FALSE(formJsInfo.isSupportMoreImages);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_002 end";
 }
+
+/**
+ * @tc.name: FmsFormDataMgrTest_GetUnusedFormInfos1_007
+ * @tc.desc: Test GetUnusedFormInfos1 skips records whose providerUserId does not match
+ *           userId and is not DEFAULT_USER_ID.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_007 start";
+
+    FormDBInfo dbInfo;
+    dbInfo.formId = 1;
+    dbInfo.providerUserId = 100;
+    dbInfo.formUserUids.emplace_back(100);
+    std::vector<FormDBInfo> formDBInfos;
+    formDBInfos.emplace_back(dbInfo);
+    MockGetAllFormInfo(formDBInfos);
+
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    formRecord.bundleName = "testBundle";
+    MockGetDBRecord(1, formRecord, ERR_OK);
+    MockGetBundleNameByUid(ERR_OK, "testBundle");
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    formDataMgr_.GetUnusedFormInfos(runningFormInfos, Constants::DEFAULT_USER_ID);
+    EXPECT_EQ(true, runningFormInfos.empty());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_007 end";
+}
+
+/**
+ * @tc.name: FmsFormDataMgrTest_GetUnusedFormInfos1_008
+ * @tc.desc: Test GetUnusedFormInfos1 allows records whose providerUserId matches the
+ *           supplied userId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_008, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_008 start";
+
+    FormDBInfo dbInfo;
+    dbInfo.formId = 1;
+    dbInfo.providerUserId = 100;
+    dbInfo.formUserUids.emplace_back(100);
+    std::vector<FormDBInfo> formDBInfos;
+    formDBInfos.emplace_back(dbInfo);
+    MockGetAllFormInfo(formDBInfos);
+
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    formRecord.bundleName = "testBundle";
+    formRecord.formUserUids.emplace_back(100);
+    MockGetDBRecord(1, formRecord, ERR_OK);
+    MockGetBundleNameByUid(ERR_OK, "testBundle");
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    constexpr int32_t matchingUserId = 100;
+    formDataMgr_.GetUnusedFormInfos(runningFormInfos, matchingUserId);
+    EXPECT_EQ(1, runningFormInfos.size());
+    EXPECT_EQ(1, runningFormInfos[0].formId);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos1_008 end";
+}
+
 }  // namespace

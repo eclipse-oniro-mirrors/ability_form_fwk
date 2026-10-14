@@ -50,6 +50,9 @@ namespace {
 constexpr ani_size REFERENCES_MAX_NUMBER = 16;
 constexpr ani_size REFERENCES_PER_CUSTOM_CONFIG = 8;
 constexpr ani_size REFERENCES_PER_FORM_ID = 2;
+// Extra scope slots for RequestOverflowInner: the request object, formId string and
+// CreateFormOverflowInfo's objects, plus margin; update when OverflowInfo/OverflowRequest gains fields.
+constexpr ani_size REFERENCES_PER_OVERFLOW_INFO = 8;
 constexpr size_t UPDATE_FORMS_CONFIG_MAX_NUM = 1024;
 constexpr size_t DELETE_FORM_MAX_NUM = 1024;
 constexpr const char *ETS_FORM_HOST_NAME = "@ohos.app.form.formHost.formHost";
@@ -970,8 +973,13 @@ ErrCode EtsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string,
     };
     mainHandler->PostSyncTask(executeFunc, "EtsFormRouterProxyMgr::GetLiveFormStatus");
 
-    bool result = dataParam->result;
-    liveFormStatusMap = std::move(dataParam->liveFormStatusMap);
+    bool result = false;
+    {
+        // Mirror the locked write in GetLiveFormStatusInner.
+        std::lock_guard<std::mutex> lock(dataParam->mutex);
+        result = dataParam->result;
+        liveFormStatusMap = std::move(dataParam->liveFormStatusMap);
+    }
     return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
@@ -982,6 +990,9 @@ void EtsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataP
         HILOG_ERROR("null dataParam");
         return;
     }
+    // Defensive init: keep failure explicit in case the struct default ever changes.
+    // Unlocked on purpose: the callback reference is created only later in this
+    // function and the caller blocks on the sync post, so no concurrent access exists.
     dataParam->result = false;
     ani_env *env = nullptr;
     ani_ref callbackRef = nullptr;
@@ -1021,8 +1032,9 @@ void EtsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataP
     std::unordered_map<std::string, std::string> liveFormStatusMap;
     bool ret = ParseRecordString(env, reinterpret_cast<ani_object>(callResult), liveFormStatusMap);
     DeleteGlobalReference(env, callbackRef);
+    std::lock_guard<std::mutex> lock(dataParam->mutex);
     dataParam->result = ret;
-    dataParam->liveFormStatusMap = liveFormStatusMap;
+    dataParam->liveFormStatusMap = std::move(liveFormStatusMap);
 }
 
 ErrCode EtsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppExecFwk::OverflowInfo &overflowInfo,
@@ -1059,7 +1071,7 @@ void EtsFormRouterProxyMgr::RequestOverflowInner(LiveFormInterfaceParam* dataPar
         HILOG_ERROR("env is null");
         return;
     }
-    ani_size nr_refs = REFERENCES_MAX_NUMBER;
+    ani_size nr_refs = REFERENCES_MAX_NUMBER + REFERENCES_PER_OVERFLOW_INFO;
     env->CreateLocalScope(nr_refs);
     ani_object object = CreateAniObject(env, ETS_OVERFLOWREQUEST_NAME);
     SetPropertyStringByName(env, object, FORM_HOST_FORMINFO_FORMID, dataParam->formId);
@@ -1094,8 +1106,8 @@ ani_object EtsFormRouterProxyMgr::CreateFormOverflowInfo(ani_env *env, AppExecFw
         HILOG_ERROR("env is null");
         return nullptr;
     }
-    ani_size nr_refs = REFERENCES_MAX_NUMBER;
-    env->CreateLocalScope(nr_refs);
+    // Objects are created in the caller's local scope: an inner scope would
+    // leave the returned reference dangling after DestroyLocalScope.
     ani_object area = CreateAniObject(env, ETS_RECT_NAME);
     SetPropertyDoubleByName(env, area, FORM_HOST_RECT_LEFT, overflowInfo.area.left);
     SetPropertyDoubleByName(env, area, FORM_HOST_RECT_TOP, overflowInfo.area.top);
@@ -1106,7 +1118,6 @@ ani_object EtsFormRouterProxyMgr::CreateFormOverflowInfo(ani_env *env, AppExecFw
     SetPropertyByName(env, object, FORM_HOST_OVERFLOWINFO_AREA, area);
     SetPropertyIntByName(env, object, FORM_HOST_OVERFLOWINFO_DURATION, overflowInfo.duration);
     SetPropertyBoolByName(env, object, FORM_HOST_OVERFLOWINFO_USEDEFAULTANIMATION, overflowInfo.useDefaultAnimation);
-    env->DestroyLocalScope();
     return object;
 }
 

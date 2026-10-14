@@ -851,7 +851,7 @@ int32_t FormRenderServiceMgr::DeleteRenderRecordByUid(
         // Identity check: ensure the map entry still points to the same record (TOCTOU guard)
         if (iterator->second.get() != search.get()) {
             HILOG_WARN("render record replaced for uid:%{public}s, skip erase", uid.c_str());
-            return ERR_OK;
+            return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDER_RECORD;
         }
         search->Release();
         renderRecordMap_.erase(iterator);

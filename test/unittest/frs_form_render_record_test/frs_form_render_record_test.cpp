@@ -4484,3 +4484,21 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleOnUnlock_002, TestSize
     formRenderRecordPtr_->formRendererGroupMap_.clear();
     GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleOnUnlock_002 end";
 }
+
+/**
+ * @tc.name: FormRenderRecordTest_FormCount_Empty
+ * @tc.desc: Verify FormCount returns 0 when formRequests_ is empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_FormCount_Empty, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_FormCount_Empty start";
+    // Use a local record so the suite-shared formRenderRecordPtr_ state stays untouched.
+    std::shared_ptr<FormRenderRecord> renderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(renderRecord, nullptr);
+
+    renderRecord->formRequests_.clear();
+    EXPECT_EQ(renderRecord->FormCount(), static_cast<size_t>(0));
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_FormCount_Empty end";
+}

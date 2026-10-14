@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,15 +41,6 @@ class FormShareMgr final : public std::enable_shared_from_this<FormShareMgr>,
 public:
     DISALLOW_COPY_AND_MOVE(FormShareMgr);
 
-    void SetEventHandler(const std::shared_ptr<FormEventHandler> &handler)
-    {
-        if (eventHandler_ != nullptr || handler == nullptr) {
-            return;
-        }
-        eventHandler_ = handler;
-        eventHandler_->RegisterEventTimeoutObserver(shared_from_this());
-    }
-
     void UnregisterObserver()
     {
         if (eventHandler_ != nullptr) {
@@ -58,27 +49,8 @@ public:
         }
     }
 
-    void SetSerialQueue(const std::shared_ptr<FormSerialQueue> &serialQueue)
-    {
-        if (serialQueue == nullptr) {
-            return;
-        }
-        serialQueue_ = serialQueue;
-    }
-
     void Initialize(const std::shared_ptr<FormEventHandler> &handler,
-                    const std::shared_ptr<FormSerialQueue> &serialQueue)
-    {
-        std::call_once(initOnce_, [this, handler, serialQueue]() {
-            if (handler == nullptr || serialQueue == nullptr) {
-                HILOG_ERROR("FormShareMgr::Initialize null handler or serialQueue, skip");
-                return;
-            }
-            serialQueue_ = serialQueue;
-            eventHandler_ = handler;
-            eventHandler_->RegisterEventTimeoutObserver(shared_from_this());
-        });
-    }
+                    const std::shared_ptr<FormSerialQueue> &serialQueue);
 
     /**
      * @brief Share form by formID and deviceID.

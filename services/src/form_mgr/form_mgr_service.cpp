@@ -2085,6 +2085,8 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
     if (ret == ERR_OK) {
         std::lock_guard<std::mutex> lock(snapshotSetMutex_);
         requestPublishFormWithSnapshotSet_.insert(formId);
+        // Key by formId: same-key rescheduling replaces the pending task, so concurrent
+        // publishes of one formId keep a single reset at the latest deadline.
         auto taskId = std::make_pair(static_cast<int64_t>(
             TaskType::UPDATE_IS_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT), formId);
         FormMgrQueue::GetInstance().ScheduleDelayTask(

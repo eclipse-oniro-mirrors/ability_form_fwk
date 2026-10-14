@@ -2181,13 +2181,23 @@ std::string FormRenderRecord::GetNativeStrFromJsTaggedObj(napi_value obj, const 
     }
 
     size_t valueStrBufLength = 0;
-    napi_get_value_string_utf8(env, valueStr, nullptr, 0, &valueStrBufLength);
+    napi_status status = napi_get_value_string_utf8(env, valueStr, nullptr, 0, &valueStrBufLength);
+    if (status != napi_ok) {
+        HILOG_ERROR("get string length failed, status: %{public}d", status);
+        return "";
+    }
     // Cap allocation to avoid unbounded memory allocation from JS string
     size_t allocLen = std::min(valueStrBufLength, MAX_ERROR_FIELD_LEN);
     auto valueCStr = std::make_unique<char[]>(allocLen + 1);
     size_t valueStrLength = 0;
-    napi_get_value_string_utf8(env, valueStr, valueCStr.get(), allocLen + 1, &valueStrLength);
-    std::string ret(valueCStr.get(), std::min(valueStrLength, allocLen));
+    status = napi_get_value_string_utf8(env, valueStr, valueCStr.get(), allocLen + 1, &valueStrLength);
+    if (status != napi_ok) {
+        HILOG_ERROR("get string value failed, status: %{public}d", status);
+        return "";
+    }
+    std::string ret;
+    ret.reserve(allocLen + sizeof("...[truncated]") - 1);
+    ret.append(valueCStr.get(), std::min(valueStrLength, allocLen));
     if (valueStrBufLength > MAX_ERROR_FIELD_LEN) {
         ret += "...[truncated]";
     }

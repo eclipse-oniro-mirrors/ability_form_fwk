@@ -571,7 +571,7 @@ HWTEST_F(FmsFormHostRecordTest, FormShareMgr_0002, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormShareMgr_0002 start";
     FormShareMgr formShareMgr;
     std::shared_ptr<FormSerialQueue> formSerialQueue = std::make_shared<FormSerialQueue>("queueName");
-    formShareMgr.SetSerialQueue(formSerialQueue);
+    formShareMgr.serialQueue_ = formSerialQueue;
     FormShareInfo info;
     int32_t userId = 100;
     EXPECT_EQ(ERR_OK, formShareMgr.RecvFormShareInfoFromRemote(info, userId));

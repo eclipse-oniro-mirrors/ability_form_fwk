@@ -1322,19 +1322,22 @@ private:
     class CallbackRefGuard {
     public:
         CallbackRefGuard(napi_env env, napi_ref ref) : env_(env), ref_(ref) {}
+
         ~CallbackRefGuard()
         {
             if (ref_ != nullptr) {
                 napi_delete_reference(env_, ref_);
             }
         }
+
         napi_ref GetRef() const
         {
             return ref_;
         }
+
     private:
-        napi_env env_;
-        napi_ref ref_;
+        napi_env env_ = nullptr;
+        napi_ref ref_ = nullptr;
     };
 
     static std::shared_ptr<CallbackRefGuard> CreateCallbackRefGuard(napi_env env, napi_value callback)
@@ -1348,18 +1351,21 @@ private:
     }
 
     NapiAsyncTask::CompleteCallback CreateSetRouterProxyCompleteCallback(std::shared_ptr<int32_t> ret,
-        std::shared_ptr<CallbackRefGuard> refGuard, std::vector<int64_t> formIds)
+        std::shared_ptr<CallbackRefGuard> refGuard, const std::vector<int64_t> &formIds)
     {
-        return [ret, refGuard, formIdsCopy = std::move(formIds)](napi_env env, NapiAsyncTask &task,
+        return [ret, refGuard, formIdsCopy = formIds](napi_env env, NapiAsyncTask &task,
             int32_t status) {
+            // Register only after IPC success; up-front registration leaves a residual callback on failure.
             if (*ret == ERR_OK) {
                 napi_value callback = nullptr;
                 if (napi_get_reference_value(env, refGuard->GetRef(), &callback) != napi_ok || callback == nullptr) {
                     HILOG_ERROR("napi_get_reference_value failed");
+                    task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env,
+                        ERR_APPEXECFWK_FORM_COMMON_CODE));
                 } else {
                     JsFormRouterProxyMgr::GetInstance()->AddFormRouterProxyCallback(env, callback, formIdsCopy);
+                    task.ResolveWithNoError(env, CreateJsUndefined(env));
                 }
-                task.ResolveWithNoError(env, CreateJsUndefined(env));
             } else {
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
             }
@@ -4266,14 +4272,16 @@ ErrCode JsFormRouterProxyMgr::DeleteFormsCallback(const std::vector<std::string>
 }
 
 namespace {
-void CloseScopeAndUnref(napi_env env, napi_handle_scope scope, napi_ref ref)
+// Releases the per-call reference created by AcquireDeleteFormsCallback and
+// closes the scope. The reference is owned exclusively by the caller, so no
+// registerDeleteFormsMutex_ protection is needed here.
+void CloseScopeAndDeleteRef(napi_env env, napi_handle_scope scope, napi_ref ref)
 {
     if (scope != nullptr && napi_close_handle_scope(env, scope) != napi_ok) {
         HILOG_ERROR("napi_close_handle_scope failed");
     }
-    uint32_t refCount = 0;
-    if (napi_reference_unref(env, ref, &refCount) != napi_ok) {
-        HILOG_ERROR("napi_reference_unref failed");
+    if (napi_delete_reference(env, ref) != napi_ok) {
+        HILOG_ERROR("napi_delete_reference failed");
     }
 }
 }
@@ -4286,10 +4294,16 @@ bool JsFormRouterProxyMgr::AcquireDeleteFormsCallback(napi_env &env, napi_ref &r
         return false;
     }
     env = deleteFormsCallbackEnv_;
-    ref = deleteFormsCallbackRef_;
-    uint32_t refCount = 0;
-    if (napi_reference_ref(env, ref, &refCount) != napi_ok) {
-        HILOG_ERROR("napi_reference_ref failed");
+    napi_value callback = nullptr;
+    if (napi_get_reference_value(env, deleteFormsCallbackRef_, &callback) != napi_ok || callback == nullptr) {
+        HILOG_ERROR("napi_get_reference_value failed");
+        return false;
+    }
+    // Create an independent reference so Unregister/Register deleting the stored
+    // one can never invalidate this per-call handle.
+    napi_status status = napi_create_reference(env, callback, REF_COUNT, &ref);
+    if (status != napi_ok || ref == nullptr) {
+        HILOG_ERROR("napi_create_reference failed, status: %{public}d", static_cast<int>(status));
         return false;
     }
     return true;
@@ -4308,29 +4322,26 @@ bool JsFormRouterProxyMgr::DeleteFormsCallbackInner(const std::vector<std::strin
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
-        CloseScopeAndUnref(env, scope, ref);
+        CloseScopeAndDeleteRef(env, scope, ref);
         return false;
     }
 
     napi_value callback = nullptr;
     if (!GetValidCallback(env, ref, callback)) {
-        CloseScopeAndUnref(env, scope, ref);
+        CloseScopeAndDeleteRef(env, scope, ref);
         return false;
     }
 
     napi_value formIdArray = nullptr;
     if (!CreateStringArray(formIds, formIdArray)) {
-        CloseScopeAndUnref(env, scope, ref);
+        CloseScopeAndDeleteRef(env, scope, ref);
         return false;
     }
 
     napi_value undefined = nullptr;
     napi_get_undefined(env, &undefined);
     napi_status status = napi_call_function(env, undefined, callback, ARGS_ONE, &formIdArray, nullptr);
-    {
-        std::lock_guard<std::mutex> lock(registerDeleteFormsMutex_);
-        CloseScopeAndUnref(env, scope, ref);
-    }
+    CloseScopeAndDeleteRef(env, scope, ref);
     if (status != napi_ok) {
         HILOG_ERROR("napi_call_function failed, status: %{public}d", static_cast<int>(status));
         return false;

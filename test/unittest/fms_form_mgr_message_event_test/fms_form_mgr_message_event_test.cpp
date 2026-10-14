@@ -18,8 +18,8 @@
 #define private public
 #include "common/connection/form_ability_connection.h"
 #undef private
-#include "ams_mgr/form_ams_helper.h"
 #define private public
+#include "ams_mgr/form_ams_helper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/database/form_db_cache.h"
@@ -423,4 +423,100 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormDbCache_020, TestSize.Level0)
     EXPECT_EQ(ERR_OK, formDbCache.DeleteInvalidDBForms(userId, callingUid, matchedFormIds, removedFormsMap));
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormDbCache_020 end";
 }
+
+/**
+ * @tc.name: GetAbilityManager_001
+ * @tc.desc: test GetAbilityManager returns the instance injected by SetAbilityManager.
+ * @tc.type: GetAbilityManager
+ */
+HWTEST_F(FmsFormMgrMessageEventTest, GetAbilityManager_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "fms_form_mgr_message_event_test GetAbilityManager_001 start";
+    sptr<AAFwk::IAbilityManager> mock = new MockAbilityMgrService();
+    FormAmsHelper::GetInstance().SetAbilityManager(mock);
+    auto result = FormAmsHelper::GetInstance().GetAbilityManager();
+    // Compare raw pointers - sptr may not be gtest-printable.
+    EXPECT_EQ(mock.GetRefPtr(), result.GetRefPtr());
+    GTEST_LOG_(INFO) << "fms_form_mgr_message_event_test GetAbilityManager_001 end";
+}
+
+/**
+ * @tc.name: GetAbilityManager_002
+ * @tc.desc: test GetAbilityManager resolves from samgr after injection is cleared and
+ *           consecutive calls return the same instance.
+ * @tc.type: GetAbilityManager
+ */
+HWTEST_F(FmsFormMgrMessageEventTest, GetAbilityManager_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "fms_form_mgr_message_event_test GetAbilityManager_002 start";
+    FormAmsHelper::GetInstance().SetAbilityManager(nullptr);
+    auto first = FormAmsHelper::GetInstance().GetAbilityManager();
+    auto second = FormAmsHelper::GetInstance().GetAbilityManager();
+    // Both calls must observe the same underlying instance (cold path -> cache).
+    EXPECT_EQ(first.GetRefPtr(), second.GetRefPtr());
+    // Restore on all exit paths.
+    FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
+    GTEST_LOG_(INFO) << "fms_form_mgr_message_event_test GetAbilityManager_002 end";
+}
+
+/**
+ * @tc.name: MessageEvent_009
+ * @tc.desc: test MessageEvent with the injected AbilityManager cleared propagates the
+ *           deep ability manager failure chain and yields ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED.
+ * @tc.type: MessageEvent
+ */
+HWTEST_F(FmsFormMgrMessageEventTest, MessageEvent_009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "fms_form_mgr_message_event_test_009 start";
+
+    // Build a complete valid fixture mirroring MessageEvent_001's pattern with a fresh
+    // formId (10000001/10000002 are already used by existing cases and FormDataMgr state
+    // persists across cases since TearDown is empty).
+    int64_t formId {10000003};
+    int callingUid {20000007};
+    FormItemInfo formItemInfo;
+    formItemInfo.SetFormId(formId);
+    formItemInfo.SetProviderBundleName(FORM_PROVIDER_BUNDLE_NAME);
+    formItemInfo.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
+    formItemInfo.SetTemporaryFlag(false);
+    FormRecord retFormRec = FormDataMgr::GetInstance().AllotFormRecord(formItemInfo, callingUid);
+    int formUserUid {1};
+    FormDataMgr::GetInstance().AddFormUserUid(formId, formUserUid);
+    retFormRec.formUserUids.emplace_back(formUserUid);
+    FormDBInfo formDBInfo(formId, retFormRec);
+    FormDbCache::GetInstance().SaveFormInfo(formDBInfo);
+    FormItemInfo info;
+    FormDataMgr::GetInstance().AllotFormHostRecord(info, token_, formId, callingUid);
+
+    Want want;
+    want.SetParam(Constants::PARAM_FORM_HOST_BUNDLENAME_KEY, FORM_HOST_BUNDLE_NAME);
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, PARAM_PROVIDER_MODULE_NAME);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, PARAM_FORM_NAME);
+    want.SetElementName(DEVICE_ID, FORM_PROVIDER_BUNDLE_NAME, FORM_PROVIDER_ABILITY_NAME);
+    want.SetParam(Constants::PARAM_MESSAGE_KEY, FORM_MESSAGE_EVENT_VALUE_1);
+
+    // Remove the injected AbilityManager to drive the deep ability manager failure path.
+    FormAmsHelper::GetInstance().SetAbilityManager(nullptr);
+
+#ifdef SUPPORT_POWER
+    bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
+    if (!screenOnFlag) {
+        EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+            FormMgr::GetInstance().MessageEvent(formId, want, token_));
+    } else {
+        EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
+            FormMgr::GetInstance().MessageEvent(formId, want, token_));
+    }
+#else
+    // No screen-on check without SUPPORT_POWER: ability manager failure chain always yields
+    // ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED here.
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
+        FormMgr::GetInstance().MessageEvent(formId, want, token_));
+#endif
+
+    // Restore on all exit paths.
+    FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
+    GTEST_LOG_(INFO) << "fms_form_mgr_message_event_test_009 end";
+}
+
 }
