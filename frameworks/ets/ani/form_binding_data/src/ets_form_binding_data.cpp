@@ -20,8 +20,10 @@
 #include "fms_log_wrapper.h"
 
 namespace {
-// formBindingDataCls, objectMethod, formBindingDataObj, stringClass, setMethod
-constexpr ani_size REFERENCES_CREATE = 5;
+constexpr const char *FORM_BINDING_DATA_INNER =
+    "@ohos.app.form.formBindingData.formBindingData.FormBindingDataInner";
+// formBindingDataCls, objectMethod, formBindingDataObj, stringClass + 2 for Object_CallMethodByName_Void
+constexpr ani_size REFERENCES_CREATE = 6;
 // formBindingDataCls, setSupportMethod
 constexpr ani_size REFERENCES_CREATE_EX = 2;
 }
@@ -39,8 +41,7 @@ static ani_object CreateFormBindingData(ani_env *env, ani_object paramObject)
     }
     ani_status status = ANI_OK;
     ani_class formBindingDataCls;
-    if ((status = env->FindClass("@ohos.app.form.formBindingData.formBindingData.FormBindingDataInner",
-        &formBindingDataCls)) != ANI_OK) {
+    if ((status = env->FindClass(FORM_BINDING_DATA_INNER, &formBindingDataCls)) != ANI_OK) {
         HILOG_ERROR("FindClass failed status %{public}d ", static_cast<int>(status));
         env->DestroyLocalScope();
         return nullptr;
@@ -70,18 +71,11 @@ static ani_object CreateFormBindingData(ani_env *env, ani_object paramObject)
         env->DestroyLocalScope();
         return nullptr;
     }
-    ani_method setMethod;
-    if ((status = env->Class_FindMethod(formBindingDataCls, "<set>data", nullptr, &setMethod)) != ANI_OK) {
-        HILOG_ERROR("Class_FindMethod failed status %{public}d ", static_cast<int>(status));
+    if ((status = env->Object_CallMethodByName_Void(formBindingDataObj, "<set>data", nullptr, paramObject)) != ANI_OK) {
+        HILOG_ERROR("Object_CallMethodByName_Void failed status %{public}d ", static_cast<int>(status));
         env->DestroyLocalScope();
         return nullptr;
     }
-    if ((status = env->Object_CallMethod_Void(formBindingDataObj, setMethod, paramObject)) != ANI_OK) {
-        HILOG_ERROR("Object_CallMethod_Void failed status %{public}d ", static_cast<int>(status));
-        env->DestroyLocalScope();
-        return nullptr;
-    }
-    HILOG_INFO("CreateFormBindingData end");
     env->DestroyLocalScope();
     return formBindingDataObj;
 }
@@ -103,8 +97,7 @@ static ani_object CreateFormBindingDataEx(ani_env *env, ani_object paramObject)
     }
     ani_status status = ANI_OK;
     ani_class formBindingDataCls;
-    status = env->FindClass("@ohos.app.form.formBindingData.formBindingData.FormBindingDataInner",
-        &formBindingDataCls);
+    status = env->FindClass(FORM_BINDING_DATA_INNER, &formBindingDataCls);
     if (status != ANI_OK) {
         HILOG_ERROR("FindClass failed status %{public}d", static_cast<int>(status));
         env->DestroyLocalScope();

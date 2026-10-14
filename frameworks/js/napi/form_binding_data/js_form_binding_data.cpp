@@ -49,17 +49,14 @@ private:
 
 napi_value JsFormBindingData::OnCreateFormBindingData(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_INFO("call");
     std::string formDataStr;
     if (argc > 0) {
         napi_value nativeValue = nullptr;
         napi_valuetype type = napi_undefined;
         napi_typeof(env, argv[0], &type);
         if (type == napi_string) {
-            HILOG_DEBUG("param type is string");
             nativeValue = argv[0];
         } else if (type == napi_object) {
-            HILOG_DEBUG("param type is object");
             napi_value globalValue = nullptr;
             napi_status status = napi_get_global(env, &globalValue);
             if (status != napi_ok || globalValue == nullptr) {
@@ -87,34 +84,29 @@ napi_value JsFormBindingData::OnCreateFormBindingData(napi_env env, size_t argc,
                 return CreateJsUndefined(env);
             }
             nativeValue = transValue;
-        } else {
-            HILOG_ERROR("param type not string or object");
-            return CreateJsUndefined(env);
         }
-        if (!ConvertFromJsValue(env, nativeValue, formDataStr)) {
-            HILOG_ERROR("Parse formDataStr failed");
-            return CreateJsUndefined(env);
-        }
+        ConvertFromJsValue(env, nativeValue, formDataStr);
     }
     napi_value objValue = nullptr;
-    napi_create_object(env, &objValue);
+    napi_status status = napi_create_object(env, &objValue);
+    if (status != napi_ok || objValue == nullptr) {
+        HILOG_ERROR("Failed to create object");
+        return CreateJsUndefined(env);
+    }
     napi_set_named_property(env, objValue, "data", CreateJsValue(env, formDataStr));
     return objValue;
 }
 
 napi_value JsFormBindingData::OnCreateFormBindingDataEx(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_INFO("call");
     std::string formDataStr;
     if (argc > 0) {
         napi_value nativeValue = nullptr;
         napi_valuetype type = napi_undefined;
         napi_typeof(env, argv[0], &type);
         if (type == napi_string) {
-            HILOG_DEBUG("param type is string");
             nativeValue = argv[0];
         } else if (type == napi_object) {
-            HILOG_DEBUG("param type is object");
             napi_value globalValue = nullptr;
             napi_status status = napi_get_global(env, &globalValue);
             if (status != napi_ok || globalValue == nullptr) {
@@ -142,14 +134,8 @@ napi_value JsFormBindingData::OnCreateFormBindingDataEx(napi_env env, size_t arg
                 return CreateJsUndefined(env);
             }
             nativeValue = transValue;
-        } else {
-            HILOG_ERROR("param type not string or object");
-            return CreateJsUndefined(env);
         }
-        if (!ConvertFromJsValue(env, nativeValue, formDataStr)) {
-            HILOG_ERROR("Parse formDataStr failed");
-            return CreateJsUndefined(env);
-        }
+        ConvertFromJsValue(env, nativeValue, formDataStr);
     }
     napi_value objValue = nullptr;
     napi_status status = napi_create_object(env, &objValue);
