@@ -255,7 +255,7 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_010, TestSize.Level0)
     FormJsInfo formJsInfo;
     formJsInfo.formSrc = "123456";
     FormJsInfo copyFormJsInfo = formJsInfo.CopyFormJsInfoWithoutFormData();
-    EXPECT_EQ(copyFormJsInfo.formSrc, "");
+    EXPECT_EQ(copyFormJsInfo.formSrc, "123456");
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_010 end";
 }
 
@@ -829,7 +829,7 @@ HWTEST_F(FmsFormJsInfoTest, ReadPkgNameMap_KeyValueMismatch_001, TestSize.Level2
 
 /**
  * @tc.name: CopyFormJsInfoWithoutFormData_FullVerification_001
- * @tc.desc: Verify all fields are correctly copied except formData and formSrc.
+ * @tc.desc: Verify all fields are correctly copied except formData.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormJsInfoTest, CopyFormJsInfoWithoutFormData_FullVerification_001, TestSize.Level1)
@@ -869,7 +869,7 @@ HWTEST_F(FmsFormJsInfoTest, CopyFormJsInfoWithoutFormData_FullVerification_001, 
     EXPECT_EQ(copy.formTempFlag, true);
     EXPECT_EQ(copy.jsFormCodePath, "/path/to/js");
     EXPECT_EQ(copy.formData, "");
-    EXPECT_EQ(copy.formSrc, "");
+    EXPECT_EQ(copy.formSrc, "formSrcContent");
     EXPECT_TRUE(copy.imageDataMap.empty());
     EXPECT_EQ(copy.formWindow.designWidth, 720);
     EXPECT_EQ(copy.formWindow.autoDesignWidth, true);

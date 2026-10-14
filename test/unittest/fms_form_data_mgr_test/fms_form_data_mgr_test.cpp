@@ -7329,12 +7329,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_MergeRefreshWant_002, TestSize.L
     const uint32_t newVersionCode = 20;
     formDataMgr_.formRecords_[FORM_ID_ONE].versionCode = newVersionCode;
 
-    // The refresh chain holds a stale snapshot whose versionCode has rolled back locally;
-    // a full-record write-back from it would revert the cache.
-    FormRecord staleSnapshot;
-    EXPECT_TRUE(formDataMgr_.GetFormRecord(FORM_ID_ONE, staleSnapshot));
-    staleSnapshot.versionCode = 10;
-
     // Refresh execution point merges only the want into the cached record in place.
     Want want;
     want.SetParam("key1", std::string("value1"));

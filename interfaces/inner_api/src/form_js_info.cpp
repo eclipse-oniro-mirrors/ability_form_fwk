@@ -546,7 +546,7 @@ FormJsInfo FormJsInfo::CopyFormJsInfoWithoutFormData() const
     copyFormJsInfo.formData = "";
     copyFormJsInfo.imageDataMap = {};
     copyFormJsInfo.formProviderData = FormProviderData();
-    copyFormJsInfo.formSrc = "";
+    copyFormJsInfo.formSrc = formSrc;
     copyFormJsInfo.formWindow = formWindow;
     copyFormJsInfo.versionCode = versionCode;
     copyFormJsInfo.versionName = versionName;

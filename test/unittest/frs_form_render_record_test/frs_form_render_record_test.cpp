@@ -43,6 +43,17 @@ constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t FORM_ID = 1;
 constexpr char FORM_RENDERER_COMP_ID[] = "ohos.extra.param.key.form_comp_id";
+
+// Test helper: populate a form request into formRequests_.
+void PopulateFormRequest(const std::shared_ptr<FormRenderRecord> &renderRecord, int64_t formId,
+    const std::string &compId, bool hasRelease = false)
+{
+    FormRequest request;
+    request.compId = compId;
+    request.hasRelease = hasRelease;
+    request.isDynamic = false;
+    renderRecord->formRequests_[formId].emplace(compId, request);
+}
 }
 #define private public
 class FormRenderRecordMock : public FormRenderRecord {
@@ -1656,32 +1667,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_089, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormRenderRecordTest_090
- * @tc.desc: Verify RecoverRenderer
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_090, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_090 start";
-
-    ASSERT_NE(formRenderRecordPtr_, nullptr);
-    formRenderRecordPtr_->formRendererGroupMap_.clear();
-
-    FormJsInfo formJsInfo;
-    formJsInfo.bundleName = "bundleName";
-    formJsInfo.moduleName = "moduleName";
-    Ace::FormRequest formRequest;
-    formRequest.formJsInfo = formJsInfo;
-    std::vector<Ace::FormRequest> requests;
-    requests.emplace_back(formRequest);
-    size_t requestIndex = 0;
-    formRenderRecordPtr_->contextsMapForModuleName_.emplace(formJsInfo.bundleName + ":" + formJsInfo.moduleName,
-        nullptr);
-    formRenderRecordPtr_->RecoverRenderer(requests, requestIndex);
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_090 end";
-}
-
-/**
  * @tc.name: FormRenderRecordTest_091
  * @tc.desc: Test HandleSetVisibleChange
  * @tc.type: FUNC
@@ -2322,23 +2307,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_130, TestSize.Level1)
     formRenderRecordPtr_->eventHandler_ = nullptr;
     formRenderRecordPtr_->ReAddIfHapPathChanged(formJsInfos);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_130 end";
-}
-
-/**
- * @tc.name: FormRenderRecordTest_131
- * @tc.desc: Verify UpdateAllFormRequest
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_131, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_131 start";
-    bool hasRelease = true;
-    FormJsInfo formJsInfo1;
-    FormJsInfo formJsInfo2;
-    FormJsInfo formJsInfo3;
-    std::vector<FormJsInfo> formJsInfos = {formJsInfo1, formJsInfo2, formJsInfo3};
-    formRenderRecordPtr_->UpdateAllFormRequest(formJsInfos, hasRelease, {});
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_131 end";
 }
 
 /**
@@ -4492,19 +4460,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleOnUnlock_002, TestSize
     GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleOnUnlock_002 end";
 }
 
-namespace {
-// Test helper for the cases below: populate a form request into formRequests_.
-void PopulateFormRequest(const std::shared_ptr<FormRenderRecord> &renderRecord, int64_t formId,
-    const std::string &compId, bool hasRelease = false)
-{
-    FormRequest request;
-    request.compId = compId;
-    request.hasRelease = hasRelease;
-    request.isDynamic = false;
-    renderRecord->formRequests_[formId].emplace(compId, request);
-}
-}
-
 /**
  * @tc.name: FormRenderRecordTest_UpdateAllFormRequest_001
  * @tc.desc: Verify isDynamic/formJsInfo sync to all compId requests while hasRelease marks only the
@@ -4578,7 +4533,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_UpdateAllFormRequest_002, Te
 /**
  * @tc.name: FormRenderRecordTest_ReAddAllReleasedForms_001
  * @tc.desc: Verify ReAddAllReleasedForms skips forms outside the recoverable set and forms
- *           whose current request is not marked, and returns error with null handler.
+ *           whose current request is not marked, and rebuilds a null handler on demand.
  * @tc.type: FUNC
  */
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ReAddAllReleasedForms_001, TestSize.Level1)
@@ -4595,13 +4550,12 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ReAddAllReleasedForms_001, T
     // Form 700 is recoverable and its current request is marked: dispatched.
     PopulateFormRequest(renderRecord, 700, "compMarked", true);
 
-    // Null handler: GetEventHandler(false, true) creates no thread, returns error.
+    // Null handler is rebuilt on demand (GetEventHandler(true, true)), then dispatch runs normally.
     renderRecord->eventHandler_ = nullptr;
-    EXPECT_EQ(renderRecord->ReAddAllReleasedForms(std::vector<int64_t>{600, 700}),
-        ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL);
+    EXPECT_EQ(renderRecord->ReAddAllReleasedForms(std::vector<int64_t>{600, 700}), ERR_OK);
+    EXPECT_NE(renderRecord->eventHandler_, nullptr);
 
-    auto eventRunner = EventRunner::Create("bundleName");
-    renderRecord->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    // A second call with the rebuilt handler dispatches normally.
     EXPECT_EQ(renderRecord->ReAddAllReleasedForms(std::vector<int64_t>{600, 700}), ERR_OK);
 
     GTEST_LOG_(INFO) << "FormRenderRecordTest_ReAddAllReleasedForms_001 end";

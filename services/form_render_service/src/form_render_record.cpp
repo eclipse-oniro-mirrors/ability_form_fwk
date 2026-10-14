@@ -1441,7 +1441,8 @@ void FormRenderRecord::HandleReleaseAllRendererInJsThread(std::vector<int64_t> &
 // is safe: GetEventHandler only takes eventHandlerMutex_, no reverse nesting.
 int32_t FormRenderRecord::ReAddAllReleasedForms(const std::vector<int64_t> &recoverableFormIds)
 {
-    if (GetEventHandler(false, true) == nullptr) {
+    if (GetEventHandler(true, true) == nullptr) {
+        HILOG_ERROR("null eventHandler");
         return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
     }
     std::unordered_set<int64_t> recoverable(recoverableFormIds.begin(), recoverableFormIds.end());
@@ -1456,6 +1457,7 @@ int32_t FormRenderRecord::ReAddAllReleasedForms(const std::vector<int64_t> &reco
         }
         PostReAddRecycledForms(current->formJsInfo, current->want);
     }
+    HILOG_INFO("ReAdd released forms, size:%{public}zu", recoverable.size());
     return ERR_OK;
 }
 
