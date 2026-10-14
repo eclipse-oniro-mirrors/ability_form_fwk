@@ -19,11 +19,22 @@
 #include "ani.h"
 #include "fms_log_wrapper.h"
 
-static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_object paramObject)
+namespace {
+// formBindingDataCls, objectMethod, formBindingDataObj, stringClass, setMethod
+constexpr ani_size REFERENCES_CREATE = 5;
+// formBindingDataCls, setSupportMethod
+constexpr ani_size REFERENCES_CREATE_EX = 2;
+}
+
+static ani_object CreateFormBindingData(ani_env *env, ani_object paramObject)
 {
     HILOG_INFO("CreateFormBindingData call");
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr ");
+        return nullptr;
+    }
+    if (env->CreateLocalScope(REFERENCES_CREATE) != ANI_OK) {
+        HILOG_ERROR("CreateLocalScope failed");
         return nullptr;
     }
     ani_status status = ANI_OK;
@@ -31,48 +42,64 @@ static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_objec
     if ((status = env->FindClass("@ohos.app.form.formBindingData.formBindingData.FormBindingDataInner",
         &formBindingDataCls)) != ANI_OK) {
         HILOG_ERROR("FindClass failed status %{public}d ", static_cast<int>(status));
+        env->DestroyLocalScope();
         return nullptr;
     }
     ani_method objectMethod;
     if ((status = env->Class_FindMethod(formBindingDataCls, "<ctor>", ":", &objectMethod)) != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed status %{public}d ", static_cast<int>(status));
+        env->DestroyLocalScope();
         return nullptr;
     }
     ani_object formBindingDataObj;
     if ((status = env->Object_New(formBindingDataCls, objectMethod, &formBindingDataObj)) != ANI_OK) {
-        HILOG_ERROR("Class_FindMethod failed status %{public}d ", static_cast<int>(status));
+        HILOG_ERROR("Object_New failed status %{public}d ", static_cast<int>(status));
+        env->DestroyLocalScope();
         return nullptr;
     }
     ani_boolean isUndefined = ANI_FALSE;
     status = env->Reference_IsUndefined(paramObject, &isUndefined);
     if (isUndefined || status != ANI_OK) {
         HILOG_ERROR("createFormBindingData failed %{public}d ", static_cast<int>(status));
+        env->DestroyLocalScope();
         return nullptr;
     }
     ani_class stringClass;
     if ((status = env->FindClass("std.core.String", &stringClass)) != ANI_OK) {
         HILOG_ERROR("FindClass failed status %{public}d ", static_cast<int>(status));
+        env->DestroyLocalScope();
         return nullptr;
     }
     ani_method setMethod;
     if ((status = env->Class_FindMethod(formBindingDataCls, "<set>data", nullptr, &setMethod)) != ANI_OK) {
         HILOG_ERROR("Class_FindMethod failed status %{public}d ", static_cast<int>(status));
+        env->DestroyLocalScope();
         return nullptr;
     }
     if ((status = env->Object_CallMethod_Void(formBindingDataObj, setMethod, paramObject)) != ANI_OK) {
         HILOG_ERROR("Object_CallMethod_Void failed status %{public}d ", static_cast<int>(status));
+        env->DestroyLocalScope();
         return nullptr;
     }
     HILOG_INFO("CreateFormBindingData end");
+    env->DestroyLocalScope();
     return formBindingDataObj;
 }
 
-static ani_object CreateFormBindingDataEx([[maybe_unused]] ani_env *env, ani_object paramObject)
+static ani_object CreateFormBindingDataEx(ani_env *env, ani_object paramObject)
 {
     HILOG_INFO("CreateFormBindingDataEx call");
+    if (env == nullptr) {
+        HILOG_ERROR("env is nullptr");
+        return nullptr;
+    }
     ani_object formBindingDataObj = CreateFormBindingData(env, paramObject);
     if (formBindingDataObj == nullptr) {
         return nullptr;
+    }
+    if (env->CreateLocalScope(REFERENCES_CREATE_EX) != ANI_OK) {
+        HILOG_ERROR("CreateLocalScope failed");
+        return formBindingDataObj;
     }
     ani_status status = ANI_OK;
     ani_class formBindingDataCls;
@@ -80,12 +107,14 @@ static ani_object CreateFormBindingDataEx([[maybe_unused]] ani_env *env, ani_obj
         &formBindingDataCls);
     if (status != ANI_OK) {
         HILOG_ERROR("FindClass failed status %{public}d", static_cast<int>(status));
+        env->DestroyLocalScope();
         return formBindingDataObj;
     }
     ani_method setSupportMethod;
     status = env->Class_FindMethod(formBindingDataCls, "<set>isSupportMoreImages", "Z:V", &setSupportMethod);
     if (status != ANI_OK) {
         HILOG_ERROR("FindMethod <set>isSupportMoreImages failed status %{public}d", static_cast<int>(status));
+        env->DestroyLocalScope();
         return formBindingDataObj;
     }
     status = env->Object_CallMethod_Void(formBindingDataObj, setSupportMethod, ANI_TRUE);
@@ -93,6 +122,7 @@ static ani_object CreateFormBindingDataEx([[maybe_unused]] ani_env *env, ani_obj
         HILOG_ERROR("Object_CallMethod_Void <set>isSupportMoreImages failed status %{public}d",
             static_cast<int>(status));
     }
+    env->DestroyLocalScope();
     return formBindingDataObj;
 }
 
