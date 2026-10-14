@@ -371,6 +371,7 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
             HILOG_WARN("unexpected imageDataState_ %{public}d", imageDataState_);
             break;
     }
+    parcel.ReadBool(isSupportMoreImages_);
     return true;
 }
 
@@ -589,6 +590,10 @@ bool FormProviderData::Marshalling(Parcel &parcel) const
         default:
             HILOG_WARN("unexpected imageDataState_ %{public}d", imageDataState_);
             break;
+    }
+    if (!parcel.WriteBool(isSupportMoreImages_)) {
+        HILOG_ERROR("WriteBool isSupportMoreImages_ failed");
+        return false;
     }
     return true;
 }

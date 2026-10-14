@@ -229,6 +229,25 @@ public:
     {
         enableDbCache_ = enable;
     }
+
+    /**
+     * @brief Check whether the form supports more images.
+     * @return True if supported, false otherwise.
+     */
+    bool IsSupportMoreImages() const
+    {
+        return isSupportMoreImages_;
+    }
+
+    /**
+     * @brief Set whether the form supports more images.
+     * @param support True to enable more image support, false otherwise.
+     */
+    void SetSupportMoreImages(bool support)
+    {
+        isSupportMoreImages_ = support;
+    }
+
 public:
     static constexpr int IMAGE_DATA_STATE_REMOVED = -1;
     static constexpr int IMAGE_DATA_STATE_NO_OPERATION = 0;
@@ -258,6 +277,7 @@ private:
     std::map<std::string, std::pair<std::shared_ptr<char>, int32_t>> rawImageBytesMap_;
     int32_t imageDataState_ = 0;
     bool enableDbCache_ = false;
+    bool isSupportMoreImages_ = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

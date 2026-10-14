@@ -7277,4 +7277,52 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_BuildFormInstanceByFromRecord_00
     EXPECT_EQ(instance.appIndex, 1);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_BuildFormInstanceByFromRecord_001 end";
 }
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_001
+ * @tc.name: CreateFormJsInfo with isSupportMoreImages=true
+ * @tc.desc: Verify isSupportMoreImages is propagated from FormProviderData to FormJsInfo.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_001 start";
+    int64_t formId = 1;
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.AllotFormRecord(formItemInfo, callingUid);
+    nlohmann::json jsonData;
+    jsonData["key"] = "value";
+    FormProviderData formProviderData(jsonData);
+    formProviderData.SetSupportMoreImages(true);
+    record.formProviderInfo.SetFormData(formProviderData);
+    FormJsInfo formJsInfo;
+    formDataMgr_.CreateFormJsInfo(formId, record, formProviderData, formJsInfo);
+    EXPECT_EQ(formJsInfo.formId, formId);
+    EXPECT_TRUE(formJsInfo.isSupportMoreImages);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_002
+ * @tc.name: CreateFormJsInfo with isSupportMoreImages=false
+ * @tc.desc: Verify isSupportMoreImages defaults to false when not set.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_002 start";
+    int64_t formId = 2;
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.AllotFormRecord(formItemInfo, callingUid);
+    nlohmann::json jsonData;
+    jsonData["key"] = "value";
+    FormProviderData formProviderData(jsonData);
+    FormJsInfo formJsInfo;
+    formDataMgr_.CreateFormJsInfo(formId, record, formProviderData, formJsInfo);
+    EXPECT_EQ(formJsInfo.formId, formId);
+    EXPECT_FALSE(formJsInfo.isSupportMoreImages);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreImages_002 end";
+}
 }  // namespace

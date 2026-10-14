@@ -37,8 +37,14 @@ public:
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormBindingData, OnCreateFormBindingData);
     }
+
+    static napi_value CreateFormBindingDataEx(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormBindingData, OnCreateFormBindingDataEx);
+    }
 private:
     napi_value OnCreateFormBindingData(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnCreateFormBindingDataEx(napi_env env, size_t argc, napi_value* argv);
 };
 
 napi_value JsFormBindingData::OnCreateFormBindingData(napi_env env, size_t argc, napi_value* argv)
@@ -82,14 +88,71 @@ napi_value JsFormBindingData::OnCreateFormBindingData(napi_env env, size_t argc,
         ConvertFromJsValue(env, nativeValue, formDataStr);
     }
     napi_value objValue = nullptr;
-    napi_create_object(env, &objValue);
+    napi_status status = napi_create_object(env, &objValue);
+    if (status != napi_ok || objValue == nullptr) {
+        HILOG_ERROR("Failed to create object");
+        return CreateJsUndefined(env);
+    }
     napi_set_named_property(env, objValue, "data", CreateJsValue(env, formDataStr));
+    return objValue;
+}
+
+napi_value JsFormBindingData::OnCreateFormBindingDataEx(napi_env env, size_t argc, napi_value* argv)
+{
+    std::string formDataStr;
+    if (argc > 0) {
+        napi_value nativeValue = nullptr;
+        napi_valuetype type = napi_undefined;
+        napi_typeof(env, argv[0], &type);
+        if (type == napi_string) {
+            nativeValue = argv[0];
+        } else if (type == napi_object) {
+            napi_value globalValue = nullptr;
+            napi_status status = napi_get_global(env, &globalValue);
+            if (status != napi_ok || globalValue == nullptr) {
+                HILOG_ERROR("Failed to get global object");
+                return CreateJsUndefined(env);
+            }
+            napi_value jsonValue = nullptr;
+            status = napi_get_named_property(env, globalValue, "JSON", &jsonValue);
+            if (status != napi_ok || jsonValue == nullptr) {
+                HILOG_ERROR("Failed to get JSON property");
+                return CreateJsUndefined(env);
+            }
+
+            napi_value stringifyValue = nullptr;
+            status = napi_get_named_property(env, jsonValue, "stringify", &stringifyValue);
+            if (status != napi_ok || stringifyValue == nullptr) {
+                HILOG_ERROR("Failed to get stringify property");
+                return CreateJsUndefined(env);
+            }
+            napi_value funcArgv[1] = { argv[0] };
+            napi_value transValue = nullptr;
+            status = napi_call_function(env, jsonValue, stringifyValue, 1, funcArgv, &transValue);
+            if (status != napi_ok || transValue == nullptr) {
+                HILOG_ERROR("Failed to call JSON.stringify");
+                return CreateJsUndefined(env);
+            }
+            nativeValue = transValue;
+        }
+        ConvertFromJsValue(env, nativeValue, formDataStr);
+    }
+    napi_value objValue = nullptr;
+    napi_status status = napi_create_object(env, &objValue);
+    if (status != napi_ok || objValue == nullptr) {
+        HILOG_ERROR("Failed to create object");
+        return CreateJsUndefined(env);
+    }
+    napi_set_named_property(env, objValue, "data", CreateJsValue(env, formDataStr));
+    napi_set_named_property(env, objValue, "isSupportMoreImages", CreateJsValue(env, true));
     return objValue;
 }
 }
 
 napi_value JsFormBindingDataInit(napi_env env, napi_value exportObj)
 {
+    HILOG_INFO("call");
+
     auto formBindingData = std::make_unique<JsFormBindingData>();
     napi_status status = napi_wrap(env, exportObj, formBindingData.get(),
         JsFormBindingData::Finalizer, nullptr, nullptr);
@@ -101,6 +164,8 @@ napi_value JsFormBindingDataInit(napi_env env, napi_value exportObj)
 
     const char *moduleName = "JsFormBindingData";
     BindNativeFunction(env, exportObj, "createFormBindingData", moduleName, JsFormBindingData::CreateFormBindingData);
+    BindNativeFunction(env, exportObj, "createFormBindingDataEx", moduleName,
+        JsFormBindingData::CreateFormBindingDataEx);
 
     return exportObj;
 }

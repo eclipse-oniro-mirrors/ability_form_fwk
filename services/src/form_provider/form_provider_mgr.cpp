@@ -509,6 +509,7 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId,
         auto formData = formRecord.formProviderInfo.GetFormData();
         formData.SetImageDataState(formProviderData.GetImageDataState());
         formData.SetImageDataMap(formProviderData.GetImageDataMap());
+        formData.SetSupportMoreImages(formProviderData.IsSupportMoreImages());
         formRecord.formProviderInfo.SetFormData(formData);
     }
 
