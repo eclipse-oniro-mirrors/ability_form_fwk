@@ -753,5 +753,145 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_ReloadFormInfos_Batch_1500, TestSize.Level
     GTEST_LOG_(INFO) << "FormInfoMgr_ReloadFormInfos_Batch_1500 end";
 }
 
+/**
+ * @tc.name: FormInfoMgr_GetFormsInfoByFilter_IsCaller_0100
+ * @tc.desc: test GetFormsInfoByFilter with non-SA caller verified by IsCaller.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByFilter_IsCaller_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_IsCaller_0100 start";
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoByFlags(_, _, _, _))
+        .WillRepeatedly(Invoke([callerToken](const std::string &bundleName, int32_t flags,
+            int32_t userId, BundleInfo &bundleInfo) -> bool {
+            bundleInfo.applicationInfo.accessTokenId = callerToken;
+            return true;
+        }));
+    auto bundleFormInfoPtr = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoMgr::GetInstance().bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfoPtr;
+    std::vector<FormInfo> formInfos;
+    FormInfoFilter filter;
+    filter.bundleName = FORM_BUNDLE_NAME_TEST;
+    MockIsSACall(false);
+    MockVerifyCallingPermission(false);
+    EXPECT_EQ(ERR_OK, FormInfoMgr::GetInstance().GetFormsInfoByFilter(filter, formInfos, USER_ID));
+    MockIsSACall(true);
+    MockVerifyCallingPermission(true);
+    FormInfoMgr::GetInstance().bundleFormInfoMap_.clear();
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_IsCaller_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetFormsInfoByBundle_IsCaller_0100
+ * @tc.desc: test GetFormsInfoByBundle with non-SA caller verified by IsCaller.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByBundle_IsCaller_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByBundle_IsCaller_0100 start";
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoByFlags(_, _, _, _))
+        .WillRepeatedly(Invoke([callerToken](const std::string &bundleName, int32_t flags,
+            int32_t userId, BundleInfo &bundleInfo) -> bool {
+            bundleInfo.applicationInfo.accessTokenId = callerToken;
+            return true;
+        }));
+    auto bundleFormInfoPtr = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoMgr::GetInstance().bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfoPtr;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(false);
+    MockVerifyCallingPermission(false);
+    EXPECT_EQ(ERR_OK, FormInfoMgr::GetInstance().GetFormsInfoByBundle(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
+    MockIsSACall(true);
+    MockVerifyCallingPermission(true);
+    FormInfoMgr::GetInstance().bundleFormInfoMap_.clear();
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByBundle_IsCaller_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByBundle_IsCaller_0100
+ * @tc.desc: test GetTemplateFormsInfoByBundle with non-SA caller verified by IsCaller.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByBundle_IsCaller_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_IsCaller_0100 start";
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoByFlags(_, _, _, _))
+        .WillRepeatedly(Invoke([callerToken](const std::string &bundleName, int32_t flags,
+            int32_t userId, BundleInfo &bundleInfo) -> bool {
+            bundleInfo.applicationInfo.accessTokenId = callerToken;
+            return true;
+        }));
+    auto bundleFormInfoPtr = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoMgr::GetInstance().bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfoPtr;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(false);
+    MockVerifyCallingPermission(false);
+    EXPECT_EQ(ERR_OK,
+        FormInfoMgr::GetInstance().GetTemplateFormsInfoByBundle(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
+    MockIsSACall(true);
+    MockVerifyCallingPermission(true);
+    FormInfoMgr::GetInstance().bundleFormInfoMap_.clear();
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByBundle_IsCaller_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetFormsInfoByModule_IsCaller_0100
+ * @tc.desc: test GetFormsInfoByModule with non-SA caller verified by IsCaller.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByModule_IsCaller_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByModule_IsCaller_0100 start";
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoByFlags(_, _, _, _))
+        .WillRepeatedly(Invoke([callerToken](const std::string &bundleName, int32_t flags,
+            int32_t userId, BundleInfo &bundleInfo) -> bool {
+            bundleInfo.applicationInfo.accessTokenId = callerToken;
+            return true;
+        }));
+    auto bundleFormInfoPtr = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoMgr::GetInstance().bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfoPtr;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(false);
+    MockVerifyCallingPermission(false);
+    EXPECT_EQ(ERR_OK, FormInfoMgr::GetInstance().GetFormsInfoByModule(
+        FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST, formInfos, USER_ID));
+    MockIsSACall(true);
+    MockVerifyCallingPermission(true);
+    FormInfoMgr::GetInstance().bundleFormInfoMap_.clear();
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByModule_IsCaller_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetTemplateFormsInfoByModule_IsCaller_0100
+ * @tc.desc: test GetTemplateFormsInfoByModule with non-SA caller verified by IsCaller.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetTemplateFormsInfoByModule_IsCaller_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_IsCaller_0100 start";
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoByFlags(_, _, _, _))
+        .WillRepeatedly(Invoke([callerToken](const std::string &bundleName, int32_t flags,
+            int32_t userId, BundleInfo &bundleInfo) -> bool {
+            bundleInfo.applicationInfo.accessTokenId = callerToken;
+            return true;
+        }));
+    auto bundleFormInfoPtr = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoMgr::GetInstance().bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfoPtr;
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(false);
+    MockVerifyCallingPermission(false);
+    EXPECT_EQ(ERR_OK, FormInfoMgr::GetInstance().GetTemplateFormsInfoByModule(
+        FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST, formInfos, USER_ID));
+    MockIsSACall(true);
+    MockVerifyCallingPermission(true);
+    FormInfoMgr::GetInstance().bundleFormInfoMap_.clear();
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetTemplateFormsInfoByModule_IsCaller_0100 end";
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS
