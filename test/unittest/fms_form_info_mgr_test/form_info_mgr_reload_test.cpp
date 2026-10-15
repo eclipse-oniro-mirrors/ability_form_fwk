@@ -30,6 +30,8 @@
 #undef private
 #include "form_mgr_errors.h"
 #include "form_mgr/form_mgr_queue.h"
+#include "ipc_skeleton.h"
+#include "inner/mock_form_util.h"
 
 using namespace testing;
 using namespace testing::ext;
