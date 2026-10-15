@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,11 @@
 #ifndef OHOS_ABILITY_RUNTIME_ETS_FORM_EDIT_EXTENSION_IMPL_H
 #define OHOS_ABILITY_RUNTIME_ETS_FORM_EDIT_EXTENSION_IMPL_H
 
+#include "ani.h"
 #include "ets_ui_extension_base.h"
 #include "form_edit_extension_context.h"
 #include <set>
+#include <string>
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -36,6 +38,8 @@ public:
         EtsUIExtensionBase::SetContext(context);
     }
 
+    static void SetWindowBackgroundColor(ani_env *env, ani_object obj, ani_string color);
+
 protected:
     void BindContext() override;
 
@@ -44,6 +48,10 @@ protected:
     std::unordered_set<uint64_t> uiExtensionComponentIdSet_;
 
 private:
+    void BindMethod(ani_env *env);
+    static EtsFormEditExtensionImpl* GetEtsFormEditExtension(ani_env *env, ani_object obj);
+    void OnSetWindowBackgroundColor(ani_env *env, const std::string &color);
+
     using EtsUIExtensionBase::SetContext;
 };
 } // namespace AbilityRuntime

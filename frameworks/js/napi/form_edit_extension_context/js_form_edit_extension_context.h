@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,10 +37,12 @@ public:
 
     static napi_value StartSecondPage(napi_env env, napi_callback_info info);
     static napi_value StartUIAbility(napi_env env, napi_callback_info info);
+    static napi_value SetWindowBackgroundColor(napi_env env, napi_callback_info info);
 
 private:
     napi_value OnStartSecondPage(napi_env env, NapiCallbackInfo &info);
     napi_value OnStartUIAbility(napi_env env, NapiCallbackInfo &info);
+    napi_value OnSetWindowBackgroundColor(napi_env env, NapiCallbackInfo &info);
 
 private:
     std::weak_ptr<FormEditExtensionContext> context_;
