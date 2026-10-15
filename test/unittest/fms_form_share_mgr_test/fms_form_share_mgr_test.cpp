@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -214,7 +214,7 @@ HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest RecvFormShareInfoFromRemote_001 start";
     const std::string queueStr = "queue";
     auto queue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>(queueStr);
-    DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(queue);
+    DelayedSingleton<FormShareMgr>::GetInstance()->serialQueue_ = queue;
     FormShareInfo info;
     int32_t userId = 100;
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info, userId);
@@ -2236,25 +2236,6 @@ HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_002, TestSize.Level1)
 }
 
 /**
- * @tc.number: SetEventHandler_001
- * @tc.name: SetEventHandler
- * @tc.desc: verify SetEventHandler succeeded.
- */
-HWTEST_F(FmsFormShareMgrTest, SetEventHandler_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormShareMgrTest SetEventHandler_001 start";
-    DelayedSingleton<FormShareMgr>::GetInstance()->eventHandler_ = nullptr;
-    std::shared_ptr<FormEventHandler> handler = nullptr;
-    DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
-    EXPECT_TRUE(DelayedSingleton<FormShareMgr>::GetInstance()->eventHandler_ == nullptr);
-
-    handler = std::make_shared<FormEventHandler>(nullptr);
-    DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
-    EXPECT_TRUE(DelayedSingleton<FormShareMgr>::GetInstance()->eventHandler_ != nullptr);
-    GTEST_LOG_(INFO) << "FmsFormShareMgrTest SetEventHandler_001 end";
-}
-
-/**
  * @tc.number: HandleProviderShareData_004
  * @tc.name: HandleProviderShareData
  * @tc.desc: Form record is not exist, verify HandleProviderShareData failed.
@@ -3105,7 +3086,7 @@ HWTEST_F(FmsFormShareMgrTest, RemoveFormShareInfo_002, TestSize.Level1)
 /**
  * @tc.number: CheckFormPackage_001
  * @tc.name: CheckFormPackage
- * @tc.desc: Package exists, verify CheckFormPackage succeeded.
+ * @tc.desc: Package absent, verify CheckFormPackage takes the free-install path.
  */
 HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_001, TestSize.Level1)
 {
@@ -3126,7 +3107,9 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_001, TestSize.Level1)
 
     const std::string queueStr = "queue";
     auto queue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>(queueStr);
-    DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(queue);
+    DelayedSingleton<FormShareMgr>::GetInstance()->serialQueue_ = queue;
+    auto handler = std::make_shared<FormEventHandler>(queue);
+    DelayedSingleton<FormShareMgr>::GetInstance()->eventHandler_ = handler;
 
     FormShareInfo info;
     info.bundleName = bundleName;
@@ -3178,7 +3161,7 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_003, TestSize.Level1)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest CheckFormPackage_003 start";
     const std::string queueStr = "queue";
     auto queue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>(queueStr);
-    DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(queue);
+    DelayedSingleton<FormShareMgr>::GetInstance()->serialQueue_ = queue;
     DelayedSingleton<FormShareMgr>::GetInstance()->eventHandler_ = nullptr;
 
     FormShareInfo info;
@@ -3206,9 +3189,9 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_004, TestSize.Level1)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest CheckFormPackage_004 start";
     const std::string queueStr = "queue";
     auto queue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>(queueStr);
-    DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(queue);
+    DelayedSingleton<FormShareMgr>::GetInstance()->serialQueue_ = queue;
     auto handler = std::make_shared<FormEventHandler>(queue);
-    DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
+    DelayedSingleton<FormShareMgr>::GetInstance()->eventHandler_ = handler;
 
     FormShareInfo info;
     info.bundleName = "bundle";
@@ -3245,9 +3228,9 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_005, TestSize.Level1)
 
     const std::string queueStr = "queue";
     auto queue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>(queueStr);
-    DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(queue);
+    DelayedSingleton<FormShareMgr>::GetInstance()->serialQueue_ = queue;
     auto handler = std::make_shared<FormEventHandler>(queue);
-    DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
+    DelayedSingleton<FormShareMgr>::GetInstance()->eventHandler_ = handler;
 
     FormShareInfo info;
     info.bundleName = FORM_PROVIDER_BUNDLE_NAME;
@@ -3263,4 +3246,117 @@ HWTEST_F(FmsFormShareMgrTest, CheckFormPackage_005, TestSize.Level1)
 
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest CheckFormPackage_005 end";
+}
+
+/**
+ * @tc.number: Initialize_001
+ * @tc.name: Initialize
+ * @tc.desc: Verify Initialize with a null handler returns early without consuming
+ *          std::call_once's once_flag.
+ */
+HWTEST_F(FmsFormShareMgrTest, Initialize_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest Initialize_001 start";
+    // Recreate the singleton so this case starts from a virgin once_flag and default
+    // members regardless of execution order.
+    DelayedSingleton<FormShareMgr>::DestroyInstance();
+    auto shareMgr = DelayedSingleton<FormShareMgr>::GetInstance();
+    EXPECT_EQ(shareMgr->eventHandler_.get(), nullptr);
+    EXPECT_EQ(shareMgr->serialQueue_.get(), nullptr);
+
+    const std::string queueName = "queue_initialize_001";
+    auto validQueue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>(queueName);
+    auto validHandler = std::make_shared<FormEventHandler>(nullptr);
+
+    // First call with null handler: should early-return, once_flag NOT consumed.
+    shareMgr->Initialize(nullptr, validQueue);
+    EXPECT_EQ(shareMgr->eventHandler_.get(), nullptr);
+    EXPECT_EQ(shareMgr->serialQueue_.get(), nullptr);
+
+    // Second call with valid args: once_flag is still virgin, so members should be set.
+    // This proves the previous null call did NOT consume the once_flag.
+    shareMgr->Initialize(validHandler, validQueue);
+    EXPECT_EQ(shareMgr->eventHandler_.get(), validHandler.get());
+    EXPECT_EQ(shareMgr->serialQueue_.get(), validQueue.get());
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest Initialize_001 end";
+}
+
+/**
+ * @tc.number: Initialize_002
+ * @tc.name: Initialize
+ * @tc.desc: Verify Initialize early-returns when serialQueue is null; members remain unchanged.
+ */
+HWTEST_F(FmsFormShareMgrTest, Initialize_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest Initialize_002 start";
+    // Recreate the singleton so this case starts from a virgin once_flag and default
+    // members regardless of execution order.
+    DelayedSingleton<FormShareMgr>::DestroyInstance();
+    auto shareMgr = DelayedSingleton<FormShareMgr>::GetInstance();
+    EXPECT_EQ(shareMgr->eventHandler_.get(), nullptr);
+    EXPECT_EQ(shareMgr->serialQueue_.get(), nullptr);
+
+    auto validHandler = std::make_shared<FormEventHandler>(nullptr);
+
+    // serialQueue is null: must early-return before call_once. The once_flag is still
+    // virgin here, so untouched members prove the null guard ran, not a consumed flag.
+    shareMgr->Initialize(validHandler, nullptr);
+    EXPECT_EQ(shareMgr->eventHandler_.get(), nullptr);
+    EXPECT_EQ(shareMgr->serialQueue_.get(), nullptr);
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest Initialize_002 end";
+}
+
+/**
+ * @tc.number: Initialize_003
+ * @tc.name: Initialize
+ * @tc.desc: Verify Initialize only takes effect on the first valid call; later calls
+ *          are no-ops and members keep the first arguments.
+ */
+HWTEST_F(FmsFormShareMgrTest, Initialize_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest Initialize_003 start";
+    // Recreate the singleton so this case starts from a virgin once_flag regardless of
+    // execution order.
+    DelayedSingleton<FormShareMgr>::DestroyInstance();
+    auto shareMgr = DelayedSingleton<FormShareMgr>::GetInstance();
+
+    auto handlerFirst = std::make_shared<FormEventHandler>(nullptr);
+    auto queueFirst = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>("queue_initialize_003_first");
+    auto handlerSecond = std::make_shared<FormEventHandler>(nullptr);
+    auto queueSecond = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>("queue_initialize_003_second");
+
+    // First valid call consumes the once_flag and stores the first arguments.
+    shareMgr->Initialize(handlerFirst, queueFirst);
+    EXPECT_EQ(shareMgr->eventHandler_.get(), handlerFirst.get());
+    EXPECT_EQ(shareMgr->serialQueue_.get(), queueFirst.get());
+
+    // Second call must be a no-op: the consumed once_flag keeps the first arguments.
+    shareMgr->Initialize(handlerSecond, queueSecond);
+    EXPECT_EQ(shareMgr->eventHandler_.get(), handlerFirst.get());
+    EXPECT_EQ(shareMgr->serialQueue_.get(), queueFirst.get());
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest Initialize_003 end";
+}
+
+/**
+ * @tc.number: Initialize_004
+ * @tc.name: Initialize
+ * @tc.desc: Verify Initialize registers FormShareMgr as a timeout observer on the handler.
+ */
+HWTEST_F(FmsFormShareMgrTest, Initialize_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest Initialize_004 start";
+    // Recreate the singleton so the once_flag is virgin regardless of execution order.
+    DelayedSingleton<FormShareMgr>::DestroyInstance();
+    auto shareMgr = DelayedSingleton<FormShareMgr>::GetInstance();
+
+    auto queue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>("queue_initialize_004");
+    auto handler = std::make_shared<FormEventHandler>(queue);
+
+    EXPECT_EQ(handler->observers_.size(), static_cast<size_t>(0));
+    shareMgr->Initialize(handler, queue);
+    EXPECT_EQ(shareMgr->eventHandler_.get(), handler.get());
+    // The real initialization chain must attach the manager as a timeout observer.
+    EXPECT_EQ(handler->observers_.size(), static_cast<size_t>(1));
+    EXPECT_EQ(handler->observers_.count(shareMgr), static_cast<size_t>(1));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest Initialize_004 end";
 }

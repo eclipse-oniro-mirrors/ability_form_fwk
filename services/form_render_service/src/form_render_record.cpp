@@ -15,6 +15,7 @@
 
 #include "form_render_record.h"
 
+#include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <iostream>
@@ -66,6 +67,9 @@ constexpr int32_t SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t CHECK_THREAD_TIME = 3;
 constexpr size_t THREAD_NAME_LEN = 15;
+// Cap JS error field/total size to prevent unbounded allocation (4KB per field, 8KB total)
+constexpr size_t MAX_ERROR_FIELD_LEN = 4096;
+constexpr size_t MAX_ERROR_TOTAL_LEN = 8192;
 constexpr const char *FORM_RENDERER_PROCESS_ON_ADD_SURFACE = "ohos.extra.param.key.process_on_add_surface";
 constexpr const char *RENDERING_BLOCK_MONITOR_PREFIX = "RenderingBlockMonitorTask_";
 constexpr const char *MEMORY_MONITOR_PREFIX = "MemoryMonitorTask_";
@@ -1573,6 +1577,7 @@ int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<FormJsInfo> &
 
 size_t FormRenderRecord::FormCount()
 {
+    std::lock_guard<std::mutex> lock(formRequestsMutex_);
     return formRequests_.size();
 }
 
@@ -2141,6 +2146,13 @@ void FormRenderRecord::OnJsError(napi_value value)
     if (!errorCode.empty()) {
         summary += "Error code:" + errorCode + "\n";
     }
+    // Enforce total length cap to prevent unbounded HiSysEvent payload
+    if (summary.size() > MAX_ERROR_TOTAL_LEN) {
+        summary = summary.substr(0, MAX_ERROR_TOTAL_LEN) + "...[truncated]";
+    }
+    if (stack.size() > MAX_ERROR_TOTAL_LEN) {
+        stack = stack.substr(0, MAX_ERROR_TOTAL_LEN) + "...[truncated]";
+    }
     HILOG_ERROR("summary: %{public}s", summary.c_str());
     HILOG_ERROR("stack: %{public}s", stack.c_str());
     FormRenderEventReport::SendBlockFaultEvent(bundleName_, summary, stack);
@@ -2169,11 +2181,26 @@ std::string FormRenderRecord::GetNativeStrFromJsTaggedObj(napi_value obj, const 
     }
 
     size_t valueStrBufLength = 0;
-    napi_get_value_string_utf8(env, valueStr, nullptr, 0, &valueStrBufLength);
-    auto valueCStr = std::make_unique<char[]>(valueStrBufLength + 1);
+    napi_status status = napi_get_value_string_utf8(env, valueStr, nullptr, 0, &valueStrBufLength);
+    if (status != napi_ok) {
+        HILOG_ERROR("get string length failed, status: %{public}d", status);
+        return "";
+    }
+    // Cap allocation to avoid unbounded memory allocation from JS string
+    size_t allocLen = std::min(valueStrBufLength, MAX_ERROR_FIELD_LEN);
+    auto valueCStr = std::make_unique<char[]>(allocLen + 1);
     size_t valueStrLength = 0;
-    napi_get_value_string_utf8(env, valueStr, valueCStr.get(), valueStrBufLength + 1, &valueStrLength);
-    std::string ret(valueCStr.get(), valueStrLength);
+    status = napi_get_value_string_utf8(env, valueStr, valueCStr.get(), allocLen + 1, &valueStrLength);
+    if (status != napi_ok) {
+        HILOG_ERROR("get string value failed, status: %{public}d", status);
+        return "";
+    }
+    std::string ret;
+    ret.reserve(allocLen + sizeof("...[truncated]") - 1);
+    ret.append(valueCStr.get(), std::min(valueStrLength, allocLen));
+    if (valueStrBufLength > MAX_ERROR_FIELD_LEN) {
+        ret += "...[truncated]";
+    }
     return ret;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,9 @@
 #ifndef OHOS_FORM_FWK_FORM_UTIL_FORM_H
 #define OHOS_FORM_FWK_FORM_UTIL_FORM_H
 
+#include <limits>
 #include <string>
+#include <type_traits>
 
 #include "appexecfwk_errors.h"
 #include "fms_log_wrapper.h"
@@ -189,8 +191,41 @@ bool ParseInfoFromJsonStr(const char *data, T &t)
         return false;
     }
 
-    t = jsonObject.get<T>();
-    return true;
+    // nlohmann stores integers only as uint64_t/int64_t and get_ptr<T*> has no
+    // overloads for narrower types, so parse through the widest type and bounds-check.
+    if constexpr (std::is_integral_v<T> && !std::is_same_v<T, bool>) {
+        if (jsonObject.is_number_unsigned()) {
+            uint64_t value = jsonObject.get<uint64_t>();
+            if (value > static_cast<uint64_t>(std::numeric_limits<T>::max())) {
+                HILOG_ERROR("unsigned value out of range for target type");
+                return false;
+            }
+            t = static_cast<T>(value);
+            return true;
+        }
+        if (jsonObject.is_number_integer()) {
+            // is_number_integer() also matches unsigned; those are handled
+            // above, so the value is negative.
+            int64_t value = jsonObject.get<int64_t>();
+            if (value < static_cast<int64_t>(std::numeric_limits<T>::min())
+                || value > static_cast<int64_t>(std::numeric_limits<T>::max())) {
+                HILOG_ERROR("signed value out of range for target type");
+                return false;
+            }
+            t = static_cast<T>(value);
+            return true;
+        }
+        HILOG_ERROR("json type mismatch");
+        return false;
+    } else {
+        auto *valuePtr = jsonObject.get_ptr<T *>();
+        if (valuePtr == nullptr) {
+            HILOG_ERROR("json type mismatch");
+            return false;
+        }
+        t = *valuePtr;
+        return true;
+    }
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

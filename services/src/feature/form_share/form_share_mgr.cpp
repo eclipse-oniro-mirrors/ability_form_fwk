@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -598,6 +598,20 @@ void FormShareMgr::OnEventTimeoutResponse(int64_t msg, int64_t eventId)
             break;
         }
     }
+}
+
+void FormShareMgr::Initialize(const std::shared_ptr<FormEventHandler> &handler,
+    const std::shared_ptr<FormSerialQueue> &serialQueue)
+{
+    if (handler == nullptr || serialQueue == nullptr) {
+        HILOG_ERROR("FormShareMgr::Initialize null handler or serialQueue, skip");
+        return;
+    }
+    std::call_once(initOnce_, [this, handler, serialQueue]() {
+        serialQueue_ = serialQueue;
+        eventHandler_ = handler;
+        eventHandler_->RegisterEventTimeoutObserver(shared_from_this());
+    });
 }
 } // namespace AppExecFwk
 } // namespace OHOS

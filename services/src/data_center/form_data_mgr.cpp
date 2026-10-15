@@ -2948,12 +2948,16 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncl
     return ret;
 }
 
-void FormDataMgr::GetUnusedFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
+void FormDataMgr::GetUnusedFormInfos(std::vector<RunningFormInfo> &runningFormInfos, int32_t userId)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("call, userId:%{public}d", userId);
     std::vector<FormDBInfo> formDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
     for (const auto &dbInfo : formDBInfos) {
+        if (dbInfo.providerUserId != userId &&
+            dbInfo.providerUserId != Constants::DEFAULT_USER_ID) {
+            continue;
+        }
         auto item = std::find_if(runningFormInfos.begin(), runningFormInfos.end(),
             [&dbInfo](const auto &it) { return it.formId == dbInfo.formId; });
         if (item != runningFormInfos.end()) {
@@ -3004,7 +3008,7 @@ ErrCode FormDataMgr::GetRunningFormInfos(bool isUnusedIncluded, std::vector<Runn
         }
     }
     if (isUnusedIncluded) {
-        GetUnusedFormInfos(runningFormInfos);
+        GetUnusedFormInfos(runningFormInfos, userId);
     }
     return ERR_OK;
 }

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <cstdint>
 #include <stack>
 #include <string>
 
@@ -414,6 +415,176 @@ HWTEST_F(FmsJsonUtilFormTest, IsJsonDepthSafe_UnclosedString_001, TestSize.Level
     nlohmann::json parsed = SafeJsonParse(jsonStr);
     EXPECT_TRUE(parsed.is_discarded());
     GTEST_LOG_(INFO) << "IsJsonDepthSafe_UnclosedString_001 end";
+}
+
+/**
+ * @tc.name: ParseInfoFromJsonStr_NullData_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseInfoFromJsonStr returns false when data is nullptr.
+ */
+HWTEST_F(FmsJsonUtilFormTest, ParseInfoFromJsonStr_NullData_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_NullData_001 start";
+    // Sentinel must stay untouched when parsing fails.
+    int64_t val = -1;
+    bool result = ParseInfoFromJsonStr<int64_t>(nullptr, val);
+    EXPECT_FALSE(result);
+    EXPECT_EQ(val, -1);
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_NullData_001 end";
+}
+
+/**
+ * @tc.name: ParseInfoFromJsonStr_DiscardedJson_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseInfoFromJsonStr returns false when input is malformed JSON.
+ */
+HWTEST_F(FmsJsonUtilFormTest, ParseInfoFromJsonStr_DiscardedJson_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_DiscardedJson_001 start";
+    // Sentinel must stay untouched when parsing fails.
+    int64_t val = -1;
+    bool result = ParseInfoFromJsonStr<int64_t>("{invalid", val);
+    EXPECT_FALSE(result);
+    EXPECT_EQ(val, -1);
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_DiscardedJson_001 end";
+}
+
+/**
+ * @tc.name: ParseInfoFromJsonStr_TypeMismatch_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseInfoFromJsonStr returns false when JSON type does not match T.
+ */
+HWTEST_F(FmsJsonUtilFormTest, ParseInfoFromJsonStr_TypeMismatch_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_TypeMismatch_001 start";
+    // Sentinel must stay untouched when parsing fails.
+    std::string val = "INIT";
+    bool result = ParseInfoFromJsonStr<std::string>("123", val);
+    EXPECT_FALSE(result);
+    EXPECT_EQ(val, std::string("INIT"));
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_TypeMismatch_001 end";
+}
+
+/**
+ * @tc.name: ParseInfoFromJsonStr_SuccessInt64_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseInfoFromJsonStr correctly parses an integer JSON value.
+ */
+HWTEST_F(FmsJsonUtilFormTest, ParseInfoFromJsonStr_SuccessInt64_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_SuccessInt64_001 start";
+    int64_t val = 0;
+    // A negative literal is stored as number_integer and matches get_ptr directly.
+    bool result = ParseInfoFromJsonStr<int64_t>("-123", val);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(val, -123);
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_SuccessInt64_001 end";
+}
+
+/**
+ * @tc.name: ParseInfoFromJsonStr_SuccessInt64_002
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseInfoFromJsonStr correctly parses a positive integer.
+ */
+HWTEST_F(FmsJsonUtilFormTest, ParseInfoFromJsonStr_SuccessInt64_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_SuccessInt64_002 start";
+    int64_t val = 0;
+    // A positive literal is stored as number_unsigned and needs the conversion branch.
+    bool result = ParseInfoFromJsonStr<int64_t>("123", val);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(val, 123);
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_SuccessInt64_002 end";
+}
+
+/**
+ * @tc.name: ParseInfoFromJsonStr_SuccessInt64_003
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseInfoFromJsonStr parses INT64_MAX stored as number_unsigned.
+ */
+HWTEST_F(FmsJsonUtilFormTest, ParseInfoFromJsonStr_SuccessInt64_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_SuccessInt64_003 start";
+    int64_t val = 0;
+    bool result = ParseInfoFromJsonStr<int64_t>("9223372036854775807", val);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(val, INT64_MAX);
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_SuccessInt64_003 end";
+}
+
+/**
+ * @tc.name: ParseInfoFromJsonStr_SuccessInt64_004
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseInfoFromJsonStr parses INT64_MIN stored as number_integer.
+ */
+HWTEST_F(FmsJsonUtilFormTest, ParseInfoFromJsonStr_SuccessInt64_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_SuccessInt64_004 start";
+    int64_t val = 0;
+    bool result = ParseInfoFromJsonStr<int64_t>("-9223372036854775808", val);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(val, INT64_MIN);
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_SuccessInt64_004 end";
+}
+
+/**
+ * @tc.name: ParseInfoFromJsonStr_FailedInt64_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseInfoFromJsonStr rejects a number_unsigned exceeding INT64_MAX.
+ */
+HWTEST_F(FmsJsonUtilFormTest, ParseInfoFromJsonStr_FailedInt64_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_FailedInt64_001 start";
+    int64_t val = 0;
+    // INT64_MAX + 1 stored as number_unsigned must fail instead of wrapping around.
+    bool result = ParseInfoFromJsonStr<int64_t>("9223372036854775808", val);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_FailedInt64_001 end";
+}
+
+/**
+ * @tc.name: ParseInfoFromJsonStr_FailedInt32_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseInfoFromJsonStr rejects a number_unsigned exceeding INT32_MAX.
+ */
+HWTEST_F(FmsJsonUtilFormTest, ParseInfoFromJsonStr_FailedInt32_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_FailedInt32_001 start";
+    int32_t val = 0;
+    // 2^32 stored as number_unsigned must fail instead of truncating to 0.
+    bool result = ParseInfoFromJsonStr<int32_t>("4294967296", val);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_FailedInt32_001 end";
+}
+
+/**
+ * @tc.name: ParseInfoFromJsonStr_SuccessString_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseInfoFromJsonStr correctly parses a JSON string value.
+ */
+HWTEST_F(FmsJsonUtilFormTest, ParseInfoFromJsonStr_SuccessString_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_SuccessString_001 start";
+    std::string val;
+    bool result = ParseInfoFromJsonStr<std::string>("\"abc\"", val);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(val, std::string("abc"));
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_SuccessString_001 end";
+}
+
+/**
+ * @tc.name: ParseInfoFromJsonStr_SuccessBool_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ParseInfoFromJsonStr correctly parses a JSON boolean value.
+ */
+HWTEST_F(FmsJsonUtilFormTest, ParseInfoFromJsonStr_SuccessBool_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_SuccessBool_001 start";
+    bool val = false;
+    bool result = ParseInfoFromJsonStr<bool>("true", val);
+    EXPECT_TRUE(result);
+    EXPECT_TRUE(val);
+    GTEST_LOG_(INFO) << "ParseInfoFromJsonStr_SuccessBool_001 end";
 }
 
 }  // namespace OHOS::AppExecFwk
