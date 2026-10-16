@@ -15,6 +15,7 @@
 #include "js_form_binding_data.h"
 
 #include "fms_log_wrapper.h"
+#include "form_mgr_errors.h"
 #include "form_provider_data.h"
 #include "js_runtime_utils.h"
 #include "napi_form_util.h"
@@ -126,14 +127,16 @@ napi_value JsFormBindingData::OnCreateFormBindingDataEx(napi_env env, size_t arg
                 HILOG_ERROR("Failed to get stringify property");
                 return CreateJsUndefined(env);
             }
-            napi_value funcArgv[1] = { argv[0] };
             napi_value transValue = nullptr;
-            status = napi_call_function(env, jsonValue, stringifyValue, 1, funcArgv, &transValue);
+            status = napi_call_function(env, jsonValue, stringifyValue, 1, &argv[0], &transValue);
             if (status != napi_ok || transValue == nullptr) {
                 HILOG_ERROR("Failed to call JSON.stringify");
                 return CreateJsUndefined(env);
             }
             nativeValue = transValue;
+        } else if (type != napi_undefined) {
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_PARAM_INVALID);
+            return CreateJsUndefined(env);
         }
         ConvertFromJsValue(env, nativeValue, formDataStr);
     }
