@@ -21,7 +21,7 @@ namespace AppExecFwk {
 FormAbilityConnectionReporter::FormAbilityConnectionReporter() {}
 FormAbilityConnectionReporter::~FormAbilityConnectionReporter() {}
 
-void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::string &bundleName) {}
+void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::string &bundleName, int32_t userId) {}
 
 void FormAbilityConnectionReporter::ReportFormAbilityDisconnection(const std::string &bundleName) {}
 } // namespace AppExecFwk

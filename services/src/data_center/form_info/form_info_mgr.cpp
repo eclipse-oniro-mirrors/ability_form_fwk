@@ -196,7 +196,7 @@ ErrCode FormInfoMgr::GetFormsInfoByFilter(
     const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId)
 {
     if (!CheckBundlePermission()) {
-        if (filter.bundleName.empty() || !IsCaller(filter.bundleName)) {
+        if (filter.bundleName.empty() || !IsCaller(filter.bundleName, userId)) {
             HILOG_ERROR("Permission is wrong");
             return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
         }
@@ -229,7 +229,7 @@ ErrCode FormInfoMgr::GetFormsInfoByBundle(
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    if (!CheckBundlePermission() && !IsCaller(bundleName)) {
+    if (!CheckBundlePermission() && !IsCaller(bundleName, userId)) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
     }
 
@@ -254,7 +254,7 @@ ErrCode FormInfoMgr::GetTemplateFormsInfoByBundle(
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    if (!CheckBundlePermission() && !IsCaller(bundleName)) {
+    if (!CheckBundlePermission() && !IsCaller(bundleName, userId)) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
     }
 
@@ -279,7 +279,7 @@ ErrCode FormInfoMgr::GetFormsInfoByModule(const std::string &bundleName, const s
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    if (!CheckBundlePermission() && !IsCaller(bundleName)) {
+    if (!CheckBundlePermission() && !IsCaller(bundleName, userId)) {
         HILOG_ERROR("CheckBundlePermission and IsCaller failed");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
     }
@@ -295,7 +295,7 @@ ErrCode FormInfoMgr::GetTemplateFormsInfoByModule(const std::string &bundleName,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    if (!CheckBundlePermission() && !IsCaller(bundleName)) {
+    if (!CheckBundlePermission() && !IsCaller(bundleName, userId)) {
         HILOG_ERROR("CheckBundlePermission and IsCaller failed");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
     }
@@ -478,11 +478,11 @@ std::shared_ptr<BundleFormInfo> FormInfoMgr::GetOrCreateBundleFromInfo(const std
     return bundleFormInfoPtr;
 }
 
-bool FormInfoMgr::IsCaller(const std::string& bundleName)
+bool FormInfoMgr::IsCaller(const std::string& bundleName, int32_t userId)
 {
     AppExecFwk::BundleInfo bundleInfo;
     if (!FormBmsHelper::GetInstance().GetBundleInfoDefault(
-        bundleName, FormUtil::GetCurrentAccountId(), bundleInfo)) {
+        bundleName, userId, bundleInfo)) {
         HILOG_ERROR("get bundleInfo failed");
         return false;
     }

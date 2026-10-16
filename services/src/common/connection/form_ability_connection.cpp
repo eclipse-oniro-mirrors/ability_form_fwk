@@ -28,7 +28,6 @@
 #include "data_center/form_info/form_info_mgr.h"
 #include "form_provider/form_supply_callback.h"
 #include "common/timer_mgr/form_timer_mgr.h"
-#include "common/util/form_util.h"
 #include "iremote_proxy.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -95,15 +94,15 @@ void FormAbilityConnection::ProcessFreeInstall(const AppExecFwk::ElementName &el
         return;
     }
 
-    std::vector<FormInfo> targetForms;
-    if (FormInfoMgr::GetInstance().GetFormsInfoByBundle(bundleName_, targetForms) != ERR_OK) {
-        HILOG_ERROR("fail get forms info for %{public}s", bundleName_.c_str());
-        return;
-    }
-
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId_, formRecord)) {
         HILOG_ERROR("not exist such form:%{public}" PRId64, formId_);
+        return;
+    }
+
+    std::vector<FormInfo> targetForms;
+    if (FormInfoMgr::GetInstance().GetFormsInfoByBundle(bundleName_, targetForms, formRecord.userId) != ERR_OK) {
+        HILOG_ERROR("fail get forms info for %{public}s", bundleName_.c_str());
         return;
     }
 
@@ -173,9 +172,13 @@ bool FormAbilityConnection::onFormAppConnect()
         return false;
     }
 
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId_, formRecord)) {
+        HILOG_ERROR("not exist such form:%{public}" PRId64, formId_);
+        return false;
+    }
     std::vector<AppExecFwk::RunningProcessInfo> infos;
-    int32_t userId = FormUtil::GetCurrentAccountId();
-    int32_t ret = appMgr->GetRunningProcessInformation(bundleName, userId, infos);
+    int32_t ret = appMgr->GetRunningProcessInformation(bundleName, formRecord.providerUserId, infos);
     if (ret != ERR_OK) {
         HILOG_ERROR("Get running process info failed");
         return false;

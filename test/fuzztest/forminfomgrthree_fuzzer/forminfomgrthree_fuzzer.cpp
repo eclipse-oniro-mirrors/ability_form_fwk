@@ -87,12 +87,13 @@ void TestGetFormsInfoByFilter(FuzzedDataProvider *fdp)
 {
     FormInfoMgr formInfoMgr;
     formInfoMgr.Start();
-    
+
     FormInfoFilter filter;
     CreateFormInfoFilter(fdp, filter);
-    
+
+    int32_t userId = fdp->ConsumeIntegral<int32_t>();
     std::vector<FormInfo> formInfos;
-    formInfoMgr.GetFormsInfoByFilter(filter, formInfos);
+    formInfoMgr.GetFormsInfoByFilter(filter, formInfos, userId);
 }
 
 void TestGetFormsInfoByBundle(FuzzedDataProvider *fdp)
@@ -186,17 +187,18 @@ void TestGetFormsInfoByFilterEdgeCases(FuzzedDataProvider *fdp)
 {
     FormInfoMgr formInfoMgr;
     formInfoMgr.Start();
-    
+
     FormInfoFilter filter;
     filter.bundleName = "";
     filter.moduleName = "";
-    
+
+    int32_t userId = fdp->ConsumeIntegral<int32_t>();
     std::vector<FormInfo> formInfos;
-    formInfoMgr.GetFormsInfoByFilter(filter, formInfos);
-    
+    formInfoMgr.GetFormsInfoByFilter(filter, formInfos, userId);
+
     filter.bundleName = "test_bundle";
     filter.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    formInfoMgr.GetFormsInfoByFilter(filter, formInfos);
+    formInfoMgr.GetFormsInfoByFilter(filter, formInfos, userId);
 }
 
 void TestGetFormsInfoByBundleEdgeCases(FuzzedDataProvider *fdp)

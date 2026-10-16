@@ -75,8 +75,9 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     
     bool isConnected = fdp->ConsumeBool();
     
-    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
-    formAbilityConnectionReporter.ReportFormAbilityConnection(emptyBundleName);
+    int32_t userId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName, userId);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(emptyBundleName, userId);
     
     formAbilityConnectionReporter.GetAppMgr();
     

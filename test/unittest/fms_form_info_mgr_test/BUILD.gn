@@ -75,7 +75,10 @@ ohos_unittest("FmsFormInfoMgrReloadTest") {
     "${form_fwk_path}/test/mock/src/mock_form_distributed_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_singleton_queue_base.cpp",
   ]
-  include_dirs = [ "${form_fwk_path}/test/mock/include" ]
+  include_dirs = [
+    "${form_fwk_path}/test/mock/include",
+    "${form_fwk_path}/test/unittest/fms_form_info_mgr_test/inner",
+  ]
   cflags = []
   ldflags = [ "-Wl,--allow-multiple-definition" ]
 

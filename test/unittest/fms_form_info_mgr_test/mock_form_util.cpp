@@ -19,17 +19,33 @@
 #include "common/util/form_util.h"
 #include "fms_log_wrapper.h"
 
+namespace {
+bool g_isSACall = true;
+bool g_verifyCallingPermission = true;
+}
+
+void MockIsSACall(bool mockRet)
+{
+    g_isSACall = mockRet;
+}
+
+void MockVerifyCallingPermission(bool mockRet)
+{
+    g_verifyCallingPermission = mockRet;
+}
+
 namespace OHOS {
 namespace AppExecFwk {
 bool FormUtil::IsSACall()
 {
-    return true;
+    GTEST_LOG_(INFO) << "IsSACall called " << g_isSACall;
+    return g_isSACall;
 }
 
 bool FormUtil::VerifyCallingPermission(std::string_view permissionName)
 {
-    (void)permissionName;
-    return true;
+    GTEST_LOG_(INFO) << "VerifyCallingPermission called " << g_verifyCallingPermission;
+    return g_verifyCallingPermission;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

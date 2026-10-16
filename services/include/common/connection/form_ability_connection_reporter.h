@@ -45,9 +45,10 @@ public:
 
     /**
      * @brief Report form ability connection info to rss.
-     * @param connection Form ability connection pointer.
+     * @param bundleName The bundle name of the connected provider.
+     * @param userId The user id the connected provider runs under.
      */
-    void ReportFormAbilityConnection(const std::string &bundleName);
+    void ReportFormAbilityConnection(const std::string &bundleName, int32_t userId);
 
     /**
      * @brief Report form ability disconnection info to rss.
