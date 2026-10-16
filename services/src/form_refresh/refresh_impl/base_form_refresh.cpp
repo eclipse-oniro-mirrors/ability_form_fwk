@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -110,7 +110,7 @@ int BaseFormRefresh::DoControlCheck(RefreshData &data)
     // 4. Screen off check
     if (flags & CONTROL_CHECK_SCREEN_OFF) {
         if (RefreshControlMgr::GetInstance().IsScreenOff(data.record)) {
-            RefreshCacheMgr::GetInstance().AddFlagByScreenOff(data.formId, data.want, data.record);
+            RefreshCacheMgr::GetInstance().AddFlagByScreenOff(data.formId, data.want);
             return ERR_OK;
         }
     }

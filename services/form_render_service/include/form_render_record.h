@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -278,13 +278,16 @@ private:
 
     bool ReAddIfHapPathChanged(const std::vector<FormJsInfo> &formJsInfos);
 
-    void UpdateAllFormRequest(const std::vector<FormJsInfo> &formJsInfos, bool hasRelease);
+    void UpdateAllFormRequest(const std::vector<FormJsInfo> &formJsInfos, bool hasRelease,
+        const std::vector<int64_t> &releasedFormIds);
+
+    int32_t ReAddAllReleasedForms(const std::vector<int64_t> &recoverableFormIds);
 
     void UpdateFormRequestsApiVersion(const Want &want);
 
     void UpdateFormRequestsApiVersionInner(const Want &want);
 
-    void HandleReleaseAllRendererInJsThread();
+    void HandleReleaseAllRendererInJsThread(std::vector<int64_t> &releasedFormIds);
 
     void UpdateGroupRequestsWhenRecover(const int64_t &formId, const FormJsInfo &formJsInfo,
         const std::vector<std::string> &orderedCompIds, const std::string &currentCompId,

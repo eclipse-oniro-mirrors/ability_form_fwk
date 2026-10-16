@@ -147,11 +147,10 @@ void RefreshCacheMgr::ConsumeInvisibleFlag(const std::vector<FormRecord> &visibl
     }
 }
 
-void RefreshCacheMgr::AddFlagByScreenOff(const int64_t formId, const Want &want, FormRecord &record)
+void RefreshCacheMgr::AddFlagByScreenOff(const int64_t formId, const Want &want)
 {
     HILOG_WARN("add screen off formId:%{public}" PRId64, formId);
-    FormDataMgr::GetInstance().UpdateRefreshWant(formId, want, record);
-    FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
+    FormDataMgr::GetInstance().MergeRefreshWant(formId, want);
     FormDataMgr::GetInstance().SetHostRefresh(formId, true);
     FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
 }

@@ -43,6 +43,17 @@ constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t FORM_ID = 1;
 constexpr char FORM_RENDERER_COMP_ID[] = "ohos.extra.param.key.form_comp_id";
+
+// Test helper: populate a form request into formRequests_.
+void PopulateFormRequest(const std::shared_ptr<FormRenderRecord> &renderRecord, int64_t formId,
+    const std::string &compId, bool hasRelease = false)
+{
+    FormRequest request;
+    request.compId = compId;
+    request.hasRelease = hasRelease;
+    request.isDynamic = false;
+    renderRecord->formRequests_[formId].emplace(compId, request);
+}
 }
 #define private public
 class FormRenderRecordMock : public FormRenderRecord {
@@ -1656,32 +1667,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_089, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormRenderRecordTest_090
- * @tc.desc: Verify RecoverRenderer
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_090, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_090 start";
-
-    ASSERT_NE(formRenderRecordPtr_, nullptr);
-    formRenderRecordPtr_->formRendererGroupMap_.clear();
-
-    FormJsInfo formJsInfo;
-    formJsInfo.bundleName = "bundleName";
-    formJsInfo.moduleName = "moduleName";
-    Ace::FormRequest formRequest;
-    formRequest.formJsInfo = formJsInfo;
-    std::vector<Ace::FormRequest> requests;
-    requests.emplace_back(formRequest);
-    size_t requestIndex = 0;
-    formRenderRecordPtr_->contextsMapForModuleName_.emplace(formJsInfo.bundleName + ":" + formJsInfo.moduleName,
-        nullptr);
-    formRenderRecordPtr_->RecoverRenderer(requests, requestIndex);
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_090 end";
-}
-
-/**
  * @tc.name: FormRenderRecordTest_091
  * @tc.desc: Test HandleSetVisibleChange
  * @tc.type: FUNC
@@ -2322,23 +2307,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_130, TestSize.Level1)
     formRenderRecordPtr_->eventHandler_ = nullptr;
     formRenderRecordPtr_->ReAddIfHapPathChanged(formJsInfos);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_130 end";
-}
-
-/**
- * @tc.name: FormRenderRecordTest_131
- * @tc.desc: Verify UpdateAllFormRequest
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_131, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_131 start";
-    bool hasRelease = true;
-    FormJsInfo formJsInfo1;
-    FormJsInfo formJsInfo2;
-    FormJsInfo formJsInfo3;
-    std::vector<FormJsInfo> formJsInfos = {formJsInfo1, formJsInfo2, formJsInfo3};
-    formRenderRecordPtr_->UpdateAllFormRequest(formJsInfos, hasRelease);
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_131 end";
 }
 
 /**
@@ -3938,8 +3906,10 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleReleaseAllRendererInJs
     ASSERT_NE(formRenderRecordPtr_, nullptr);
 
     formRenderRecordPtr_->formRendererGroupMap_.clear();
-    formRenderRecordPtr_->HandleReleaseAllRendererInJsThread();
+    std::vector<int64_t> releasedFormIds;
+    formRenderRecordPtr_->HandleReleaseAllRendererInJsThread(releasedFormIds);
     EXPECT_EQ(formRenderRecordPtr_->formRendererGroupMap_.size(), 0);
+    EXPECT_TRUE(releasedFormIds.empty());
 
     GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleReleaseAllRendererInJsThread_001 end";
 }
@@ -3957,7 +3927,9 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleReleaseAllRendererInJs
     int64_t formId = 100;
     formRenderRecordPtr_->formRendererGroupMap_.clear();
     formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, nullptr);
-    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->HandleReleaseAllRendererInJsThread());
+    std::vector<int64_t> releasedFormIds;
+    EXPECT_NO_FATAL_FAILURE(formRenderRecordPtr_->HandleReleaseAllRendererInJsThread(releasedFormIds));
+    EXPECT_TRUE(releasedFormIds.empty());
 
     GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleReleaseAllRendererInJsThread_002 end";
 }
@@ -3980,8 +3952,11 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleReleaseAllRendererInJs
     auto group = std::make_shared<FormRendererGroup>(context, runtime, handler);
     ASSERT_NE(group, nullptr);
     formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, group);
-    formRenderRecordPtr_->HandleReleaseAllRendererInJsThread();
+    std::vector<int64_t> releasedFormIds;
+    formRenderRecordPtr_->HandleReleaseAllRendererInJsThread(releasedFormIds);
     EXPECT_EQ(formRenderRecordPtr_->formRendererGroupMap_.size(), 0);
+    EXPECT_EQ(releasedFormIds.size(), 1u);
+    EXPECT_EQ(releasedFormIds[0], formId);
 
     GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleReleaseAllRendererInJsThread_003 end";
 }
@@ -4483,6 +4458,130 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_HandleOnUnlock_002, TestSize
 
     formRenderRecordPtr_->formRendererGroupMap_.clear();
     GTEST_LOG_(INFO) << "FormRenderRecordTest_HandleOnUnlock_002 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_UpdateAllFormRequest_001
+ * @tc.desc: Verify isDynamic/formJsInfo sync to all compId requests while hasRelease marks only the
+ *           current request of a released form; a form outside the release set is not marked.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_UpdateAllFormRequest_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateAllFormRequest_001 start";
+    std::shared_ptr<FormRenderRecord> renderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(renderRecord, nullptr);
+
+    // Form 100 is only in the update list (not released by this flow);
+    // two requests, comp2 is the current (max compId) request.
+    PopulateFormRequest(renderRecord, 100, "comp1");
+    PopulateFormRequest(renderRecord, 100, "comp2");
+    // Form 200 stays outside the update list but is released by this flow;
+    // its single request is the current one.
+    PopulateFormRequest(renderRecord, 200, "compA");
+    // Form 400 is neither listed nor released by this flow.
+    PopulateFormRequest(renderRecord, 400, "compB");
+
+    FormJsInfo jsInfo;
+    jsInfo.formId = 100;
+    jsInfo.isDynamic = true;
+    std::vector<FormJsInfo> formJsInfos = { jsInfo };
+    renderRecord->UpdateAllFormRequest(formJsInfos, true, std::vector<int64_t>{200});
+
+    // Listed form: isDynamic/formJsInfo synced to every compId request;
+    // the current request is not marked because the form was not released by this flow.
+    EXPECT_TRUE(renderRecord->formRequests_[100]["comp1"].isDynamic);
+    EXPECT_TRUE(renderRecord->formRequests_[100]["comp2"].isDynamic);
+    EXPECT_EQ(renderRecord->formRequests_[100]["comp1"].formJsInfo.formId, 100);
+    EXPECT_FALSE(renderRecord->formRequests_[100]["comp1"].hasRelease);
+    EXPECT_FALSE(renderRecord->formRequests_[100]["comp2"].hasRelease);
+    // Released form outside the update list: card info untouched, current request still marked.
+    EXPECT_FALSE(renderRecord->formRequests_[200]["compA"].isDynamic);
+    EXPECT_TRUE(renderRecord->formRequests_[200]["compA"].hasRelease);
+    // Form outside the release set: not marked.
+    EXPECT_FALSE(renderRecord->formRequests_[400]["compB"].hasRelease);
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateAllFormRequest_001 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_UpdateAllFormRequest_002
+ * @tc.desc: Verify the current request is picked by numeric value across a digit-count boundary and
+ *           within the same digit count: "9900000000"/"9999999999" vs "11000000000".
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_UpdateAllFormRequest_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateAllFormRequest_002 start";
+    std::shared_ptr<FormRenderRecord> renderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(renderRecord, nullptr);
+
+    PopulateFormRequest(renderRecord, 300, "11000000000"); // 11 digits, numerically larger (newer)
+    PopulateFormRequest(renderRecord, 300, "9900000000"); // 10 digits, lexicographically larger but older
+    PopulateFormRequest(renderRecord, 300, "9999999999"); // 10 digits, equal length falls back to lexicographic
+
+    std::vector<FormJsInfo> formJsInfos = {};
+    renderRecord->UpdateAllFormRequest(formJsInfos, true, std::vector<int64_t>{300});
+
+    EXPECT_TRUE(renderRecord->formRequests_[300]["11000000000"].hasRelease);
+    EXPECT_FALSE(renderRecord->formRequests_[300]["9900000000"].hasRelease);
+    EXPECT_FALSE(renderRecord->formRequests_[300]["9999999999"].hasRelease);
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateAllFormRequest_002 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_ReAddAllReleasedForms_001
+ * @tc.desc: Verify ReAddAllReleasedForms skips forms outside the recoverable set and forms
+ *           whose current request is not marked, and rebuilds a null handler on demand.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_ReAddAllReleasedForms_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ReAddAllReleasedForms_001 start";
+    std::shared_ptr<FormRenderRecord> renderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(renderRecord, nullptr);
+
+    // Form 500 is outside the recoverable set: skipped even though marked.
+    PopulateFormRequest(renderRecord, 500, "compOut", true);
+    // Form 600 is recoverable but its current request (c2) is not marked: skipped.
+    PopulateFormRequest(renderRecord, 600, "c1");
+    PopulateFormRequest(renderRecord, 600, "c2");
+    // Form 700 is recoverable and its current request is marked: dispatched.
+    PopulateFormRequest(renderRecord, 700, "compMarked", true);
+
+    // Null handler is rebuilt on demand (GetEventHandler(true, true)), then dispatch runs normally.
+    renderRecord->eventHandler_ = nullptr;
+    EXPECT_EQ(renderRecord->ReAddAllReleasedForms(std::vector<int64_t>{600, 700}), ERR_OK);
+    EXPECT_NE(renderRecord->eventHandler_, nullptr);
+
+    // A second call with the rebuilt handler dispatches normally.
+    EXPECT_EQ(renderRecord->ReAddAllReleasedForms(std::vector<int64_t>{600, 700}), ERR_OK);
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_ReAddAllReleasedForms_001 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_UpdateAllFormRequest_003
+ * @tc.desc: Verify equal-length pure-numeric compIds pick the lexicographically larger one as current.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_UpdateAllFormRequest_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateAllFormRequest_003 start";
+    std::shared_ptr<FormRenderRecord> renderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(renderRecord, nullptr);
+
+    PopulateFormRequest(renderRecord, 800, "9900000000"); // 10 digits
+    PopulateFormRequest(renderRecord, 800, "9999999999"); // 10 digits, lexicographically and numerically larger
+
+    std::vector<FormJsInfo> formJsInfos = {};
+    renderRecord->UpdateAllFormRequest(formJsInfos, true, std::vector<int64_t>{800});
+
+    EXPECT_TRUE(renderRecord->formRequests_[800]["9999999999"].hasRelease);
+    EXPECT_FALSE(renderRecord->formRequests_[800]["9900000000"].hasRelease);
+
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_UpdateAllFormRequest_003 end";
 }
 
 /**

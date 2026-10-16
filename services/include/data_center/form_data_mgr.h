@@ -985,12 +985,11 @@ public:
     bool GetFormCanUpdate(int64_t formId);
 
     /**
-     * @brief Update form want.
+     * @brief Merge refresh want into the cached record in place.
      * @param formId form id.
      * @param want new want.
-     * @param record form record info.
      */
-    void UpdateRefreshWant(const int64_t formId, const Want &want, FormRecord &record);
+    void MergeRefreshWant(const int64_t formId, const Want &want);
 
     /**
      * @brief Get all formRecord by userId.

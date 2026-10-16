@@ -19,7 +19,7 @@ void RefreshCacheMgr::AddFlagByHealthyControl(const int64_t formId, bool isAskFo
 void RefreshCacheMgr::ConsumeHealthyControlFlag(std::vector<FormRecord>::iterator &record, const int32_t userId) {}
 void RefreshCacheMgr::AddFlagByInvisible(const int64_t formId, const int32_t refreshType) {}
 void RefreshCacheMgr::ConsumeInvisibleFlag(const std::vector<FormRecord> &visibleFormRecords, int32_t userId) {}
-void RefreshCacheMgr::AddFlagByScreenOff(const int64_t formId, const Want &want, FormRecord &record) {}
+void RefreshCacheMgr::AddFlagByScreenOff(const int64_t formId, const Want &want) {}
 void RefreshCacheMgr::ConsumeScreenOffFlag() {}
 void RefreshCacheMgr::AddRenderTask(int64_t formId, std::function<void()> task) {}
 void RefreshCacheMgr::ConsumeRenderTask(int64_t formId) {}

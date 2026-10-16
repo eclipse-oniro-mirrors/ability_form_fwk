@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,9 +76,8 @@ public:
      * @brief Refresh task be screen off controlled, add cache flag.
      * @param formId The formId.
      * @param want The want of the form to refresh.
-     * @param record The form record.
      */
-    void AddFlagByScreenOff(const int64_t formId, const Want &want, FormRecord &record);
+    void AddFlagByScreenOff(const int64_t formId, const Want &want);
 
     /**
      * @brief Receive screen unlock, consume cache flag.

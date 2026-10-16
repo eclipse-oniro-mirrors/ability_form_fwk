@@ -3382,8 +3382,15 @@ bool FormDataMgr::GetFormCanUpdate(int64_t formId)
     return search->second;
 }
 
-void FormDataMgr::UpdateRefreshWant(const int64_t formId, const Want &want, FormRecord &record)
+void FormDataMgr::MergeRefreshWant(const int64_t formId, const Want &want)
 {
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto iter = formRecords_.find(formId);
+    if (iter == formRecords_.end()) {
+        HILOG_ERROR("form record not exist");
+        return;
+    }
+    auto &record = iter->second;
     auto it = record.refreshWantMap.find(formId);
     if (it != record.refreshWantMap.end()) {
         it->second.MergeFrom(want);
