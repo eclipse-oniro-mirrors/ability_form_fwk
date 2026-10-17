@@ -91,7 +91,7 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, GetRetryTaskType_001, TestSize.Leve
 
 /**
  * @tc.name: HandleSendRequestFailed_DeadObject_001
- * @tc.desc: Verify dead error sets sendRequestFailed and waits for disconnect (signal 1).
+ * @tc.desc: Verify dead error enters WAITING_DISCONNECT_CONFIRM and waits for disconnect.
  * @tc.type: FUNC
  * @tc.require: issueI5NQJG
  */
@@ -102,7 +102,7 @@ HWTEST_F(FmsProviderRefreshErrorHandlerTest, HandleSendRequestFailed_DeadObject_
     EXPECT_TRUE(handler_->HandleSendRequestFailed(FORM_ID, IPC_ERR_DEAD_OBJECT, want));
     auto it = handler_->retryPolicyMap_.find(FORM_ID);
     ASSERT_NE(it, handler_->retryPolicyMap_.end());
-    EXPECT_TRUE(it->second.IsSendRequestFailed());
+    EXPECT_EQ(it->second.GetStage(), RequestStage::WAITING_DISCONNECT_CONFIRM);
     GTEST_LOG_(INFO) << "HandleSendRequestFailed_DeadObject_001 end";
 }
 

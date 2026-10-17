@@ -59,8 +59,8 @@ HWTEST_F(FmsRetryPolicyTest, Constructor_DefaultAndCustom_001, TestSize.Level1)
     // Default constructor
     RetryPolicy defaultPolicy;
     EXPECT_EQ(defaultPolicy.GetRetryCount(), 0);
-    EXPECT_FALSE(defaultPolicy.IsSendRequestFailed());
-    EXPECT_FALSE(defaultPolicy.IsDisconnectFailed());
+    EXPECT_EQ(defaultPolicy.GetStage(), RequestStage::IDLE);
+    EXPECT_EQ(defaultPolicy.GetCallbackConnectId(), 0);
 
     // Custom constructor
     RetryPolicyConfig customCfg;
@@ -70,52 +70,10 @@ HWTEST_F(FmsRetryPolicyTest, Constructor_DefaultAndCustom_001, TestSize.Level1)
     customCfg.maxDelayMs = 2000;
     RetryPolicy customPolicy(customCfg);
     EXPECT_EQ(customPolicy.GetRetryCount(), 0);
-    EXPECT_FALSE(customPolicy.IsSendRequestFailed());
-    EXPECT_FALSE(customPolicy.IsDisconnectFailed());
+    EXPECT_EQ(customPolicy.GetStage(), RequestStage::IDLE);
+    EXPECT_EQ(customPolicy.GetCallbackConnectId(), 0);
 
     GTEST_LOG_(INFO) << "Constructor_DefaultAndCustom_001 end";
-}
-
-/**
- * @tc.name: NeedRetry_AllBranches_001
- * @tc.desc: Verify NeedRetry covers all logical branches:
- *           true when both signals true + count < max;
- *           false when sendRequestFailed=false, disconnectFailed=false, count >= max.
- * @tc.type: FUNC
- * @tc.require: issueI5T4GJ
- */
-HWTEST_F(FmsRetryPolicyTest, NeedRetry_AllBranches_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "NeedRetry_AllBranches_001 start";
-
-    RetryPolicy policy;
-
-    // Branch: both signals true + count < max → true
-    policy.SetSendRequestFailed(true);
-    policy.SetDisconnectFailed(true);
-    EXPECT_TRUE(policy.NeedRetry());
-
-    // Branch: sendRequestFailed=false → false
-    policy.SetSendRequestFailed(false);
-    EXPECT_FALSE(policy.NeedRetry());
-
-    // Branch: disconnectFailed=false → false
-    policy.SetSendRequestFailed(true);
-    policy.SetDisconnectFailed(false);
-    EXPECT_FALSE(policy.NeedRetry());
-
-    // Branch: both signals true but count >= max → false
-    policy.SetDisconnectFailed(true);
-    policy.retryCount_ = 3; // >= default maxRetryCount=3
-    EXPECT_FALSE(policy.NeedRetry());
-
-    // Branch: all false → false
-    policy.SetSendRequestFailed(false);
-    policy.SetDisconnectFailed(false);
-    policy.retryCount_ = 0;
-    EXPECT_FALSE(policy.NeedRetry());
-
-    GTEST_LOG_(INFO) << "NeedRetry_AllBranches_001 end";
 }
 
 /**
@@ -151,7 +109,7 @@ HWTEST_F(FmsRetryPolicyTest, IsRetryLimitReached_001, TestSize.Level1)
 /**
  * @tc.name: IncrementRetryCount_AndReset_001
  * @tc.desc: Verify IncrementRetryCount increments sequentially from 0→3,
- *           and Reset clears count and both signal flags.
+ *           and Reset clears count, stage and connectId.
  * @tc.type: FUNC
  * @tc.require: issueI5T4GJ
  */
@@ -170,13 +128,13 @@ HWTEST_F(FmsRetryPolicyTest, IncrementRetryCount_AndReset_001, TestSize.Level1)
     policy.IncrementRetryCount();
     EXPECT_EQ(policy.GetRetryCount(), 3);
 
-    // Set signals then Reset
-    policy.SetSendRequestFailed(true);
-    policy.SetDisconnectFailed(true);
+    // Set non-idle state then Reset
+    policy.SetStage(RequestStage::WAITING_CALLBACK);
+    policy.SetCallbackConnectId(200);
     policy.Reset();
     EXPECT_EQ(policy.GetRetryCount(), 0);
-    EXPECT_FALSE(policy.IsSendRequestFailed());
-    EXPECT_FALSE(policy.IsDisconnectFailed());
+    EXPECT_EQ(policy.GetStage(), RequestStage::IDLE);
+    EXPECT_EQ(policy.GetCallbackConnectId(), 0);
 
     GTEST_LOG_(INFO) << "IncrementRetryCount_AndReset_001 end";
 }
@@ -285,51 +243,43 @@ HWTEST_F(FmsRetryPolicyTest, CalculateNextDelay_Exponential_001, TestSize.Level1
 }
 
 /**
- * @tc.name: SignalFlags_SetGet_001
- * @tc.desc: Verify sendRequestFailed and disconnectFailed setter/getter pairs,
- *           including individual and simultaneous setting.
+ * @tc.name: Stage_SetGet_001
+ * @tc.desc: Verify stage and callbackConnectId setter/getter pairs, covering
+ *           transitions between all RequestStage values.
  * @tc.type: FUNC
  * @tc.require: issueI5T4GJ
  */
-HWTEST_F(FmsRetryPolicyTest, SignalFlags_SetGet_001, TestSize.Level1)
+HWTEST_F(FmsRetryPolicyTest, Stage_SetGet_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "SignalFlags_SetGet_001 start";
+    GTEST_LOG_(INFO) << "Stage_SetGet_001 start";
 
     RetryPolicy policy;
 
-    // Both default to false
-    EXPECT_FALSE(policy.IsSendRequestFailed());
-    EXPECT_FALSE(policy.IsDisconnectFailed());
+    // Default: IDLE, no match
+    EXPECT_EQ(policy.GetStage(), RequestStage::IDLE);
+    EXPECT_EQ(policy.GetCallbackConnectId(), 0);
 
-    // Set send true
-    policy.SetSendRequestFailed(true);
-    EXPECT_TRUE(policy.IsSendRequestFailed());
-    EXPECT_FALSE(policy.IsDisconnectFailed());
+    // Registration: WAITING_CALLBACK + connectId match
+    policy.SetStage(RequestStage::WAITING_CALLBACK);
+    policy.SetCallbackConnectId(200);
+    EXPECT_EQ(policy.GetStage(), RequestStage::WAITING_CALLBACK);
+    EXPECT_EQ(policy.GetCallbackConnectId(), 200);
 
-    // Set disconnect true
-    policy.SetDisconnectFailed(true);
-    EXPECT_TRUE(policy.IsSendRequestFailed());
-    EXPECT_TRUE(policy.IsDisconnectFailed());
+    // Terminal: CALLBACK_COMPLETED (match cleared by 0)
+    policy.SetStage(RequestStage::CALLBACK_COMPLETED);
+    policy.SetCallbackConnectId(0);
+    EXPECT_EQ(policy.GetStage(), RequestStage::CALLBACK_COMPLETED);
+    EXPECT_EQ(policy.GetCallbackConnectId(), 0);
 
-    // Toggle both back to false
-    policy.SetSendRequestFailed(false);
-    policy.SetDisconnectFailed(false);
-    EXPECT_FALSE(policy.IsSendRequestFailed());
-    EXPECT_FALSE(policy.IsDisconnectFailed());
+    // Death-confirmation stages
+    policy.SetStage(RequestStage::WAITING_DISCONNECT_CONFIRM);
+    EXPECT_EQ(policy.GetStage(), RequestStage::WAITING_DISCONNECT_CONFIRM);
+    policy.SetStage(RequestStage::WAITING_SEND_RESULT);
+    EXPECT_EQ(policy.GetStage(), RequestStage::WAITING_SEND_RESULT);
+    policy.SetStage(RequestStage::IDLE);
+    EXPECT_EQ(policy.GetStage(), RequestStage::IDLE);
 
-    // Mixed: send=true, disconnect=false
-    policy.SetSendRequestFailed(true);
-    policy.SetDisconnectFailed(false);
-    EXPECT_TRUE(policy.IsSendRequestFailed());
-    EXPECT_FALSE(policy.IsDisconnectFailed());
-
-    // Mixed: send=false, disconnect=true
-    policy.SetSendRequestFailed(false);
-    policy.SetDisconnectFailed(true);
-    EXPECT_FALSE(policy.IsSendRequestFailed());
-    EXPECT_TRUE(policy.IsDisconnectFailed());
-
-    GTEST_LOG_(INFO) << "SignalFlags_SetGet_001 end";
+    GTEST_LOG_(INFO) << "Stage_SetGet_001 end";
 }
 
 class FmsProviderErrorHandlerFactoryTest : public testing::Test {
@@ -356,13 +306,14 @@ HWTEST_F(FmsProviderErrorHandlerFactoryTest, GetRefreshHandler_Singleton_001, Te
 {
     GTEST_LOG_(INFO) << "GetRefreshHandler_Singleton_001 start";
 
-    auto &handler1 = FormProviderErrorHandlerFactory::GetRefreshHandler();
-    auto &handler2 = FormProviderErrorHandlerFactory::GetRefreshHandler();
-    auto &handler3 = FormProviderErrorHandlerFactory::GetRefreshHandler();
+    // Factory returns sptr by value (refcounted copy); singleton = same underlying instance.
+    auto handler1 = FormProviderErrorHandlerFactory::GetRefreshHandler();
+    auto handler2 = FormProviderErrorHandlerFactory::GetRefreshHandler();
+    auto handler3 = FormProviderErrorHandlerFactory::GetRefreshHandler();
 
-    EXPECT_EQ(&handler1, &handler2);
-    EXPECT_EQ(&handler2, &handler3);
-    EXPECT_NE(&handler1, nullptr);
+    EXPECT_EQ(handler1.GetRefPtr(), handler2.GetRefPtr());
+    EXPECT_EQ(handler2.GetRefPtr(), handler3.GetRefPtr());
+    EXPECT_NE(handler1.GetRefPtr(), nullptr);
 
     GTEST_LOG_(INFO) << "GetRefreshHandler_Singleton_001 end";
 }

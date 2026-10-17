@@ -161,8 +161,7 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, EnsureRetryPolicyLocked_NewFormI
 
     // Verify initial state
     EXPECT_EQ(policy.GetRetryCount(), RETRY_COUNT_ZERO);
-    EXPECT_FALSE(policy.sendRequestFailed_);
-    EXPECT_FALSE(policy.disconnectFailed_);
+    EXPECT_EQ(policy.GetStage(), RequestStage::IDLE);
 
     GTEST_LOG_(INFO) << "EnsureRetryPolicyLocked_NewFormId_001 end";
 }
@@ -170,7 +169,7 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, EnsureRetryPolicyLocked_NewFormI
 /**
  * @tc.name: EnsureRetryPolicyLocked_ExistingFormId_002
  * @tc.desc: Verify EnsureRetryPolicyLocked returns same reference when formId already exists in map,
- *           preserving modified state (sendRequestFailed=true, retryCount=1).
+ *           preserving modified state (stage=WAITING_DISCONNECT_CONFIRM, retryCount=1).
  * @tc.type: FUNC
  * @tc.require: issueI5T4GJ
  */
@@ -180,7 +179,7 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, EnsureRetryPolicyLocked_Existing
 
     std::lock_guard<std::mutex> lock(handler_->retryPolicyMutex_);
     RetryPolicy &policy1 = handler_->EnsureRetryPolicyLocked(FORM_ID);
-    policy1.sendRequestFailed_ = true;
+    policy1.SetStage(RequestStage::WAITING_DISCONNECT_CONFIRM);
     policy1.retryCount_ = 1;
 
     VerifyMapSize(1);
@@ -190,7 +189,7 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, EnsureRetryPolicyLocked_Existing
     // Verify same reference returned
     VerifyMapSize(1);
     EXPECT_EQ(&policy1, &policy2);
-    EXPECT_TRUE(policy2.sendRequestFailed_);
+    EXPECT_EQ(policy2.GetStage(), RequestStage::WAITING_DISCONNECT_CONFIRM);
     EXPECT_EQ(policy2.GetRetryCount(), 1);
 
     GTEST_LOG_(INFO) << "EnsureRetryPolicyLocked_ExistingFormId_002 end";
@@ -274,9 +273,8 @@ HWTEST_F(FmsProviderConnectionErrorHandlerTest, GetDefaultRetryPolicy_AllFields_
     // Verify retry count
     EXPECT_EQ(policy.GetRetryCount(), RETRY_COUNT_ZERO);
 
-    // Verify signals
-    EXPECT_FALSE(policy.sendRequestFailed_);
-    EXPECT_FALSE(policy.disconnectFailed_);
+    // Verify stage
+    EXPECT_EQ(policy.GetStage(), RequestStage::IDLE);
 
     GTEST_LOG_(INFO) << "GetDefaultRetryPolicy_AllFields_001 end";
 }

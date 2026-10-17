@@ -117,6 +117,7 @@ group("unittest") {
     "unittest/fms_provider_connection_error_handler_test:unittest",
     "unittest/fms_provider_refresh_error_handler_test:unittest",
     "unittest/fms_refresh_cache_mgr_test:unittest",
+    "unittest/fms_retry_policy_test:unittest",
     "unittest/fms_running_form_info_test:unittest",
     "unittest/fms_stagger_strategy_test:unittest",
     "unittest/form_basic_info_mgr_test:unittest",
