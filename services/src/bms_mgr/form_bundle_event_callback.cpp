@@ -27,6 +27,8 @@ namespace {
 constexpr const char *BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO_CHANGED";
 constexpr const char *KEY_USER_ID = "userId";
 constexpr const char *KEY_APP_INDEX = "appIndex";
+constexpr int32_t BMS_EVENT_UNINSTALL_STATE = 15;
+constexpr const char *EVENT_INFO_TYPE = "type";
 } // namespace
 
 FormBundleEventCallback::FormBundleEventCallback()
@@ -64,6 +66,10 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         HILOG_WARN("package changed, bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
         HandleBundleChange(bundleName, userId, false);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
+        if (want.GetIntParam(EVENT_INFO_TYPE, 0) == BMS_EVENT_UNINSTALL_STATE) {
+            HILOG_WARN("package changed, type is UNINSTALL_STATE");
+            return;
+        }
         // uninstall module/bundle
         int appIndex = want.GetIntParam(KEY_APP_INDEX, Constants::MAIN_APP_INDEX);
         HILOG_WARN("package removed, bundleName:%{public}s, userId:%{public}d, appIndex:%{public}d",
