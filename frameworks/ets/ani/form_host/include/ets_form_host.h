@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -102,6 +102,11 @@ public:
 
     void RegisterGetFormRectListener(ani_vm *ani_vm, ani_object callback);
 
+    // Callers must be system apps (checked at the native entry before calling).
+    bool RemoveGetFormRectListener(ani_env *env, ani_object callback);
+
+    bool HasGetFormRectListener();
+
     void UnregisterGetFormRectListener();
 
     void RegisterGetLiveFormStatusListener(ani_vm *ani_vm, ani_object callback);
@@ -139,7 +144,11 @@ private:
     mutable std::mutex aniVmMutex_;
     ani_vm* ani_vm_ = nullptr;
     ani_ref changeSceneAnimationStateRigisterCallback_ = nullptr;
-    ani_ref getFormRectCallbackRef_ = nullptr;
+    // (wrapperId, wrapper global ref), registration order
+    std::vector<std::pair<int64_t, ani_ref>> getFormRectCallbackRefs_;
+    bool getFormRectDispatchActive_ = false;
+    // Refs removed during dispatch; deleted after it ends to keep the snapshot valid.
+    std::vector<std::pair<int64_t, ani_ref>> getFormRectPendingDeleteRefs_;
     ani_ref getLiveFormStatusCallbackRef_ = nullptr;
     mutable std::mutex registerGetLiveFormStatusMutex_;
     DISALLOW_COPY_AND_MOVE(EtsFormRouterProxyMgr);
@@ -151,6 +160,9 @@ private:
     void ChangeSceneAnimationStateInner(std::shared_ptr<LiveFormInterfaceParam> dataParam);
     ErrCode GetFormRect(const int64_t formId, AppExecFwk::Rect &rect);
     void GetFormRectInner(LiveFormInterfaceParam *dataParam);
+    void EndGetFormRectDispatch(ani_env *env);
+    ani_long GetWrapperId(ani_env *env, ani_object callback);
+    bool ReplaceGetFormRectCallbackRef(ani_env *env, std::pair<int64_t, ani_ref> &entry, ani_object callback);
     ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
     void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
     ani_env* GetAniEnv();

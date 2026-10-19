@@ -48,6 +48,9 @@ export class CallbackWrapper<T> {
 export default namespace formHost {
 
   let callbackArray: CallbackWrapper<string>[] = [];
+  let getFormRectCallbackArray: Array<formInfo.GetFormRectInfoCallback> = [];
+  let getFormRectWrapperArray: Array<GetFormRectInfoCallbackWrapper> = [];
+  let nextGetFormRectWrapperId: long = 1;
 
   loadLibrary("formHost_ani.z");
 
@@ -98,7 +101,8 @@ export default namespace formHost {
   export native function nativeOnChangeSceneAnimationState(callback: CallbackWrapper<formInfo.ChangeSceneAnimationStateRequest>): void;
   export native function nativeOffChangeSceneAnimationState(callback?: CallbackWrapper<formInfo.ChangeSceneAnimationStateRequest>): void;
   export native function nativeOnGetFormRect(callback: GetFormRectInfoCallbackWrapper): void;
-  export native function nativeOffGetFormRect(callback?: GetFormRectInfoCallbackWrapper): void;
+  export native function nativeOffGetFormRect(callback: GetFormRectInfoCallbackWrapper): void;
+  export native function nativeOffGetFormRectAll(): void;
   export native function nativeOnGetLiveFormStatus(callback: GetLiveFormStatusCallbackWrapper): void;
   export native function nativeOffGetLiveFormStatus(callback?: GetLiveFormStatusCallbackWrapper): void;
   export native function nativeOnTemplateFormDetailInfoChange(callback: TemplateFormDetailInfoChangeCallbackWrapper): void;
@@ -1115,17 +1119,45 @@ export default namespace formHost {
     formHost.nativeOffChangeSceneAnimationState(myCall);
   }
 
+  function findGetFormRectCallbackIndex(callback: formInfo.GetFormRectInfoCallback): int {
+    let idx = getFormRectCallbackArray.indexOf(callback);
+    return idx >= 0 ? idx : INVALID_CALLBACK_INDEX;
+  }
+
   function onGetFormRect(callback: formInfo.GetFormRectInfoCallback): void {
-    let myCall = new GetFormRectInfoCallbackWrapper(callback);
-    formHost.nativeOnGetFormRect(myCall);
+    if (findGetFormRectCallbackIndex(callback) != INVALID_CALLBACK_INDEX) {
+      return; // already registered, idempotent
+    }
+    let wrapper = new GetFormRectInfoCallbackWrapper(callback, nextGetFormRectWrapperId);
+    getFormRectCallbackArray.push(callback);
+    getFormRectWrapperArray.push(wrapper);
+    try {
+      formHost.nativeOnGetFormRect(wrapper);
+      nextGetFormRectWrapperId++;
+    } catch (e) {
+      // roll back cache so a failed register does not poison later off()/on()
+      getFormRectCallbackArray.pop();
+      getFormRectWrapperArray.pop();
+      throw e;
+    }
   }
 
   function offGetFormRect(callback?: formInfo.GetFormRectInfoCallback): void {
-    let myCall: GetFormRectInfoCallbackWrapper | undefined = undefined;
     if (callback) {
-      myCall = new GetFormRectInfoCallbackWrapper(callback);
+      let index = findGetFormRectCallbackIndex(callback);
+      if (index == INVALID_CALLBACK_INDEX) {
+        return; // never registered: silent no-op per d.ts convention
+      }
+      // native first: if it throws, the caches stay in sync with native state
+      let wrapper = getFormRectWrapperArray[index];
+      formHost.nativeOffGetFormRect(wrapper);
+      getFormRectCallbackArray.splice(index, 1);
+      getFormRectWrapperArray.splice(index, 1);
+      return;
     }
-    formHost.nativeOffGetFormRect(myCall);
+    formHost.nativeOffGetFormRectAll();
+    getFormRectCallbackArray = [];
+    getFormRectWrapperArray = [];
   }
 
   function onGetLiveFormStatus(callback: formInfo.GetLiveFormStatusCallback): void {
@@ -1199,6 +1231,7 @@ export default namespace formHost {
 
   class GetFormRectInfoCallbackWrapper {
     private liveFormInterfaceParam: long;
+    private wrapperId: long = 0;
 
     native nativePromiseCallback(realRect: formInfo.Rect): void;
 
@@ -1220,8 +1253,9 @@ export default namespace formHost {
       });
     }
 
-    constructor(myFun: formInfo.GetFormRectInfoCallback) {
+    constructor(myFun: formInfo.GetFormRectInfoCallback, wrapperId: long) {
       this.formRectCallback = myFun;
+      this.wrapperId = wrapperId;
     }
 
     invoke(formId: string): Promise<formInfo.Rect> {
