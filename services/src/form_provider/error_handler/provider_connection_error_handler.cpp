@@ -316,6 +316,9 @@ void FormProviderConnectionErrorHandler::ScheduleRetryWithReset(int64_t formId, 
         });
 }
 
+// Invariant: use only FormAbilityConnection base-class interfaces here. The original
+// connection may be a refresh connection carrying a RECREATE task routed to this
+// handler, so subclass-specific members must not be accessed.
 void FormProviderConnectionErrorHandler::ExecuteRetry(
     int64_t formId, const sptr<FormAbilityConnection> &originalConnection)
 {

@@ -81,10 +81,19 @@ void FormRefreshConnection::OnAbilityDisconnectDone(
 
     // Handle disconnect error BEFORE base cleanup: HandleDisconnectError re-reads GetConnectState()
     // and expects CONNECTED; the base call resets it to DISCONNECTED.
-    if (resultCode == DISCONNECT_ERROR && state == ConnectState::CONNECTED) {
+    // One-shot message events never register a retry policy, so exclude them
+    // to avoid a useless 5s signal timeout.
+    bool isMessageEvent = want_.HasParameter(Constants::PARAM_MESSAGE_KEY);
+    if (resultCode == DISCONNECT_ERROR && state == ConnectState::CONNECTED && !isMessageEvent) {
         sptr<FormAbilityConnection> connection = this;
-        FormProviderErrorHandlerFactory::GetRefreshHandler()
-            ->HandleDisconnectError(GetFormId(), connection);
+        // RECREATE tasks are acquire tasks: their retry policy lives in the acquire handler.
+        if (want_.HasParameter(Constants::RECREATE_FORM_KEY)) {
+            FormProviderErrorHandlerFactory::GetAcquireHandler()
+                ->HandleDisconnectError(GetFormId(), connection);
+        } else {
+            FormProviderErrorHandlerFactory::GetRefreshHandler()
+                ->HandleDisconnectError(GetFormId(), connection);
+        }
     }
 
     FormAbilityConnection::OnAbilityDisconnectDone(element, resultCode);

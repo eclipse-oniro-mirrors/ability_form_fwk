@@ -43,6 +43,7 @@
 #include "feature/free_install/free_install_status_callback_stub.h"
 #include "mock_form_provider_task_mgr.h"
 #include "mock_form_provider_refresh_error_handler.h"
+#include "mock_form_provider_acquire_error_handler.h"
 #include "mock_form_supply_callback.h"
 #include "mock_form_data_mgr.h"
 #undef private
@@ -82,12 +83,14 @@ void FmsFormRefreshConnectionTest::SetUp()
 {
     MockFormProviderTaskMgr::obj = std::make_shared<MockFormProviderTaskMgr>();
     MockFormProviderRefreshErrorHandler::obj = std::make_shared<MockFormProviderRefreshErrorHandler>();
+    MockFormProviderAcquireErrorHandler::obj = std::make_shared<MockFormProviderAcquireErrorHandler>();
 }
 
 void FmsFormRefreshConnectionTest::TearDown()
 {
     MockFormProviderTaskMgr::obj = nullptr;
     MockFormProviderRefreshErrorHandler::obj = nullptr;
+    MockFormProviderAcquireErrorHandler::obj = nullptr;
 }
 
 sptr<FormRefreshConnection> FmsFormRefreshConnectionTest::CreateRefreshConnection(int64_t formId, Want &want)
@@ -124,6 +127,61 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_DisconnectError_0
     EXPECT_EQ(0, conn->GetConnectId());
 
     GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_DisconnectError_001 end";
+}
+
+/**
+ * @tc.name: OnAbilityDisconnectDone_DispatchRecreateToAcquire_001
+ * @tc.desc: test OnAbilityDisconnectDone with a RECREATE want: the death confirmation
+ *           must dispatch to the acquire handler (the recreate task chain registers
+ *           its retry policy there), not the refresh handler.
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_DispatchRecreateToAcquire_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_DispatchRecreateToAcquire_001 start";
+    AppExecFwk::ElementName element;
+    Want want;
+    const std::string recreateFlag = "true";
+    want.SetParam(Constants::RECREATE_FORM_KEY, recreateFlag);
+
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(1, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    conn->SetConnectState(ConnectState::CONNECTED);
+    EXPECT_CALL(*MockFormProviderAcquireErrorHandler::obj, HandleDisconnectError(1, _)).Times(1);
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _)).Times(0);
+    conn->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
+    EXPECT_EQ(0, conn->GetConnectId());
+
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_DispatchRecreateToAcquire_001 end";
+}
+
+/**
+ * @tc.name: OnAbilityDisconnectDone_MessageEvent_NoHandler_001
+ * @tc.desc: test OnAbilityDisconnectDone with a message-event want: one-shot
+ *           FireFormEvent never registers a retry policy, so the death must
+ *           not enter any error handler (avoids a dead signal timeout).
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_MessageEvent_NoHandler_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_MessageEvent_NoHandler_001 start";
+    AppExecFwk::ElementName element;
+    Want want;
+    want.SetParam(Constants::PARAM_MESSAGE_KEY, FORM_MESSAGE_EVENT_VALUE_1);
+
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(1, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    conn->SetConnectState(ConnectState::CONNECTED);
+    EXPECT_CALL(*MockFormProviderAcquireErrorHandler::obj, HandleDisconnectError(_, _)).Times(0);
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _)).Times(0);
+    conn->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
+    EXPECT_EQ(0, conn->GetConnectId());
+
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_MessageEvent_NoHandler_001 end";
 }
 
 /**
