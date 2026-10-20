@@ -17,9 +17,7 @@
 #include <vector>
 
 #include "ani.h"
-#include "ani_form_error_util.h"
 #include "fms_log_wrapper.h"
-#include "form_mgr_errors.h"
 
 namespace {
 constexpr const char *FORM_BINDING_DATA_INNER =
@@ -89,18 +87,8 @@ static ani_object CreateFormBindingDataEx(ani_env *env, ani_object paramObject)
         HILOG_ERROR("env is nullptr");
         return nullptr;
     }
-    ani_boolean isUndefined = ANI_FALSE;
-    ani_status undefinedStatus = env->Reference_IsUndefined(paramObject, &isUndefined);
-    if (undefinedStatus != ANI_OK) {
-        HILOG_ERROR("Reference_IsUndefined failed status %{public}d", static_cast<int>(undefinedStatus));
-        return nullptr;
-    }
     ani_object formBindingDataObj = CreateFormBindingData(env, paramObject);
     if (formBindingDataObj == nullptr) {
-        if (!isUndefined) {
-            EtsFormErrorUtil::ThrowByExternalErrorCode(env,
-                static_cast<int32_t>(ERR_FORM_EXTERNAL_PARAM_INVALID));
-        }
         return nullptr;
     }
     if (env->CreateLocalScope(REFERENCES_CREATE_EX) != ANI_OK) {

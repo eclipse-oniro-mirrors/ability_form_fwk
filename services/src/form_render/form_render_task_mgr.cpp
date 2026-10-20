@@ -106,13 +106,10 @@ void FormRenderTaskMgr::UpdateFormSize(const int64_t &formId, const FormSurfaceI
 
     FormProviderData formProviderData;
     FormJsInfo formJsInfo;
+    formProviderData.SetSupportMoreImages(
+        formRecord.formProviderInfo.GetFormData().IsSupportMoreImages());
     if (!formRecord.isDynamic) {
-        // Only fall back to record when no cache; otherwise MergeFormData already
-        // preserved the flag from the input formProviderData.
-        if (!FormDataMgr::GetInstance().MergeFormData(formRecord.formId, formProviderData)) {
-            formProviderData.SetSupportMoreImages(
-                formRecord.formProviderInfo.GetFormData().IsSupportMoreImages());
-        }
+        (void)FormDataMgr::GetInstance().MergeFormData(formRecord.formId, formProviderData);
         FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formProviderData, formJsInfo);
     }
 

@@ -42,7 +42,6 @@ ohos_shared_library("formBindingData_ani") {
   sources = [ "src/ets_form_binding_data.cpp" ]
 
   deps = [
-    "${form_fwk_ani_path}/utils:util_ani",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
