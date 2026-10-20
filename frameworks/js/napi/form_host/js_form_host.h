@@ -68,6 +68,10 @@ public:
 
     bool RegisterGetFormRectListener(napi_env env, napi_ref callback);
 
+    bool RemoveGetFormRectListener(napi_env env, napi_value callback);
+
+    bool HasGetFormRectListener();
+
     bool UnregisterGetFormRectListener();
 
     bool RegisterGetLiveFormStatusListener(napi_env env, napi_ref callback);
@@ -109,11 +113,16 @@ private:
         std::shared_ptr<LiveFormInterfaceParam> dataParam, napi_handle_scope scope);
     ErrCode ChangeSceneAnimationState(const int64_t formId, int32_t state);
     void ChangeSceneAnimationStateInner(std::shared_ptr<LiveFormInterfaceParam> dataParam);
-    napi_ref getFormRectCallbackRef_ = nullptr;
-    napi_env getFormRectEnv_ = nullptr;
+    std::vector<std::pair<napi_env, napi_ref>> getFormRectCallbacks_; // (env, ref), registration order
+    bool getFormRectDispatchActive_ = false;
+    // Refs removed during dispatch; deleted after it ends to keep the snapshot valid.
+    std::vector<std::pair<napi_env, napi_ref>> getFormRectPendingDeleteRefs_;
     ErrCode GetFormRect(const int64_t formId, AppExecFwk::Rect &rect);
     void GetFormRectInner(std::shared_ptr<LiveFormInterfaceParam> dataParam);
-    void CallPromise(napi_value funcResult, std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam);
+    bool InvokeGetFormRectCallback(napi_env env, napi_ref callbackRef,
+        std::shared_ptr<LiveFormInterfaceParam> dataParam);
+    void CallPromise(napi_env env, napi_value funcResult,
+        std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam);
     static napi_value PromiseCallback(napi_env env, napi_callback_info info);
     static bool ConvertFunctionResult(napi_env env, napi_value funcResult, AppExecFwk::Rect &rect);
 

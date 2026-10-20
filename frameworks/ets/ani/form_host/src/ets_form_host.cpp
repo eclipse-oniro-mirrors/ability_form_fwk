@@ -77,6 +77,7 @@ constexpr const char *CALL_PROMISE_SIGNATURE = "C{std.core.Promise}:";
 constexpr const char *FORM_HOST_FORMINFO_FORMID = "formId";
 constexpr const char *FORM_HOST_FORMINFO_STATE = "state";
 constexpr const char *FORM_HOST_FORMRECT_LIVEFORMINTERFACEPARAM = "liveFormInterfaceParam";
+constexpr const char *FORM_HOST_WRAPPER_ID = "wrapperId";
 constexpr const char *FORM_HOST_INVOKE = "invoke";
 constexpr const char *FORM_HOST_CHECKPROMISE = "checkPromise";
 constexpr const char *FORM_HOST_CALLPROMISE = "callPromise";
@@ -487,6 +488,32 @@ public:
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
         }
+        // Selective deregistration per d.ts: remove only the matching callback;
+        // unregister the fms proxy only when the last local listener is gone.
+        bool removed = EtsFormRouterProxyMgr::GetInstance()->RemoveGetFormRectListener(env, callback);
+        if (removed && !EtsFormRouterProxyMgr::GetInstance()->HasGetFormRectListener()) {
+            ErrCode result = AppExecFwk::FormMgr::GetInstance().UnregisterGetFormRectProxy();
+            if (result != ERR_OK) {
+                HILOG_ERROR("UnRegisterGetFormRectListener failed");
+                EtsFormErrorUtil::ThrowByInternalErrorCode(env, result);
+                return;
+            }
+            EtsFormRouterProxyMgr::GetInstance()->UnregisterGetFormRectListener();
+        }
+    }
+
+    static void OffRegisterGetFormRectAll(ani_env *env)
+    {
+        HILOG_INFO("OffRegisterGetFormRectAll Call");
+        if (env == nullptr) {
+            HILOG_ERROR("env is nullptr");
+            return;
+        }
+        if (!FormAniUtil::CheckCallerIsSystemApp()) {
+            HILOG_ERROR("The app not system-app,can't use system-api");
+            EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return;
+        }
         ErrCode result = AppExecFwk::FormMgr::GetInstance().UnregisterGetFormRectProxy();
         if (result != ERR_OK) {
             HILOG_ERROR("UnRegisterGetFormRectListener failed");
@@ -588,6 +615,10 @@ void EtsFormHostInit(ani_env *env)
         ani_native_function {
             "nativeOffGetFormRect", nullptr,
             reinterpret_cast<void *>(EtsFormHost::OffRegisterGetFormRectListener)
+        },
+        ani_native_function {
+            "nativeOffGetFormRectAll", nullptr,
+            reinterpret_cast<void *>(EtsFormHost::OffRegisterGetFormRectAll)
         },
         ani_native_function {
             "nativeOnGetLiveFormStatus", nullptr,
@@ -825,73 +856,103 @@ void EtsFormRouterProxyMgr::GetFormRectInner(LiveFormInterfaceParam *dataParam)
 {
     HILOG_INFO("call");
     ani_env *env = nullptr;
-    ani_ref callbackRef = nullptr;
     ani_status status = ANI_ERROR;
+    std::vector<std::pair<int64_t, ani_ref>> callbackRefs;
     {
         std::lock_guard<std::mutex> lock(registerGetFormRectProxyMutex_);
+        // GetAniEnv reads ani_vm_ without aniVmMutex_, so it must stay under this mutex
         env = GetAniEnv();
         if (env == nullptr) {
             HILOG_ERROR("null env");
             return;
         }
-        if (getFormRectCallbackRef_ == nullptr) {
-            HILOG_ERROR("callback is null");
-            return;
-        }
-        if ((status = env->GlobalReference_Create(getFormRectCallbackRef_, &callbackRef)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Create status: %{public}d", status);
-            return;
+        callbackRefs = getFormRectCallbackRefs_; // snapshot; mutex must not be held while invoking JS
+        if (!callbackRefs.empty()) {
+            getFormRectDispatchActive_ = true;
         }
     }
-    ani_object callbackObj = reinterpret_cast<ani_object>(callbackRef);
+    if (callbackRefs.empty()) {
+        HILOG_ERROR("callback is null");
+        return;
+    }
     ani_class cls = nullptr;
     if ((status = env->FindClass(ETS_FORM_RECT_INFO_CALLBACK, &cls)) != ANI_OK) {
         HILOG_ERROR("findClass failed");
-        DeleteGlobalReference(env, callbackRef);
-        return;
-    }
-    if (!BindNativeMethod(env, cls, dataParam, callbackObj)) {
-        HILOG_ERROR("BindNativeMethod failed");
-        DeleteGlobalReference(env, callbackRef);
+        EndGetFormRectDispatch(env);
         return;
     }
     ani_string aniFormId = nullptr;
     if ((status = env->String_NewUTF8(dataParam->formId.c_str(), dataParam->formId.size(), &aniFormId)) != ANI_OK) {
         HILOG_ERROR("string_NewUTF8 failed");
-        DeleteGlobalReference(env, callbackRef);
+        EndGetFormRectDispatch(env);
         return;
     }
-    ani_ref callbackRet = nullptr;
-    if ((status = env->Object_CallMethodByName_Ref(callbackObj, FORM_HOST_INVOKE, nullptr, &callbackRet,
-        reinterpret_cast<ani_object>(aniFormId))) != ANI_OK || callbackRet == nullptr) {
-        HILOG_ERROR("callMethod failed");
-        DeleteGlobalReference(env, callbackRef);
-        return;
-    }
-    ani_method method = nullptr;
-    auto retObj = reinterpret_cast<ani_object>(callbackRet);
+    // Callbacks are tried in registration order; the first one that yields a valid
+    // Rect (sync or promise-resolved) wins.
+    for (const auto &entry : callbackRefs) {
+        // Local copy isolates this iteration from later mutations of the shared table entry.
+        ani_ref callbackRef = nullptr;
+        if ((status = env->GlobalReference_Create(entry.second, &callbackRef)) != ANI_OK) {
+            HILOG_ERROR("GlobalReference_Create status: %{public}d", status);
+            continue;
+        }
+        ani_object callbackObj = reinterpret_cast<ani_object>(callbackRef);
+        if (!BindNativeMethod(env, cls, dataParam, callbackObj)) {
+            HILOG_ERROR("BindNativeMethod failed");
+            DeleteGlobalReference(env, callbackRef);
+            continue;
+        }
+        ani_ref callbackRet = nullptr;
+        if ((status = env->Object_CallMethodByName_Ref(callbackObj, FORM_HOST_INVOKE, nullptr, &callbackRet,
+            reinterpret_cast<ani_object>(aniFormId))) != ANI_OK || callbackRet == nullptr) {
+            HILOG_ERROR("callMethod failed");
+            DeleteGlobalReference(env, callbackRef);
+            continue;
+        }
+        ani_method method = nullptr;
+        auto retObj = reinterpret_cast<ani_object>(callbackRet);
         if ((status = env->Class_FindMethod(cls, FORM_HOST_CHECKPROMISE,
             CHECK_PROMISE_SIGNATURE, &method)) != ANI_OK) {
-        HILOG_ERROR("findMethod failed");
+            HILOG_ERROR("findMethod failed");
+            DeleteGlobalReference(env, callbackRef);
+            continue;
+        }
+        ani_boolean isPromise = ANI_FALSE;
+        if ((status = env->Object_CallMethod_Boolean(callbackObj, method, &isPromise, retObj)) != ANI_OK) {
+            HILOG_ERROR("callMethod failed");
+            DeleteGlobalReference(env, callbackRef);
+            continue;
+        }
+        if (!isPromise) {
+            HILOG_INFO("result not promise");
+            std::unique_ptr<AppExecFwk::Rect> item = std::make_unique<AppExecFwk::Rect>();
+            bool ret = ConvertFunctionResult(env, retObj, *item);
+            if (ret) {
+                CallBackReturn(*item, dataParam, true);
+                DeleteGlobalReference(env, callbackRef);
+                break;
+            }
+            DeleteGlobalReference(env, callbackRef);
+            continue;
+        }
+        // CallPromise settles dataParam synchronously via waitForCompletion
+        CallPromise(env, cls, callbackObj, retObj, dataParam);
         DeleteGlobalReference(env, callbackRef);
-        return;
+        if (dataParam->result) {
+            break;
+        }
     }
-    ani_boolean isPromise = ANI_FALSE;
-    if ((status = env->Object_CallMethod_Boolean(callbackObj, method, &isPromise, retObj)) != ANI_OK) {
-        HILOG_ERROR("callMethod failed");
-        DeleteGlobalReference(env, callbackRef);
-        return;
+    EndGetFormRectDispatch(env);
+}
+
+void EtsFormRouterProxyMgr::EndGetFormRectDispatch(ani_env *env)
+{
+    std::lock_guard<std::mutex> lock(registerGetFormRectProxyMutex_);
+    getFormRectDispatchActive_ = false;
+    for (auto &entry : getFormRectPendingDeleteRefs_) {
+        DeleteGlobalReference(env, entry.second);
     }
-    if (!isPromise) {
-        HILOG_INFO("result not promise");
-        std::unique_ptr<AppExecFwk::Rect> item = std::make_unique<AppExecFwk::Rect>();
-        bool ret = ConvertFunctionResult(env, retObj, *item);
-        CallBackReturn(*item, dataParam, ret);
-        DeleteGlobalReference(env, callbackRef);
-        return;
-    }
-    CallPromise(env, cls, callbackObj, retObj, dataParam);
-    DeleteGlobalReference(env, callbackRef);
+    getFormRectPendingDeleteRefs_.clear();
 }
 
 void EtsFormRouterProxyMgr::CallPromise(ani_env *env, ani_class cls, ani_object callbackObj,
@@ -1170,6 +1231,51 @@ void EtsFormRouterProxyMgr::UnregisterOverflowListener()
     SetAniVM(nullptr);
 }
 
+// Reads the wrapperId field from the callback wrapper; returns 0 on failure.
+ani_long EtsFormRouterProxyMgr::GetWrapperId(ani_env *env, ani_object callback)
+{
+    ani_class cls = nullptr;
+    if (env->FindClass(ETS_FORM_RECT_INFO_CALLBACK, &cls) != ANI_OK) {
+        HILOG_ERROR("findClass failed");
+        return 0;
+    }
+    ani_field wrapperIdField = nullptr;
+    if (env->Class_FindField(cls, FORM_HOST_WRAPPER_ID, &wrapperIdField) != ANI_OK) {
+        HILOG_ERROR("findField failed");
+        return 0;
+    }
+    ani_long wrapperId = 0;
+    if (env->Object_GetField_Long(callback, wrapperIdField, &wrapperId) != ANI_OK) {
+        HILOG_ERROR("getField failed");
+        return 0;
+    }
+    return wrapperId;
+}
+
+// Replace for a duplicate wrapperId (normally unreachable: the ets layer dedups).
+// Creates the new ref first so a failure leaves the old entry intact.
+bool EtsFormRouterProxyMgr::ReplaceGetFormRectCallbackRef(ani_env *env,
+    std::pair<int64_t, ani_ref> &entry, ani_object callback)
+{
+    ani_status status = ANI_ERROR;
+    ani_ref newRef = nullptr;
+    if ((status = env->GlobalReference_Create(callback, &newRef)) != ANI_OK) {
+        HILOG_ERROR("GlobalReference_Create status: %{public}d", status);
+        return false;
+    }
+    if (entry.second != nullptr) {
+        if (getFormRectDispatchActive_) {
+            getFormRectPendingDeleteRefs_.push_back(entry);
+        } else if ((status = env->GlobalReference_Delete(entry.second)) != ANI_OK) {
+            HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
+            DeleteGlobalReference(env, newRef);
+            return false;
+        }
+    }
+    entry.second = newRef;
+    return true;
+}
+
 void EtsFormRouterProxyMgr::RegisterGetFormRectListener(ani_vm* ani_vm, ani_object callback)
 {
     std::lock_guard<std::mutex> lock(registerGetFormRectProxyMutex_);
@@ -1188,18 +1294,63 @@ void EtsFormRouterProxyMgr::RegisterGetFormRectListener(ani_vm* ani_vm, ani_obje
         HILOG_ERROR("Invalid callback reference");
         return;
     }
-    if (getFormRectCallbackRef_ != nullptr) {
-        if ((status = env->GlobalReference_Delete(getFormRectCallbackRef_)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
+    ani_long wrapperId = GetWrapperId(env, callback);
+    if (wrapperId == 0) {
+        return;
+    }
+    for (auto &entry : getFormRectCallbackRefs_) {
+        if (entry.first == wrapperId) {
+            if (!ReplaceGetFormRectCallbackRef(env, entry, callback)) {
+                return;
+            }
+            SetAniVM(ani_vm);
             return;
         }
-        getFormRectCallbackRef_ = nullptr;
     }
-    if ((status = env->GlobalReference_Create(callback, &getFormRectCallbackRef_)) != ANI_OK) {
+    ani_ref callbackRef = nullptr;
+    if ((status = env->GlobalReference_Create(callback, &callbackRef)) != ANI_OK) {
         HILOG_ERROR("GlobalReference_Create status: %{public}d", status);
         return;
     }
+    getFormRectCallbackRefs_.push_back({wrapperId, callbackRef});
     SetAniVM(ani_vm);
+}
+
+bool EtsFormRouterProxyMgr::RemoveGetFormRectListener(ani_env *env, ani_object callback)
+{
+    std::lock_guard<std::mutex> lock(registerGetFormRectProxyMutex_);
+    HILOG_INFO("RemoveGetFormRectListener Call");
+    if (env == nullptr) {
+        HILOG_ERROR("env is null");
+        return false;
+    }
+    if (callback == nullptr) {
+        HILOG_ERROR("Invalid callback reference");
+        return false;
+    }
+    ani_long wrapperId = GetWrapperId(env, callback);
+    if (wrapperId == 0) {
+        return false;
+    }
+    for (auto iter = getFormRectCallbackRefs_.begin(); iter != getFormRectCallbackRefs_.end(); ++iter) {
+        if (iter->first == wrapperId) {
+            if (getFormRectDispatchActive_) {
+                getFormRectPendingDeleteRefs_.push_back(*iter);
+            } else if (iter->second != nullptr) {
+                DeleteGlobalReference(env, iter->second);
+            }
+            getFormRectCallbackRefs_.erase(iter);
+            HILOG_INFO("Listener removed");
+            return true;
+        }
+    }
+    return false;
+}
+
+bool EtsFormRouterProxyMgr::HasGetFormRectListener()
+{
+    std::lock_guard<std::mutex> lock(registerGetFormRectProxyMutex_);
+    return !getFormRectCallbackRefs_.empty();
 }
 
 void EtsFormRouterProxyMgr::UnregisterGetFormRectListener()
@@ -1211,11 +1362,19 @@ void EtsFormRouterProxyMgr::UnregisterGetFormRectListener()
         HILOG_ERROR("env is null");
         return;
     }
-    if (getFormRectCallbackRef_ != nullptr) {
-        if (!DeleteGlobalReference(env, getFormRectCallbackRef_)) {
-            return;
+    if (getFormRectDispatchActive_) {
+        // keep snapshot refs alive until the in-flight dispatch drains
+        getFormRectPendingDeleteRefs_.insert(getFormRectPendingDeleteRefs_.end(),
+            getFormRectCallbackRefs_.begin(), getFormRectCallbackRefs_.end());
+    } else {
+        for (auto &entry : getFormRectCallbackRefs_) {
+            // Keep draining on failure: a half-cleared table would leave dangling handles for the next dispatch.
+            if (entry.second != nullptr && !DeleteGlobalReference(env, entry.second)) {
+                HILOG_ERROR("DeleteGlobalReference failed, keep going");
+            }
         }
     }
+    getFormRectCallbackRefs_.clear();
     SetAniVM(nullptr);
 }
 
