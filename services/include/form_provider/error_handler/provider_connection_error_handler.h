@@ -172,7 +172,7 @@ protected:
     void CancelCallbackTimeout(int64_t formId);
 
     /**
-     * @brief Cancel all pending retry + signal-timeout tasks for specified form.
+     * @brief Cancel all pending delay tasks (retry / signal-timeout / callback-timeout) for specified form.
      *        Thread-safe (FormProviderQueue handles its own locking); safe to call within retryPolicyMutex_.
      * @param formId Form ID.
      */

@@ -49,10 +49,10 @@ RetryPolicy &FormProviderConnectionErrorHandler::EnsureRetryPolicyLocked(int64_t
 
 void FormProviderConnectionErrorHandler::CancelPendingTasks(int64_t formId)
 {
+    // Retry, signal-timeout and callback-timeout tasks share the single key slot
+    // (GetRetryTaskType(), formId); one cancel removes whichever is pending.
     FormProviderQueue::GetInstance().CancelDelayTask(
         std::make_pair(static_cast<int64_t>(GetRetryTaskType()), formId));
-    CancelSignalTimeout(formId);
-    CancelCallbackTimeout(formId);
 }
 
 void FormProviderConnectionErrorHandler::RemoveRetryPolicy(int64_t formId)
@@ -176,7 +176,7 @@ void FormProviderConnectionErrorHandler::OnCallbackArrived(int64_t formId, int32
     CancelCallbackTimeout(formId);
     CancelSignalTimeout(formId);
     policy.SetStage(RequestStage::CALLBACK_COMPLETED);
-    HILOG_INFO("stage=WAITING_CALLBACK->CALLBACK_COMPLETED, formId=%{public}" PRId64, formId);
+    HILOG_INFO("stage=WAITING_CALLBACK->CALLBACK_COMPLETED, formId %{public}" PRId64, formId);
 }
 
 void FormProviderConnectionErrorHandler::ScheduleRetry(int64_t formId,
@@ -245,6 +245,7 @@ bool FormProviderConnectionErrorHandler::HandleDisconnectError(int64_t formId,
             return HandleDisconnectOnWaitingCallback(formId, policy, connection);
         case RequestStage::CALLBACK_COMPLETED:
             HILOG_INFO("Callback already completed, erase policy on disconnect, formId %{public}" PRId64, formId);
+            CancelPendingTasks(formId);
             retryPolicyMap_.erase(formId);
             return true;
         case RequestStage::WAITING_DISCONNECT_CONFIRM:
@@ -256,8 +257,11 @@ bool FormProviderConnectionErrorHandler::HandleDisconnectError(int64_t formId,
             policy.SetStage(RequestStage::WAITING_SEND_RESULT);
             StartSignalTimeout(formId);
             return false;
+        default:
+            HILOG_ERROR("Unexpected stage %{public}d, formId %{public}" PRId64,
+                static_cast<int32_t>(policy.GetStage()), formId);
+            return false;
     }
-    return false;
 }
 
 bool FormProviderConnectionErrorHandler::HandleDisconnectOnWaitingCallback(int64_t formId, RetryPolicy &policy,
