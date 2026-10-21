@@ -133,7 +133,8 @@ bool FormBaseSerialQueue::CancelDelayTask(const TaskKey& taskKey)
     if (it->second.first != nullptr) {
         int32_t ret = queue_.cancel(it->second.first);
         if (ret != 0) {
-            HILOG_ERROR("Failed,errCode:%{public}d", ret);
+            // Expected when the task is already executing; its wrapper cleans up the map entry.
+            HILOG_WARN("Cancel skipped, task already running, errCode:%{public}d", ret);
             result = false;
         }
     }
