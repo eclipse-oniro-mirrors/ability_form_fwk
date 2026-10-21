@@ -142,8 +142,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_DispatchRecreateT
     GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_DispatchRecreateToAcquire_001 start";
     AppExecFwk::ElementName element;
     Want want;
-    const std::string recreateFlag = "true";
-    want.SetParam(Constants::RECREATE_FORM_KEY, recreateFlag);
+    want.SetParam(Constants::RECREATE_FORM_KEY, true);
 
     sptr<FormRefreshConnection> conn = CreateRefreshConnection(1, want);
     ASSERT_NE(nullptr, conn);
@@ -292,8 +291,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnBuildTaskWant_RecreateFormKey_001, Test
     GTEST_LOG_(INFO) << "OnBuildTaskWant_RecreateFormKey_001 start";
 
     Want want;
-    const std::string recreateFlag = "true";
-    want.SetParam(Constants::RECREATE_FORM_KEY, recreateFlag);
+    want.SetParam(Constants::RECREATE_FORM_KEY, true);
     sptr<FormRefreshConnection> conn = CreateRefreshConnection(2, want);
     ASSERT_NE(nullptr, conn);
     conn->SetConnectId(TEST_CONNECT_ID);
@@ -372,8 +370,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnExecuteConnectTask_RecreateForm_001, Te
 
     // Test RECREATE_FORM_KEY branch
     Want want;
-    const std::string recreateFlag = "true";
-    want.SetParam(Constants::RECREATE_FORM_KEY, recreateFlag);
+    want.SetParam(Constants::RECREATE_FORM_KEY, true);
     sptr<FormRefreshConnection> connection = CreateRefreshConnection(2, want);
     ASSERT_NE(nullptr, connection);
 
