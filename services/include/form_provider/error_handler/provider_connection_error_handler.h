@@ -220,6 +220,24 @@ protected:
      */
     bool CheckRetryLimitReached(int64_t formId, RetryPolicy &policy);
 
+    /**
+     * @brief Get the scenario name ("Acquire"/"Refresh") for base-class log prefixes,
+     *        so messages shared by both handlers stay distinguishable when interleaved
+     *        on one formId (recreate-acquire + concurrent refresh).
+     * @return Scenario name string.
+     */
+    const char *GetScenarioName() const
+    {
+        switch (GetRetryTaskType()) {
+            case TaskType::ACQUIRE_RETRY_TASK:
+                return "Acquire";
+            case TaskType::REFRESH_RETRY_TASK:
+                return "Refresh";
+            default:
+                return "Unknown";
+        }
+    }
+
     // --- Virtual hooks: subclass variation points ---
 
     /**

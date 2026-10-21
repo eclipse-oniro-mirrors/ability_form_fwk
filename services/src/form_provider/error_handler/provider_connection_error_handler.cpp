@@ -94,7 +94,8 @@ void FormProviderConnectionErrorHandler::OnSignalTimeout(int64_t formId)
     RetryPolicy &policy = it->second;
     RequestStage stage = policy.GetStage();
     if (stage == RequestStage::WAITING_DISCONNECT_CONFIRM || stage == RequestStage::WAITING_SEND_RESULT) {
-        HILOG_WARN("Signal timeout, cleaning up partial state for formId %{public}" PRId64, formId);
+        HILOG_WARN("%{public}s: Signal timeout, cleaning up partial state for formId %{public}" PRId64,
+            GetScenarioName(), formId);
         retryPolicyMap_.erase(it);
     }
 }
@@ -183,7 +184,8 @@ void FormProviderConnectionErrorHandler::ScheduleRetry(int64_t formId,
     const RetryPolicy &policy, std::function<void()> retryFunc)
 {
     int32_t delayMs = policy.CalculateNextDelay();
-    HILOG_INFO("Scheduling retry for formId %{public}" PRId64 ", delay=%{public}dms", formId, delayMs);
+    HILOG_INFO("%{public}s: Scheduling retry for formId %{public}" PRId64 ", delay=%{public}dms",
+        GetScenarioName(), formId, delayMs);
     FormProviderQueue::GetInstance().ScheduleDelayTask(
         std::make_pair(static_cast<int64_t>(GetRetryTaskType()), formId),
         delayMs, retryFunc);
@@ -201,23 +203,26 @@ bool FormProviderConnectionErrorHandler::HandleSendRequestFailed(
     auto &policy = EnsureRetryPolicyLocked(formId);
     if (policy.GetStage() == RequestStage::WAITING_SEND_RESULT) {
         if (policy.GetOriginalConnection() == nullptr) {
-            HILOG_ERROR("No connection in retryPolicy, abort retry for formId %{public}" PRId64, formId);
+            HILOG_ERROR("%{public}s: No connection in retryPolicy, abort retry for formId %{public}" PRId64,
+                GetScenarioName(), formId);
             CancelPendingTasks(formId);
             retryPolicyMap_.erase(formId);
             return false;
         }
         if (policy.IsRetryLimitReached()) {
-            HILOG_WARN("Retry limit reached formId %{public}" PRId64, formId);
+            HILOG_WARN("%{public}s: Retry limit reached formId %{public}" PRId64, GetScenarioName(), formId);
             CancelPendingTasks(formId);
             retryPolicyMap_.erase(formId);
             OnRetryLimitReached(formId);
             return false;
         }
-        HILOG_INFO("Scheduling retry from HandleSendRequestFailed, formId %{public}" PRId64, formId);
+        HILOG_INFO("%{public}s: Scheduling retry from HandleSendRequestFailed, formId %{public}" PRId64,
+            GetScenarioName(), formId);
         ScheduleRetryWithReset(formId, policy, policy.GetOriginalConnection());
         return true;
     }
-    HILOG_INFO("Send request failed, waiting for disconnect confirmation, formId %{public}" PRId64, formId);
+    HILOG_INFO("%{public}s: Send request failed, waiting for disconnect confirmation, formId %{public}" PRId64,
+        GetScenarioName(), formId);
     policy.SetStage(RequestStage::WAITING_DISCONNECT_CONFIRM);
     StartSignalTimeout(formId);
     return true;
@@ -253,7 +258,8 @@ bool FormProviderConnectionErrorHandler::HandleDisconnectError(int64_t formId,
         case RequestStage::IDLE:
         case RequestStage::WAITING_SEND_RESULT:
             // The disconnect may precede the SendRequest failure (reverse order).
-            HILOG_WARN("Disconnect arrived before send request failure, not handled, formId %{public}" PRId64, formId);
+            HILOG_WARN("%{public}s: Disconnect arrived before send request failure, not handled, "
+                "formId %{public}" PRId64, GetScenarioName(), formId);
             policy.SetStage(RequestStage::WAITING_SEND_RESULT);
             StartSignalTimeout(formId);
             return false;
@@ -282,7 +288,8 @@ bool FormProviderConnectionErrorHandler::HandleDisconnectOnWaitingConfirm(int64_
     if (CheckRetryLimitReached(formId, policy)) {
         return true;
     }
-    HILOG_INFO("Send request failure and disconnect both confirmed, scheduling retry, formId %{public}" PRId64, formId);
+    HILOG_INFO("%{public}s: Send request failure and disconnect both confirmed, scheduling retry, "
+        "formId %{public}" PRId64, GetScenarioName(), formId);
     ScheduleRetryWithReset(formId, policy, connection);
     return true;
 }
@@ -292,7 +299,7 @@ bool FormProviderConnectionErrorHandler::CheckRetryLimitReached(int64_t formId, 
     if (!policy.IsRetryLimitReached()) {
         return false;
     }
-    HILOG_WARN("Retry limit reached on disconnect, formId %{public}" PRId64, formId);
+    HILOG_WARN("%{public}s: Retry limit reached on disconnect, formId %{public}" PRId64, GetScenarioName(), formId);
     CancelPendingTasks(formId);
     retryPolicyMap_.erase(formId);
     OnRetryLimitReached(formId);
@@ -326,7 +333,7 @@ void FormProviderConnectionErrorHandler::ScheduleRetryWithReset(int64_t formId, 
 void FormProviderConnectionErrorHandler::ExecuteRetry(
     int64_t formId, const sptr<FormAbilityConnection> &originalConnection)
 {
-    HILOG_INFO("Execute retry, formId %{public}" PRId64, formId);
+    HILOG_INFO("%{public}s: Execute retry, formId %{public}" PRId64, GetScenarioName(), formId);
     bool formExist = FormDataMgr::GetInstance().HasFormRecord(formId);
 
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
@@ -337,11 +344,13 @@ void FormProviderConnectionErrorHandler::ExecuteRetry(
     if (!formExist) {
         CancelPendingTasks(formId);
         retryPolicyMap_.erase(formId);
-        HILOG_WARN("FormRecord not found, abort retry for formId %{public}" PRId64, formId);
+        HILOG_WARN("%{public}s: FormRecord not found, abort retry for formId %{public}" PRId64,
+            GetScenarioName(), formId);
         return;
     }
     if (originalConnection == nullptr) {
-        HILOG_ERROR("null originalConnection, abort retry for formId %{public}" PRId64, formId);
+        HILOG_ERROR("%{public}s: null originalConnection, abort retry for formId %{public}" PRId64,
+            GetScenarioName(), formId);
         CancelPendingTasks(formId);
         retryPolicyMap_.erase(formId);
         return;
@@ -349,7 +358,8 @@ void FormProviderConnectionErrorHandler::ExecuteRetry(
 
     sptr<FormAbilityConnection> retryConnection = originalConnection->CreateRetryConnection();
     if (retryConnection == nullptr) {
-        HILOG_ERROR("Create retry connection failed, abort retry for formId %{public}" PRId64, formId);
+        HILOG_ERROR("%{public}s: Create retry connection failed, abort retry for formId %{public}" PRId64,
+            GetScenarioName(), formId);
         CancelPendingTasks(formId);
         retryPolicyMap_.erase(formId);
         return;
@@ -360,7 +370,7 @@ void FormProviderConnectionErrorHandler::ExecuteRetry(
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
         connectWant, retryConnection, retryConnection->GetUserId());
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("Retry connect failed, errorCode:%{public}d", errorCode);
+        HILOG_ERROR("%{public}s: Retry connect failed, errorCode:%{public}d", GetScenarioName(), errorCode);
         CancelPendingTasks(formId);
         retryPolicyMap_.erase(formId);
     }
