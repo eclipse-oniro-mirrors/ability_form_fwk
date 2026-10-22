@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,6 +28,8 @@
 #include "ets_context_utils.h"
 #include "ets_extension_context.h"
 #include "form_histogram_utils.h"
+#include "event_handler.h"
+#include "form_mgr_errors.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -101,6 +103,8 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
             reinterpret_cast<void *>(EtsFormEditExtensionContext::StartSecondPage) },
         ani_native_function { "nativeStartUIAbility", nullptr,
             reinterpret_cast<void *>(EtsFormEditExtensionContext::StartUIAbility) },
+        ani_native_function { "nativeSetWindowBackgroundColor", "C{std.core.String}:",
+            reinterpret_cast<void *>(EtsFormEditExtensionContext::SetWindowBackgroundColor) },
     };
     if ((status = env->Class_BindNativeMethods(cls, functions.data(), functions.size())) != ANI_OK) {
         HILOG_ERROR("status: %{public}d", status);
@@ -303,6 +307,62 @@ bool EtsFormEditExtensionContext::AsyncCallback(ani_env *env, ani_object call, a
 {
     // Use the unified implementation from EtsFormErrorUtil
     return FormAniUtil::AsyncCallback(env, AGENT_CLASSNAME_ASYNC_CALLBACK_WRAPPER, call, error, result);
+}
+
+void EtsFormEditExtensionContext::SetWindowBackgroundColor(ani_env *env, ani_object aniObj, ani_string color)
+{
+    HILOG_INFO("called");
+    if (env == nullptr) {
+        HILOG_ERROR("null env");
+        return;
+    }
+
+    auto etsContext = GetEtsFormEditExtensionContext(env, aniObj);
+    if (etsContext == nullptr) {
+        HILOG_ERROR("null etsContext");
+        EtsErrorUtil::ThrowError(env,
+            static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR), ERR_MSG_INTERNAL_ERROR);
+        return;
+    }
+    std::string colorStr = FormAniUtil::AniStringToStdString(env, color);
+    if (colorStr.empty()) {
+        HILOG_ERROR("color is empty");
+        EtsFormErrorUtil::ThrowParamTypeError(env, "color", "string");
+        return;
+    }
+    etsContext->OnSetWindowBackgroundColor(env, colorStr);
+}
+
+void EtsFormEditExtensionContext::OnSetWindowBackgroundColor(ani_env *env, const std::string &color)
+{
+    HILOG_INFO("called");
+    if (env == nullptr) {
+        HILOG_ERROR("null env");
+        return;
+    }
+    auto contextPtr = context_.lock();
+    if (!contextPtr) {
+        HILOG_ERROR("Context is released");
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+        return;
+    }
+    auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
+    if (runner == nullptr) {
+        HILOG_ERROR("GetMainEventRunner returned nullptr");
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+        return;
+    }
+    auto mainHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
+    bool isSuccess = false;
+    std::function<void()> executeFunc = [contextPtr, color, &isSuccess]() {
+        isSuccess = contextPtr->SetWindowBackgroundColor(color);
+    };
+    mainHandler->PostSyncTask(executeFunc, "EtsFormEditExtensionContext::OnSetWindowBackgroundColor");
+    if (!isSuccess) {
+        HILOG_ERROR("SetWindowBackgroundColor failed");
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+        return;
+    }
 }
 } // namespace AbilityRuntime
 } // namespace OHOS

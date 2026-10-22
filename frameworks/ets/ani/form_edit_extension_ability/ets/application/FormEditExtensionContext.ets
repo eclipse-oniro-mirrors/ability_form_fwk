@@ -36,6 +36,8 @@ export default class FormEditExtensionContext extends UIExtensionContext {
 
   native nativeStartUIAbility(want: Want, callback: AsyncCallbackWrapper<AbilityResult>): void;
 
+  native nativeSetWindowBackgroundColor(color: string): void;
+
   startSecondPage(want: Want): Promise<AbilityResult> {
     let p: Promise<AbilityResult> =
       new Promise<AbilityResult>((resolve: (data: AbilityResult) => void, reject: (err: BusinessError) => void): void => {
@@ -74,6 +76,12 @@ export default class FormEditExtensionContext extends UIExtensionContext {
         });
       });
     return p;
+  }
+
+  async setWindowBackgroundColor(color: string): Promise<void> {
+    await taskpool.execute((): void => {
+      this.nativeSetWindowBackgroundColor(color);
+    });
   }
 }
 

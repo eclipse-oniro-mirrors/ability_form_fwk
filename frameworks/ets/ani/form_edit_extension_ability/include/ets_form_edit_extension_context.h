@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,12 +35,14 @@ public:
     static void Clean(ani_env *env, ani_object object);
     static void StartSecondPage(ani_env *env, ani_object aniObj, ani_object aniWant, ani_object callback);
     static void StartUIAbility(ani_env *env, ani_object aniObj, ani_object aniWant, ani_object callback);
+    static void SetWindowBackgroundColor(ani_env *env, ani_object aniObj, ani_string color);
 
 private:
     static EtsFormEditExtensionContext* GetEtsFormEditExtensionContext(ani_env *env, ani_object obj);
     bool AsyncCallback(ani_env *env, ani_object call, ani_object error, ani_object result);
     void OnStartSecondPage(ani_env *env, ani_object aniWant, ani_object callback);
     void OnStartUIAbility(ani_env *env, ani_object aniWant, ani_object callback);
+    void OnSetWindowBackgroundColor(ani_env *env, const std::string &color);
 
     std::weak_ptr<FormEditExtensionContext> context_;
 };

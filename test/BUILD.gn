@@ -49,6 +49,8 @@ group("unittest") {
     "unittest/fms_form_db_record_test:unittest",
     "unittest/fms_form_distributed_client_test:unittest",
     "unittest/fms_form_ecological_rule_client_test:unittest",
+    "unittest/fms_form_edit_extension_context_test:unittest",
+    "unittest/fms_form_edit_extension_impl_test:unittest",
     "unittest/fms_form_event_notify_connection_test:unittest",
     "unittest/fms_form_event_report_test:unittest",
     "unittest/fms_form_host_callback_test:unittest",
