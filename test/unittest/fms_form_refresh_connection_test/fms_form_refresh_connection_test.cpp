@@ -359,7 +359,10 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnExecuteConnectTask_MessageParam_001, Te
 
 /**
  * @tc.name: OnExecuteConnectTask_RecreateForm_001
- * @tc.desc: Verify OnExecuteConnectTask with RECREATE_FORM_KEY → PostAcquireTask called.
+ * @tc.desc: Verify the recreate dispatch forwards the real-chain payload intact: the want
+ *           OnExecuteConnectTask receives is OnBuildTaskWant() output (RECREATE key kept,
+ *           ACQUIRE_TYPE and FORM_CONNECT_ID injected) and must reach PostAcquireTask unmodified
+ *           — AcquireProviderFormInfo depends on these keys (connectId lookup, acquire-type branch).
  * @tc.type: FUNC
  * @tc.require: issueI5T4GJ
  */
@@ -368,17 +371,27 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnExecuteConnectTask_RecreateForm_001, Te
     GTEST_LOG_(INFO) << "OnExecuteConnectTask_RecreateForm_001 start";
     sptr<IRemoteObject> remoteObject = nullptr;
 
-    // Test RECREATE_FORM_KEY branch
     Want want;
     want.SetParam(Constants::RECREATE_FORM_KEY, true);
     sptr<FormRefreshConnection> connection = CreateRefreshConnection(2, want);
     ASSERT_NE(nullptr, connection);
+    connection->SetConnectId(TEST_CONNECT_ID);
 
-    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostAcquireTask(2, _, remoteObject)).Times(1);
+    // Real chain (FormAbilityConnection::OnAbilityConnectDone): the want fed to
+    // OnExecuteConnectTask is OnBuildTaskWant() output, so reproduce it and assert the
+    // payload is forwarded intact instead of only checking the dispatch branch.
+    Want taskWant = connection->OnBuildTaskWant();
+    Want capturedWant;
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostAcquireTask(2, _, remoteObject)).Times(1)
+        .WillOnce(::testing::SaveArg<1>(&capturedWant));
     EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostRefreshTask(_, _, _)).Times(0);
     EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostFormEventTask(_, _, _, _)).Times(0);
 
-    connection->OnExecuteConnectTask(want, remoteObject);
+    connection->OnExecuteConnectTask(taskWant, remoteObject);
+
+    EXPECT_TRUE(capturedWant.HasParameter(Constants::RECREATE_FORM_KEY));
+    EXPECT_EQ(Constants::ACQUIRE_TYPE_RECREATE_FORM, capturedWant.GetIntParam(Constants::ACQUIRE_TYPE, 0));
+    EXPECT_EQ(TEST_CONNECT_ID, capturedWant.GetIntParam(Constants::FORM_CONNECT_ID, 0));
 
     GTEST_LOG_(INFO) << "OnExecuteConnectTask_RecreateForm_001 end";
 }
