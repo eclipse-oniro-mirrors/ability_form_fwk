@@ -378,13 +378,10 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
     }
 
     FormProviderData formProviderData;
+    formProviderData.SetSupportMoreImages(
+        record.formProviderInfo.GetFormData().IsSupportMoreImages());
     if (FormStatus::GetInstance().GetFormLastStatus(record.formId) != FormFsmStatus::RENDERED) {
-        // Only fall back to record when no cache; otherwise MergeFormData already
-        // preserved the flag from the input formProviderData.
-        if (!FormDataMgr::GetInstance().MergeFormData(record.formId, formProviderData)) {
-            formProviderData.SetSupportMoreImages(
-                record.formProviderInfo.GetFormData().IsSupportMoreImages());
-        }
+        (void)FormDataMgr::GetInstance().MergeFormData(record.formId, formProviderData);
     }
 
     FormJsInfo formJsInfo;
