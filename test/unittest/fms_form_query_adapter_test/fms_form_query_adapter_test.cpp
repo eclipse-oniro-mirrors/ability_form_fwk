@@ -72,6 +72,8 @@ void FmsFormQueryAdapterTest::SetUpTestCase()
     MockFormTimerMgr::obj = std::make_shared<MockFormTimerMgr>();
     MockFormDbCache::obj = std::make_shared<MockFormDbCache>();
     MockIPCSkeleton::obj = new MockIPCSkeleton();
+    // Stable default so GetCallerUserId derives userId 0 deterministically.
+    ON_CALL(*MockIPCSkeleton::obj, GetCallingUid()).WillByDefault(Return(0));
 }
 
 void FmsFormQueryAdapterTest::TearDownTestCase()
@@ -544,6 +546,10 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormStateCheck_001, TestSize.Level1)
     Want want;
     std::string provider;
 
+    // AcquireFormStateCheck derives userId from GetCallingUid exactly once.
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(1)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
     auto result = FormQueryAdapter::GetInstance().AcquireFormStateCheck(
         bundleName, abilityName, want, provider);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
@@ -565,6 +571,10 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormStateCheck_002, TestSize.Level1)
     Want want;
     std::string provider;
 
+    // AcquireFormStateCheck derives userId from GetCallingUid exactly once.
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(1)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
     auto result = FormQueryAdapter::GetInstance().AcquireFormStateCheck(
         bundleName, abilityName, want, provider);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
@@ -587,6 +597,10 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormStateCheck_003, TestSize.Level1)
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
     std::string provider;
 
+    // AcquireFormStateCheck derives userId from GetCallingUid exactly once.
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(1)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
     auto result = FormQueryAdapter::GetInstance().AcquireFormStateCheck(
         bundleName, abilityName, want, provider);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
@@ -609,6 +623,10 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormStateCheck_004, TestSize.Level1)
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
     std::string provider;
 
+    // AcquireFormStateCheck derives userId from GetCallingUid exactly once.
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(1)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
     auto result = FormQueryAdapter::GetInstance().AcquireFormStateCheck(
         bundleName, abilityName, want, provider);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
@@ -636,6 +654,10 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormStateCheck_005, TestSize.Level1)
     EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
         .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_INFO_FAILED));
 
+    // AcquireFormStateCheck derives userId from GetCallingUid exactly once.
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(1)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
     auto result = FormQueryAdapter::GetInstance().AcquireFormStateCheck(
         bundleName, abilityName, want, provider);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
@@ -671,6 +693,10 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormStateCheck_006, TestSize.Level1)
     EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(formInfos), Return(ERR_OK)));
 
+    // AcquireFormStateCheck derives userId from GetCallingUid exactly once.
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(1)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
     auto result = FormQueryAdapter::GetInstance().AcquireFormStateCheck(
         bundleName, abilityName, want, provider);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
@@ -704,9 +730,11 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormStateCheck_007, TestSize.Level1)
 
     EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(formInfos), Return(ERR_OK)));
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .WillOnce(Return(TEST_CALLING_UID));
 
+    // AcquireFormStateCheck derives userId from GetCallingUid exactly once.
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(1)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
     auto result = FormQueryAdapter::GetInstance().AcquireFormStateCheck(
         bundleName, abilityName, want, provider);
     EXPECT_EQ(result, ERR_OK);
@@ -750,6 +778,10 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormState_002, TestSize.Level1)
     FormStateInfo stateInfo;
     sptr<IRemoteObject> callerToken = new MockIRemoteObject();
 
+    // Empty element aborts in AcquireFormStateCheck after one GetCallingUid call.
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(1)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
     auto result = FormQueryAdapter::GetInstance().AcquireFormState(
         want, callerToken, stateInfo);
     // bundleName and abilityName are empty, AcquireFormStateCheck returns ERR_APPEXECFWK_FORM_INVALID_PARAM
@@ -778,6 +810,10 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormState_003, TestSize.Level1)
     EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
         .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_INFO_FAILED));
 
+    // AcquireFormStateCheck aborts after one GetCallingUid call on this error path.
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .Times(1)
+        .WillRepeatedly(Return(TEST_CALLING_UID));
     auto result = FormQueryAdapter::GetInstance().AcquireFormState(
         want, callerToken, stateInfo);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
