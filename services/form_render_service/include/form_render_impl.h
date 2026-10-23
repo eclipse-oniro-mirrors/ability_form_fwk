@@ -97,7 +97,7 @@ protected:
     int32_t CheckPermission() override;
 
 private:
-    bool CheckIsFoundationCall();
+    bool CheckIsSubFoundationCall();
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

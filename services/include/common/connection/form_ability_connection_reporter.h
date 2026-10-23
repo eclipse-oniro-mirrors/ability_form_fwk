@@ -56,6 +56,11 @@ public:
      */
     void ReportFormAbilityDisconnection(const std::string &bundleName);
 
+    /**
+     * @brief Clear the app manager instance when AppMgr died.
+     */
+    void ClearAppMgr();
+
 private:
     /**
      * @brief Get app manager proxy.
@@ -82,7 +87,9 @@ private:
 private:
     std::mutex formConnectionInfoMapMutex_;
     std::map<std::string, FormConnectionInfo> formConnectionInfoMap_;
+    std::mutex appManagerMutex_;
     sptr<OHOS::AppExecFwk::IAppMgr> appManager_ = nullptr;
+    sptr<IRemoteObject::DeathRecipient> appMgrDeath_ = nullptr;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

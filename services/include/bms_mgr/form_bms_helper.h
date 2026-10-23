@@ -64,6 +64,11 @@ public:
     sptr<IBundleInstaller> GetBundleInstaller();
 
     /**
+     * @brief Clear the bundle manager instance when BMS died.
+     */
+    void ClearBundleManager();
+
+    /**
      * @brief Get bundle package info.
      * @param bundleName Indicates the bundle name.
      * @param userId Indicates the user ID.
@@ -327,6 +332,7 @@ private:
     sptr<IBundleMgr> iBundleMgr_ = nullptr;
     sptr<IBundleInstaller> bundleInstallerProxy_ = nullptr;
     sptr<FormBundleEventCallback> formBundleEventCallback_ = nullptr;
+    sptr<IRemoteObject::DeathRecipient> bundleMgrDeath_ = nullptr;
     std::mutex ibundleMutex_;
     std::mutex registerMutex_;
     std::mutex iBundleInstallerMutex_;

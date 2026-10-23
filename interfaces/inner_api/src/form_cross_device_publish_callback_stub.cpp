@@ -43,8 +43,8 @@ int FormCrossDevicePublishCallbackStub::OnRemoteRequest(
     }
 
     int32_t callerUid = IPCSkeleton::GetCallingUid();
-    if (callerUid != FormConstants::FOUNDATION_UID) {
-        HILOG_ERROR("caller uid %{public}d is not foundation, rejected", callerUid);
+    if (callerUid != FormConstants::SUBFOUNDATION_UID) {
+        HILOG_ERROR("caller uid %{public}d is not subfoundation, rejected", callerUid);
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
 

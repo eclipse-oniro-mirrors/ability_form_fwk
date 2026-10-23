@@ -26,6 +26,17 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+class BundleMgrDeathRecipient : public IRemoteObject::DeathRecipient {
+public:
+    void OnRemoteDied(const wptr<IRemoteObject> &object) override
+    {
+        (void)object;
+        FormBmsHelper::GetInstance().ClearBundleManager();
+    }
+};
+}
+
 FormBmsHelper::FormBmsHelper()
 {
     HILOG_INFO("call");
@@ -34,6 +45,10 @@ FormBmsHelper::FormBmsHelper()
 FormBmsHelper::~FormBmsHelper()
 {
     HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(ibundleMutex_);
+    if (iBundleMgr_ != nullptr && bundleMgrDeath_ != nullptr) {
+        iBundleMgr_->AsObject()->RemoveDeathRecipient(bundleMgrDeath_);
+    }
 }
 
 bool FormBmsHelper::IsBundleMgrValid()
@@ -65,7 +80,32 @@ sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
         HILOG_ERROR("fail get bundle manager service");
         return nullptr;
     }
+    if (bundleMgrDeath_ == nullptr) {
+        bundleMgrDeath_ = new (std::nothrow) BundleMgrDeathRecipient();
+        if (bundleMgrDeath_ != nullptr) {
+            iBundleMgr_->AsObject()->AddDeathRecipient(bundleMgrDeath_);
+        }
+    }
     return iBundleMgr_;
+}
+
+void FormBmsHelper::ClearBundleManager()
+{
+    HILOG_INFO("call");
+    {
+        std::lock_guard<std::mutex> lock(ibundleMutex_);
+        iBundleMgr_ = nullptr;
+        bundleMgrDeath_ = nullptr;
+    }
+    {
+        std::lock_guard<std::mutex> lock(iBundleInstallerMutex_);
+        bundleInstallerProxy_ = nullptr;
+    }
+    {
+        std::lock_guard<std::mutex> lock(registerMutex_);
+        formBundleEventCallback_ = nullptr;
+        hasRegisterBundleEvent_ = false;
+    }
 }
 
 sptr<IBundleInstaller> FormBmsHelper::GetBundleInstaller()

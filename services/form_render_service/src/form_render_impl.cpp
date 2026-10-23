@@ -127,15 +127,15 @@ int32_t FormRenderImpl::UpdateFormSize(const int64_t formId, const FormSurfaceIn
     return FormRenderServiceMgr::GetInstance().UpdateFormSize(formId, formSurfaceInfo, uid, formJsInfo);
 }
 
-bool FormRenderImpl::CheckIsFoundationCall()
+bool FormRenderImpl::CheckIsSubFoundationCall()
 {
-    return IPCSkeleton::GetCallingUid() == FormConstants::FOUNDATION_UID;
+    return IPCSkeleton::GetCallingUid() == FormConstants::SUBFOUNDATION_UID;
 }
 
 int32_t FormRenderImpl::CheckPermission()
 {
-    if (!CheckIsFoundationCall()) {
-        HILOG_ERROR("Caller not foundation");
+    if (!CheckIsSubFoundationCall()) {
+        HILOG_ERROR("Caller not subfoundation");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     return ERR_OK;

@@ -32,12 +32,27 @@
 namespace OHOS {
 namespace AppExecFwk {
 constexpr int32_t DEFAULT_INVAL_VALUE = -1;
+namespace {
+class AbilityManagerDeathRecipient : public IRemoteObject::DeathRecipient {
+public:
+    void OnRemoteDied(const wptr<IRemoteObject> &object) override
+    {
+        (void)object;
+        FormAmsHelper::GetInstance().ClearAbilityManager();
+    }
+};
+}
 
 FormAmsHelper::FormAmsHelper()
 {}
 
 FormAmsHelper::~FormAmsHelper()
-{}
+{
+    std::lock_guard<std::mutex> lock(abilityManagerMutex_);
+    if (abilityManager_ != nullptr && abilityManagerDeath_ != nullptr) {
+        abilityManager_->AsObject()->RemoveDeathRecipient(abilityManagerDeath_);
+    }
+}
 
 /**
  * @brief acquire a form ability manager, if it not existed,
@@ -72,8 +87,22 @@ sptr<AAFwk::IAbilityManager> FormAmsHelper::GetAbilityManager()
     std::lock_guard<std::mutex> lock(abilityManagerMutex_);
     if (abilityManager_ == nullptr) {
         abilityManager_ = abilityManager;
+        if (abilityManagerDeath_ == nullptr) {
+            abilityManagerDeath_ = new (std::nothrow) AbilityManagerDeathRecipient();
+            if (abilityManagerDeath_ != nullptr) {
+                abilityManager_->AsObject()->AddDeathRecipient(abilityManagerDeath_);
+            }
+        }
     }
     return abilityManager_;
+}
+
+void FormAmsHelper::ClearAbilityManager()
+{
+    HILOG_DEBUG("call");
+    std::lock_guard<std::mutex> lock(abilityManagerMutex_);
+    abilityManager_ = nullptr;
+    abilityManagerDeath_ = nullptr;
 }
 
 /**
