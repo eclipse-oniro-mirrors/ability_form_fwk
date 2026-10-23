@@ -320,8 +320,7 @@ void EtsFormEditExtensionContext::SetWindowBackgroundColor(ani_env *env, ani_obj
     auto etsContext = GetEtsFormEditExtensionContext(env, aniObj);
     if (etsContext == nullptr) {
         HILOG_ERROR("null etsContext");
-        EtsErrorUtil::ThrowError(env,
-            static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR), ERR_MSG_INTERNAL_ERROR);
+        EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
         return;
     }
     std::string colorStr = FormAniUtil::AniStringToStdString(env, color);

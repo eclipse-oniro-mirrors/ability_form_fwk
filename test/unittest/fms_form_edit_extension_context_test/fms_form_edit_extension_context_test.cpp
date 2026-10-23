@@ -66,11 +66,7 @@ HWTEST_F(FmsFormEditExtensionContextTest, SetWindowBackgroundColor_001, TestSize
     MockGetWindow(false);
     MockSetBackgroundColor(Rosen::WMError::WM_OK);
     bool result = context.SetWindowBackgroundColor(VALID_COLOR_RRGGBB);
-#ifdef SUPPORT_SCREEN
     EXPECT_TRUE(result);
-#else
-    EXPECT_TRUE(result);
-#endif
     GTEST_LOG_(INFO) << "SetWindowBackgroundColor_001 end";
 }
 
@@ -87,11 +83,7 @@ HWTEST_F(FmsFormEditExtensionContextTest, SetWindowBackgroundColor_002, TestSize
     MockGetWindow(false);
     MockSetBackgroundColor(Rosen::WMError::WM_OK);
     bool result = context.SetWindowBackgroundColor(VALID_COLOR_AARRGGBB);
-#ifdef SUPPORT_SCREEN
     EXPECT_TRUE(result);
-#else
-    EXPECT_TRUE(result);
-#endif
     GTEST_LOG_(INFO) << "SetWindowBackgroundColor_002 end";
 }
 
@@ -171,11 +163,7 @@ HWTEST_F(FmsFormEditExtensionContextTest, SetWindowBackgroundColor_006, TestSize
     MockGetWindow(false);
     MockSetBackgroundColor(Rosen::WMError::WM_OK);
     bool result = context.SetWindowBackgroundColor(COLOR_TRANSPARENT);
-#ifdef SUPPORT_SCREEN
     EXPECT_TRUE(result);
-#else
-    EXPECT_TRUE(result);
-#endif
     GTEST_LOG_(INFO) << "SetWindowBackgroundColor_006 end";
 }
 
@@ -193,11 +181,7 @@ HWTEST_F(FmsFormEditExtensionContextTest, SetWindowBackgroundColor_007, TestSize
     MockGetWindow(false);
     MockSetBackgroundColor(Rosen::WMError::WM_OK);
     bool result = context.SetWindowBackgroundColor("");
-#ifdef SUPPORT_SCREEN
     EXPECT_TRUE(result);
-#else
-    EXPECT_TRUE(result);
-#endif
     GTEST_LOG_(INFO) << "SetWindowBackgroundColor_007 end";
 }
 
@@ -238,15 +222,9 @@ HWTEST_F(FmsFormEditExtensionContextTest, SetWindowBackgroundColor_009, TestSize
     bool result1 = context.SetWindowBackgroundColor("#FF0000");
     bool result2 = context.SetWindowBackgroundColor("#00FF00");
     bool result3 = context.SetWindowBackgroundColor("#0000FF");
-#ifdef SUPPORT_SCREEN
     EXPECT_TRUE(result1);
     EXPECT_TRUE(result2);
     EXPECT_TRUE(result3);
-#else
-    EXPECT_TRUE(result1);
-    EXPECT_TRUE(result2);
-    EXPECT_TRUE(result3);
-#endif
     GTEST_LOG_(INFO) << "SetWindowBackgroundColor_009 end";
 }
 
@@ -263,11 +241,7 @@ HWTEST_F(FmsFormEditExtensionContextTest, SetWindowBackgroundColor_010, TestSize
     MockGetWindow(false);
     MockSetBackgroundColor(Rosen::WMError::WM_OK);
     bool result1 = context.SetWindowBackgroundColor("#FF0000");
-#ifdef SUPPORT_SCREEN
     EXPECT_TRUE(result1);
-#else
-    EXPECT_TRUE(result1);
-#endif
 
     // Window becomes unavailable
     MockGetWindow(true);
