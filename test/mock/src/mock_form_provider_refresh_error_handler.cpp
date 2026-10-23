@@ -16,10 +16,12 @@
 #include "form_provider/error_handler/provider_connection_error_handler.h"
 #include "common/retry_policy/retry_policy.h"
 #include "common/util/form_task_common.h"
+#include "mock_form_provider_acquire_error_handler.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 std::shared_ptr<MockFormProviderRefreshErrorHandler> MockFormProviderRefreshErrorHandler::obj = nullptr;
+std::shared_ptr<MockFormProviderAcquireErrorHandler> MockFormProviderAcquireErrorHandler::obj = nullptr;
 
 // vtable anchor for FormProviderRefreshErrorHandler (refresh handler thinned to GetRetryTaskType only)
 TaskType FormProviderRefreshErrorHandler::GetRetryTaskType() const
@@ -43,6 +45,12 @@ bool FormProviderConnectionErrorHandler::HandleDisconnectError(
     int64_t formId, const sptr<FormAbilityConnection> &connection)
 {
     GTEST_LOG_(INFO) << "HandleDisconnectError called formId:" << formId;
+    // Dispatch by the real instance's task type so tests can assert which handler a
+    // connection routed to (e.g. FormRefreshConnection's RECREATE key dispatch).
+    if (MockFormProviderAcquireErrorHandler::obj != nullptr
+        && GetRetryTaskType() == TaskType::ACQUIRE_RETRY_TASK) {
+        return MockFormProviderAcquireErrorHandler::obj->HandleDisconnectError(formId, connection);
+    }
     if (MockFormProviderRefreshErrorHandler::obj) {
         return MockFormProviderRefreshErrorHandler::obj->HandleDisconnectError(formId, connection);
     }

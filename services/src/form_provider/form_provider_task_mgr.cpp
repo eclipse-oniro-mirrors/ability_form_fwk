@@ -255,7 +255,9 @@ void FormProviderTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Wa
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);
     int error = formProviderProxy->AcquireProviderFormInfo(formJsInfo, want, FormSupplyCallback::GetInstance());
     if (error == ERR_OK) {
-        FormProviderErrorHandlerFactory::GetAcquireHandler()->RemoveRetryPolicy(formId);
+        // Register the callback wait so a lost OnAcquire (SendRequest returned OK,
+        // provider died before answering) still retries.
+        FormProviderErrorHandlerFactory::GetAcquireHandler()->StartCallbackPending(formId, connectId);
         DelayedFormExitDetect(connectId);
         FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
         return;

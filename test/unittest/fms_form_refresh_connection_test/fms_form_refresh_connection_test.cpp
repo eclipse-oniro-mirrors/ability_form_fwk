@@ -43,6 +43,7 @@
 #include "feature/free_install/free_install_status_callback_stub.h"
 #include "mock_form_provider_task_mgr.h"
 #include "mock_form_provider_refresh_error_handler.h"
+#include "mock_form_provider_acquire_error_handler.h"
 #include "mock_form_supply_callback.h"
 #include "mock_form_data_mgr.h"
 #undef private
@@ -82,12 +83,14 @@ void FmsFormRefreshConnectionTest::SetUp()
 {
     MockFormProviderTaskMgr::obj = std::make_shared<MockFormProviderTaskMgr>();
     MockFormProviderRefreshErrorHandler::obj = std::make_shared<MockFormProviderRefreshErrorHandler>();
+    MockFormProviderAcquireErrorHandler::obj = std::make_shared<MockFormProviderAcquireErrorHandler>();
 }
 
 void FmsFormRefreshConnectionTest::TearDown()
 {
     MockFormProviderTaskMgr::obj = nullptr;
     MockFormProviderRefreshErrorHandler::obj = nullptr;
+    MockFormProviderAcquireErrorHandler::obj = nullptr;
 }
 
 sptr<FormRefreshConnection> FmsFormRefreshConnectionTest::CreateRefreshConnection(int64_t formId, Want &want)
@@ -124,6 +127,60 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_DisconnectError_0
     EXPECT_EQ(0, conn->GetConnectId());
 
     GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_DisconnectError_001 end";
+}
+
+/**
+ * @tc.name: OnAbilityDisconnectDone_DispatchRecreateToAcquire_001
+ * @tc.desc: test OnAbilityDisconnectDone with a RECREATE want: the death confirmation
+ *           must dispatch to the acquire handler (the recreate task chain registers
+ *           its retry policy there), not the refresh handler.
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_DispatchRecreateToAcquire_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_DispatchRecreateToAcquire_001 start";
+    AppExecFwk::ElementName element;
+    Want want;
+    want.SetParam(Constants::RECREATE_FORM_KEY, true);
+
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(1, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    conn->SetConnectState(ConnectState::CONNECTED);
+    EXPECT_CALL(*MockFormProviderAcquireErrorHandler::obj, HandleDisconnectError(1, _)).Times(1);
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _)).Times(0);
+    conn->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
+    EXPECT_EQ(0, conn->GetConnectId());
+
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_DispatchRecreateToAcquire_001 end";
+}
+
+/**
+ * @tc.name: OnAbilityDisconnectDone_MessageEvent_NoHandler_001
+ * @tc.desc: test OnAbilityDisconnectDone with a message-event want: one-shot
+ *           FireFormEvent never registers a retry policy, so the death must
+ *           not enter any error handler (avoids a dead signal timeout).
+ * @tc.type: FUNC
+ * @tc.require: issueI5T4GJ
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, OnAbilityDisconnectDone_MessageEvent_NoHandler_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_MessageEvent_NoHandler_001 start";
+    AppExecFwk::ElementName element;
+    Want want;
+    want.SetParam(Constants::PARAM_MESSAGE_KEY, FORM_MESSAGE_EVENT_VALUE_1);
+
+    sptr<FormRefreshConnection> conn = CreateRefreshConnection(1, want);
+    ASSERT_NE(nullptr, conn);
+    conn->SetConnectId(TEST_CONNECT_ID);
+    conn->SetConnectState(ConnectState::CONNECTED);
+    EXPECT_CALL(*MockFormProviderAcquireErrorHandler::obj, HandleDisconnectError(_, _)).Times(0);
+    EXPECT_CALL(*MockFormProviderRefreshErrorHandler::obj, HandleDisconnectError(_, _)).Times(0);
+    conn->OnAbilityDisconnectDone(element, DISCONNECT_ERROR);
+    EXPECT_EQ(0, conn->GetConnectId());
+
+    GTEST_LOG_(INFO) << "OnAbilityDisconnectDone_MessageEvent_NoHandler_001 end";
 }
 
 /**
@@ -234,8 +291,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnBuildTaskWant_RecreateFormKey_001, Test
     GTEST_LOG_(INFO) << "OnBuildTaskWant_RecreateFormKey_001 start";
 
     Want want;
-    const std::string recreateFlag = "true";
-    want.SetParam(Constants::RECREATE_FORM_KEY, recreateFlag);
+    want.SetParam(Constants::RECREATE_FORM_KEY, true);
     sptr<FormRefreshConnection> conn = CreateRefreshConnection(2, want);
     ASSERT_NE(nullptr, conn);
     conn->SetConnectId(TEST_CONNECT_ID);
@@ -303,7 +359,10 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnExecuteConnectTask_MessageParam_001, Te
 
 /**
  * @tc.name: OnExecuteConnectTask_RecreateForm_001
- * @tc.desc: Verify OnExecuteConnectTask with RECREATE_FORM_KEY → PostAcquireTask called.
+ * @tc.desc: Verify the recreate dispatch forwards the real-chain payload intact: the want
+ *           OnExecuteConnectTask receives is OnBuildTaskWant() output (RECREATE key kept,
+ *           ACQUIRE_TYPE and FORM_CONNECT_ID injected) and must reach PostAcquireTask unmodified
+ *           — AcquireProviderFormInfo depends on these keys (connectId lookup, acquire-type branch).
  * @tc.type: FUNC
  * @tc.require: issueI5T4GJ
  */
@@ -312,18 +371,27 @@ HWTEST_F(FmsFormRefreshConnectionTest, OnExecuteConnectTask_RecreateForm_001, Te
     GTEST_LOG_(INFO) << "OnExecuteConnectTask_RecreateForm_001 start";
     sptr<IRemoteObject> remoteObject = nullptr;
 
-    // Test RECREATE_FORM_KEY branch
     Want want;
-    const std::string recreateFlag = "true";
-    want.SetParam(Constants::RECREATE_FORM_KEY, recreateFlag);
+    want.SetParam(Constants::RECREATE_FORM_KEY, true);
     sptr<FormRefreshConnection> connection = CreateRefreshConnection(2, want);
     ASSERT_NE(nullptr, connection);
+    connection->SetConnectId(TEST_CONNECT_ID);
 
-    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostAcquireTask(2, _, remoteObject)).Times(1);
+    // Real chain (FormAbilityConnection::OnAbilityConnectDone): the want fed to
+    // OnExecuteConnectTask is OnBuildTaskWant() output, so reproduce it and assert the
+    // payload is forwarded intact instead of only checking the dispatch branch.
+    Want taskWant = connection->OnBuildTaskWant();
+    Want capturedWant;
+    EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostAcquireTask(2, _, remoteObject)).Times(1)
+        .WillOnce(::testing::SaveArg<1>(&capturedWant));
     EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostRefreshTask(_, _, _)).Times(0);
     EXPECT_CALL(*MockFormProviderTaskMgr::obj, PostFormEventTask(_, _, _, _)).Times(0);
 
-    connection->OnExecuteConnectTask(want, remoteObject);
+    connection->OnExecuteConnectTask(taskWant, remoteObject);
+
+    EXPECT_TRUE(capturedWant.HasParameter(Constants::RECREATE_FORM_KEY));
+    EXPECT_EQ(Constants::ACQUIRE_TYPE_RECREATE_FORM, capturedWant.GetIntParam(Constants::ACQUIRE_TYPE, 0));
+    EXPECT_EQ(TEST_CONNECT_ID, capturedWant.GetIntParam(Constants::FORM_CONNECT_ID, 0));
 
     GTEST_LOG_(INFO) << "OnExecuteConnectTask_RecreateForm_001 end";
 }

@@ -21,13 +21,8 @@
 namespace OHOS {
 namespace AppExecFwk {
 
-RetryPolicy::RetryPolicy(const RetryPolicyConfig &config) : sendRequestFailed_(false), disconnectFailed_(false),
+RetryPolicy::RetryPolicy(const RetryPolicyConfig &config) : stage_(RequestStage::IDLE), callbackConnectId_(0),
     config_(config), retryCount_(0) {}
-
-bool RetryPolicy::NeedRetry() const
-{
-    return sendRequestFailed_ && disconnectFailed_ && retryCount_ < config_.maxRetryCount;
-}
 
 int32_t RetryPolicy::GetRetryCount() const
 {
@@ -42,8 +37,8 @@ void RetryPolicy::IncrementRetryCount()
 void RetryPolicy::Reset()
 {
     retryCount_ = 0;
-    sendRequestFailed_ = false;
-    disconnectFailed_ = false;
+    stage_ = RequestStage::IDLE;
+    callbackConnectId_ = 0;
 }
 
 bool RetryPolicy::IsRetryLimitReached() const
@@ -78,24 +73,24 @@ int32_t RetryPolicy::CalculateNextDelay() const
     return delay;
 }
 
-bool RetryPolicy::IsSendRequestFailed() const
+RequestStage RetryPolicy::GetStage() const
 {
-    return sendRequestFailed_;
+    return stage_;
 }
 
-void RetryPolicy::SetSendRequestFailed(bool failed)
+void RetryPolicy::SetStage(RequestStage stage)
 {
-    sendRequestFailed_ = failed;
+    stage_ = stage;
 }
 
-bool RetryPolicy::IsDisconnectFailed() const
+int32_t RetryPolicy::GetCallbackConnectId() const
 {
-    return disconnectFailed_;
+    return callbackConnectId_;
 }
 
-void RetryPolicy::SetDisconnectFailed(bool failed)
+void RetryPolicy::SetCallbackConnectId(int32_t connectId)
 {
-    disconnectFailed_ = failed;
+    callbackConnectId_ = connectId;
 }
 
 sptr<FormAbilityConnection> RetryPolicy::GetOriginalConnection() const

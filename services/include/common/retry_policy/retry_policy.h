@@ -34,6 +34,14 @@ enum class RetryStrategyType {
     EXPONENTIAL
 };
 
+enum class RequestStage : int32_t {
+    IDLE = 0,                // No request in flight
+    WAITING_CALLBACK = 1,    // SendRequest returned ERR_OK, waiting for the OnAcquire callback
+    CALLBACK_COMPLETED = 2,  // Callback arrived, business done (success terminal, policy kept until cleanup)
+    WAITING_DISCONNECT_CONFIRM = 3, // SendRequest failed (dead-object error), waiting for disconnect to confirm death
+    WAITING_SEND_RESULT = 4, // The disconnect arrived first, waiting for the SendRequest failure to confirm death
+};
+
 struct RetryPolicyConfig {
     int32_t maxRetryCount = 3;
     RetryStrategyType strategyType = RetryStrategyType::LINEAR;
@@ -46,7 +54,6 @@ public:
     RetryPolicy() = default;
     explicit RetryPolicy(const RetryPolicyConfig &config);
 
-    bool NeedRetry() const;
     int32_t GetRetryCount() const;
     void IncrementRetryCount();
     void Reset();
@@ -66,17 +73,19 @@ public:
      */
     int32_t CalculateNextDelay() const;
 
-    bool IsSendRequestFailed() const;
-    void SetSendRequestFailed(bool failed);
-    bool IsDisconnectFailed() const;
-    void SetDisconnectFailed(bool failed);
+    RequestStage GetStage() const;
+    void SetStage(RequestStage stage);
+    int32_t GetCallbackConnectId() const;
+    // Set 0 to clear the match (0 is never a real id: connect ids are timestamp-derived,
+    // and 0 is the want default when FORM_CONNECT_ID is absent).
+    void SetCallbackConnectId(int32_t connectId);
 
     sptr<FormAbilityConnection> GetOriginalConnection() const;
     void SetOriginalConnection(const sptr<FormAbilityConnection> &connection);
 
 private:
-    bool sendRequestFailed_ = false;
-    bool disconnectFailed_ = false;
+    RequestStage stage_ = RequestStage::IDLE;
+    int32_t callbackConnectId_ = 0;
     RetryPolicyConfig config_;
     int32_t retryCount_ = 0;
     sptr<FormAbilityConnection> originalConnection_;

@@ -28,6 +28,7 @@
 #include "form_provider/form_provider_mgr.h"
 #include "form_provider/form_provider_task_mgr.h"
 #include "form_provider/form_provider_queue.h"
+#include "form_provider/error_handler/provider_error_handler_factory.h"
 #include "form_render/form_render_mgr.h"
 #include "feature/form_share/form_share_mgr.h"
 #include "common/util/form_util.h"
@@ -144,6 +145,8 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
         RemoveConnection(connectId);
         return validRet;
     }
+    // Only a validated callback completes the wait; invalid ones must not mark it done.
+    FormProviderErrorHandlerFactory::GetAcquireHandler()->OnCallbackArrived(formId, connectId);
     int32_t callerUserId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     RefreshCacheMgr::GetInstance().ConsumeAddUnfinishFlag(formId, callerUserId);
     FormReport::GetInstance().SetStartAquireTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
@@ -256,7 +259,7 @@ void FormSupplyCallback::AddConnection(sptr<FormAbilityConnection> connection)
     }
     connection->SetConnectId(connectKey);
     connections_.emplace(connectKey, connection);
-    HILOG_DEBUG("end");
+    HILOG_DEBUG("end, connectId:%{public}d", connectKey);
 }
 
 /**

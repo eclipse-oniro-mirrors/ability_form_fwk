@@ -67,6 +67,25 @@ public:
     virtual bool HandleDisconnectError(int64_t formId, const sptr<FormAbilityConnection> &connection);
 
     /**
+     * @brief Register callback waiting after SendRequest returned ERR_OK: enters
+     *        WAITING_CALLBACK, records connectId and starts the 10s callback timeout.
+     *        Preserves retryCount across retries in the same retry chain.
+     * @param formId Form ID.
+     * @param connectId Connect id for callback matching.
+     */
+    void StartCallbackPending(int64_t formId, int32_t connectId);
+
+    /**
+     * @brief Notify callback arrival (called at OnAcquire head): WAITING_CALLBACK ->
+     *        CALLBACK_COMPLETED, cancels pending timeouts, keeps the policy until
+     *        disconnect cleanup or next registration. No-op without a matching
+     *        WAITING_CALLBACK policy (absent / wrong stage / connectId mismatch).
+     * @param formId Form ID (0 when the want carries no form identity, no policy matches).
+     * @param connectId Connect id carried by the callback.
+     */
+    void OnCallbackArrived(int64_t formId, int32_t connectId);
+
+    /**
      * @brief Remove retry policy for specified form.
      * @param formId Form ID.
      */
@@ -77,6 +96,12 @@ protected:
     static constexpr int32_t IPC_ERR_SERVICE_DIED = 29189;
     // Fallback timeout waiting for the second dual-signal (disconnect or sendRequest).
     static constexpr int32_t RETRY_SIGNAL_TIMEOUT_MS = 5000; // ms
+    // Callback timeout spec (aligned with DETECT_FORM_EXIT_TIMEOUT_DELAY, not adjustable):
+    // neither callback nor disconnect within 10s -> out of scope, erase policy without retry.
+    // Order dependency: StartCallbackPending must be called before DelayedFormExitDetect so
+    // that the callback timeout fires first; otherwise the exit-detect disconnect converts
+    // the scenario from "give up" to "retry".
+    static constexpr int32_t CALLBACK_TIMEOUT_MS = 10 * 1000; // ms
 
     std::unordered_map<int64_t, RetryPolicy> retryPolicyMap_;
     std::mutex retryPolicyMutex_;
@@ -125,8 +150,30 @@ protected:
     void CancelSignalTimeout(int64_t formId);
 
     /**
-     * @brief Cancel all pending retry + signal-timeout tasks for specified form.
-     *        Thread-safe (FormMgrQueue handles its own locking); safe to call within retryPolicyMutex_.
+     * @brief Start the 10s callback timeout for WAITING_CALLBACK. OnCallbackTimeout
+     *        erases the policy when neither callback nor disconnect arrived.
+     * @param formId Form ID.
+     * @param connectId Connect id registered for this round (stale-round guard).
+     */
+    void StartCallbackTimeout(int64_t formId, int32_t connectId);
+
+    /**
+     * @brief Callback timeout handler: erase the policy if still WAITING_CALLBACK
+     *        on the same round (expectedConnectId matches).
+     * @param formId Form ID.
+     * @param expectedConnectId Connect id captured at registration.
+     */
+    void OnCallbackTimeout(int64_t formId, int32_t expectedConnectId);
+
+    /**
+     * @brief Cancel pending callback timeout task for specified form.
+     * @param formId Form ID.
+     */
+    void CancelCallbackTimeout(int64_t formId);
+
+    /**
+     * @brief Cancel all pending delay tasks (retry / signal-timeout / callback-timeout) for specified form.
+     *        Thread-safe (FormProviderQueue handles its own locking); safe to call within retryPolicyMutex_.
      * @param formId Form ID.
      */
     void CancelPendingTasks(int64_t formId);
@@ -150,11 +197,54 @@ protected:
      */
     void ScheduleRetryWithReset(int64_t formId, RetryPolicy &policy, const sptr<FormAbilityConnection> &connection);
 
+    /**
+     * @brief Handle disconnect when stage=WAITING_CALLBACK: callback lost, retry or limit-reached.
+     *        Caller MUST hold retryPolicyMutex_.
+     * @return true (always handled).
+     */
+    bool HandleDisconnectOnWaitingCallback(int64_t formId, RetryPolicy &policy,
+        const sptr<FormAbilityConnection> &connection);
+
+    /**
+     * @brief Handle disconnect when stage=WAITING_DISCONNECT_CONFIRM: dual-signal confirmed, retry or limit-reached.
+     *        Caller MUST hold retryPolicyMutex_.
+     * @return true (always handled).
+     */
+    bool HandleDisconnectOnWaitingConfirm(int64_t formId, RetryPolicy &policy,
+        const sptr<FormAbilityConnection> &connection);
+
+    /**
+     * @brief Check retry limit: if reached, cancel pending tasks, erase policy, call OnRetryLimitReached.
+     *        Caller MUST hold retryPolicyMutex_.
+     * @return true if limit reached (terminal), false if retry can proceed.
+     */
+    bool CheckRetryLimitReached(int64_t formId, RetryPolicy &policy);
+
+    /**
+     * @brief Get the scenario name ("Acquire"/"Refresh") for base-class log prefixes,
+     *        so messages shared by both handlers stay distinguishable when interleaved
+     *        on one formId (recreate-acquire + concurrent refresh).
+     * @return Scenario name string.
+     */
+    const char *GetScenarioName() const
+    {
+        switch (GetRetryTaskType()) {
+            case TaskType::ACQUIRE_RETRY_TASK:
+                return "Acquire";
+            case TaskType::REFRESH_RETRY_TASK:
+                return "Refresh";
+            default:
+                return "Unknown";
+        }
+    }
+
     // --- Virtual hooks: subclass variation points ---
 
     /**
-     * @brief Get the retry delay-task key. Refresh/acquire return their own TaskType so retry
-     *        tasks do not collide (a formId is only ever in one scenario at a time).
+     * @brief Get the delay-task key for this handler (refresh/acquire return their own
+     *        TaskType so tasks of the two handlers never collide on one formId). The
+     *        callback/signal timeouts and the retry task share this key slot: each policy
+     *        stage has at most one active delay task and transitions cancel in pairs.
      * @return TaskType for ScheduleDelayTask/CancelDelayTask.
      */
     virtual TaskType GetRetryTaskType() const = 0;

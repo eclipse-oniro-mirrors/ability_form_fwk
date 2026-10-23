@@ -108,7 +108,7 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnRetryLimitReached_001, TestSize.L
 {
     GTEST_LOG_(INFO) << "OnRetryLimitReached_001 start";
     auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
-    policy.SetSendRequestFailed(true);
+    policy.SetStage(RequestStage::WAITING_DISCONNECT_CONFIRM);
     EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
     handler_->OnRetryLimitReached(FORM_ID);
     EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
@@ -118,7 +118,7 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnRetryLimitReached_001, TestSize.L
 
 /**
  * @tc.name: HandleSendRequestFailed_DeadObject_001
- * @tc.desc: Verify path A signal 1: dead error sets sendRequestFailed and waits for disconnect.
+ * @tc.desc: Verify dead-object error enters WAITING_DISCONNECT_CONFIRM and waits for disconnect.
  * @tc.type: FUNC
  * @tc.require: issueI5NQJG
  */
@@ -129,8 +129,7 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, HandleSendRequestFailed_DeadObject_
     EXPECT_TRUE(handler_->HandleSendRequestFailed(FORM_ID, IPC_ERR_DEAD_OBJECT, want));
     auto it = handler_->retryPolicyMap_.find(FORM_ID);
     ASSERT_NE(it, handler_->retryPolicyMap_.end());
-    EXPECT_TRUE(it->second.IsSendRequestFailed());
-    EXPECT_FALSE(it->second.IsDisconnectFailed());
+    EXPECT_EQ(it->second.GetStage(), RequestStage::WAITING_DISCONNECT_CONFIRM);
     GTEST_LOG_(INFO) << "HandleSendRequestFailed_DeadObject_001 end";
 }
 
@@ -180,8 +179,7 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, DualSignal_RetryLimit_001, TestSize
 {
     GTEST_LOG_(INFO) << "DualSignal_RetryLimit_001 start";
     auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
-    policy.SetSendRequestFailed(true);
-    policy.SetDisconnectFailed(true);
+    policy.SetStage(RequestStage::WAITING_DISCONNECT_CONFIRM);
     for (int i = 0; i < 3; i++) { // maxRetryCount = 3 → IsRetryLimitReached
         policy.IncrementRetryCount();
     }
@@ -234,12 +232,11 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, HandleDisconnectError_NoPriorSendRe
     GTEST_LOG_(INFO) << "HandleDisconnectError_NoPriorSendRequest_001 start";
     sptr<FormAbilityConnection> conn = new TestConnection();
     conn->SetConnectState(ConnectState::CONNECTED);
-    // No prior HandleSendRequestFailed → sendRequestFailed=false → not handled
+    // No prior HandleSendRequestFailed → stage stays IDLE → WAITING_SEND_RESULT entry, not handled
     EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, conn));
     auto it = handler_->retryPolicyMap_.find(FORM_ID);
     ASSERT_NE(it, handler_->retryPolicyMap_.end());
-    EXPECT_TRUE(it->second.IsDisconnectFailed());
-    EXPECT_FALSE(it->second.IsSendRequestFailed());
+    EXPECT_EQ(it->second.GetStage(), RequestStage::WAITING_SEND_RESULT);
     handler_->RemoveRetryPolicy(FORM_ID);
     GTEST_LOG_(INFO) << "HandleDisconnectError_NoPriorSendRequest_001 end";
 }
@@ -257,9 +254,9 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, DualSignal_DisconnectFirst_001, Tes
     sptr<FormAbilityConnection> conn = new TestConnection();
     conn->SetConnectState(ConnectState::CONNECTED);
 
-    // Disconnect first: no prior sendRequest → returns false, but sets disconnectFailed
+    // Disconnect first: no prior sendRequest → returns false, but records the disconnect
     EXPECT_FALSE(handler_->HandleDisconnectError(FORM_ID, conn));
-    // SendRequest arrives: disconnectFailed already set → dual-signal confirmed → schedule retry
+    // SendRequest arrives after the disconnect: both signals confirmed, schedule retry
     EXPECT_TRUE(handler_->HandleSendRequestFailed(FORM_ID, IPC_ERR_DEAD_OBJECT, want));
 
     auto it = handler_->retryPolicyMap_.find(FORM_ID);
@@ -277,9 +274,9 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, DualSignal_DisconnectFirst_001, Tes
 HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnSignalTimeout_StuckHalfSignal_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "OnSignalTimeout_StuckHalfSignal_001 start";
-    // Simulate partial state: only sendRequestFailed set (waiting for disconnect that never comes)
+    // Simulate partial state: WAITING_DISCONNECT_CONFIRM (waiting for a disconnect that never comes)
     auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
-    policy.SetSendRequestFailed(true);
+    policy.SetStage(RequestStage::WAITING_DISCONNECT_CONFIRM);
     EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
 
     handler_->OnSignalTimeout(FORM_ID);
@@ -289,7 +286,8 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnSignalTimeout_StuckHalfSignal_001
 
 /**
  * @tc.name: OnSignalTimeout_BothSignalsSet_001
- * @tc.desc: Verify OnSignalTimeout does nothing when both signals set (retry in progress).
+ * @tc.desc: Verify OnSignalTimeout does nothing when the stage is not a partial-signal
+ *           stage (dual confirm resets the stage to IDLE before the retry is scheduled).
  * @tc.type: FUNC
  * @tc.require: issueI5NQJG
  */
@@ -297,13 +295,367 @@ HWTEST_F(FmsProviderAcquireErrorHandlerTest, OnSignalTimeout_BothSignalsSet_001,
 {
     GTEST_LOG_(INFO) << "OnSignalTimeout_BothSignalsSet_001 start";
     auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
-    policy.SetSendRequestFailed(true);
-    policy.SetDisconnectFailed(true);
+    policy.SetStage(RequestStage::IDLE);
     EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
 
     handler_->OnSignalTimeout(FORM_ID);
-    // Both set = not stuck → policy preserved
+    // Both signals confirmed resets to IDLE before retry, not stuck, policy preserved
     EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
     handler_->RemoveRetryPolicy(FORM_ID);
     GTEST_LOG_(INFO) << "OnSignalTimeout_BothSignalsSet_001 end";
+}
+
+/**
+ * @tc.name: StartCallbackPending_EnterWaitingStage_001
+ * @tc.desc: Verify registration after SendRequest ERR_OK: enters WAITING_CALLBACK with
+ *           connectId recorded and policy created.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, StartCallbackPending_EnterWaitingStage_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "StartCallbackPending_EnterWaitingStage_001 start";
+    handler_->StartCallbackPending(FORM_ID, 100);
+    auto it = handler_->retryPolicyMap_.find(FORM_ID);
+    ASSERT_NE(it, handler_->retryPolicyMap_.end());
+    EXPECT_EQ(it->second.GetStage(), RequestStage::WAITING_CALLBACK);
+    EXPECT_EQ(it->second.GetCallbackConnectId(), 100);
+    GTEST_LOG_(INFO) << "StartCallbackPending_EnterWaitingStage_001 end";
+}
+
+/**
+ * @tc.name: StartCallbackPending_OverwriteConnectId_001
+ * @tc.desc: Verify re-registration overwrites the recorded connectId (retry cycle switch).
+ *           Stale-timer misfire protection is covered by CallbackTimeout_StaleConnectId.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, StartCallbackPending_OverwriteConnectId_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "StartCallbackPending_OverwriteConnectId_001 start";
+    handler_->StartCallbackPending(FORM_ID, 100);
+    handler_->StartCallbackPending(FORM_ID, 200);
+    auto it = handler_->retryPolicyMap_.find(FORM_ID);
+    ASSERT_NE(it, handler_->retryPolicyMap_.end());
+    EXPECT_EQ(it->second.GetStage(), RequestStage::WAITING_CALLBACK);
+    EXPECT_EQ(it->second.GetCallbackConnectId(), 200);
+    GTEST_LOG_(INFO) << "StartCallbackPending_OverwriteConnectId_001 end";
+}
+
+/**
+ * @tc.name: Disconnect_WaitingCallback_DirectRetry_001
+ * @tc.desc: Verify WAITING_CALLBACK + disconnect (CONNECTED) retries directly
+ *           (recovery delay = the provider death perception delay), count +1.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, Disconnect_WaitingCallback_DirectRetry_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Disconnect_WaitingCallback_DirectRetry_001 start";
+    handler_->StartCallbackPending(FORM_ID, 100);
+    sptr<FormAbilityConnection> conn = new TestConnection();
+    conn->SetConnectState(ConnectState::CONNECTED);
+    EXPECT_TRUE(handler_->HandleDisconnectError(FORM_ID, conn));
+    auto it = handler_->retryPolicyMap_.find(FORM_ID);
+    ASSERT_NE(it, handler_->retryPolicyMap_.end());
+    EXPECT_EQ(it->second.GetRetryCount(), 1);
+    EXPECT_EQ(it->second.GetStage(), RequestStage::IDLE);
+    GTEST_LOG_(INFO) << "Disconnect_WaitingCallback_DirectRetry_001 end";
+}
+
+/**
+ * @tc.name: Disconnect_WaitingCallback_RetryExhausted_001
+ * @tc.desc: Verify WAITING_CALLBACK + disconnect with count exhausted erases the policy
+ *           and reports OnRetryLimitReached (acquire: SendFormFailedEvent).
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, Disconnect_WaitingCallback_RetryExhausted_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Disconnect_WaitingCallback_RetryExhausted_001 start";
+    handler_->StartCallbackPending(FORM_ID, 100);
+    auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
+    for (int i = 0; i < 3; i++) { // maxRetryCount = 3
+        policy.IncrementRetryCount();
+    }
+    sptr<FormAbilityConnection> conn = new TestConnection();
+    conn->SetConnectState(ConnectState::CONNECTED);
+    EXPECT_TRUE(handler_->HandleDisconnectError(FORM_ID, conn));
+    EXPECT_EQ(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    GTEST_LOG_(INFO) << "Disconnect_WaitingCallback_RetryExhausted_001 end";
+}
+
+/**
+ * @tc.name: Disconnect_CallbackCompleted_ErasePolicy_001
+ * @tc.desc: Verify CALLBACK_COMPLETED + disconnect erases the policy without retry
+ *           (last-connection exit sequence, no zombie policy).
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, Disconnect_CallbackCompleted_ErasePolicy_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "Disconnect_CallbackCompleted_ErasePolicy_001 start";
+    handler_->StartCallbackPending(FORM_ID, 100);
+    handler_->OnCallbackArrived(FORM_ID, 100);
+    EXPECT_EQ(handler_->EnsureRetryPolicyLocked(FORM_ID).GetStage(), RequestStage::CALLBACK_COMPLETED);
+
+    sptr<FormAbilityConnection> conn = new TestConnection();
+    conn->SetConnectState(ConnectState::CONNECTED);
+    EXPECT_TRUE(handler_->HandleDisconnectError(FORM_ID, conn));
+    EXPECT_EQ(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    GTEST_LOG_(INFO) << "Disconnect_CallbackCompleted_ErasePolicy_001 end";
+}
+
+/**
+ * @tc.name: CallbackArrived_EnterCompleted_001
+ * @tc.desc: Verify callback arrival with matching connectId enters CALLBACK_COMPLETED,
+ *           cancels timeouts and keeps the policy in the map.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, CallbackArrived_EnterCompleted_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CallbackArrived_EnterCompleted_001 start";
+    handler_->StartCallbackPending(FORM_ID, 100);
+    handler_->OnCallbackArrived(FORM_ID, 100);
+    auto it = handler_->retryPolicyMap_.find(FORM_ID);
+    ASSERT_NE(it, handler_->retryPolicyMap_.end());
+    EXPECT_EQ(it->second.GetStage(), RequestStage::CALLBACK_COMPLETED);
+    GTEST_LOG_(INFO) << "CallbackArrived_EnterCompleted_001 end";
+}
+
+/**
+ * @tc.name: CallbackArrived_ConnectIdMismatch_001
+ * @tc.desc: Verify callback arrival with a stale connectId does not advance the stage.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, CallbackArrived_ConnectIdMismatch_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CallbackArrived_ConnectIdMismatch_001 start";
+    handler_->StartCallbackPending(FORM_ID, 200);
+    handler_->OnCallbackArrived(FORM_ID, 100); // stale round
+    auto it = handler_->retryPolicyMap_.find(FORM_ID);
+    ASSERT_NE(it, handler_->retryPolicyMap_.end());
+    EXPECT_EQ(it->second.GetStage(), RequestStage::WAITING_CALLBACK);
+    EXPECT_EQ(it->second.GetCallbackConnectId(), 200);
+    GTEST_LOG_(INFO) << "CallbackArrived_ConnectIdMismatch_001 end";
+}
+
+/**
+ * @tc.name: CallbackArrived_NotWaitingStage_001
+ * @tc.desc: Verify callback arrival on CALLBACK_COMPLETED is a no-op (terminal stays).
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, CallbackArrived_NotWaitingStage_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CallbackArrived_NotWaitingStage_001 start";
+    handler_->StartCallbackPending(FORM_ID, 100);
+    handler_->OnCallbackArrived(FORM_ID, 100);
+    handler_->OnCallbackArrived(FORM_ID, 100); // duplicate arrival
+    auto it = handler_->retryPolicyMap_.find(FORM_ID);
+    ASSERT_NE(it, handler_->retryPolicyMap_.end());
+    EXPECT_EQ(it->second.GetStage(), RequestStage::CALLBACK_COMPLETED);
+    GTEST_LOG_(INFO) << "CallbackArrived_NotWaitingStage_001 end";
+}
+
+/**
+ * @tc.name: CallbackArrived_NoPolicy_001
+ * @tc.desc: Verify callback arrival without a policy is a safe no-op.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, CallbackArrived_NoPolicy_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CallbackArrived_NoPolicy_001 start";
+    handler_->OnCallbackArrived(FORM_ID, 100);
+    EXPECT_EQ(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    GTEST_LOG_(INFO) << "CallbackArrived_NoPolicy_001 end";
+}
+
+/**
+ * @tc.name: CallbackTimeout_NoEvent_OutOfScope_001
+ * @tc.desc: Verify callback timeout with no event (same round, still WAITING_CALLBACK)
+ *           erases the policy without retry (out of scope).
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, CallbackTimeout_NoEvent_OutOfScope_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CallbackTimeout_NoEvent_OutOfScope_001 start";
+    handler_->StartCallbackPending(FORM_ID, 100);
+    handler_->OnCallbackTimeout(FORM_ID, 100);
+    EXPECT_EQ(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    GTEST_LOG_(INFO) << "CallbackTimeout_NoEvent_OutOfScope_001 end";
+}
+
+/**
+ * @tc.name: CallbackTimeout_StaleConnectId_Ignored_001
+ * @tc.desc: Verify callback timeout carrying a stale connectId is ignored (stale timer).
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, CallbackTimeout_StaleConnectId_Ignored_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CallbackTimeout_StaleConnectId_Ignored_001 start";
+    handler_->StartCallbackPending(FORM_ID, 200);
+    handler_->OnCallbackTimeout(FORM_ID, 100); // stale round
+    auto it = handler_->retryPolicyMap_.find(FORM_ID);
+    ASSERT_NE(it, handler_->retryPolicyMap_.end());
+    EXPECT_EQ(it->second.GetStage(), RequestStage::WAITING_CALLBACK);
+    GTEST_LOG_(INFO) << "CallbackTimeout_StaleConnectId_Ignored_001 end";
+}
+
+/**
+ * @tc.name: CallbackTimeout_NotWaiting_Ignored_001
+ * @tc.desc: Verify callback timeout on a non-waiting stage is ignored (already handled).
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, CallbackTimeout_NotWaiting_Ignored_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CallbackTimeout_NotWaiting_Ignored_001 start";
+    handler_->StartCallbackPending(FORM_ID, 100);
+    handler_->OnCallbackArrived(FORM_ID, 100); // -> CALLBACK_COMPLETED
+    handler_->OnCallbackTimeout(FORM_ID, 100);
+    auto it = handler_->retryPolicyMap_.find(FORM_ID);
+    ASSERT_NE(it, handler_->retryPolicyMap_.end());
+    EXPECT_EQ(it->second.GetStage(), RequestStage::CALLBACK_COMPLETED);
+    GTEST_LOG_(INFO) << "CallbackTimeout_NotWaiting_Ignored_001 end";
+}
+
+/**
+ * @tc.name: ScheduleRetryWithReset_ClearsTimeoutAndStage_001
+ * @tc.desc: Verify a scheduled retry resets the stage to IDLE and clears the
+ *           callback connectId (double-path retry safety).
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, ScheduleRetryWithReset_ClearsTimeoutAndStage_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ScheduleRetryWithReset_ClearsTimeoutAndStage_001 start";
+    handler_->StartCallbackPending(FORM_ID, 100);
+    sptr<FormAbilityConnection> conn = new TestConnection();
+    conn->SetConnectState(ConnectState::CONNECTED);
+    EXPECT_TRUE(handler_->HandleDisconnectError(FORM_ID, conn)); // schedules retry
+
+    auto it = handler_->retryPolicyMap_.find(FORM_ID);
+    ASSERT_NE(it, handler_->retryPolicyMap_.end());
+    EXPECT_EQ(it->second.GetStage(), RequestStage::IDLE);
+    EXPECT_EQ(it->second.GetCallbackConnectId(), 0);
+    EXPECT_EQ(it->second.GetRetryCount(), 1);
+    GTEST_LOG_(INFO) << "ScheduleRetryWithReset_ClearsTimeoutAndStage_001 end";
+}
+
+/**
+ * @tc.name: RemoveRetryPolicy_CancelsCallbackTimeout_001
+ * @tc.desc: Verify RemoveRetryPolicy (form deletion path) erases the registered policy;
+ *           pending timer tasks are cancelled inside CancelPendingTasks.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, RemoveRetryPolicy_CancelsCallbackTimeout_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RemoveRetryPolicy_CancelsCallbackTimeout_001 start";
+    handler_->StartCallbackPending(FORM_ID, 100);
+    EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    handler_->RemoveRetryPolicy(FORM_ID);
+    EXPECT_EQ(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    GTEST_LOG_(INFO) << "RemoveRetryPolicy_CancelsCallbackTimeout_001 end";
+}
+
+/**
+ * @tc.name: ExecuteRetry_HasFormRecordGuard_001
+ * @tc.desc: Verify ExecuteRetry aborts (erases policy, no connect) when the form record
+ *           was deleted inside the retry connect window (existing behavior regression).
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, ExecuteRetry_HasFormRecordGuard_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ExecuteRetry_HasFormRecordGuard_001 start";
+    EXPECT_CALL(*mockFormDataMgr_, HasFormRecord(FORM_ID)).WillRepeatedly(Return(false));
+    auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
+    policy.SetStage(RequestStage::IDLE);
+    sptr<FormAbilityConnection> conn = new TestConnection();
+    handler_->ExecuteRetry(FORM_ID, conn);
+    EXPECT_EQ(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    GTEST_LOG_(INFO) << "ExecuteRetry_HasFormRecordGuard_001 end";
+}
+
+/**
+ * @tc.name: CallbackLate_AfterRetry_001
+ * @tc.desc: Verify an old-round callback arriving after a retry cycle does not advance
+ *           the new round's policy (connectId guard across cycles).
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, CallbackLate_AfterRetry_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CallbackLate_AfterRetry_001 start";
+    handler_->StartCallbackPending(FORM_ID, 100);
+    sptr<FormAbilityConnection> conn = new TestConnection();
+    conn->SetConnectState(ConnectState::CONNECTED);
+    EXPECT_TRUE(handler_->HandleDisconnectError(FORM_ID, conn)); // retry, stage -> IDLE
+
+    handler_->StartCallbackPending(FORM_ID, 200); // new round
+    handler_->OnCallbackArrived(FORM_ID, 100);    // old-round callback
+    auto it = handler_->retryPolicyMap_.find(FORM_ID);
+    ASSERT_NE(it, handler_->retryPolicyMap_.end());
+    EXPECT_EQ(it->second.GetStage(), RequestStage::WAITING_CALLBACK);
+    EXPECT_EQ(it->second.GetCallbackConnectId(), 200);
+    GTEST_LOG_(INFO) << "CallbackLate_AfterRetry_001 end";
+}
+
+/**
+ * @tc.name: CallbackTimeout_NoPolicy_001
+ * @tc.desc: Verify callback timeout without a policy is a safe no-op.
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, CallbackTimeout_NoPolicy_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "CallbackTimeout_NoPolicy_001 start";
+    handler_->OnCallbackTimeout(FORM_ID, 100);
+    EXPECT_EQ(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    GTEST_LOG_(INFO) << "CallbackTimeout_NoPolicy_001 end";
+}
+
+/**
+ * @tc.name: SignalTimeout_WaitingSendResult_Cleanup_001
+ * @tc.desc: Verify OnSignalTimeout erases the policy in WAITING_SEND_RESULT
+ *           (partial-signal stage, existing behavior).
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, SignalTimeout_WaitingSendResult_Cleanup_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SignalTimeout_WaitingSendResult_Cleanup_001 start";
+    auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
+    policy.SetStage(RequestStage::WAITING_SEND_RESULT);
+    handler_->OnSignalTimeout(FORM_ID);
+    EXPECT_EQ(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    GTEST_LOG_(INFO) << "SignalTimeout_WaitingSendResult_Cleanup_001 end";
+}
+
+/**
+ * @tc.name: SignalTimeout_NonPartialStages_NoOp_001
+ * @tc.desc: Verify OnSignalTimeout preserves the policy for non-partial-signal stages
+ *           (IDLE / CALLBACK_COMPLETED / WAITING_CALLBACK — the latter owns its own
+ *           callback timeout, no signal timeout should be running).
+ * @tc.type: FUNC
+ * @tc.require: issueI5NQJG
+ */
+HWTEST_F(FmsProviderAcquireErrorHandlerTest, SignalTimeout_NonPartialStages_NoOp_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "SignalTimeout_NonPartialStages_NoOp_001 start";
+    auto &policy = handler_->EnsureRetryPolicyLocked(FORM_ID);
+    for (auto stage : {RequestStage::IDLE, RequestStage::CALLBACK_COMPLETED, RequestStage::WAITING_CALLBACK}) {
+        policy.SetStage(stage);
+        handler_->OnSignalTimeout(FORM_ID);
+        EXPECT_NE(handler_->retryPolicyMap_.find(FORM_ID), handler_->retryPolicyMap_.end());
+    }
+    handler_->RemoveRetryPolicy(FORM_ID);
+    GTEST_LOG_(INFO) << "SignalTimeout_NonPartialStages_NoOp_001 end";
 }
