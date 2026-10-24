@@ -19,6 +19,7 @@
 
 #include "common_event_support.h"
 #include "fms_log_wrapper.h"
+#include "ams_mgr/form_ams_helper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "form_constants.h"
 #include "data_center/form_data_mgr.h"
@@ -168,6 +169,7 @@ void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
         return;
     }
     FormMgrQueue::GetInstance().ScheduleTask(0, [userId]() {
+        FormAmsHelper::GetInstance().UnRegisterConfigurationObserver(userId);
         std::vector<int64_t> removedFormIds;
         FormDataMgr::GetInstance().DeleteFormsByUserId(userId, removedFormIds);
         FormDbCache::GetInstance().DeleteDBFormsByUserId(userId);
@@ -210,6 +212,7 @@ void FormSysEventReceiver::InitFormInfosAndRegister()
         }
         for (int32_t userId : activeUsers) {
             FormInfoMgr::GetInstance().ReloadFormInfos(userId);
+            FormAmsHelper::GetInstance().RegisterConfigurationObserver(userId);
         }
     }, Common::TaskQos::QOS_DEADLINE_REQUEST);
 }
@@ -276,6 +279,7 @@ void FormSysEventReceiver::HandleUserStopped(const int32_t userId)
     HILOG_INFO("user stopped userId: %{public}d", userId);
     auto task = [userId]() {
         FormInfoMgr::GetInstance().ClearReloadUserId(userId);
+        FormAmsHelper::GetInstance().UnRegisterConfigurationObserver(userId);
         FormRenderMgr::GetInstance().DisconnectAllRenderConnections(userId);
     };
     FormMgrQueue::GetInstance().ScheduleTask(0, task);
@@ -294,6 +298,7 @@ void FormSysEventReceiver::HandleUserStarted(const int32_t userId)
         FormInfoMgr::GetInstance().ReloadFormInfos(userId, [userId]() {
             FormRenderMgr::GetInstance().RerenderAllFormsImmediate(userId);
         });
+        FormAmsHelper::GetInstance().RegisterConfigurationObserver(userId);
     };
     FormMgrQueue::GetInstance().ScheduleTask(0, task, Common::TaskQos::QOS_DEADLINE_REQUEST);
 }

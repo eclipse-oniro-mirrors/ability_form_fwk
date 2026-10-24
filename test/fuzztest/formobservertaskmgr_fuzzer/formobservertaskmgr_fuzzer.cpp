@@ -95,6 +95,10 @@ void DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     AppExecFwk::Configuration configuration;
     FormObserverTaskMgr::GetInstance().PostBatchConfigurationUpdateForms(configuration);
 
+    // Test PostBatchColorModeUpdateForms with fuzzed userId
+    int32_t colorModeUserId = fdp->ConsumeIntegral<int32_t>();
+    FormObserverTaskMgr::GetInstance().PostBatchColorModeUpdateForms(colorModeUserId, configuration);
+
     // Test direct private method calls with fuzzed data
     FormObserverTaskMgr::GetInstance().FormAdd(bundleName, remoteObject, runningFormInfo);
     FormObserverTaskMgr::GetInstance().FormRemove(bundleName, remoteObject, runningFormInfo);

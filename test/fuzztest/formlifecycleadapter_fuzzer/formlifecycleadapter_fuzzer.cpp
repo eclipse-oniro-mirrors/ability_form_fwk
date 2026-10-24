@@ -237,6 +237,20 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     Configuration configuration;
     adapter.BatchNotifyFormsConfigurationUpdate(configuration);
 
+    // Fuzz BatchNotifyFormsColorModeUpdate
+    int32_t colorModeUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
+    Configuration colorModeConfig;
+    adapter.BatchNotifyFormsColorModeUpdate(colorModeUserId, colorModeConfig);
+
+    // Fuzz ConsumeColorModeCache
+    std::vector<int64_t> cacheFormIds;
+    int32_t cacheCount = fdp->ConsumeIntegralInRange<int32_t>(0, 5);
+    for (int32_t i = 0; i < cacheCount; i++) {
+        cacheFormIds.push_back(fdp->ConsumeIntegral<int64_t>());
+    }
+    int32_t cacheUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
+    adapter.ConsumeColorModeCache(cacheFormIds, cacheUserId);
+
     // Fuzz HandleFormRemoveObserver
     RunningFormInfo removeObserverInfo = GenerateRunningFormInfo(fdp);
     adapter.HandleFormRemoveObserver(removeObserverInfo);

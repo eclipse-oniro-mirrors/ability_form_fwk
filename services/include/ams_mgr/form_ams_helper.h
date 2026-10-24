@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_AMS_HELPER_H
 
 #include <singleton.h>
+#include <unordered_map>
 
 #include "ability_connect_callback_interface.h"
 #include "ability_manager_interface.h"
@@ -90,13 +91,19 @@ public:
      */
     ErrCode StopExtensionAbility(const Want &want);
     /**
-     * @brief register Configuration Observer.
+     * @brief register Configuration Observer for a specific user.
+     * @param userId The user ID to register observer for.
      */
-    void RegisterConfigurationObserver();
+    void RegisterConfigurationObserver(int32_t userId);
     /**
-     * @brief unregister Configuration Observer.
+     * @brief unregister Configuration Observer for a specific user.
+     * @param userId The user ID to unregister observer for.
      */
-    void UnRegisterConfigurationObserver();
+    void UnRegisterConfigurationObserver(int32_t userId);
+    /**
+     * @brief unregister all Configuration Observers.
+     */
+    void UnRegisterAllConfigurationObservers();
     /**
      * @brief StartAbilityOnlyUIAbility with want, send want to ability manager service.
      * @param want The want of the ability to start.
@@ -173,7 +180,7 @@ private:
 private:
     sptr<AAFwk::IAbilityManager> abilityManager_ = nullptr;
     std::mutex abilityManagerMutex_;
-    sptr<IConfigurationObserver> configurationObserver_ = nullptr;
+    std::unordered_map<int32_t, sptr<IConfigurationObserver>> configurationObservers_;
     std::mutex configObserverMutex_;
 };
 }  // namespace AppExecFwk

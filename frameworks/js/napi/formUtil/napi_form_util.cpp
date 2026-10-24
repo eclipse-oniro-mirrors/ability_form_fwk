@@ -636,6 +636,8 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
     napi_set_named_property(env, objContext, "isPrivacySensitive",
         CreateJsValue(env, formInfo.standby.isPrivacySensitive));
     napi_set_named_property(env, objContext, "isTemplateForm", CreateJsValue(env, formInfo.isTemplateForm));
+    napi_set_named_property(env, objContext, "isColorModeRefreshEnabled",
+        CreateJsValue(env, formInfo.isColorModeRefreshEnabled));
 
     return objContext;
 }
@@ -687,6 +689,8 @@ napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFor
     napi_set_named_property(env, objContext, "formDescription", CreateJsValue(env, runningFormInfo.description));
     napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env,
         static_cast<int32_t>(runningFormInfo.formLocation)));
+    napi_set_named_property(env, objContext, "isColorModeRefreshEnabled",
+        CreateJsValue(env, runningFormInfo.isColorModeRefreshEnabled));
 
     return objContext;
 }

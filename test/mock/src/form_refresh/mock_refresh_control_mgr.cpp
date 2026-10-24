@@ -20,6 +20,7 @@
 
 namespace {
     bool g_mockIsFormInvisibleRet = false;
+    bool g_mockIsHealthyControlRet = false;
 }
 
 namespace OHOS {
@@ -29,6 +30,11 @@ void MockRefreshControlMgr::MockIsFormInvisible(bool mockRet)
     g_mockIsFormInvisibleRet = mockRet;
 }
 
+void MockRefreshControlMgr::MockIsHealthyControl(bool mockRet)
+{
+    g_mockIsHealthyControlRet = mockRet;
+}
+
 RefreshControlMgr::RefreshControlMgr() {}
 RefreshControlMgr::~RefreshControlMgr() {}
 
@@ -36,6 +42,12 @@ bool RefreshControlMgr::IsFormInvisible(const FormRecord &record)
 {
     GTEST_LOG_(INFO) << "RefreshControlMgr::IsFormInvisible called, returning " << g_mockIsFormInvisibleRet;
     return g_mockIsFormInvisibleRet;
+}
+
+bool RefreshControlMgr::IsHealthyControl(const FormRecord &record)
+{
+    GTEST_LOG_(INFO) << "RefreshControlMgr::IsHealthyControl called, returning " << g_mockIsHealthyControlRet;
+    return g_mockIsHealthyControlRet;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

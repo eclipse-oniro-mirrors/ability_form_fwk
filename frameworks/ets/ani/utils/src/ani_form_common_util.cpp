@@ -1582,6 +1582,7 @@ void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::F
     SetPropertyBoolByName(env, formInfoAni, "isStandbyAdapted", formInfo.standby.isAdapted);
     SetPropertyBoolByName(env, formInfoAni, "isPrivacySensitive", formInfo.standby.isPrivacySensitive);
     SetPropertyBoolByName(env, formInfoAni, "isTemplateForm", formInfo.isTemplateForm);
+    SetPropertyBoolByName(env, formInfoAni, "isColorModeRefreshEnabled", formInfo.isColorModeRefreshEnabled);
     // Set boolean properties
     SetPropertyBoolByNameValue(env, formInfoAni, "isDefault", formInfo.defaultFlag);
     SetPropertyBoolByNameValue(env, formInfoAni, "formVisibleNotify", formInfo.formVisibleNotify);

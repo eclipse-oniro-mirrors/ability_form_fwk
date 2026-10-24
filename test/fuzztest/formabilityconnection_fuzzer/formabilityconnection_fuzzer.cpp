@@ -85,18 +85,19 @@ void DoSomethingInterestingPart2(FuzzedDataProvider *fdp)
     int resultCode = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     Want want;
     sptr<AAFwk::IAbilityConnection> connect = nullptr;
+    int32_t userId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     
     formAmsHelper.GetAbilityManager();
     formAmsHelper.ConnectServiceAbility(want, connect);
     formAmsHelper.DisconnectServiceAbility(connect);
     formAmsHelper.DisconnectServiceAbilityDelay(connect);
     formAmsHelper.StopExtensionAbility(want);
-    formAmsHelper.RegisterConfigurationObserver();
-    formAmsHelper.UnRegisterConfigurationObserver();
+    formAmsHelper.RegisterConfigurationObserver(userId);
+    formAmsHelper.UnRegisterConfigurationObserver(userId);
+    formAmsHelper.UnRegisterAllConfigurationObservers();
     sptr<AAFwk::IAbilityManager> abilityManager = nullptr;
     formAmsHelper.SetAbilityManager(abilityManager);
     formAmsHelper.DisconnectAbilityTask(connect);
-    int32_t userId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     formAmsHelper.StartAbility(want, userId);
     sptr<IRemoteObject> callerToken = nullptr;
     uint32_t specifyTokenId = fdp->ConsumeIntegralInRange<uint32_t>(MIN_NUM, MAX_NUM);

@@ -556,5 +556,31 @@ const std::string &FormDataMgr::GetFormStandbyCapabilityKey()
     }
     return emptyKey;
 }
+
+void FormDataMgr::GetFormRecordsByUserId(const int32_t userId, std::vector<FormRecord> &formRecords)
+{
+    GTEST_LOG_(INFO) << "GetFormRecordsByUserId called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        AppExecFwk::MockFormDataMgr::obj->GetFormRecordsByUserId(userId, formRecords);
+    }
+}
+
+bool FormDataMgr::GetFormRecordById(const int64_t formId, FormRecord &formRecord)
+{
+    GTEST_LOG_(INFO) << "GetFormRecordById called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetFormRecordById(formId, formRecord);
+    }
+    return false;
+}
+
+bool FormDataMgr::GetFormVisible(int64_t formId)
+{
+    GTEST_LOG_(INFO) << "GetFormVisible called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->GetFormVisible(formId);
+    }
+    return false;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

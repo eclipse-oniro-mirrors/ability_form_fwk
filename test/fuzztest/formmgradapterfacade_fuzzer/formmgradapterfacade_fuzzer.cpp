@@ -320,6 +320,10 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     Configuration config;
     facade.BatchNotifyFormsConfigurationUpdate(config);
 
+    // BatchNotifyFormsColorModeUpdate
+    int32_t colorModeUserId = fdp->ConsumeIntegralInRange<int32_t>(MIN_USER_ID, MAX_USER_ID);
+    facade.BatchNotifyFormsColorModeUpdate(colorModeUserId, config);
+
     // RecycleForms
     std::vector<int64_t> recycleFormIds = GenerateFormIds(fdp);
     Want recycleWant = GenerateWant(fdp);

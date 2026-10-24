@@ -545,15 +545,6 @@ void FormProviderTaskMgr::NotifyConfigurationUpdate(const AppExecFwk::Configurat
     DelayedFormExitDetect(connectId);
 }
 
-void FormProviderTaskMgr::PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration)
-{
-    HILOG_INFO("Call.");
-    auto batchConfigurationUpdate = [configuration]() {
-        return FormMgrAdapterFacade::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
-    };
-    HILOG_INFO("end");
-}
-
 void FormProviderTaskMgr::NotifyFormLocationUpdate(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {

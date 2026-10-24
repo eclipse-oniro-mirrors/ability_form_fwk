@@ -50,6 +50,7 @@ export default namespace formInfo {
     readonly isStandbyAdapted?: boolean;
     readonly isPrivacySensitive?: boolean;
     readonly isTemplateForm?: boolean;
+    readonly isColorModeRefreshEnabled?: boolean;
   }
 
   enum RenderingMode {
@@ -179,6 +180,7 @@ export default namespace formInfo {
     readonly formUsageState: FormUsageState;
     readonly formDescription: string;
     readonly extraData?: Record<string, Object>;
+    readonly isColorModeRefreshEnabled?: boolean;
   }
 
   class RunningFormInfoInner implements RunningFormInfo {
@@ -252,6 +254,7 @@ export default namespace formInfo {
     public isStandbyAdapted?: boolean = false;
     public isPrivacySensitive?: boolean = false;
     public isTemplateForm?: boolean = false;
+    public isColorModeRefreshEnabled?: boolean = false;
   }
 
   export class runningFormInfoInner implements RunningFormInfo {
@@ -267,6 +270,7 @@ export default namespace formInfo {
     public formUsageState: FormUsageState = FormUsageState.USED;
     public formDescription: string = '';
     public extraData?: Record<string, Object> = {};
+    public isColorModeRefreshEnabled?: boolean = false;
   }
 
   export class FormStateInfoInner implements FormStateInfo {

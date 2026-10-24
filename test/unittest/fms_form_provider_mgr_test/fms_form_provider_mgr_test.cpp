@@ -1184,6 +1184,75 @@ HWTEST_F(FmsFormProviderMgrTest, ConnectForConfigUpdate_003, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ConnectForConfigUpdateWithUserId_001
+ * @tc.desc: Verify ConnectForConfigUpdateWithUserId with valid params and connect failed.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderMgrTest, ConnectForConfigUpdateWithUserId_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ConnectForConfigUpdateWithUserId_001 start";
+    FormRecord record;
+    record.formId = 0x123460aa00000000;
+    record.bundleName = "com.test.bundle";
+    record.abilityName = "com.test.ability";
+    record.providerUserId = 0;
+    Want want;
+    AppExecFwk::Configuration configuration;
+    MockConnectServiceAbility(false);
+    ErrCode result = FormProviderMgr::GetInstance().ConnectForConfigUpdateWithUserId(
+        configuration, record, want, 100);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    MockConnectServiceAbility(true);
+    GTEST_LOG_(INFO) << "ConnectForConfigUpdateWithUserId_001 end";
+}
+
+/**
+ * @tc.name: ConnectForConfigUpdateWithUserId_002
+ * @tc.desc: Verify ConnectForConfigUpdateWithUserId with valid params and connect success returns ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderMgrTest, ConnectForConfigUpdateWithUserId_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ConnectForConfigUpdateWithUserId_002 start";
+    FormRecord record;
+    record.formId = 0x114526aa00000000;
+    record.bundleName = "com.test.bundle";
+    record.abilityName = "com.test.ability";
+    record.providerUserId = 0;
+    Want want;
+    AppExecFwk::Configuration configuration;
+    MockConnectServiceAbility(true);
+    ErrCode result = FormProviderMgr::GetInstance().ConnectForConfigUpdateWithUserId(
+        configuration, record, want, 100);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "ConnectForConfigUpdateWithUserId_002 end";
+}
+
+/**
+ * @tc.name: ConnectForConfigUpdateWithUserId_003
+ * @tc.desc: Verify ConnectForConfigUpdateWithUserId returns ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED
+ * when errorCode is ERR_ECOLOGICAL_CONTROL_STATUS.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderMgrTest, ConnectForConfigUpdateWithUserId_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ConnectForConfigUpdateWithUserId_003 start";
+    FormRecord record;
+    record.formId = 0x114543aa00000000;
+    record.bundleName = "com.test.bundle";
+    record.abilityName = "com.test.ability";
+    record.providerUserId = 0;
+    Want want;
+    AppExecFwk::Configuration configuration;
+    MockConnectServiceAbilityWithErrorCode(ERR_ECOLOGICAL_CONTROL_STATUS);
+    ErrCode result = FormProviderMgr::GetInstance().ConnectForConfigUpdateWithUserId(
+        configuration, record, want, 100);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED);
+    MockConnectServiceAbility(true);
+    GTEST_LOG_(INFO) << "ConnectForConfigUpdateWithUserId_003 end";
+}
+
+/**
  * @tc.name: ConnectAmsChangeLocation_001
  * @tc.desc: Verify ConnectAmsChangeLocation with connect failed.
  * @tc.type: FUNC

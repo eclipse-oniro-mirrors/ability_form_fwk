@@ -46,6 +46,7 @@ struct RunningFormInfo : public Parcelable {
     BundleType formBundleType = BundleType::APP;
     int32_t appIndex = 0;
     int32_t userId = -1;
+    bool isColorModeRefreshEnabled = false;
 
     bool ReadFromParcel(Parcel &parcel);
     bool Marshalling(Parcel &parcel) const override;

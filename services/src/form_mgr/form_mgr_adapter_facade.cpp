@@ -168,6 +168,13 @@ ErrCode FormMgrAdapterFacade::BatchNotifyFormsConfigurationUpdate(const AppExecF
     return FormLifecycleAdapter::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
 }
 
+ErrCode FormMgrAdapterFacade::BatchNotifyFormsColorModeUpdate(int32_t userId,
+    const AppExecFwk::Configuration& configuration)
+{
+    HILOG_INFO("called, userId:%{public}d", userId);
+    return FormLifecycleAdapter::GetInstance().BatchNotifyFormsColorModeUpdate(userId, configuration);
+}
+
 #ifdef RES_SCHEDULE_ENABLE
 void FormMgrAdapterFacade::SetTimerTaskNeeded(bool isTimerTaskNeeded)
 {

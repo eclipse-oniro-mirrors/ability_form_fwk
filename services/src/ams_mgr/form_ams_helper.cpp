@@ -19,6 +19,7 @@
 #include "app_mgr_client.h"
 #include "form_observer/form_resource_observer.h"
 #include "fms_log_wrapper.h"
+#include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "common/util/form_serial_queue.h"
 #include "if_system_ability_manager.h"
@@ -198,15 +199,15 @@ ErrCode FormAmsHelper::StartAbility(const Want &want, int32_t userId)
     return IN_PROCESS_CALL(ams->StartAbility(want, userId));
 }
 
-void FormAmsHelper::RegisterConfigurationObserver()
+void FormAmsHelper::RegisterConfigurationObserver(int32_t userId)
 {
-    HILOG_INFO("begin");
+    HILOG_INFO("begin, userId:%{public}d", userId);
     std::lock_guard<std::mutex> lock(configObserverMutex_);
-    if (configurationObserver_ != nullptr) {
-        HILOG_WARN("configurationObserver_ not null");
+    if (configurationObservers_.find(userId) != configurationObservers_.end()) {
+        HILOG_WARN("configurationObserver already exists for userId:%{public}d", userId);
         return;
     }
-    sptr<IConfigurationObserver> configurationObserver(new (std::nothrow) FormFwkResourceObserver());
+    sptr<IConfigurationObserver> configurationObserver(new (std::nothrow) FormFwkResourceObserver(userId));
     if (configurationObserver == nullptr) {
         HILOG_ERROR("create configurationObserver failed");
         return;
@@ -216,21 +217,27 @@ void FormAmsHelper::RegisterConfigurationObserver()
         HILOG_ERROR("create appMgrClient failed");
         return;
     }
-    AppMgrResultCode resCode = appMgrClient->RegisterConfigurationObserver(configurationObserver);
+    AppMgrResultCode resCode = AppMgrResultCode::RESULT_OK;
+    if (Constants::DEFAULT_USER_ID == userId) {
+        resCode = appMgrClient->RegisterConfigurationObserver(configurationObserver);
+    } else {
+        resCode = appMgrClient->RegisterConfigurationObserver(configurationObserver, userId);
+    }
     if (resCode != AppMgrResultCode::RESULT_OK) {
-        HILOG_ERROR("RegisterConfigurationObserver failed");
+        HILOG_ERROR("RegisterConfigurationObserver failed, userId:%{public}d", userId);
         return;
     }
-    configurationObserver_ = configurationObserver;
-    HILOG_INFO("end");
+    configurationObservers_[userId] = configurationObserver;
+    HILOG_INFO("end, userId:%{public}d", userId);
 }
 
-void FormAmsHelper::UnRegisterConfigurationObserver()
+void FormAmsHelper::UnRegisterConfigurationObserver(int32_t userId)
 {
-    HILOG_INFO("begin");
     std::lock_guard<std::mutex> lock(configObserverMutex_);
-    if (configurationObserver_ == nullptr) {
-        HILOG_WARN("null configurationObserver_");
+    HILOG_INFO("begin, userId:%{public}d", userId);
+    auto it = configurationObservers_.find(userId);
+    if (it == configurationObservers_.end()) {
+        HILOG_WARN("no configurationObserver for userId:%{public}d", userId);
         return;
     }
     auto appMgrClient = std::make_unique<AppMgrClient>();
@@ -238,12 +245,38 @@ void FormAmsHelper::UnRegisterConfigurationObserver()
         HILOG_ERROR("create appMgrClient failed");
         return;
     }
-    AppMgrResultCode resCode = appMgrClient->UnregisterConfigurationObserver(configurationObserver_);
+    AppMgrResultCode resCode = appMgrClient->UnregisterConfigurationObserver(it->second);
     if (resCode != AppMgrResultCode::RESULT_OK) {
-        HILOG_ERROR("UnregisterConfigurationObserver failed");
+        HILOG_ERROR("UnregisterConfigurationObserver failed, userId:%{public}d", userId);
         return;
     }
-    configurationObserver_ = nullptr;
+    configurationObservers_.erase(it);
+    HILOG_INFO("end, userId:%{public}d", userId);
+}
+
+void FormAmsHelper::UnRegisterAllConfigurationObservers()
+{
+    HILOG_INFO("begin");
+    std::vector<std::pair<int32_t, sptr<IConfigurationObserver>>> observers;
+    {
+        std::lock_guard<std::mutex> lock(configObserverMutex_);
+        for (auto &pair : configurationObservers_) {
+            observers.emplace_back(pair.first, pair.second);
+        }
+        configurationObservers_.clear();
+    }
+    auto appMgrClient = std::make_unique<AppMgrClient>();
+    if (appMgrClient == nullptr) {
+        HILOG_ERROR("create appMgrClient failed");
+        return;
+    }
+    // IPC outside lock to avoid deadlock; local sptr copies keep observers alive
+    for (auto &item : observers) {
+        AppMgrResultCode resCode = appMgrClient->UnregisterConfigurationObserver(item.second);
+        if (resCode != AppMgrResultCode::RESULT_OK) {
+            HILOG_ERROR("UnregisterConfigurationObserver failed, userId:%{public}d", item.first);
+        }
+    }
     HILOG_INFO("end");
 }
 

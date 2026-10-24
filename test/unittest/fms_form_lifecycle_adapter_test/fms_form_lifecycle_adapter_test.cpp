@@ -19,6 +19,7 @@
 #define private public
 #define protected public
 #include "form_mgr/form_lifecycle_adapter.h"
+#include "form_mgr/form_mgr_adapter_facade.h"
 #undef private
 #undef protected
 
@@ -3200,5 +3201,228 @@ HWTEST_F(FmsFormLifecycleAdapterTest, DeleteThemeForm_003, TestSize.Level1)
     GTEST_LOG_(INFO) << "DeleteThemeForm_003 end";
 }
 #endif
+
+// ========== BatchNotifyFormsColorModeUpdate Tests ==========
+
+/**
+ * @tc.name: BatchNotifyFormsColorModeUpdate_001
+ * @tc.desc: Verify BatchNotifyFormsColorModeUpdate caches config for invisible form (not under healthy control).
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, BatchNotifyFormsColorModeUpdate_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "BatchNotifyFormsColorModeUpdate_001 start";
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "testBundle";
+    record.abilityName = "testAbility";
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordsByUserId(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(std::vector<FormRecord>{record}), Return()));
+    FormInfo formInfo;
+    formInfo.isColorModeRefreshEnabled = true;
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formInfo), Return(ERR_OK)));
+    MockRefreshControlMgr::MockIsHealthyControl(false);
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormVisible(_)).WillOnce(Return(false));
+
+    Configuration configuration;
+    auto result = FormLifecycleAdapter::GetInstance().BatchNotifyFormsColorModeUpdate(TEST_USER_ID, configuration);
+    EXPECT_EQ(result, ERR_OK);
+    // Invisible form: configuration should be cached for retry
+    auto &adapter = FormLifecycleAdapter::GetInstance();
+    std::string key = std::to_string(TEST_USER_ID) + "::testBundle::testAbility";
+    {
+        std::lock_guard<std::mutex> lock(adapter.colorModeCacheMutex_);
+        EXPECT_EQ(adapter.colorModeUpdateCache_.count(key), 1);
+        adapter.colorModeUpdateCache_.clear();
+    }
+
+    GTEST_LOG_(INFO) << "BatchNotifyFormsColorModeUpdate_001 end";
+}
+
+/**
+ * @tc.name: ConsumeColorModeCache_001
+ * @tc.desc: Verify ConsumeColorModeCache consumes cached entry and clears it on success.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, ConsumeColorModeCache_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ConsumeColorModeCache_001 start";
+
+    auto &adapter = FormLifecycleAdapter::GetInstance();
+    Configuration configuration;
+    std::string key = std::to_string(TEST_USER_ID) + "::testBundle::testAbility";
+    {
+        std::lock_guard<std::mutex> lock(adapter.colorModeCacheMutex_);
+        adapter.colorModeUpdateCache_[key] = configuration;
+    }
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "testBundle";
+    record.abilityName = "testAbility";
+    // GetFormRecordById returns false (found) to proceed past the guard
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordById(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(false)));
+    FormInfo formInfo;
+    formInfo.isColorModeRefreshEnabled = true;
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formInfo), Return(ERR_OK)));
+    MockRefreshControlMgr::MockIsHealthyControl(false);
+
+    std::vector<int64_t> formIds = {TEST_FORM_ID};
+    EXPECT_NO_FATAL_FAILURE(adapter.ConsumeColorModeCache(formIds, TEST_USER_ID));
+    // Consume success (stub returns ERR_OK): cache entry should be erased
+    {
+        std::lock_guard<std::mutex> lock(adapter.colorModeCacheMutex_);
+        EXPECT_EQ(adapter.colorModeUpdateCache_.count(key), 0);
+    }
+
+    GTEST_LOG_(INFO) << "ConsumeColorModeCache_001 end";
+}
+
+/**
+ * @tc.name: ConsumeColorModeCache_002
+ * @tc.desc: Verify ConsumeColorModeCache keeps cache when formIds is empty (early return).
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, ConsumeColorModeCache_002, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "ConsumeColorModeCache_002 start";
+
+    auto &adapter = FormLifecycleAdapter::GetInstance();
+    Configuration configuration;
+    std::string key = std::to_string(TEST_USER_ID) + "::testBundle::testAbility";
+    {
+        std::lock_guard<std::mutex> lock(adapter.colorModeCacheMutex_);
+        adapter.colorModeUpdateCache_[key] = configuration;
+    }
+    std::vector<int64_t> emptyFormIds;
+    EXPECT_NO_FATAL_FAILURE(adapter.ConsumeColorModeCache(emptyFormIds, TEST_USER_ID));
+    // Empty formIds: early return, cache should remain untouched
+    {
+        std::lock_guard<std::mutex> lock(adapter.colorModeCacheMutex_);
+        EXPECT_EQ(adapter.colorModeUpdateCache_.count(key), 1);
+        adapter.colorModeUpdateCache_.clear();
+    }
+
+    GTEST_LOG_(INFO) << "ConsumeColorModeCache_002 end";
+}
+
+/**
+ * @tc.name: ConsumeColorModeCache_003
+ * @tc.desc: Verify ConsumeColorModeCache keeps cache when app is under healthy control.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, ConsumeColorModeCache_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ConsumeColorModeCache_003 start";
+
+    auto &adapter = FormLifecycleAdapter::GetInstance();
+    Configuration configuration;
+    std::string key = std::to_string(TEST_USER_ID) + "::testBundle::testAbility";
+    {
+        std::lock_guard<std::mutex> lock(adapter.colorModeCacheMutex_);
+        adapter.colorModeUpdateCache_[key] = configuration;
+    }
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "testBundle";
+    record.abilityName = "testAbility";
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordById(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(false)));
+    FormInfo formInfo;
+    formInfo.isColorModeRefreshEnabled = true;
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formInfo), Return(ERR_OK)));
+    MockRefreshControlMgr::MockIsHealthyControl(true);
+
+    std::vector<int64_t> formIds = {TEST_FORM_ID};
+    EXPECT_NO_FATAL_FAILURE(adapter.ConsumeColorModeCache(formIds, TEST_USER_ID));
+    // Healthy control: skip callback, cache should be retained
+    {
+        std::lock_guard<std::mutex> lock(adapter.colorModeCacheMutex_);
+        EXPECT_EQ(adapter.colorModeUpdateCache_.count(key), 1);
+        adapter.colorModeUpdateCache_.clear();
+    }
+    MockRefreshControlMgr::MockIsHealthyControl(false);
+
+    GTEST_LOG_(INFO) << "ConsumeColorModeCache_003 end";
+}
+
+/**
+ * @tc.name: FacadeBatchNotifyFormsColorModeUpdate_001
+ * @tc.desc: Verify facade BatchNotifyFormsColorModeUpdate delegates to lifecycle adapter and caches for invisible form.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, FacadeBatchNotifyFormsColorModeUpdate_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FacadeBatchNotifyFormsColorModeUpdate_001 start";
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "testBundle";
+    record.abilityName = "testAbility";
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordsByUserId(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(std::vector<FormRecord>{record}), Return()));
+    FormInfo formInfo;
+    formInfo.isColorModeRefreshEnabled = true;
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formInfo), Return(ERR_OK)));
+    MockRefreshControlMgr::MockIsHealthyControl(false);
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormVisible(_)).WillOnce(Return(false));
+
+    Configuration configuration;
+    auto result = FormMgrAdapterFacade::GetInstance().BatchNotifyFormsColorModeUpdate(TEST_USER_ID, configuration);
+    EXPECT_EQ(result, ERR_OK);
+    // Verify delegation side effect: invisible form config cached
+    auto &adapter = FormLifecycleAdapter::GetInstance();
+    std::string key = std::to_string(TEST_USER_ID) + "::testBundle::testAbility";
+    {
+        std::lock_guard<std::mutex> lock(adapter.colorModeCacheMutex_);
+        EXPECT_EQ(adapter.colorModeUpdateCache_.count(key), 1);
+        adapter.colorModeUpdateCache_.clear();
+    }
+
+    GTEST_LOG_(INFO) << "FacadeBatchNotifyFormsColorModeUpdate_001 end";
+}
+
+/**
+ * @tc.name: FacadeBatchNotifyFormsColorModeUpdate_002
+ * @tc.desc: Verify facade BatchNotifyFormsColorModeUpdate caches config for invisible form with userId=0.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormLifecycleAdapterTest, FacadeBatchNotifyFormsColorModeUpdate_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FacadeBatchNotifyFormsColorModeUpdate_002 start";
+
+    constexpr int32_t facadeUserId = 0;
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.bundleName = "testBundle";
+    record.abilityName = "testAbility";
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordsByUserId(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(std::vector<FormRecord>{record}), Return()));
+    FormInfo formInfo;
+    formInfo.isColorModeRefreshEnabled = true;
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formInfo), Return(ERR_OK)));
+    MockRefreshControlMgr::MockIsHealthyControl(false);
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormVisible(_)).WillOnce(Return(false));
+
+    Configuration configuration;
+    auto result = FormMgrAdapterFacade::GetInstance().BatchNotifyFormsColorModeUpdate(facadeUserId, configuration);
+    EXPECT_EQ(result, ERR_OK);
+    // Verify delegation side effect: invisible form config cached with userId=0
+    auto &adapter = FormLifecycleAdapter::GetInstance();
+    std::string key = std::to_string(facadeUserId) + "::testBundle::testAbility";
+    {
+        std::lock_guard<std::mutex> lock(adapter.colorModeCacheMutex_);
+        EXPECT_EQ(adapter.colorModeUpdateCache_.count(key), 1);
+        adapter.colorModeUpdateCache_.clear();
+    }
+
+    GTEST_LOG_(INFO) << "FacadeBatchNotifyFormsColorModeUpdate_002 end";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

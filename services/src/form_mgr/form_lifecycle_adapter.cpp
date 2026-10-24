@@ -1553,5 +1553,125 @@ ErrCode FormLifecycleAdapter::CheckAddRequestPublishForm(const Want &want, const
     return errCode;
 }
 
+// Visible forms get a direct configuration-update callback; invisible forms are
+// cached in colorModeUpdateCache_ and notified when they become visible again.
+// Key includes userId so the same app under different users is handled separately.
+ErrCode FormLifecycleAdapter::BatchNotifyFormsColorModeUpdate(int32_t userId,
+    const AppExecFwk::Configuration& configuration)
+{
+    HILOG_INFO("colorMode update for userId:%{public}d", userId);
+    std::vector<FormRecord> formRecords;
+    FormDataMgr::GetInstance().GetFormRecordsByUserId(userId, formRecords);
+
+    Want reqWant;
+    std::set<std::string> notified;
+    for (const auto &formRecord : formRecords) {
+        FormInfo formInfo;
+        ErrCode ret = FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
+        if (ret != ERR_OK) {
+            HILOG_WARN("get formInfo failed, formId:%{public}" PRId64 ", ret:%{public}d",
+                formRecord.formId, ret);
+            continue;
+        }
+        if (!formInfo.isColorModeRefreshEnabled) {
+            continue;
+        }
+        // Dedup: one callback per app per user
+        std::string key = std::to_string(userId) + "::" + formRecord.bundleName + "::" + formRecord.abilityName;
+        if (notified.find(key) != notified.end()) {
+            continue;
+        }
+
+        // App under healthy device control: cache and wait for uncontrol
+        if (RefreshControlMgr::GetInstance().IsHealthyControl(formRecord)) {
+            std::lock_guard<std::mutex> lock(colorModeCacheMutex_);
+            colorModeUpdateCache_[key] = configuration;
+            HILOG_INFO("cache colorMode for healthy control, key:%{public}s", key.c_str());
+            continue;
+        }
+
+        if (FormDataMgr::GetInstance().GetFormVisible(formRecord.formId)) {
+            ErrCode connectRet = FormProviderMgr::GetInstance().ConnectForConfigUpdateWithUserId(
+                configuration, formRecord, reqWant, userId);
+            if (connectRet == ERR_OK) {
+                HILOG_INFO("notify colorMode success, key:%{public}s", key.c_str());
+                notified.insert(key);
+                // Clear cached configuration since the app has been notified directly
+                std::lock_guard<std::mutex> lock(colorModeCacheMutex_);
+                colorModeUpdateCache_.erase(key);
+            } else {
+                HILOG_ERROR("ConnectForConfigUpdateWithUserId failed, connectRet:%{public}d, "
+                    "cache for retry, key:%{public}s", connectRet, key.c_str());
+                // Direct callback failed, cache for retry when visible next time
+                std::lock_guard<std::mutex> lock(colorModeCacheMutex_);
+                colorModeUpdateCache_[key] = configuration;
+            }
+        } else {
+            std::lock_guard<std::mutex> lock(colorModeCacheMutex_);
+            colorModeUpdateCache_[key] = configuration;
+            HILOG_INFO("cache colorMode for invisible form, key:%{public}s", key.c_str());
+        }
+    }
+    HILOG_INFO("colorMode update done, notified size:%{public}zu", notified.size());
+    return ERR_OK;
+}
+
+void FormLifecycleAdapter::ConsumeColorModeCache(const std::vector<int64_t> &formIds, int32_t userId)
+{
+    HILOG_INFO("consume colorMode cache, formIds size:%{public}zu, userId:%{public}d, cache size:%{public}zu",
+        formIds.size(), userId, colorModeUpdateCache_.size());
+    if (colorModeUpdateCache_.empty() || formIds.empty()) {
+        return;
+    }
+    Want reqWant;
+    std::vector<std::string> consumedKeys;
+    for (int64_t formId : formIds) {
+        FormRecord formRecord;
+        if (FormDataMgr::GetInstance().GetFormRecordById(formId, formRecord)) {
+            continue;
+        }
+        std::string key = std::to_string(userId) + "::" + formRecord.bundleName + "::" + formRecord.abilityName;
+        // Already consumed by a previous formId of the same app, skip without acquiring lock
+        if (std::find(consumedKeys.begin(), consumedKeys.end(), key) != consumedKeys.end()) {
+            continue;
+        }
+        Configuration cachedConfig;
+        {
+            std::lock_guard<std::mutex> lock(colorModeCacheMutex_);
+            auto it = colorModeUpdateCache_.find(key);
+            if (it == colorModeUpdateCache_.end()) {
+                continue;
+            }
+            FormInfo formInfo;
+            if (FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo) != ERR_OK ||
+                !formInfo.isColorModeRefreshEnabled) {
+                continue;
+            }
+            // App under healthy device control: keep cache, skip callback
+            if (RefreshControlMgr::GetInstance().IsHealthyControl(formRecord)) {
+                continue;
+            }
+            // Snapshot configuration under lock, IPC outside lock to avoid long hold
+            cachedConfig = it->second;
+        }
+        ErrCode ret = FormProviderMgr::GetInstance().ConnectForConfigUpdateWithUserId(
+            cachedConfig, formRecord, reqWant, userId);
+        if (ret == ERR_OK) {
+            HILOG_INFO("consume cache success, key:%{public}s", key.c_str());
+            consumedKeys.push_back(key);
+        } else {
+            HILOG_ERROR("consume cache failed, ret:%{public}d, keep cache for retry, key:%{public}s",
+                ret, key.c_str());
+        }
+    }
+    {
+        std::lock_guard<std::mutex> lock(colorModeCacheMutex_);
+        for (const auto &key : consumedKeys) {
+            colorModeUpdateCache_.erase(key);
+        }
+        HILOG_INFO("consume colorMode cache done, remaining:%{public}zu", colorModeUpdateCache_.size());
+    }
+}
+
 } // namespace AppExecFwk
 } // namespace OHOS

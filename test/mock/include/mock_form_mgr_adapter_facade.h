@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_MOCK_FORM_MGR_ADAPTER_FACADE_H
 
 #include "gmock/gmock.h"
+#include "configuration.h"
 #include "data_center/form_record/form_record.h"
 #include "form_provider_data.h"
 
@@ -30,6 +31,8 @@ public:
         const FormProviderData &formProviderData, const std::vector<FormDataProxy> &formDataProxies) = 0;
     virtual ErrCode UpdateFormCrossBundle(int64_t formId, int32_t callingUid,
         const FormProviderData &formProviderData) = 0;
+    virtual ErrCode BatchNotifyFormsColorModeUpdate(int32_t userId, const Configuration &configuration) = 0;
+    virtual ErrCode BatchNotifyFormsConfigurationUpdate(const Configuration &configuration) = 0;
 };
 
 class MockFormMgrAdapterFacade : public AbstractMockFormMgrAdapterFacade {
@@ -40,6 +43,8 @@ public:
     MOCK_METHOD1(IsDeleteCacheInUpgradeScene, bool(const FormRecord &record));
     MOCK_METHOD4(UpdateForm, int(int64_t, int32_t, const FormProviderData&, const std::vector<FormDataProxy>&));
     MOCK_METHOD3(UpdateFormCrossBundle, ErrCode(int64_t, int32_t, const FormProviderData&));
+    MOCK_METHOD2(BatchNotifyFormsColorModeUpdate, ErrCode(int32_t, const Configuration&));
+    MOCK_METHOD1(BatchNotifyFormsConfigurationUpdate, ErrCode(const Configuration&));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

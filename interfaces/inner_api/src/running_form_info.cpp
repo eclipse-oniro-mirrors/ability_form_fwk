@@ -57,6 +57,7 @@ bool RunningFormInfo::ReadFromParcel(Parcel &parcel)
         return false;
     }
     userId = parcel.ReadInt32();
+    isColorModeRefreshEnabled = parcel.ReadBool();
     return true;
 }
 
@@ -124,6 +125,11 @@ bool RunningFormInfo::Marshalling(Parcel &parcel) const
 
     // write userId
     if (!parcel.WriteInt32(userId)) {
+        return false;
+    }
+
+    // write isColorModeRefreshEnabled
+    if (!parcel.WriteBool(isColorModeRefreshEnabled)) {
         return false;
     }
     return true;

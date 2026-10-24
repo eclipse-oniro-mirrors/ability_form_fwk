@@ -26,6 +26,7 @@
 #include "form_constants.h"
 #include "form_constants_util.h"
 #include "data_center/form_basic_info_mgr.h"
+#include "data_center/form_info/form_info_mgr.h"
 #include "data_center/form_data_proxy_mgr.h"
 #include "data_center/database/form_db_cache.h"
 #include "form_mgr_errors.h"
@@ -2603,6 +2604,10 @@ void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRec
     runningFormInfo.lowMemoryRecycleStatus = formRecord.lowMemoryRecycleStatus;
     runningFormInfo.formBundleType = formRecord.formBundleType;
     runningFormInfo.userId = formRecord.userId;
+    FormInfo formInfo;
+    if (FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo) == ERR_OK) {
+        runningFormInfo.isColorModeRefreshEnabled = formInfo.isColorModeRefreshEnabled;
+    }
 }
 
 ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo,

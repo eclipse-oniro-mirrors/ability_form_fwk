@@ -123,5 +123,62 @@ HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_StartAbilityOnlyUIAbility_003, Test
     EXPECT_EQ(ERR_OK, formAmsHelper.StartAbilityOnlyUIAbility(want, callerToken, specifyTokenId, userId));
     GTEST_LOG_(INFO) << "FormAmsHelper_StartAbilityOnlyUIAbility_003 end";
 }
+
+/**
+ * @tc.name: FormAmsHelper_RegisterConfigurationObserver_001
+ * @tc.desc: Verify RegisterConfigurationObserver skips when userId already registered.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_RegisterConfigurationObserver_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormAmsHelper_RegisterConfigurationObserver_001 start";
+
+    FormAmsHelper formAmsHelper;
+    constexpr int32_t userId = 100;
+    formAmsHelper.configurationObservers_[userId] = nullptr;
+    size_t sizeBefore = formAmsHelper.configurationObservers_.size();
+    EXPECT_NO_FATAL_FAILURE(formAmsHelper.RegisterConfigurationObserver(userId));
+    EXPECT_EQ(formAmsHelper.configurationObservers_.size(), sizeBefore);
+
+    GTEST_LOG_(INFO) << "FormAmsHelper_RegisterConfigurationObserver_001 end";
+}
+
+/**
+ * @tc.name: FormAmsHelper_UnRegisterConfigurationObserver_001
+ * @tc.desc: Verify UnRegisterConfigurationObserver does nothing when userId not registered.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_UnRegisterConfigurationObserver_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormAmsHelper_UnRegisterConfigurationObserver_001 start";
+
+    FormAmsHelper formAmsHelper;
+    EXPECT_TRUE(formAmsHelper.configurationObservers_.empty());
+    EXPECT_NO_FATAL_FAILURE(formAmsHelper.UnRegisterConfigurationObserver(100));
+    EXPECT_TRUE(formAmsHelper.configurationObservers_.empty());
+
+    GTEST_LOG_(INFO) << "FormAmsHelper_UnRegisterConfigurationObserver_001 end";
+}
+
+/**
+ * @tc.name: FormAmsHelper_UnRegisterAllConfigurationObservers_001
+ * @tc.desc: Verify UnRegisterAllConfigurationObservers handles empty map without crash.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_UnRegisterAllConfigurationObservers_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormAmsHelper_UnRegisterAllConfigurationObservers_001 start";
+
+    FormAmsHelper formAmsHelper;
+    constexpr int32_t userId1 = 100;
+    constexpr int32_t userId2 = 200;
+    formAmsHelper.configurationObservers_[userId1] = nullptr;
+    formAmsHelper.configurationObservers_[userId2] = nullptr;
+    EXPECT_EQ(formAmsHelper.configurationObservers_.size(), 2);
+    EXPECT_NO_FATAL_FAILURE(formAmsHelper.UnRegisterAllConfigurationObservers());
+    EXPECT_TRUE(formAmsHelper.configurationObservers_.empty());
+
+    GTEST_LOG_(INFO) << "FormAmsHelper_UnRegisterAllConfigurationObservers_001 end";
+}
 } // namespace AppExecFwk
 } // namespace OHOS

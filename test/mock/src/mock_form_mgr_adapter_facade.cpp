@@ -53,5 +53,24 @@ ErrCode FormMgrAdapterFacade::UpdateFormCrossBundle(int64_t formId, int32_t call
     }
     return ERR_OK;
 }
+
+ErrCode FormMgrAdapterFacade::BatchNotifyFormsColorModeUpdate(int32_t userId,
+    const AppExecFwk::Configuration &configuration)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapterFacade::BatchNotifyFormsColorModeUpdate called, userId:" << userId;
+    if (AppExecFwk::MockFormMgrAdapterFacade::obj) {
+        return AppExecFwk::MockFormMgrAdapterFacade::obj->BatchNotifyFormsColorModeUpdate(userId, configuration);
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapterFacade::BatchNotifyFormsConfigurationUpdate(const AppExecFwk::Configuration &configuration)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapterFacade::BatchNotifyFormsConfigurationUpdate called";
+    if (AppExecFwk::MockFormMgrAdapterFacade::obj) {
+        return AppExecFwk::MockFormMgrAdapterFacade::obj->BatchNotifyFormsConfigurationUpdate(configuration);
+    }
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -96,6 +96,17 @@ public:
         const FormRecord &record, const Want &want);
 
     /**
+     * @brief Connect provider ability for notify config update with specific userId
+     * @param configuration system config.
+     * @param record Form data.
+     * @param want The want of the form.
+     * @param userId Target user id for multi-user connection.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode ConnectForConfigUpdateWithUserId(const AppExecFwk::Configuration &configuration,
+        const FormRecord &record, const Want &want, int32_t userId);
+
+    /**
      * @brief Connect ability manager service for refresh app permission
      *
      * @param formId The form id.
