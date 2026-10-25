@@ -16,8 +16,6 @@
 #ifndef OHOS_FORM_FWK_NET_CONN_CALLBACK_OBSERVER_H
 #define OHOS_FORM_FWK_NET_CONN_CALLBACK_OBSERVER_H
 
-
-
 #include <memory>
 #include <singleton.h>
 
