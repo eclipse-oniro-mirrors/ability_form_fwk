@@ -18,6 +18,7 @@
 
 #include <cstdint>
 #include <string>
+#include <unordered_set>
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -376,6 +377,16 @@ namespace Constants {
     constexpr int32_t REFRESHTYPE_UPDATENEXTTIME = 3;
     constexpr int32_t REFRESHTYPE_NETWORKCHANGED = 4;
     constexpr int32_t REFRESHTYPE_VISIABLE = 99;
+    // condition update type
+    constexpr int32_t CONDITION_NETWORK = 1;
+    constexpr int32_t CONDITION_ACCOUNT = 3;
+    // refresh type for account change (Want param PARAM_FORM_REFRESH_TYPE value)
+    constexpr int32_t REFRESHTYPE_ACCOUNT_CHANGED = 6;
+    // condition refresh type set, used by IsConditionRefreshType
+    inline const std::unordered_set<int32_t> CONDITION_REFRESHTYPE_SET = {
+        REFRESHTYPE_NETWORKCHANGED,
+        REFRESHTYPE_ACCOUNT_CHANGED,
+    };
     constexpr int32_t FULL_UPDATE = 0;
     constexpr int32_t ADD_UPDATE = 1;
 
@@ -440,6 +451,10 @@ namespace Constants {
     constexpr const char* IS_MULTI_APP_FORM = "isMultiAppForm";
     // form contains multi app is true
     constexpr const char* IS_MULTI_APP_FORM_TRUE = "true";
+    // Metadata name for account-triggered refresh. When value is "true",
+    // BMS injects CONDITION_ACCOUNT into conditionUpdate during profile parsing.
+    constexpr const char* METADATA_ACCOUNT_REFRESH = "enableAccountSwitchRefresh";
+    constexpr const char* METADATA_ACCOUNT_VALUE_TRUE = "true";
     // Form data update type
     constexpr const char* FORM_DATA_UPDATE_TYPE = "formDataUpdateType";
     // Form info max num

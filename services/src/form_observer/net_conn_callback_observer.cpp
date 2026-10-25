@@ -16,6 +16,7 @@
 #include "form_observer/net_conn_callback_observer.h"
 
 #include "fms_log_wrapper.h"
+#include "form_constants.h"
 #include "form_mgr/form_mgr_adapter_facade.h"
 #include "common/util/form_util.h"
 #include "form_mgr/form_mgr_queue.h"
@@ -25,7 +26,6 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr int64_t FORM_DISCON_NETWORK_CHECK_TIME = 600000; // ms
-constexpr int32_t CONDITION_NETWORK = 1;
 }
 using namespace OHOS::NetManagerStandard;
 
@@ -84,7 +84,7 @@ void NetConnCallbackObserver::SetNetConnect()
     int64_t currentTime = FormUtil::GetCurrentMillisecond();
     if ((currentTime - lastNetLostTime_.load()) >= FORM_DISCON_NETWORK_CHECK_TIME) {
         HILOG_INFO("network is available for form update");
-        FormMgrAdapterFacade::GetInstance().UpdateFormByCondition(CONDITION_NETWORK);
+        FormMgrAdapterFacade::GetInstance().UpdateFormByCondition(Constants::CONDITION_NETWORK);
         lastNetLostTime_.store(0);
     }
 }

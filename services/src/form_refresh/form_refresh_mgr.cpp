@@ -31,6 +31,7 @@
 #include "form_refresh/refresh_impl/form_refresh_after_uncontrol_impl.h"
 #include "form_refresh/refresh_impl/form_app_upgrade_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_provider_refresh_impl.h"
+#include "form_refresh/refresh_impl/form_account_refresh_impl.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -53,6 +54,7 @@ const std::unordered_map<int32_t, IFormRefresh *> REFRESH_MAP = {
     { TYPE_UNCONTROL, &FormRefreshAfterUncontrolImpl::GetInstance() },
     { TYPE_APP_UPGRADE, &FormAppUpgradeRefreshImpl::GetInstance() },
     { TYPE_PROVIDER, &FormProviderRefreshImpl::GetInstance() },
+    { TYPE_ACCOUNT, &FormAccountRefreshImpl::GetInstance() },
 };
 }
 

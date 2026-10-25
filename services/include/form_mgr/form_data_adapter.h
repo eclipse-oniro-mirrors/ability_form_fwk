@@ -95,6 +95,7 @@ public:
     int32_t OnNotifyRefreshForm(const int64_t &formId);
 
     ErrCode UpdateFormByCondition(int32_t type);
+    ErrCode UpdateFormByCondition(int32_t type, int32_t userId);
 
     void DelayRefreshFormsOnAppUpgrade(const std::vector<FormRecord> &updatedForms, const Want &want);
 

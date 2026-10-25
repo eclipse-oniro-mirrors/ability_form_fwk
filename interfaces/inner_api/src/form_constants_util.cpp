@@ -79,7 +79,7 @@ bool FormConstantsUtil::IsLiveFormSupportLauncher(const std::string &status)
 
 bool FormConstantsUtil::IsConditionRefreshType(int32_t refreshType)
 {
-    return refreshType == Constants::REFRESHTYPE_NETWORKCHANGED;
+    return Constants::CONDITION_REFRESHTYPE_SET.find(refreshType) != Constants::CONDITION_REFRESHTYPE_SET.end();
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

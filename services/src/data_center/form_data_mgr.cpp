@@ -48,6 +48,7 @@
 #include "parameter.h"
 #include "parameters.h"
 #include "form_observer/net_conn_callback_manager.h"
+#include "form_observer/account_common_event_manager.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -56,7 +57,6 @@ constexpr const char *MEMMORY_WATERMARK = "resourceschedule.memmgr.min.memmory.w
 constexpr const char *TRANSPARENT_FORM_CAPABILITY_PARAM_NAME = "const.form.transparentForm.capability";
 constexpr const char *FORM_STANDBY_CAPABILITY_PARAM_NAME = "const.form.standby.capability";
 constexpr const char *RERENDER_ALL_FORMS_TASK_NAME = "RerenderAllForms";
-constexpr int32_t CONDITION_NETWORK = 1;
 static bool g_hasReportedExceedsDistribution = false;
 constexpr int32_t RERENDER_ALL_FORMS_DELAY_TIME = 120 * 1000; // 2 minutes in milliseconds
 
@@ -228,6 +228,9 @@ FormRecord FormDataMgr::AllotFormRecord(const FormItemInfo &formInfo, const int 
     if (isNewRecord && IsNetworkConditionForm(record)) {
         NetConnCallbackManager::GetInstance().RegisterNetConnCallback();
     }
+    if (isNewRecord && IsAccountConditionForm(record)) {
+        AccountCommonEventManager::GetInstance().RegisterAccountCallback();
+    }
     HILOG_INFO("end formId: %{public}" PRId64, formInfo.GetFormId());
     FormBasicInfo basic {
         record.formId, record.abilityName, record.bundleName, record.moduleName, record.formName, record.packageName
@@ -248,6 +251,7 @@ bool FormDataMgr::DeleteFormRecord(const int64_t formId)
     HILOG_INFO("delete record, form:%{public}" PRId64, formId);
     FormRecord formRecord;
     bool isNetConditionForm = false;
+    bool isAccountConditionForm = false;
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         auto iter = formRecords_.find(formId);
@@ -257,10 +261,14 @@ bool FormDataMgr::DeleteFormRecord(const int64_t formId)
         }
         formRecord = iter->second;
         isNetConditionForm = IsNetworkConditionForm(formRecord);
+        isAccountConditionForm = IsAccountConditionForm(formRecord);
         formRecords_.erase(iter);
     }
     if (isNetConditionForm && !HasNetworkConditionForm()) {
         NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();
+    }
+    if (isAccountConditionForm && !HasAccountConditionForm()) {
+        AccountCommonEventManager::GetInstance().UnregisterAccountCallback();
     }
     FormUtil::DeleteFormId(formId);
     FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
@@ -943,7 +951,7 @@ bool FormDataMgr::GetFormRecordByCondition(int32_t conditionType, std::vector<Fo
 bool FormDataMgr::IsNetworkConditionForm(const FormRecord &record)
 {
     for (int32_t item : record.conditionUpdate) {
-        if (item == CONDITION_NETWORK) {
+        if (item == Constants::CONDITION_NETWORK) {
             return true;
         }
     }
@@ -959,6 +967,26 @@ bool FormDataMgr::HasNetworkConditionForm() const
         }
     }
     return false;
+}
+
+bool FormDataMgr::GetFormRecordByCondition(int32_t conditionType, int32_t userId,
+    std::vector<FormRecord> &formInfos) const
+{
+    HILOG_DEBUG("get form record by conditionType and userId:%{public}d", userId);
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
+        if (itFormRecord->second.userId != userId) {
+            continue;
+        }
+        const auto &formRecord = itFormRecord->second;
+        const auto &conditionUpdate = formRecord.conditionUpdate;
+        if (conditionType == Constants::CONDITION_ACCOUNT && IsAccountConditionForm(formRecord)) {
+            formInfos.emplace_back(formRecord);
+        } else if (conditionType == Constants::CONDITION_NETWORK && IsNetworkConditionForm(formRecord)) {
+            formInfos.emplace_back(formRecord);
+        }
+    }
+    return !formInfos.empty();
 }
 
 /**
@@ -1632,6 +1660,9 @@ void FormDataMgr::CleanRemovedTempFormRecords(const std::string &bundleName, con
     if (hadNetCondition && !HasNetworkConditionForm()) {
         NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();
     }
+    if (hadAccountCondition && !HasAccountConditionForm()) {
+        AccountCommonEventManager::GetInstance().UnregisterAccountCallback();
+    }
 }
 /**
  * @brief Get recreate form records.
@@ -2233,6 +2264,9 @@ void FormDataMgr::DeleteFormsByUserId(const int32_t userId, std::vector<int64_t>
     if (hadNetCondition && !HasNetworkConditionForm()) {
         NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();
     }
+    if (hadAccountCondition && !HasAccountConditionForm()) {
+        AccountCommonEventManager::GetInstance().UnregisterAccountCallback();
+    }
 }
 /**
  * @brief Clear form records for st limit value test.
@@ -2248,6 +2282,7 @@ void FormDataMgr::ClearFormRecords()
         tempForms_.clear();
     }
     NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();
+    AccountCommonEventManager::GetInstance().UnregisterAccountCallback();
 }
 
 /**
@@ -3600,6 +3635,9 @@ void FormDataMgr::DeleteRecordTempForms(const std::vector<int64_t> &recordTempFo
     }
     if (hadNetCondition && !HasNetworkConditionForm()) {
         NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();
+    }
+    if (hadAccountCondition && !HasAccountConditionForm()) {
+        AccountCommonEventManager::GetInstance().UnregisterAccountCallback();
     }
 }
 

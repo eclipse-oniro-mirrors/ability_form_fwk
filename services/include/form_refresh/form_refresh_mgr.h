@@ -34,6 +34,7 @@ enum FormRefreshType {
     TYPE_UNCONTROL,
     TYPE_APP_UPGRADE,
     TYPE_PROVIDER,
+    TYPE_ACCOUNT = 10,
 };
 
 /**

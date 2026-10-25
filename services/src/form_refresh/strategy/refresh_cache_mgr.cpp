@@ -100,7 +100,7 @@ void RefreshCacheMgr::AddFlagByInvisible(const int64_t formId, int refreshType)
     FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
     FormDataMgr::GetInstance().SetRefreshType(formId, refreshType);
     if (FormConstantsUtil::IsConditionRefreshType(refreshType)) {
-        // The visibility refresh of network refresh is processed in the same way as the timer refresh.
+        // The visibility refresh of condition refresh is processed in the same way as the timer refresh.
         FormDataMgr::GetInstance().SetTimerRefresh(formId, true);
     }
     FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_INVISIBLE_INTERCEPT);

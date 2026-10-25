@@ -25,7 +25,6 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr int32_t FORM_CON_NET_MAX = 100;
-constexpr int32_t CONDITION_NETWORK = 1;
 }
 using namespace OHOS::NetManagerStandard;
 

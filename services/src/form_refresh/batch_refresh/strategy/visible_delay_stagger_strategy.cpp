@@ -23,6 +23,7 @@ namespace AppExecFwk {
 namespace {
 const static std::unordered_map<int32_t, int32_t> CONDITION_TYPE_MAP = {
     { FormRefreshType::TYPE_NETWORK, Constants::REFRESHTYPE_NETWORKCHANGED },
+    { FormRefreshType::TYPE_ACCOUNT, Constants::REFRESHTYPE_ACCOUNT_CHANGED },
 };
 }
 
@@ -35,6 +36,7 @@ void VisibleDelayStaggerStrategy::Filter(std::vector<RefreshData> &batch, int32_
     auto it = std::remove_if(batch.begin(), batch.end(),
         [&refreshControlMgr, &refreshCacheMgr, conditionType](const RefreshData &data) {
         if (refreshControlMgr.IsFormInvisible(data.record)) {
+            HILOG_INFO("refreshCacheMgr.AddFlagByInvisible %{public}d", conditionType);
             refreshCacheMgr.AddFlagByInvisible(data.formId, conditionType);
             return true;
         }

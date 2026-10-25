@@ -322,6 +322,11 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
             formInfo.package = extensionInfo.bundleName + extraFormInfo.moduleName;
             formInfo.customizeDatas.push_back({ Constants::DISTRIBUTE_FORM_MODULE, extraFormInfo.moduleName });
         }
+        auto it = std::find(formInfo.conditionUpdate.begin(),
+            formInfo.conditionUpdate.end(), Constants::CONDITION_ACCOUNT);
+        if (IsAccountConditionForm(bundleInfo, formInfo.customizeDatas) && it == formInfo.conditionUpdate.end()) {
+            formInfo.conditionUpdate.push_back(Constants::CONDITION_ACCOUNT);
+        }
         formInfo.versionCode = bundleInfo.versionCode;
         formInfo.bundleType = bundleInfo.applicationInfo.bundleType;
         formInfo.privacyLevel = privacyLevel;
@@ -329,6 +334,20 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
         PrintLoadStageFormConfigInfo(formInfo, extraFormInfo.isDistributedForm);
         formInfos.emplace_back(std::move(formInfo));
     }
+}
+
+bool FormInfoHelper::IsAccountConditionForm(const BundleInfo &bundleInfo,
+    const std::vector<FormCustomizeData> &customizeDatas)
+{
+    if (!bundleInfo.applicationInfo.isSystemApp) {
+        return false;
+    }
+    for (const auto &data : customizeDatas) {
+        if (data.name == Constants::METADATA_ACCOUNT_REFRESH && data.value == Constants::METADATA_ACCOUNT_VALUE_TRUE) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void FormInfoHelper::PrintLoadStageFormConfigInfo(const FormInfo &formInfo, bool hasDistributedForm)
