@@ -35,6 +35,7 @@
 #include "form_host/form_host_record.h"
 #include "form_mgr_errors.h"
 #include "form_mgr/form_common_adapter.h"
+#include "form_mgr/form_lifecycle_adapter.h"
 #include "form_provider/form_provider_mgr.h"
 #include "form_render/form_render_mgr.h"
 #include "status_mgr_center/form_status.h"
@@ -138,6 +139,10 @@ ErrCode FormVisibilityAdapter::NotifyWhetherVisibleForms(const std::vector<int64
         }
     }
     RefreshCacheMgr::GetInstance().ConsumeInvisibleFlag(needRefreshRecords, userId);
+    // Consume cached color-mode updates for forms that just became visible
+    if (formVisibleType == Constants::FORM_VISIBLE) {
+        FormLifecycleAdapter::GetInstance().ConsumeColorModeCache(checkFormIds, userId);
+    }
     PostVisibleNotify(
         (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) ? checkFormIds : formIds,
         formInstanceMaps, eventMaps, formVisibleType, visibleNotifyDelay_.load(), callerToken);

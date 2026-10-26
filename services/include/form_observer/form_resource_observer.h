@@ -24,13 +24,18 @@ namespace OHOS {
 namespace AppExecFwk {
 class FormFwkResourceObserver : public ConfigurationObserverStub {
 public:
-    FormFwkResourceObserver();
+    explicit FormFwkResourceObserver(int32_t userId);
 
     virtual ~FormFwkResourceObserver() override;
 
     void OnConfigurationUpdated(const AppExecFwk::Configuration& configuration) override;
 private:
+    void HandleLanguageUpdate(const AppExecFwk::Configuration& configuration);
+    void HandleColorModeUpdate(const AppExecFwk::Configuration& configuration);
+
+    int32_t userId_ = -1;
     std::string language_;
+    std::string colorMode_;
 };
 } // AppExecFwk
 } // OHOS

@@ -68,6 +68,13 @@ public:
      */
     void PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration);
 
+    /**
+     * @brief notify color mode update to form provider(task).
+     * @param userId Target user id.
+     * @param configuration System configuration carrying the new color mode.
+     */
+    void PostBatchColorModeUpdateForms(int32_t userId, const AppExecFwk::Configuration& configuration);
+
 private:
     /**
     * @brief Notify remote observer form click event.

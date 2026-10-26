@@ -67,5 +67,70 @@ HWTEST_F(FmsRunningFormInfoTest, FmsRunningFormInfoTest_002, TestSize.Level0)
     EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "FmsRunningFormInfoTest_002 end";
 }
+
+/**
+ * @tc.name: FmsRunningFormInfoTest_003
+ * @tc.desc: Verify isColorModeRefreshEnabled round-trips through Marshalling/ReadFromParcel when true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsRunningFormInfoTest, FmsRunningFormInfoTest_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsRunningFormInfoTest_003 start";
+
+    RunningFormInfo src;
+    src.isColorModeRefreshEnabled = true;
+    Parcel parcel;
+    EXPECT_TRUE(src.Marshalling(parcel));
+
+    RunningFormInfo *dst = RunningFormInfo::Unmarshalling(parcel);
+    ASSERT_NE(dst, nullptr);
+    EXPECT_TRUE(dst->isColorModeRefreshEnabled);
+    delete dst;
+
+    GTEST_LOG_(INFO) << "FmsRunningFormInfoTest_003 end";
+}
+
+/**
+ * @tc.name: FmsRunningFormInfoTest_004
+ * @tc.desc: Verify isColorModeRefreshEnabled round-trips through Marshalling/ReadFromParcel when false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsRunningFormInfoTest, FmsRunningFormInfoTest_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsRunningFormInfoTest_004 start";
+
+    RunningFormInfo src;
+    src.isColorModeRefreshEnabled = false;
+    Parcel parcel;
+    EXPECT_TRUE(src.Marshalling(parcel));
+
+    RunningFormInfo *dst = RunningFormInfo::Unmarshalling(parcel);
+    ASSERT_NE(dst, nullptr);
+    EXPECT_FALSE(dst->isColorModeRefreshEnabled);
+    delete dst;
+
+    GTEST_LOG_(INFO) << "FmsRunningFormInfoTest_004 end";
+}
+
+/**
+ * @tc.name: FmsRunningFormInfoTest_005
+ * @tc.desc: Verify isColorModeRefreshEnabled defaults to false in ReadFromParcel.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsRunningFormInfoTest, FmsRunningFormInfoTest_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsRunningFormInfoTest_005 start";
+
+    RunningFormInfo src;
+    EXPECT_FALSE(src.isColorModeRefreshEnabled);
+    Parcel parcel;
+    EXPECT_TRUE(src.Marshalling(parcel));
+
+    RunningFormInfo dst;
+    EXPECT_TRUE(dst.ReadFromParcel(parcel));
+    EXPECT_FALSE(dst.isColorModeRefreshEnabled);
+
+    GTEST_LOG_(INFO) << "FmsRunningFormInfoTest_005 end";
+}
 } // namespace AppExecFwk
 } // namespace OHOS

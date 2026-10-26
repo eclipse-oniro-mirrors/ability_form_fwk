@@ -165,5 +165,17 @@ void FormObserverTaskMgr::FormClickEvent(const std::string &bundleName, const st
     HILOG_DEBUG("end");
 }
 
+void FormObserverTaskMgr::PostBatchColorModeUpdateForms(int32_t userId,
+    const AppExecFwk::Configuration& configuration)
+{
+    HILOG_INFO("Call, userId:%{public}d", userId);
+
+    auto batchColorModeUpdate = [userId, configuration]() {
+        return FormMgrAdapterFacade::GetInstance().BatchNotifyFormsColorModeUpdate(userId, configuration);
+    };
+    FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, batchColorModeUpdate);
+    HILOG_INFO("end");
+}
+
 } // namespace AppExecFwk
 } // namespace OHOS

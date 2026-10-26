@@ -20,6 +20,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <unordered_map>
 
 #include <singleton.h>
 
@@ -99,6 +100,14 @@ public:
     int32_t RecycleForms(const std::vector<int64_t> &formIds, const Want &want, bool isCheckCallingUid);
     ErrCode SwitchLockForms(const std::string &bundleName, int32_t userId, const bool lock);
     ErrCode BatchNotifyFormsConfigurationUpdate(const AppExecFwk::Configuration &configuration);
+    ErrCode BatchNotifyFormsColorModeUpdate(int32_t userId, const AppExecFwk::Configuration& configuration);
+
+    /**
+     * @brief Consume cached color-mode updates for forms that just became visible.
+     * @param formIds Form IDs that became visible.
+     * @param userId Current user id.
+     */
+    void ConsumeColorModeCache(const std::vector<int64_t> &formIds, int32_t userId);
 
 #ifdef RES_SCHEDULE_ENABLE
     /**
@@ -156,6 +165,11 @@ private:
     ErrCode HandleAddRequestPublishForm(const int64_t formId, const Want &want,
         const sptr<IRemoteObject> &callerToken, FormJsInfo &formJsInfo,
         const FormItemInfo &formItemInfo);
+
+    // Cache color-mode configuration for invisible forms; consumed when they become visible.
+    // Key: userId::bundleName::abilityName
+    std::mutex colorModeCacheMutex_;
+    std::unordered_map<std::string, AppExecFwk::Configuration> colorModeUpdateCache_;
 
 #ifdef THEME_MGR_ENABLE
     int DeleteThemeForm(const int64_t formId);

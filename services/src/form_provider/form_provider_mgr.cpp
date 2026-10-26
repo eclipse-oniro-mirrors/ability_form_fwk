@@ -275,6 +275,36 @@ ErrCode FormProviderMgr::ConnectForConfigUpdate(const AppExecFwk::Configuration 
     return ERR_OK;
 }
 
+ErrCode FormProviderMgr::ConnectForConfigUpdateWithUserId(const AppExecFwk::Configuration &configuration,
+    const FormRecord &record, const Want &want, int32_t userId)
+{
+    HILOG_INFO("bundleName:%{public}s, abilityName:%{public}s, userId:%{public}d, providerUserId:%{public}d",
+        record.bundleName.c_str(), record.abilityName.c_str(), userId, record.providerUserId);
+    sptr<IAbilityConnection> abilityConnection = new (std::nothrow) ConfigurationUpdateConnection(record.formId, want,
+        record.bundleName, record.abilityName, configuration, record.providerUserId);
+    if (abilityConnection == nullptr) {
+        HILOG_ERROR("create ConfigurationUpdateConnection failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    Want connectWant;
+    connectWant.SetElementName(record.bundleName, record.abilityName);
+    if (!record.moduleName.empty()) {
+        connectWant.SetModuleName(record.moduleName);
+    }
+
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
+        connectWant, abilityConnection, record.providerUserId);
+    if (errorCode != ERR_OK) {
+        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
+        if (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) {
+            return ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED;
+        }
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+
+    return ERR_OK;
+}
+
 /**
  * @brief Connect ams for refresh form
  *

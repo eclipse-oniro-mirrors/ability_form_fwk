@@ -20,5 +20,11 @@ ErrCode FormProviderMgr::ConnectForConfigUpdate(const AppExecFwk::Configuration 
 {
     return ERR_OK;
 }
+
+ErrCode FormProviderMgr::ConnectForConfigUpdateWithUserId(const AppExecFwk::Configuration &configuration,
+    const FormRecord &formRecord, const Want &want, int32_t userId)
+{
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

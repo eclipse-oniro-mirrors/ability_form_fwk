@@ -21,6 +21,7 @@ namespace AppExecFwk {
 class MockRefreshControlMgr {
 public:
     static void MockIsFormInvisible(bool mockRet);
+    static void MockIsHealthyControl(bool mockRet);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

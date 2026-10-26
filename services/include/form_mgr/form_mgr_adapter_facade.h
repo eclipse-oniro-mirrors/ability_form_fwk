@@ -107,6 +107,8 @@ public:
 
     ErrCode BatchNotifyFormsConfigurationUpdate(const AppExecFwk::Configuration &configuration);
 
+    ErrCode BatchNotifyFormsColorModeUpdate(int32_t userId, const AppExecFwk::Configuration& configuration);
+
 #ifdef RES_SCHEDULE_ENABLE
     /**
      * @brief Set the value which indicate whether Refresh Timer task should be triggered.

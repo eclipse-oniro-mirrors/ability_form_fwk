@@ -102,6 +102,9 @@ public:
     virtual ErrCode HandleFormRemoveObserver(const std::string &, const RunningFormInfo &) = 0;
     virtual const std::string &GetTransparencyFormCapabilityKey() = 0;
     virtual const std::string &GetFormStandbyCapabilityKey() = 0;
+    virtual void GetFormRecordsByUserId(const int32_t userId, std::vector<FormRecord> &formRecords) = 0;
+    virtual bool GetFormRecordById(const int64_t formId, FormRecord &formRecord) = 0;
+    virtual bool GetFormVisible(int64_t formId) = 0;
 };
 
 class MockFormDataMgr : public AbstractMockFormDataMgr {
@@ -178,6 +181,9 @@ public:
     MOCK_METHOD2(HandleFormRemoveObserver, ErrCode(const std::string &, const RunningFormInfo &));
     MOCK_METHOD0(GetTransparencyFormCapabilityKey, const std::string &());
     MOCK_METHOD0(GetFormStandbyCapabilityKey, const std::string &());
+    MOCK_METHOD2(GetFormRecordsByUserId, void(const int32_t userId, std::vector<FormRecord> &formRecords));
+    MOCK_METHOD2(GetFormRecordById, bool(const int64_t formId, FormRecord &formRecord));
+    MOCK_METHOD1(GetFormVisible, bool(int64_t formId));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
