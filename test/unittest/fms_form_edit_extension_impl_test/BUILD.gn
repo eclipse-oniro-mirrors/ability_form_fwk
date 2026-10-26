@@ -74,6 +74,7 @@ ohos_unittest("FmsFormEditExtensionImplTest") {
     "c_utils:utils",
     "googletest:gtest_main",
     "hilog:libhilog",
+    "ipc:ipc_napi",
     "napi:ace_napi",
     "window_manager:libwm",
   ]
