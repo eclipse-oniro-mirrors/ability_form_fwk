@@ -76,7 +76,6 @@ void AccountCommonEventManager::RegisterAccountCallbackInternal()
     EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
     // Permission filter: only receive broadcasts from account service
     subscribeInfo.SetPermission(MANAGE_LOCAL_ACCOUNTS_PERMISSION);
-    subscribeInfo.SetUid(OsAccountSdkUid);
 
     observer_ = std::make_shared<AccountCommonEventObserver>(subscribeInfo);
     bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(observer_);

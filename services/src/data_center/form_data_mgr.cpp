@@ -2676,7 +2676,7 @@ void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRec
     runningFormInfo.lowMemoryRecycleStatus = formRecord.lowMemoryRecycleStatus;
     runningFormInfo.formBundleType = formRecord.formBundleType;
     runningFormInfo.userId = formRecord.userId;
-    }
+}
 
 ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo,
     const int32_t userId)
@@ -3576,12 +3576,12 @@ void FormDataMgr::InitLowMemoryStatus()
 
 void FormDataMgr::SetIsLowMemory(bool isLowMemory)
 {
-        isLowMemory_.store(isLowMemory);
+    isLowMemory_.store(isLowMemory);
 }
 
 bool FormDataMgr::IsLowMemory() const
 {
-        return isLowMemory_.load();
+    return isLowMemory_.load();
 }
 
 ErrCode FormDataMgr::SetSpecification(const int64_t formId, const int32_t specification)
