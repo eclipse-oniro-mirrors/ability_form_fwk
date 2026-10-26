@@ -38,8 +38,6 @@ public:
         EtsUIExtensionBase::SetContext(context);
     }
 
-    static void SetWindowBackgroundColor(ani_env *env, ani_object obj, ani_string color);
-
 protected:
     void BindContext() override;
 
@@ -48,10 +46,6 @@ protected:
     std::unordered_set<uint64_t> uiExtensionComponentIdSet_;
 
 private:
-    void BindMethod(ani_env *env);
-    static EtsFormEditExtensionImpl* GetEtsFormEditExtension(ani_env *env, ani_object obj);
-    void OnSetWindowBackgroundColor(ani_env *env, const std::string &color);
-
     using EtsUIExtensionBase::SetContext;
 };
 } // namespace AbilityRuntime
