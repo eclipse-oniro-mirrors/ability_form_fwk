@@ -755,10 +755,6 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormState_002, TestSize.Level1)
     FormStateInfo stateInfo;
     sptr<IRemoteObject> callerToken = new MockIRemoteObject();
 
-    // Empty element aborts in AcquireFormStateCheck after one GetCallingUid call.
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .Times(1)
-        .WillRepeatedly(Return(TEST_CALLING_UID));
     auto result = FormQueryAdapter::GetInstance().AcquireFormState(
         want, callerToken, stateInfo);
     // bundleName and abilityName are empty, AcquireFormStateCheck returns ERR_APPEXECFWK_FORM_INVALID_PARAM
@@ -787,10 +783,6 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormState_003, TestSize.Level1)
     EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModuleWithoutCheck(_, _, _, _))
         .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_INFO_FAILED));
 
-    // AcquireFormStateCheck aborts after one GetCallingUid call on this error path.
-    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
-        .Times(1)
-        .WillRepeatedly(Return(TEST_CALLING_UID));
     auto result = FormQueryAdapter::GetInstance().AcquireFormState(
         want, callerToken, stateInfo);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
