@@ -50,7 +50,6 @@ void AccountCommonEventObserver::OnReceiveEvent(const EventFwk::CommonEventData 
         HILOG_WARN("Invalid userId:%{public}d, skip refresh", userId);
         return;
     }
-    HILOG_ERROR("zzz refresh 1");
     HILOG_INFO("Account event action:%{public}s userId:%{public}d", action.c_str(), userId);
     // Dispatch to FMS main thread via queue
     auto task = [userId]() {

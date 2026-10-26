@@ -42,7 +42,7 @@ public:
         std::unordered_map<std::string, std::vector<FormInfo>> &formInfosMap);
 
 private:
-    static bool IsAccountConditionForm(const BundleInfo &bundleInfo,
+    static bool IsAccountMetadataEnabled(const BundleInfo &bundleInfo,
         const std::vector<FormCustomizeData> &customizeDatas);
 
     static ErrCode LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos);

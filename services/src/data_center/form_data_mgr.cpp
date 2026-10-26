@@ -1003,7 +1003,6 @@ bool FormDataMgr::GetFormRecordByCondition(int32_t conditionType, int32_t userId
             continue;
         }
         const auto &formRecord = itFormRecord->second;
-        const auto &conditionUpdate = formRecord.conditionUpdate;
         if (conditionType == Constants::CONDITION_ACCOUNT && IsAccountConditionForm(formRecord)) {
             formInfos.emplace_back(formRecord);
         } else if (conditionType == Constants::CONDITION_NETWORK && IsNetworkConditionForm(formRecord)) {

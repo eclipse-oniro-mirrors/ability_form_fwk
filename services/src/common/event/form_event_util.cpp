@@ -24,6 +24,7 @@
 #include "data_center/form_cache_mgr.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_data_proxy_mgr.h"
+#include "form_observer/account_common_event_manager.h"
 #include "data_center/database/form_db_cache.h"
 #include "data_center/form_info/form_info_mgr.h"
 #include "form_mgr/form_mgr_adapter_facade.h"
@@ -325,7 +326,19 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
     SetTimerCfgByMultUpdate(updatedForm.multiScheduledUpdateTime, timerCfg);
     HandleTimerUpdate(formId, formRecord, timerCfg);
     UpdateRecordByBundleInfo(bundleInfo, formRecord);
+    // Reconcile account-condition subscription: compare before/after to handle
+    // conditionUpdate changes introduced by bundle upgrade.
+    bool wasAccountForm = FormDataMgr::IsAccountConditionForm(formRecord);
+    formRecord.conditionUpdate = updatedForm.conditionUpdate;
+    bool isAccountForm = FormDataMgr::IsAccountConditionForm(formRecord);
     UpdateFormRecord(updatedForm, formRecord);
+    if (!wasAccountForm && isAccountForm) {
+        // New account-condition form appears after upgrade, ensure observer registered.
+        AccountCommonEventManager::GetInstance().RegisterAccountCallback();
+    } else if (wasAccountForm && !isAccountForm && !FormDataMgr::GetInstance().HasAccountConditionForm()) {
+        // Last account-condition form drops condition after upgrade, unregister observer.
+        AccountCommonEventManager::GetInstance().UnregisterAccountCallback();
+    }
     FormDataMgr::GetInstance().SetVersionUpgrade(formId, true);
     return true;
 }

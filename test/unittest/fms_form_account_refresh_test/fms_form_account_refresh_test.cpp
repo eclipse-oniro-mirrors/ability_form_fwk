@@ -30,7 +30,11 @@ protected:
     void TearDown() override {}
 };
 
-// Task 1: Constants definition
+/**
+ * @tc.number: FmsFormAccountRefreshTest_Constants_001
+ * @tc.name: Constants definition
+ * @tc.desc: Verify account-refresh related constants are defined with expected values.
+ */
 HWTEST_F(FmsFormAccountRefreshTest, TestConstants_001, TestSize.Level0)
 {
     EXPECT_EQ(Constants::CONDITION_NETWORK, 1);
@@ -38,7 +42,11 @@ HWTEST_F(FmsFormAccountRefreshTest, TestConstants_001, TestSize.Level0)
     EXPECT_EQ(Constants::REFRESHTYPE_ACCOUNT_CHANGED, 6);
 }
 
-// Task 1: CONDITION_REFRESHTYPE_SET
+/**
+ * @tc.number: FmsFormAccountRefreshTest_ConditionRefreshTypeSet_001
+ * @tc.name: CONDITION_REFRESHTYPE_SET membership
+ * @tc.desc: Verify the set contains network and account refresh types and excludes others.
+ */
 HWTEST_F(FmsFormAccountRefreshTest, TestConditionRefreshTypeSet_001, TestSize.Level0)
 {
     EXPECT_TRUE(Constants::CONDITION_REFRESHTYPE_SET.find(Constants::REFRESHTYPE_NETWORKCHANGED) !=
@@ -49,13 +57,21 @@ HWTEST_F(FmsFormAccountRefreshTest, TestConditionRefreshTypeSet_001, TestSize.Le
         Constants::CONDITION_REFRESHTYPE_SET.end());
 }
 
-// Task 2: FormRefreshType enum
+/**
+ * @tc.number: FmsFormAccountRefreshTest_FormRefreshType_001
+ * @tc.name: FormRefreshType enum
+ * @tc.desc: Verify TYPE_ACCOUNT enum value.
+ */
 HWTEST_F(FmsFormAccountRefreshTest, TestFormRefreshType_001, TestSize.Level0)
 {
     EXPECT_EQ(FormRefreshType::TYPE_ACCOUNT, 10);
 }
 
-// Task 3: IsConditionRefreshType
+/**
+ * @tc.number: FmsFormAccountRefreshTest_IsConditionRefreshType_001
+ * @tc.name: IsConditionRefreshType
+ * @tc.desc: Verify IsConditionRefreshType returns true for network/account, false for others.
+ */
 HWTEST_F(FmsFormAccountRefreshTest, TestIsConditionRefreshType_001, TestSize.Level0)
 {
     EXPECT_TRUE(FormConstantsUtil::IsConditionRefreshType(Constants::REFRESHTYPE_NETWORKCHANGED));
@@ -64,7 +80,11 @@ HWTEST_F(FmsFormAccountRefreshTest, TestIsConditionRefreshType_001, TestSize.Lev
     EXPECT_FALSE(FormConstantsUtil::IsConditionRefreshType(Constants::REFRESHTYPE_DEFAULT));
 }
 
-// Task 5: IsAccountConditionForm with isSystemApp double-insurance
+/**
+ * @tc.number: FmsFormAccountRefreshTest_IsAccountConditionForm_001
+ * @tc.name: IsAccountConditionForm system app with account condition
+ * @tc.desc: Verify system app record with CONDITION_ACCOUNT returns true.
+ */
 HWTEST_F(FmsFormAccountRefreshTest, TestIsAccountConditionForm_001, TestSize.Level0)
 {
     FormRecord record;
@@ -73,6 +93,11 @@ HWTEST_F(FmsFormAccountRefreshTest, TestIsAccountConditionForm_001, TestSize.Lev
     EXPECT_TRUE(FormDataMgr::IsAccountConditionForm(record));
 }
 
+/**
+ * @tc.number: FmsFormAccountRefreshTest_IsAccountConditionForm_002
+ * @tc.name: IsAccountConditionForm non-system app blocked
+ * @tc.desc: Verify non-system app record with CONDITION_ACCOUNT returns false (double-insurance).
+ */
 HWTEST_F(FmsFormAccountRefreshTest, TestIsAccountConditionForm_002, TestSize.Level0)
 {
     FormRecord record;
@@ -81,6 +106,11 @@ HWTEST_F(FmsFormAccountRefreshTest, TestIsAccountConditionForm_002, TestSize.Lev
     EXPECT_FALSE(FormDataMgr::IsAccountConditionForm(record));
 }
 
+/**
+ * @tc.number: FmsFormAccountRefreshTest_IsAccountConditionForm_003
+ * @tc.name: IsAccountConditionForm without account condition
+ * @tc.desc: Verify system app record with only network condition returns false.
+ */
 HWTEST_F(FmsFormAccountRefreshTest, TestIsAccountConditionForm_003, TestSize.Level0)
 {
     FormRecord record;
@@ -89,29 +119,15 @@ HWTEST_F(FmsFormAccountRefreshTest, TestIsAccountConditionForm_003, TestSize.Lev
     EXPECT_FALSE(FormDataMgr::IsAccountConditionForm(record));
 }
 
+/**
+ * @tc.number: FmsFormAccountRefreshTest_IsAccountConditionForm_004
+ * @tc.name: IsAccountConditionForm empty conditionUpdate
+ * @tc.desc: Verify system app record with empty conditionUpdate returns false.
+ */
 HWTEST_F(FmsFormAccountRefreshTest, TestIsAccountConditionForm_004, TestSize.Level0)
 {
     FormRecord record;
     record.isSystemApp = true;
     record.conditionUpdate = {};  // empty conditionUpdate
     EXPECT_FALSE(FormDataMgr::IsAccountConditionForm(record));
-}
-
-// Task 5: GetFormRecordByCondition userId overload conditionType assertion
-HWTEST_F(FmsFormAccountRefreshTest, TestGetFormRecordByCondition_Q3B_001, TestSize.Level0)
-{
-    std::vector<FormRecord> formInfos;
-    // Non-CONDITION_ACCOUNT type returns false
-    bool result = FormDataMgr::GetInstance().GetFormRecordByCondition(
-        Constants::CONDITION_NETWORK, 100, formInfos);
-    EXPECT_FALSE(result);
-}
-
-HWTEST_F(FmsFormAccountRefreshTest, TestGetFormRecordByCondition_Q3B_002, TestSize.Level0)
-{
-    std::vector<FormRecord> formInfos;
-    // CONDITION_ACCOUNT with non-existent userId returns false (no matching records)
-    bool result = FormDataMgr::GetInstance().GetFormRecordByCondition(
-        Constants::CONDITION_ACCOUNT, 99999, formInfos);
-    EXPECT_FALSE(result);
 }

@@ -15,6 +15,7 @@
 
 #include "data_center/form_info/form_info_helper.h"
 
+#include <algorithm>
 #include <fstream>
 
 #include "bms_mgr/form_bms_helper.h"
@@ -324,7 +325,7 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
         }
         auto it = std::find(formInfo.conditionUpdate.begin(),
             formInfo.conditionUpdate.end(), Constants::CONDITION_ACCOUNT);
-        if (IsAccountConditionForm(bundleInfo, formInfo.customizeDatas) && it == formInfo.conditionUpdate.end()) {
+        if (IsAccountMetadataEnabled(bundleInfo, formInfo.customizeDatas) && it == formInfo.conditionUpdate.end()) {
             formInfo.conditionUpdate.push_back(Constants::CONDITION_ACCOUNT);
         }
         formInfo.versionCode = bundleInfo.versionCode;
@@ -336,7 +337,7 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
     }
 }
 
-bool FormInfoHelper::IsAccountConditionForm(const BundleInfo &bundleInfo,
+bool FormInfoHelper::IsAccountMetadataEnabled(const BundleInfo &bundleInfo,
     const std::vector<FormCustomizeData> &customizeDatas)
 {
     if (!bundleInfo.applicationInfo.isSystemApp) {

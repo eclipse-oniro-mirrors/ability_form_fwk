@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const static std::unordered_map<int32_t, int32_t> CONDITION_TYPE_MAP = {
+const static std::unordered_map<int32_t, int32_t> REFRESH_TYPE_MAP = {
     { FormRefreshType::TYPE_NETWORK, Constants::REFRESHTYPE_NETWORKCHANGED },
     { FormRefreshType::TYPE_ACCOUNT, Constants::REFRESHTYPE_ACCOUNT_CHANGED },
 };
@@ -31,12 +31,12 @@ void VisibleDelayStaggerStrategy::Filter(std::vector<RefreshData> &batch, int32_
 {
     auto &refreshControlMgr = RefreshControlMgr::GetInstance();
     auto &refreshCacheMgr = RefreshCacheMgr::GetInstance();
-    auto mapIt = CONDITION_TYPE_MAP.find(refreshType);
-    int32_t conditionType = (mapIt != CONDITION_TYPE_MAP.end()) ? mapIt->second : Constants::REFRESHTYPE_DEFAULT;
+    auto mapIt = REFRESH_TYPE_MAP.find(refreshType);
+    int32_t conditionType = (mapIt != REFRESH_TYPE_MAP.end()) ? mapIt->second : Constants::REFRESHTYPE_DEFAULT;
     auto it = std::remove_if(batch.begin(), batch.end(),
         [&refreshControlMgr, &refreshCacheMgr, conditionType](const RefreshData &data) {
         if (refreshControlMgr.IsFormInvisible(data.record)) {
-            HILOG_INFO("refreshCacheMgr.AddFlagByInvisible %{public}d", conditionType);
+            HILOG_DEBUG("refreshCacheMgr.AddFlagByInvisible %{public}d", conditionType);
             refreshCacheMgr.AddFlagByInvisible(data.formId, conditionType);
             return true;
         }

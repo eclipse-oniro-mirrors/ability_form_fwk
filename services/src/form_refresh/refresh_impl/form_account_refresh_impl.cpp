@@ -19,7 +19,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 // Configuration for form account change refresh, check types and control checks
-static RefreshConfig CreateConfig()
+RefreshConfig CreateConfig()
 {
     RefreshConfig config;
     // Check types configuration

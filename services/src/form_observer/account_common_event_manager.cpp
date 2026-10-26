@@ -24,6 +24,7 @@
 #include "fms_log_wrapper.h"
 #include "form_mgr/form_mgr_queue.h"
 #include "data_center/form_data_mgr.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
@@ -58,6 +59,10 @@ void AccountCommonEventManager::RegisterAccountCallback()
 void AccountCommonEventManager::RegisterAccountCallbackInternal()
 {
     if (isShutdown_.load()) return;
+    if (!FormDataMgr::GetInstance().HasAccountConditionForm()) {
+        HILOG_WARN("no need to register RegisterAccountCallback");
+        return;
+    }
     HILOG_INFO("Register account callback begin");
 
     if (isRegistered_.load()) {
@@ -71,6 +76,7 @@ void AccountCommonEventManager::RegisterAccountCallbackInternal()
     EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
     // Permission filter: only receive broadcasts from account service
     subscribeInfo.SetPermission(MANAGE_LOCAL_ACCOUNTS_PERMISSION);
+    subscribeInfo.SetUid(OsAccountSdkUid);
 
     observer_ = std::make_shared<AccountCommonEventObserver>(subscribeInfo);
     bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(observer_);
@@ -102,21 +108,17 @@ void AccountCommonEventManager::UnregisterAccountCallback()
 
 void AccountCommonEventManager::UnregisterAccountCallbackInternal()
 {
-    isShutdown_.store(true);
-    if (!FormDataMgr::GetInstance().HasAccountConditionForm()) {
-        HILOG_WARN("no need to register RegisterAccountCallback");
-        return;
-    }
     HILOG_INFO("Unregister account callback begin");
-    if (!isRegistered_.load()) {
-        HILOG_WARN("AccountCommonEventObserver not registered");
-        return;
-    }
     if (observer_ != nullptr) {
         EventFwk::CommonEventManager::UnSubscribeCommonEvent(observer_);
         observer_ = nullptr;
     }
+    if (!isRegistered_.load()) {
+        HILOG_WARN("AccountCommonEventObserver not registered");
+        return;
+    }
     isRegistered_.store(false);
+    retryCount_.store(0);
     HILOG_INFO("Unregister account callback end");
 }
 

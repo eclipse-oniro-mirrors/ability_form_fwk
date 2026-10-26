@@ -227,7 +227,7 @@ public:
     bool GetFormRecordByCondition(int32_t conditionType, std::vector<FormRecord> &formInfos) const;
     /**
      * @brief Get form records by condition type and userId.
-     * @param conditionType Must be CONDITION_ACCOUNT.
+     * @param conditionType refresh type.
      * @param userId User ID for filtering.
      * @param formInfos The form record list.
      * @return Returns true if found, false otherwise.

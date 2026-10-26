@@ -71,7 +71,7 @@ const static std::unordered_map<int32_t, int32_t> CONDITION_TYPE_MAP = {
     {Constants::CONDITION_NETWORK, FormRefreshType::TYPE_NETWORK},
     {Constants::CONDITION_ACCOUNT, FormRefreshType::TYPE_ACCOUNT},
 };
-}
+}  // namespace
 
 FormDataAdapter::FormDataAdapter()
 {
@@ -705,11 +705,11 @@ ErrCode FormDataAdapter::UpdateFormByCondition(int32_t type, int32_t userId)
     if (mapIt == CONDITION_TYPE_MAP.end()) {
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    auto refreshType = mapIt->second;
+    const auto refreshType = mapIt->second;
     std::vector<FormRecord> formInfos;
-    if (userId < 0 && !FormDataMgr::GetInstance().GetFormRecordByCondition(type, formInfos)) {
-        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-    } else if (!FormDataMgr::GetInstance().GetFormRecordByCondition(type, userId, formInfos)) {
+    bool found = (userId < 0) ? FormDataMgr::GetInstance().GetFormRecordByCondition(type, formInfos)
+        : FormDataMgr::GetInstance().GetFormRecordByCondition(type, userId, formInfos);
+    if (!found) {
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
