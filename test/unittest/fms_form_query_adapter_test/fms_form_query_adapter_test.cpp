@@ -72,6 +72,8 @@ void FmsFormQueryAdapterTest::SetUpTestCase()
     MockFormTimerMgr::obj = std::make_shared<MockFormTimerMgr>();
     MockFormDbCache::obj = std::make_shared<MockFormDbCache>();
     MockIPCSkeleton::obj = new MockIPCSkeleton();
+    // Stable default so GetCallerUserId derives userId 0 deterministically.
+    ON_CALL(*MockIPCSkeleton::obj, GetCallingUid()).WillByDefault(Return(0));
 }
 
 void FmsFormQueryAdapterTest::TearDownTestCase()
@@ -92,6 +94,9 @@ void FmsFormQueryAdapterTest::SetUp()
 
 void FmsFormQueryAdapterTest::TearDown()
 {
+    if (MockIPCSkeleton::obj != nullptr) {
+        Mock::VerifyAndClearExpectations(MockIPCSkeleton::obj);
+    }
 }
 
 // ========== GetAllFormsInfo Tests ==========

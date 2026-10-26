@@ -91,6 +91,8 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0001 start";
     FormMgrService formMgrService;
+    // SA branch takes GetCurrentAccountId, so the mock below controls userId.
+    MockIsSACall(true);
     formMgrService.state_ = ServiceRunningState::STATE_NOT_START;
     EXPECT_EQ(formMgrService.CheckFMSReady(), ERR_APPEXECFWK_FORM_COMMON_CODE);
  

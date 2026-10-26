@@ -188,7 +188,14 @@ int32_t FormMgrService::CheckFMSReady()
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
+    // SA uid carries no user semantics; use the active account for SA callers.
+    int32_t userId = FormUtil::IsSACall()
+        ? FormUtil::GetCurrentAccountId()
+        : FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
+    if (userId == Constants::ANY_USERID) {
+        HILOG_ERROR("empty account");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_CheckFMSReady",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     bool result = FormInfoMgr::GetInstance().HasReloadedFormInfos(userId);
