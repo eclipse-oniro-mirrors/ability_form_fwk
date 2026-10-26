@@ -94,6 +94,9 @@ void FmsFormQueryAdapterTest::SetUp()
 
 void FmsFormQueryAdapterTest::TearDown()
 {
+    if (MockIPCSkeleton::obj != nullptr) {
+        Mock::VerifyAndClearExpectations(MockIPCSkeleton::obj);
+    }
 }
 
 // ========== GetAllFormsInfo Tests ==========

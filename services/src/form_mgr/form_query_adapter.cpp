@@ -166,11 +166,13 @@ ErrCode FormQueryAdapter::GetFormInstancesByFilter(const FormInstancesFilter &fo
 ErrCode FormQueryAdapter::AcquireFormStateCheck(const std::string &bundleName,
     const std::string &abilityName, const Want &want, std::string &provider)
 {
-    int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     if (bundleName.empty() || abilityName.empty()) {
         HILOG_ERROR("empty bundleName or abilityName");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
 
     std::string moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     std::string formName = want.GetStringParam(AppExecFwk::Constants::PARAM_FORM_NAME_KEY);
@@ -203,7 +205,6 @@ ErrCode FormQueryAdapter::AcquireFormStateCheck(const std::string &bundleName,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
     const std::string doubleColon = "::";
     provider.append(bundleName).append(doubleColon).append(abilityName).append(doubleColon)
         .append(moduleName).append(doubleColon).append(formName).append(doubleColon)
