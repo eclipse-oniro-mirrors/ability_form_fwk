@@ -360,7 +360,6 @@ void EtsFormEditExtensionContext::OnSetWindowBackgroundColor(ani_env *env, const
     if (!isSuccess) {
         HILOG_ERROR("SetWindowBackgroundColor failed");
         EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
-        return;
     }
 }
 } // namespace AbilityRuntime
