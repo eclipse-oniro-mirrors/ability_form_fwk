@@ -638,6 +638,7 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
     napi_set_named_property(env, objContext, "isTemplateForm", CreateJsValue(env, formInfo.isTemplateForm));
     napi_set_named_property(env, objContext, "isColorModeRefreshEnabled",
         CreateJsValue(env, formInfo.isColorModeRefreshEnabled));
+    napi_set_named_property(env, objContext, "enableTint", CreateJsValue(env, formInfo.enableTint));
 
     return objContext;
 }
