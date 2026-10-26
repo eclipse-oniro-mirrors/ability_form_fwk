@@ -36,7 +36,6 @@ void AccountCommonEventObserver::OnReceiveEvent(const EventFwk::CommonEventData 
 {
     auto want = data.GetWant();
     std::string action = want.GetAction();
-    HILOG_INFO("AccountCommonEvent receive action:%{public}s", action.c_str());
 
     // Filter non-account events
     if (action != ACCOUNT_LOGIN_ACTION && action != ACCOUNT_LOGOUT_ACTION) {

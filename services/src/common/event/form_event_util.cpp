@@ -326,8 +326,6 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
     SetTimerCfgByMultUpdate(updatedForm.multiScheduledUpdateTime, timerCfg);
     HandleTimerUpdate(formId, formRecord, timerCfg);
     UpdateRecordByBundleInfo(bundleInfo, formRecord);
-    // Reconcile account-condition subscription: compare before/after to handle
-    // conditionUpdate changes introduced by bundle upgrade.
     bool wasAccountForm = FormDataMgr::IsAccountConditionForm(formRecord);
     formRecord.conditionUpdate = updatedForm.conditionUpdate;
     bool isAccountForm = FormDataMgr::IsAccountConditionForm(formRecord);

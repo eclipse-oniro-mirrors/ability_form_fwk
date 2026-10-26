@@ -58,12 +58,13 @@ void AccountCommonEventManager::RegisterAccountCallback()
 
 void AccountCommonEventManager::RegisterAccountCallbackInternal()
 {
-    if (isShutdown_.load()) return;
+    if (isShutdown_.load()) {
+        return;
+    }
     if (!FormDataMgr::GetInstance().HasAccountConditionForm()) {
         HILOG_WARN("no need to register RegisterAccountCallback");
         return;
     }
-    HILOG_INFO("Register account callback begin");
 
     if (isRegistered_.load()) {
         HILOG_WARN("AccountCommonEventObserver already registered");
