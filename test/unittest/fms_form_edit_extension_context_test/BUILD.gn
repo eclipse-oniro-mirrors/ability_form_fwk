@@ -65,6 +65,8 @@ ohos_unittest("FmsFormEditExtensionContextTest") {
     "ability_base:want",
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_context",
+    "ability_runtime:extensionkit_native",
+    "ability_runtime:runtime",
     "ability_runtime:ui_extension",
     "c_utils:utils",
     "googletest:gtest_main",
