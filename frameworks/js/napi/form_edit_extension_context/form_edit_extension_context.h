@@ -27,6 +27,9 @@ enum class FormEditErrorCode {
     // param error
     ERROR_CODE_PARAM_ERROR = 401,
 
+    // invalid color value
+    ERROR_CODE_INVALID_COLOR_VALUE = 16501026,
+
     // IPC error
     ERROR_CODE_IPC_ERROR = 16500050,
 

@@ -30,8 +30,8 @@ export class AsyncCallbackWrapper<T, E = void> {
   }
 }
 
-const ERROR_CODE_PARAM = 401;
-const ERROR_MSG_PARAM = 'Params error';
+const ERROR_CODE_INVALID_COLOR_VALUE = 16501026;
+const ERROR_MSG_INVALID_COLOR_VALUE = 'Invalid color value';
 const COLOR_LEN_RGB = 7;
 const COLOR_LEN_ARGB = 9;
 
@@ -100,7 +100,7 @@ export default class FormEditExtensionContext extends UIExtensionContext {
 
   async setWindowBackgroundColor(color: string): Promise<void> {
     if (!isValidColorFormat(color)) {
-      throw { code: ERROR_CODE_PARAM, message: ERROR_MSG_PARAM } as BusinessError;
+      throw { code: ERROR_CODE_INVALID_COLOR_VALUE, message: ERROR_MSG_INVALID_COLOR_VALUE } as BusinessError;
     }
     await taskpool.execute((): void => {
       this.nativeSetWindowBackgroundColor(color);

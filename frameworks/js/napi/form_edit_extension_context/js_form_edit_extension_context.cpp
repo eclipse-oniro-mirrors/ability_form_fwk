@@ -35,6 +35,7 @@ constexpr size_t ARGC_ONE = 1;
 constexpr size_t ARGC_TWO = 2;
 constexpr int32_t INDEX_ZERO = 0;
 constexpr const char *ERR_MSG_PARAMS_ERROR = "Params error";
+constexpr const char *ERR_MSG_INVALID_COLOR_VALUE = "Invalid color value";
 constexpr const char *ERR_MSG_INTERNAL_ERROR = "Internal error";
 constexpr const char *ERR_MSG_CONTEXT_RELEASED = "context has released";
 constexpr const char *ERR_MSG_PARSE_WANT_FAILED = "Parse param want failed, want must be Want";
@@ -218,18 +219,21 @@ napi_value JsFormEditExtensionContext::OnSetWindowBackgroundColor(napi_env env, 
 {
     HILOG_DEBUG("OnSetWindowBackgroundColor begin");
     if (info.argc < ARGC_ONE) {
-        ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_PARAM_ERROR), ERR_MSG_PARAMS_ERROR);
+        ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INVALID_COLOR_VALUE),
+            ERR_MSG_INVALID_COLOR_VALUE);
         return CreateJsUndefined(env);
     }
     std::string color;
     if (!ConvertFromJsValue(env, info.argv[INDEX_ZERO], color)) {
         HILOG_ERROR("Parse color failed");
-        ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_PARAM_ERROR), ERR_MSG_PARAMS_ERROR);
+        ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INVALID_COLOR_VALUE),
+            ERR_MSG_INVALID_COLOR_VALUE);
         return CreateJsUndefined(env);
     }
     if (!IsValidColorFormat(color)) {
         HILOG_ERROR("Invalid color format: %{public}s", color.c_str());
-        ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_PARAM_ERROR), ERR_MSG_PARAMS_ERROR);
+        ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INVALID_COLOR_VALUE),
+            ERR_MSG_INVALID_COLOR_VALUE);
         return CreateJsUndefined(env);
     }
     NapiAsyncTask::CompleteCallback complete =
