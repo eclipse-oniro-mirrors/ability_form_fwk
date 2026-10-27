@@ -40,6 +40,25 @@ constexpr const char *ERR_MSG_CONTEXT_RELEASED = "context has released";
 constexpr const char *ERR_MSG_PARSE_WANT_FAILED = "Parse param want failed, want must be Want";
 constexpr int32_t INDEX_ONE = 1;
 constexpr bool HISTOGRAM_BOOLEAN_SAMPLE = true;
+constexpr size_t COLOR_LEN_RGB = 7;
+constexpr size_t COLOR_LEN_ARGB = 9;
+
+bool IsValidColorFormat(const std::string &color)
+{
+    if (color.size() != COLOR_LEN_RGB && color.size() != COLOR_LEN_ARGB) {
+        return false;
+    }
+    if (color[0] != '#') {
+        return false;
+    }
+    for (size_t i = 1; i < color.size(); i++) {
+        char c = color[i];
+        if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
+            return false;
+        }
+    }
+    return true;
+}
 } // namespace
 using namespace OHOS::AppExecFwk;
 
@@ -205,6 +224,11 @@ napi_value JsFormEditExtensionContext::OnSetWindowBackgroundColor(napi_env env, 
     std::string color;
     if (!ConvertFromJsValue(env, info.argv[INDEX_ZERO], color)) {
         HILOG_ERROR("Parse color failed");
+        ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_PARAM_ERROR), ERR_MSG_PARAMS_ERROR);
+        return CreateJsUndefined(env);
+    }
+    if (!IsValidColorFormat(color)) {
+        HILOG_ERROR("Invalid color format: %{public}s", color.c_str());
         ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_PARAM_ERROR), ERR_MSG_PARAMS_ERROR);
         return CreateJsUndefined(env);
     }
