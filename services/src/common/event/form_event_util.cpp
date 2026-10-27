@@ -326,17 +326,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
     SetTimerCfgByMultUpdate(updatedForm.multiScheduledUpdateTime, timerCfg);
     HandleTimerUpdate(formId, formRecord, timerCfg);
     UpdateRecordByBundleInfo(bundleInfo, formRecord);
-    bool wasAccountForm = FormDataMgr::IsAccountConditionForm(formRecord);
-    formRecord.conditionUpdate = updatedForm.conditionUpdate;
-    bool isAccountForm = FormDataMgr::IsAccountConditionForm(formRecord);
     UpdateFormRecord(updatedForm, formRecord);
-    if (!wasAccountForm && isAccountForm) {
-        // New account-condition form appears after upgrade, ensure observer registered.
-        AccountCommonEventManager::GetInstance().RegisterAccountCallback();
-    } else if (wasAccountForm && !isAccountForm && !FormDataMgr::GetInstance().HasAccountConditionForm()) {
-        // Last account-condition form drops condition after upgrade, unregister observer.
-        AccountCommonEventManager::GetInstance().UnregisterAccountCallback();
-    }
     FormDataMgr::GetInstance().SetVersionUpgrade(formId, true);
     return true;
 }
