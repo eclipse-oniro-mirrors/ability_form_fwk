@@ -99,6 +99,16 @@ public:
     virtual ErrCode GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo);
 
     /**
+     * @brief Get form info, falling back to a direct BMS query when the storage copy is
+     *        stale (versionCode lags behind bundleInfo) or missing.
+     * @param want The want of the request
+     * @param bundleInfo Live bundle info, used both as freshness reference and BMS query key
+     * @param formInfo Form info
+     * @return Returns ERR_OK on success, others on failure
+     */
+    virtual ErrCode GetFormInfo(const AAFwk::Want &want, const BundleInfo &bundleInfo, FormInfo &formInfo);
+
+    /**
      * @brief Create form item info
      * @param bundleInfo Bundle info
      * @param formInfo Form info
