@@ -108,6 +108,8 @@ void FmsFormCommonAdapterTest::SetUp()
     // Default fail keeps AlignCloneProviderUid on caller appIndex so tests need no clone setup
     ON_CALL(*MockFormBmsHelper::obj, GetEnabledCloneIndex(_, _, _))
         .WillByDefault(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+    // Default mocks: BMS is valid, so GetBundleInfoV9 works without per-test expectations.
+    ON_CALL(*MockFormBmsHelper::obj, IsBundleMgrValid()).WillByDefault(Return(true));
 }
 
 void FmsFormCommonAdapterTest::TearDown()
@@ -379,6 +381,287 @@ HWTEST_F(FmsFormCommonAdapterTest, GetFormInfo_009, TestSize.Level1)
     EXPECT_EQ(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "GetFormInfo_009 end";
+}
+
+// ========== Method 3: GetFormInfo (with bundleInfo) Tests ==========
+/**
+ * @tc.name: GetFormInfoWithBundleInfo_001
+ * @tc.desc: Verify fresh storage form info is returned without BMS query
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCommonAdapterTest, GetFormInfoWithBundleInfo_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetFormInfoWithBundleInfo_001 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+
+    FormInfo testFormInfo;
+    testFormInfo.name = "widget";
+    testFormInfo.abilityName = "MainAbility";
+    testFormInfo.moduleName = "entry";
+    testFormInfo.versionCode = 100;
+    testFormInfo.src = "storage_src";
+    std::vector<FormInfo> formInfos;
+    formInfos.push_back(testFormInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = "com.test.bundle";
+    bundleInfo.versionCode = 100;
+
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(formInfos), Return(ERR_OK)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetFormsInfoByModule(_, _, _))
+        .Times(0);
+
+    FormInfo formInfo;
+    auto result = FormCommonAdapter::GetInstance().GetFormInfo(want, bundleInfo, formInfo);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(formInfo.src, std::string("storage_src"));
+
+    GTEST_LOG_(INFO) << "GetFormInfoWithBundleInfo_001 end";
+}
+
+/**
+ * @tc.name: GetFormInfoWithBundleInfo_002
+ * @tc.desc: Verify stale storage form info is replaced by BMS form info
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCommonAdapterTest, GetFormInfoWithBundleInfo_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetFormInfoWithBundleInfo_002 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+
+    FormInfo testFormInfo;
+    testFormInfo.name = "widget";
+    testFormInfo.abilityName = "MainAbility";
+    testFormInfo.moduleName = "entry";
+    testFormInfo.versionCode = 1;
+    testFormInfo.src = "storage_src";
+    std::vector<FormInfo> formInfos;
+    formInfos.push_back(testFormInfo);
+
+    FormInfo bmsFormInfo;
+    bmsFormInfo.name = "widget";
+    bmsFormInfo.abilityName = "MainAbility";
+    bmsFormInfo.moduleName = "entry";
+    bmsFormInfo.versionCode = 100;
+    bmsFormInfo.src = "bms_src";
+    std::vector<FormInfo> bmsFormInfos;
+    bmsFormInfos.push_back(bmsFormInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = "com.test.bundle";
+    bundleInfo.versionCode = 100;
+
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(formInfos), Return(ERR_OK)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetFormsInfoByModule(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bmsFormInfos), Return(true)));
+
+    FormInfo formInfo;
+    auto result = FormCommonAdapter::GetInstance().GetFormInfo(want, bundleInfo, formInfo);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(formInfo.src, std::string("bms_src"));
+
+    GTEST_LOG_(INFO) << "GetFormInfoWithBundleInfo_002 end";
+}
+
+/**
+ * @tc.name: GetFormInfoWithBundleInfo_003
+ * @tc.desc: Verify stale storage form info is kept when BMS query fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCommonAdapterTest, GetFormInfoWithBundleInfo_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetFormInfoWithBundleInfo_003 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+
+    FormInfo testFormInfo;
+    testFormInfo.name = "widget";
+    testFormInfo.abilityName = "MainAbility";
+    testFormInfo.moduleName = "entry";
+    testFormInfo.versionCode = 1;
+    testFormInfo.src = "storage_src";
+    std::vector<FormInfo> formInfos;
+    formInfos.push_back(testFormInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = "com.test.bundle";
+    bundleInfo.versionCode = 100;
+
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(formInfos), Return(ERR_OK)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetFormsInfoByModule(_, _, _))
+        .WillOnce(Return(false));
+
+    FormInfo formInfo;
+    auto result = FormCommonAdapter::GetInstance().GetFormInfo(want, bundleInfo, formInfo);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(formInfo.src, std::string("storage_src"));
+
+    GTEST_LOG_(INFO) << "GetFormInfoWithBundleInfo_003 end";
+}
+
+/**
+ * @tc.name: GetFormInfoWithBundleInfo_004
+ * @tc.desc: Verify storage miss falls back to BMS form info
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCommonAdapterTest, GetFormInfoWithBundleInfo_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetFormInfoWithBundleInfo_004 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+
+    FormInfo bmsFormInfo;
+    bmsFormInfo.name = "widget";
+    bmsFormInfo.abilityName = "MainAbility";
+    bmsFormInfo.moduleName = "entry";
+    bmsFormInfo.versionCode = 100;
+    bmsFormInfo.src = "bms_src";
+    std::vector<FormInfo> bmsFormInfos;
+    bmsFormInfos.push_back(bmsFormInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = "com.test.bundle";
+    bundleInfo.versionCode = 100;
+
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetFormsInfoByModule(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bmsFormInfos), Return(true)));
+
+    FormInfo formInfo;
+    auto result = FormCommonAdapter::GetInstance().GetFormInfo(want, bundleInfo, formInfo);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(formInfo.src, std::string("bms_src"));
+
+    GTEST_LOG_(INFO) << "GetFormInfoWithBundleInfo_004 end";
+}
+
+/**
+ * @tc.name: GetFormInfoWithBundleInfo_005
+ * @tc.desc: Verify storage miss returns the storage error when BMS query also fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCommonAdapterTest, GetFormInfoWithBundleInfo_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetFormInfoWithBundleInfo_005 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = "com.test.bundle";
+    bundleInfo.versionCode = 100;
+
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetFormsInfoByModule(_, _, _))
+        .WillOnce(Return(false));
+
+    FormInfo formInfo;
+    auto result = FormCommonAdapter::GetInstance().GetFormInfo(want, bundleInfo, formInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+
+    GTEST_LOG_(INFO) << "GetFormInfoWithBundleInfo_005 end";
+}
+
+/**
+ * @tc.name: GetFormInfoWithBundleInfo_006
+ * @tc.desc: Verify permission denial is returned without BMS query
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCommonAdapterTest, GetFormInfoWithBundleInfo_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetFormInfoWithBundleInfo_006 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = "com.test.bundle";
+    bundleInfo.versionCode = 100;
+
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetFormsInfoByModule(_, _, _))
+        .Times(0);
+
+    FormInfo formInfo;
+    auto result = FormCommonAdapter::GetInstance().GetFormInfo(want, bundleInfo, formInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
+
+    GTEST_LOG_(INFO) << "GetFormInfoWithBundleInfo_006 end";
+}
+
+/**
+ * @tc.name: GetFormInfoWithBundleInfo_007
+ * @tc.desc: Verify unmatched form returns NOT_SUPPORTED without BMS query
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCommonAdapterTest, GetFormInfoWithBundleInfo_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetFormInfoWithBundleInfo_007 start";
+
+    Want want;
+    want.SetElementName("com.test.bundle", "MainAbility");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("widget"));
+
+    FormInfo testFormInfo;
+    testFormInfo.name = "other_widget"; // name mismatch
+    testFormInfo.abilityName = "MainAbility";
+    testFormInfo.moduleName = "entry";
+    std::vector<FormInfo> formInfos;
+    formInfos.push_back(testFormInfo);
+
+    BundleInfo bundleInfo;
+    bundleInfo.name = "com.test.bundle";
+    bundleInfo.versionCode = 100;
+
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByModule(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(formInfos), Return(ERR_OK)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetFormsInfoByModule(_, _, _))
+        .Times(0);
+
+    FormInfo formInfo;
+    auto result = FormCommonAdapter::GetInstance().GetFormInfo(want, bundleInfo, formInfo);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_SUPPORTED);
+
+    GTEST_LOG_(INFO) << "GetFormInfoWithBundleInfo_007 end";
 }
 
 // ========== Method 9: IsDimensionValid Tests ==========
@@ -2359,7 +2642,7 @@ HWTEST_F(FmsFormCommonAdapterTest, GetBundleInfo_006, TestSize.Level1)
     std::string packageName;
 
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(sptr<IBundleMgr>(new MockBundleMgrStub())));
+        .WillRepeatedly(Return(sptr<IBundleMgr>(new MockBundleMgrStub())));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillOnce(Return(TEST_CALLING_UID));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))
@@ -2389,7 +2672,7 @@ HWTEST_F(FmsFormCommonAdapterTest, GetBundleInfo_007, TestSize.Level1)
     std::string packageName;
 
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleMgr())
-        .WillOnce(Return(sptr<IBundleMgr>(new MockBundleMgrStub())));
+        .WillRepeatedly(Return(sptr<IBundleMgr>(new MockBundleMgrStub())));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillOnce(Return(TEST_CALLING_UID));
     EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoV9(_, _, _))

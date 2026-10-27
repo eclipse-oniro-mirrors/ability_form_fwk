@@ -51,6 +51,44 @@ namespace OHOS {
 namespace AppExecFwk {
 using namespace FormAdapterConstants;
 
+namespace {
+// FormInfoMgr (storage) and BMS both return a per-module form list; picking the requested
+// form out of it follows the same rule in both paths.
+bool MatchFormInfo(const std::vector<FormInfo> &formInfos, const std::string &abilityName,
+    const std::string &formName, const std::string &moduleName, FormInfo &formInfo)
+{
+    for (const auto &form : formInfos) {
+        if (form.abilityName != abilityName) {
+            continue;
+        }
+        if ((formName.empty() && form.defaultFlag) || form.name == formName) {
+            formInfo = form;
+            formInfo.moduleName = moduleName;
+            return true;
+        }
+    }
+    return false;
+}
+
+ErrCode GetFormInfoFromBms(const Want &want, const BundleInfo &bundleInfo, FormInfo &formInfo)
+{
+    std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
+    std::string abilityName = want.GetElement().GetAbilityName();
+    std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
+    std::vector<FormInfo> formInfos;
+    if (!FormBmsHelper::GetInstance().GetFormsInfoByModule(bundleInfo.name, moduleName, formInfos)) {
+        HILOG_ERROR("get forms info from bms failed, bundleName:%{public}s", bundleInfo.name.c_str());
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+    if (!MatchFormInfo(formInfos, abilityName, formName, moduleName, formInfo)) {
+        HILOG_INFO("form not found in bms, bundleName:%{public}s, abilityName:%{public}s",
+            bundleInfo.name.c_str(), abilityName.c_str());
+        return ERR_APPEXECFWK_FORM_NOT_SUPPORTED;
+    }
+    return ERR_OK;
+}
+}
+
 FormCommonAdapter::FormCommonAdapter()
     : formDataMgr_(&FormDataMgr::GetInstance()),
       formInfoMgr_(&FormInfoMgr::GetInstance())
@@ -75,7 +113,7 @@ ErrCode FormCommonAdapter::GetFormConfigInfo(const Want& want, FormItemInfo &for
     }
 
     FormInfo formInfo;
-    errCode = GetFormInfo(want, formInfo);
+    errCode = GetFormInfo(want, bundleInfo, formInfo);
     if (errCode != ERR_OK) {
         HILOG_ERROR("Get target form info failed");
         return errCode;
@@ -238,22 +276,39 @@ ErrCode FormCommonAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formIn
     }
 
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    for (const auto &form : formInfos) {
-        if (form.abilityName != abilityName) {
-            continue;
-        }
+    if (!MatchFormInfo(formInfos, abilityName, formName, moduleName, formInfo)) {
+        HILOG_ERROR("fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d",
+            abilityName.c_str(), formName.c_str(), userId);
+        return ERR_APPEXECFWK_FORM_NOT_SUPPORTED;
+    }
+    HILOG_INFO("GetFormInfo end");
+    return ERR_OK;
+}
 
-        if ((formName.empty() && form.defaultFlag) || form.name == formName) {
-            formInfo = form;
-            formInfo.moduleName = moduleName;
-            HILOG_INFO("GetFormInfo end");
+ErrCode FormCommonAdapter::GetFormInfo(const AAFwk::Want &want, const BundleInfo &bundleInfo,
+    FormInfo &formInfo)
+{
+    ErrCode errCode = GetFormInfo(want, formInfo);
+    if (errCode == ERR_OK) {
+        if (formInfo.versionCode == bundleInfo.versionCode) {
             return ERR_OK;
         }
+        HILOG_WARN("storage form info stale, bundleName:%{public}s, storage version:%{public}u, "
+            "bundle version:%{public}u", bundleInfo.name.c_str(), formInfo.versionCode,
+            bundleInfo.versionCode);
+    } else if (errCode != ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED) {
+        // Permission denial must not reach BMS: the query carries FMS's own identity.
+        return errCode;
     }
-
-    HILOG_ERROR("fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d",
-        abilityName.c_str(), formName.c_str(), userId);
-    return ERR_APPEXECFWK_FORM_NOT_SUPPORTED;
+    // Stale or missing storage copy: fall back to BMS once.
+    FormInfo bmsFormInfo;
+    if (GetFormInfoFromBms(want, bundleInfo, bmsFormInfo) == ERR_OK) {
+        formInfo = bmsFormInfo;
+        return ERR_OK;
+    }
+    HILOG_WARN("BMS query failed, keep the storage form info, bundleName:%{public}s",
+        bundleInfo.name.c_str());
+    return errCode;
 }
 
 ErrCode FormCommonAdapter::GetFormItemInfo(const AAFwk::Want &want, const BundleInfo &bundleInfo,
