@@ -44,7 +44,7 @@ AccountCommonEventManager::AccountCommonEventManager()
 AccountCommonEventManager::~AccountCommonEventManager()
 {
     isShutdown_.store(true);
-    UnregisterAccountCallbackInternal();
+    UnregisterAccountCallback();
 }
 
 void AccountCommonEventManager::RegisterAccountCallback()
@@ -109,7 +109,7 @@ void AccountCommonEventManager::UnregisterAccountCallback()
 void AccountCommonEventManager::UnregisterAccountCallbackInternal()
 {
     HILOG_INFO("Unregister account callback begin");
-    if (observer_ != nullptr) {
+    if (isRegistered_.load() && observer_ != nullptr) {
         EventFwk::CommonEventManager::UnSubscribeCommonEvent(observer_);
         observer_ = nullptr;
     }
