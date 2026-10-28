@@ -23,10 +23,8 @@ namespace AppExecFwk {
 namespace {
 const int32_t MAX_LEN = 128;
 constexpr const char *SYSTEM_LANGUAGE = "persist.global.locale";
-constexpr const char *SYSTEM_COLOR_MODE = "persist.ace.darkmode";
 constexpr const char *BOOT_BOPD_MODE = "ohos.boot.bopd.mode";
 constexpr const char *DEFAULT_LANGUAGE = "zh-Hans";
-constexpr const char *DEFAULT_COLOR_MODE_LIGHT = "light";
 
 constexpr const char *BOPD_BEFORE_DL = "0x2";
 constexpr const char *BOPD_STG_RO_BEFORE_DL = "0x3";
@@ -51,12 +49,6 @@ std::string FormResourceParam::GetSystemLanguage()
 {
     std::string language = GetSystemParam(SYSTEM_LANGUAGE);
     return language.empty() ? DEFAULT_LANGUAGE : language;
-}
-
-std::string FormResourceParam::GetSystemColorMode()
-{
-    std::string mode = GetSystemParam(SYSTEM_COLOR_MODE);
-    return mode.empty() ? DEFAULT_COLOR_MODE_LIGHT : mode;
 }
 
 bool FormResourceParam::IsBopdMode()

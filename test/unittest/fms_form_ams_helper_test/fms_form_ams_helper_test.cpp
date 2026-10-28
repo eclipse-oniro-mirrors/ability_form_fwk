@@ -16,6 +16,7 @@
 #include <string>
 
 #include "want.h"
+#include "configuration.h"
 #define private public
 #define protected public
 #include "ams_mgr/form_ams_helper.h"
@@ -179,6 +180,42 @@ HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_UnRegisterAllConfigurationObservers
     EXPECT_TRUE(formAmsHelper.configurationObservers_.empty());
 
     GTEST_LOG_(INFO) << "FormAmsHelper_UnRegisterAllConfigurationObservers_001 end";
+}
+
+/**
+ * @tc.name: FormAmsHelper_GetConfiguration_001
+ * @tc.desc: Verify GetConfiguration returns false when AMS is unavailable (test environment).
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_GetConfiguration_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormAmsHelper_GetConfiguration_001 start";
+
+    FormAmsHelper formAmsHelper;
+    AppExecFwk::Configuration config;
+    EXPECT_FALSE(formAmsHelper.GetConfiguration(config, 100));
+
+    GTEST_LOG_(INFO) << "FormAmsHelper_GetConfiguration_001 end";
+}
+
+/**
+ * @tc.name: FormAmsHelper_UnRegisterConfigurationObserver_002
+ * @tc.desc: Verify UnRegisterConfigurationObserver erases null observer without IPC.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_UnRegisterConfigurationObserver_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormAmsHelper_UnRegisterConfigurationObserver_002 start";
+
+    FormAmsHelper formAmsHelper;
+    constexpr int32_t userId = 100;
+    formAmsHelper.configurationObservers_[userId] = nullptr;
+    EXPECT_EQ(formAmsHelper.configurationObservers_.size(), 1);
+    EXPECT_NO_FATAL_FAILURE(formAmsHelper.UnRegisterConfigurationObserver(userId));
+    // Null observer should be erased without attempting IPC
+    EXPECT_TRUE(formAmsHelper.configurationObservers_.empty());
+
+    GTEST_LOG_(INFO) << "FormAmsHelper_UnRegisterConfigurationObserver_002 end";
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include <thread>
 
+#include "ams_mgr/form_ams_helper.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_resource_param.h"
@@ -28,7 +29,19 @@ namespace AppExecFwk {
 FormFwkResourceObserver::FormFwkResourceObserver(int32_t userId) : userId_(userId)
 {
     language_ = FormResourceParam::GetSystemLanguage();
-    colorMode_ = FormResourceParam::GetSystemColorMode();
+    // Default user handles language changes only; colorMode is per-user, skip init for it
+    if (userId_ != Constants::DEFAULT_USER_ID) {
+        InitColorMode();
+    }
+}
+
+void FormFwkResourceObserver::InitColorMode()
+{
+    Configuration config;
+    if (!FormAmsHelper::GetInstance().GetConfiguration(config, userId_)) {
+        return;
+    }
+    colorMode_ = config.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
 }
 
 FormFwkResourceObserver::~FormFwkResourceObserver()
@@ -62,11 +75,17 @@ void FormFwkResourceObserver::HandleLanguageUpdate(const AppExecFwk::Configurati
 void FormFwkResourceObserver::HandleColorModeUpdate(const AppExecFwk::Configuration& configuration)
 {
     std::string colorMode = configuration.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
-    if (!colorMode.empty() && colorMode != colorMode_) {
-        HILOG_INFO("colorMode changed %{public}s to %{public}s", colorMode_.c_str(), colorMode.c_str());
-        colorMode_ = colorMode;
-        FormObserverTaskMgr::GetInstance().PostBatchColorModeUpdateForms(userId_, configuration);
+    if (colorMode.empty()) {
+        return;
     }
+    // colorMode_ empty means constructor InitColorMode failed; dispatch to ensure forms get correct colorMode
+    if (colorMode == colorMode_) {
+        return;
+    }
+    HILOG_INFO("colorMode update %{public}s to %{public}s, userId:%{public}d",
+        colorMode_.c_str(), colorMode.c_str(), userId_);
+    colorMode_ = colorMode;
+    FormObserverTaskMgr::GetInstance().PostBatchColorModeUpdateForms(userId_, configuration);
 }
 } // AppExecFwk
 } // OHOS

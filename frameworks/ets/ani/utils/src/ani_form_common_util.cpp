@@ -1048,6 +1048,7 @@ ani_object CreateRunningFormInfo(ani_env *env, const AppExecFwk::RunningFormInfo
             HILOG_ERROR("CreateRunningFormInfo failed");
             return nullptr;
     }
+    SetPropertyBoolByName(env, infoObject, "isColorModeRefreshEnabled", runningFormInfo.isColorModeRefreshEnabled);
     if (!CreateRunningFormInfoEnum(env, runningFormInfo, infoObject)) {
         HILOG_ERROR("CreateRunningFormInfoEnum failed");
         return nullptr;
@@ -1672,6 +1673,7 @@ void SetRunningFormInfoFields(ani_env *env, ani_object formInfoAni, AppExecFwk::
     SetStringProperty(env, formInfoAni, "abilityName", formInfo.abilityName);
     SetStringProperty(env, formInfoAni, "formDescription", formInfo.description);
     SetStringProperty(env, formInfoAni, "hostBundleName", formInfo.hostBundleName);
+    SetPropertyBoolByName(env, formInfoAni, "isColorModeRefreshEnabled", formInfo.isColorModeRefreshEnabled);
 
     // Set enum properties
     env->Object_SetPropertyByName_Int(formInfoAni, "formLocation", static_cast<int>(formInfo.formLocation));

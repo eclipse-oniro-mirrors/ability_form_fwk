@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 #include "common/event/form_event_handler.h"
 #include "common/util/form_serial_queue.h"
 #include "iconfiguration_observer.h"
+#include "configuration.h"
 #include "insight_intent/insight_intent_execute_lite_param.h"
 #include "start_options.h"
 #include "uri.h"
@@ -104,6 +105,13 @@ public:
      * @brief unregister all Configuration Observers.
      */
     void UnRegisterAllConfigurationObservers();
+    /**
+     * @brief Get configuration for a specific user.
+     * @param config Output parameter to receive the configuration.
+     * @param userId The user ID to get configuration for.
+     * @return Returns true on success, false on failure.
+     */
+    bool GetConfiguration(AppExecFwk::Configuration& config, int32_t userId);
     /**
      * @brief StartAbilityOnlyUIAbility with want, send want to ability manager service.
      * @param want The want of the ability to start.
