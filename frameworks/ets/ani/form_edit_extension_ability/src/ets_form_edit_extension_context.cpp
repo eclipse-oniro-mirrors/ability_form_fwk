@@ -324,11 +324,6 @@ void EtsFormEditExtensionContext::SetWindowBackgroundColor(ani_env *env, ani_obj
         return;
     }
     std::string colorStr = FormAniUtil::AniStringToStdString(env, color);
-    if (colorStr.empty()) {
-        HILOG_ERROR("color is empty");
-        EtsFormErrorUtil::ThrowParamTypeError(env, "color", "string");
-        return;
-    }
     etsContext->OnSetWindowBackgroundColor(env, colorStr);
 }
 

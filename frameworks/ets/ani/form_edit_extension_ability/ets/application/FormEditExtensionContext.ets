@@ -30,6 +30,26 @@ export class AsyncCallbackWrapper<T, E = void> {
   }
 }
 
+const ERROR_CODE_INVALID_COLOR_VALUE = 16501026;
+const ERROR_MSG_INVALID_COLOR_VALUE = 'Invalid color value';
+const COLOR_LEN_RGB = 7;
+const COLOR_LEN_ARGB = 9;
+
+function isValidColorFormat(color: string): boolean {
+  if (typeof color !== 'string' ||
+      (color.length !== COLOR_LEN_RGB && color.length !== COLOR_LEN_ARGB) ||
+      color[0] !== '#') {
+    return false;
+  }
+  for (let i = 1; i < color.length; i++) {
+    let c = color[i];
+    if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export default class FormEditExtensionContext extends UIExtensionContext {
 
   native nativeStartSecondPage(want: Want, callback: AsyncCallbackWrapper<AbilityResult>): void;
@@ -79,6 +99,9 @@ export default class FormEditExtensionContext extends UIExtensionContext {
   }
 
   async setWindowBackgroundColor(color: string): Promise<void> {
+    if (!isValidColorFormat(color)) {
+      throw { code: ERROR_CODE_INVALID_COLOR_VALUE, message: ERROR_MSG_INVALID_COLOR_VALUE } as BusinessError;
+    }
     await taskpool.execute((): void => {
       this.nativeSetWindowBackgroundColor(color);
     });
