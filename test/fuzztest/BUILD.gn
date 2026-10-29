@@ -43,6 +43,7 @@ group("fuzztest") {
     "formhisyseventwrapper_fuzzer:fuzztest",
     "formforcerefreshimpl_fuzzer:fuzztest",
     "formfreeinstalloperator_fuzzer:fuzztest",
+    "formgetvisibleformrect_fuzzer:fuzztest",
     "formhostcaller_fuzzer:fuzztest",
     "formhostclient_fuzzer:fuzztest",
     "formhostdelegatestub_fuzzer:fuzztest",

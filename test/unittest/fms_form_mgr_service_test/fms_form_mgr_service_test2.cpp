@@ -2551,4 +2551,78 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_DeleteForms_003, TestSize.Level1
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_DeleteForms_003 end";
 }
+
+/**
+ * @tc.name: FormMgrService_GetVisibleFormRect_Svc001
+ * @tc.desc: Verify GetVisibleFormRect returns PERMISSION_DENY_SYS for non-system caller.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetVisibleFormRect_Svc001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_GetVisibleFormRect_Svc001 start";
+    FormMgrService formMgrService;
+    const int64_t formId = 1;
+    Rect rect;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    ErrCode ret = formMgrService.GetVisibleFormRect(formId, rect);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    GTEST_LOG_(INFO) << "FormMgrService_GetVisibleFormRect_Svc001 end";
+}
+
+/**
+ * @tc.name: FormMgrService_GetVisibleFormRect_Svc002
+ * @tc.desc: Verify formId <= 0 is forwarded to adapter facade (pass-through, no Service intercept).
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetVisibleFormRect_Svc002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_GetVisibleFormRect_Svc002 start";
+    FormMgrService formMgrService;
+    const int64_t formId = 0;
+    Rect rect;
+    MockIsSACall(true);
+    // Service forwards to adapter facade; adapter returns NOT_EXIST_ID for formId <= 0.
+    MockFormMgrAdapterFacadeGetVisibleFormRect(ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    ErrCode ret = formMgrService.GetVisibleFormRect(formId, rect);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    MockFormMgrAdapterFacadeGetVisibleFormRect(ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_GetVisibleFormRect_Svc002 end";
+}
+
+/**
+ * @tc.name: FormMgrService_RegisterGetVisibleFormRectProxy_Svc003
+ * @tc.desc: Verify RegisterGetVisibleFormRectProxy denies without the required permission.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterGetVisibleFormRectProxy_Svc003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterGetVisibleFormRectProxy_Svc003 start";
+    FormMgrService formMgrService;
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockIsSACall(true);
+    MockVerifyCallingPermission(false);
+    ErrCode ret = formMgrService.RegisterGetVisibleFormRectProxy(callerToken);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
+    MockVerifyCallingPermission(true);
+    GTEST_LOG_(INFO) << "FormMgrService_RegisterGetVisibleFormRectProxy_Svc003 end";
+}
+
+/**
+ * @tc.name: FormMgrService_UnregisterGetVisibleFormRectProxy_Svc003b
+ * @tc.desc: Verify UnregisterGetVisibleFormRectProxy denies without the required permission.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterGetVisibleFormRectProxy_Svc003b, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterGetVisibleFormRectProxy_Svc003b start";
+    FormMgrService formMgrService;
+    MockIsSACall(true);
+    MockVerifyCallingPermission(false);
+    ErrCode ret = formMgrService.UnregisterGetVisibleFormRectProxy();
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
+    MockVerifyCallingPermission(true);
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterGetVisibleFormRectProxy_Svc003b end";
+}
+
 }

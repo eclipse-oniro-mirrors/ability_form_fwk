@@ -322,6 +322,12 @@ public:
 
     ErrCode GetFormRect(const int64_t formId, const int32_t callingUid, Rect &rect);
 
+    ErrCode RegisterGetVisibleFormRectProxy(const sptr<IRemoteObject> &callerToken);
+
+    ErrCode UnregisterGetVisibleFormRectProxy();
+
+    ErrCode GetVisibleFormRect(const int64_t formId, const int32_t callingUid, Rect &rect);
+
     ErrCode RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken);
 
     ErrCode UnregisterGetLiveFormStatusProxy();

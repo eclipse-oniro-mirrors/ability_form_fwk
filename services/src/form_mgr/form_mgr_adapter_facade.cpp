@@ -608,6 +608,22 @@ ErrCode FormMgrAdapterFacade::GetFormRect(const int64_t formId,
     return FormCallbackAdapter::GetInstance().GetFormRect(formId, callingUid, rect);
 }
 
+ErrCode FormMgrAdapterFacade::RegisterGetVisibleFormRectProxy(const sptr<IRemoteObject> &callerToken)
+{
+    return FormCallbackAdapter::GetInstance().RegisterGetVisibleFormRectProxy(callerToken);
+}
+
+ErrCode FormMgrAdapterFacade::UnregisterGetVisibleFormRectProxy()
+{
+    return FormCallbackAdapter::GetInstance().UnregisterGetVisibleFormRectProxy();
+}
+
+ErrCode FormMgrAdapterFacade::GetVisibleFormRect(const int64_t formId,
+    const int32_t callingUid, Rect &rect)
+{
+    return FormCallbackAdapter::GetInstance().GetVisibleFormRect(formId, callingUid, rect);
+}
+
 ErrCode FormMgrAdapterFacade::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
 {
     return FormCallbackAdapter::GetInstance().RegisterGetLiveFormStatusProxy(callerToken);

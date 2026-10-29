@@ -4217,4 +4217,154 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormCrossBundle_002, TestS
     EXPECT_EQ(stub->updateFormCrossBundleCount, 0);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_002 ends";
 }
+
+/**
+ * @tc.name: FormMgrStubTest_GetVisibleFormRect_001
+ * @tc.desc: Verify HandleGetVisibleFormRect normal parcel roundtrip.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_001 starts";
+    ASSERT_TRUE(mockFormMgrService != nullptr);
+    constexpr int64_t formId = 1;
+    Rect expectRect;
+    expectRect.left = 10.0;
+    expectRect.top = 20.0;
+    expectRect.width = 30.0;
+    expectRect.height = 40.0;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt64(formId);
+    EXPECT_CALL(*mockFormMgrService, GetVisibleFormRect(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(expectRect), Return(ERR_OK)));
+    auto handlerResult = mockFormMgrService->HandleGetVisibleFormRect(data, reply);
+    EXPECT_EQ(handlerResult, ERR_OK);
+    // Handler writes GetVisibleFormRect result (ERR_OK) into reply
+    int32_t serviceResult = 0;
+    ASSERT_TRUE(reply.ReadInt32(serviceResult));
+    EXPECT_EQ(serviceResult, ERR_OK);
+    // Reply must also carry the Rect parcelable after ERR_OK
+    std::unique_ptr<Rect> readRect(reply.ReadParcelable<Rect>());
+    ASSERT_NE(readRect, nullptr);
+    EXPECT_EQ(readRect->left, 10.0);
+    EXPECT_EQ(readRect->top, 20.0);
+    EXPECT_EQ(readRect->width, 30.0);
+    EXPECT_EQ(readRect->height, 40.0);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_001 ends";
+}
+
+/**
+ * @tc.name: FormMgrStubTest_GetVisibleFormRect_002
+ * @tc.desc: Verify HandleGetVisibleFormRect with a truncated parcel missing formId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_002 starts";
+    ASSERT_TRUE(mockFormMgrService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    // Do NOT write formId — ReadInt64 will fail inside the handler
+    auto handlerResult = mockFormMgrService->HandleGetVisibleFormRect(data, reply);
+    EXPECT_EQ(handlerResult, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_002 ends";
+}
+
+/**
+ * @tc.name: FormMgrStubTest_GetVisibleFormRect_003
+ * @tc.desc: Verify HandleGetVisibleFormRect with a non-ERR_OK service result.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_003 starts";
+    ASSERT_TRUE(mockFormMgrService != nullptr);
+    constexpr int64_t formId = 1;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt64(formId);
+    EXPECT_CALL(*mockFormMgrService, GetVisibleFormRect(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+    auto handlerResult = mockFormMgrService->HandleGetVisibleFormRect(data, reply);
+    // Handler itself succeeded writing to reply
+    EXPECT_EQ(handlerResult, ERR_OK);
+    int32_t serviceResult = 0;
+    ASSERT_TRUE(reply.ReadInt32(serviceResult));
+    EXPECT_EQ(serviceResult, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    // Service result != ERR_OK means Rect was NOT written — readParcelable must yield nullptr
+    std::unique_ptr<Rect> readRect(reply.ReadParcelable<Rect>());
+    EXPECT_EQ(readRect, nullptr);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_003 ends";
+}
+
+/**
+ * @tc.name: FormMgrStubTest_GetVisibleFormRect_005
+ * @tc.desc: Verify OnRemoteRequest dispatches FORM_MGR_REGISTER_GET_VISIBLE_FORM_RECT_PROXY.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_005, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_005 starts";
+    ASSERT_TRUE(mockFormMgrService != nullptr);
+    MessageOption option{MessageOption::TF_SYNC};
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, RegisterGetVisibleFormRectProxy(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    uint32_t code = static_cast<uint32_t>(
+        IFormMgr::Message::FORM_MGR_REGISTER_GET_VISIBLE_FORM_RECT_PROXY);
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_005 ends";
+}
+
+/**
+ * @tc.name: FormMgrStubTest_GetVisibleFormRect_006
+ * @tc.desc: Verify OnRemoteRequest dispatches FORM_MGR_UNREGISTER_GET_VISIBLE_FORM_RECT_PROXY.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_006, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_006 starts";
+    ASSERT_TRUE(mockFormMgrService != nullptr);
+    MessageOption option{MessageOption::TF_SYNC};
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    EXPECT_CALL(*mockFormMgrService, UnregisterGetVisibleFormRectProxy())
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    uint32_t code = static_cast<uint32_t>(
+        IFormMgr::Message::FORM_MGR_UNREGISTER_GET_VISIBLE_FORM_RECT_PROXY);
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_006 ends";
+}
+
+/**
+ * @tc.name: FormMgrStubTest_GetVisibleFormRect_007
+ * @tc.desc: Verify OnRemoteRequest dispatches FORM_MGR_GET_VISIBLE_FORM_RECT.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_007, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_007 starts";
+    ASSERT_TRUE(mockFormMgrService != nullptr);
+    MessageOption option{MessageOption::TF_SYNC};
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    constexpr int64_t formId = 1;
+    data.WriteInt64(formId);
+    EXPECT_CALL(*mockFormMgrService, GetVisibleFormRect(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    uint32_t code = static_cast<uint32_t>(
+        IFormMgr::Message::FORM_MGR_GET_VISIBLE_FORM_RECT);
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_007 ends";
+}
+
 }

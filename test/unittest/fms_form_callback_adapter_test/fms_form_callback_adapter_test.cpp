@@ -109,6 +109,10 @@ public:
     {
         return deleteFormsResult_;
     }
+    ErrCode GetVisibleFormRect(int64_t formId, Rect &rect) override
+    {
+        return getVisibleFormRectResult_;
+    }
     ErrCode requestOverflowResult_ = ERR_OK;
     ErrCode changeSceneResult_ = ERR_OK;
     ErrCode getFormRectResult_ = ERR_OK;
@@ -118,6 +122,7 @@ public:
     ErrCode updateFormsConfigResult_ = ERR_OK;
     ErrCode deleteFormsResult_ = ERR_OK;
     std::unordered_map<std::string, std::string> liveFormStatusData_;
+    ErrCode getVisibleFormRectResult_ = ERR_OK;
 };
 }
 
@@ -2747,6 +2752,313 @@ HWTEST_F(FmsFormCallbackAdapterTest, UpdateFormsConfig_003, TestSize.Level1)
     FormCallbackAdapter::GetInstance().updateFormsConfigRegistry_->Clear();
 
     GTEST_LOG_(INFO) << "UpdateFormsConfig_003 end";
+}
+
+/**
+ * @tc.name: GetVisibleFormRect_Adapter_001
+ * @tc.desc: Verify inline ownership check failure (uid mismatch) returns OPERATION_NOT_SELF.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetVisibleFormRect_Adapter_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_001 start";
+
+    int32_t callingUid = TEST_CALLING_UID;
+    Rect rect;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = INVALID_UID;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    auto result = FormCallbackAdapter::GetInstance().GetVisibleFormRect(TEST_FORM_ID, callingUid, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_001 end";
+}
+
+/**
+ * @tc.name: GetVisibleFormRect_Adapter_002
+ * @tc.desc: Verify form record not exist returns NOT_EXIST_ID.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetVisibleFormRect_Adapter_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_002 start";
+
+    int32_t callingUid = TEST_CALLING_UID;
+    Rect rect;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(Return(false));
+
+    auto result = FormCallbackAdapter::GetInstance().GetVisibleFormRect(TEST_FORM_ID, callingUid, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_002 end";
+}
+
+/**
+ * @tc.name: GetVisibleFormRect_Adapter_003
+ * @tc.desc: Verify registry empty (all host uids miss) returns GET_INFO_FAILED.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetVisibleFormRect_Adapter_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_003 start";
+
+    int32_t callingUid = TEST_CALLING_UID;
+    Rect rect;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = callingUid;
+    record.formUserUids = { callingUid };
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    // No registration in visibleFormRectRegistry_ for callingUid.
+    FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Clear();
+
+    auto result = FormCallbackAdapter::GetInstance().GetVisibleFormRect(TEST_FORM_ID, callingUid, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_003 end";
+}
+
+/**
+ * @tc.name: GetVisibleFormRect_Adapter_004
+ * @tc.desc: Verify first uid unregistered, second registered returns ERR_OK (skip logic).
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetVisibleFormRect_Adapter_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_004 start";
+
+    constexpr int32_t HOST_UID_2 = 30000001;
+    int32_t callingUid = TEST_CALLING_UID;
+    Rect rect;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = callingUid;
+    record.formUserUids = { INVALID_UID, HOST_UID_2 };
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Clear();
+
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->getVisibleFormRectResult_ = ERR_OK;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Register(
+        HOST_UID_2, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    auto result = FormCallbackAdapter::GetInstance().GetVisibleFormRect(TEST_FORM_ID, callingUid, rect);
+    EXPECT_EQ(result, ERR_OK);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Clear();
+
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_004 end";
+}
+
+/**
+ * @tc.name: GetVisibleFormRect_Adapter_005
+ * @tc.desc: Verify single host IPC failure (non-ERR_OK response) ends loop with GET_INFO_FAILED, no crash.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetVisibleFormRect_Adapter_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_005 start";
+
+    int32_t callingUid = TEST_CALLING_UID;
+    Rect rect;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = callingUid;
+    record.formUserUids = { callingUid };
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Clear();
+
+    // iface_cast wraps this mock into a real proxy; stub SendRequest failure to simulate host IPC error.
+    sptr<IRemoteObject> nonDelegate = new MockIRemoteObject();
+    auto *mockCaller = static_cast<MockIRemoteObject *>(nonDelegate.GetRefPtr());
+    EXPECT_CALL(*mockCaller, AddDeathRecipient(_))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*mockCaller, SendRequest(_, _, _, _))
+        .WillRepeatedly(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Register(
+        callingUid, nonDelegate), ERR_OK);
+
+    auto result = FormCallbackAdapter::GetInstance().GetVisibleFormRect(TEST_FORM_ID, callingUid, rect);
+    // Loop continues, no host answered with ERR_OK -> GET_INFO_FAILED.
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Clear();
+
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_005 end";
+}
+
+/**
+ * @tc.name: GetVisibleFormRect_Adapter_006
+ * @tc.desc: Verify host returning non-ERR_OK error is NOT terminal, loop continues to next host returning ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetVisibleFormRect_Adapter_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_006 start";
+
+    constexpr int32_t HOST_UID_1 = 30000002;
+    constexpr int32_t HOST_UID_2 = 30000003;
+    int32_t callingUid = TEST_CALLING_UID;
+    Rect rect;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = callingUid;
+    record.formUserUids = { HOST_UID_1, HOST_UID_2 };
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Clear();
+
+    // Host 1 returns non-ERR_OK (NOT terminal -> continue to next host).
+    auto mock1 = new MockFormHostDelegateStub();
+    mock1->getVisibleFormRectResult_ = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Register(
+        HOST_UID_1, sptr<IRemoteObject>(mock1)), ERR_OK);
+
+    // Host 2 returns ERR_OK (terminates loop).
+    auto mock2 = new MockFormHostDelegateStub();
+    mock2->getVisibleFormRectResult_ = ERR_OK;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Register(
+        HOST_UID_2, sptr<IRemoteObject>(mock2)), ERR_OK);
+
+    auto result = FormCallbackAdapter::GetInstance().GetVisibleFormRect(TEST_FORM_ID, callingUid, rect);
+    EXPECT_EQ(result, ERR_OK);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Clear();
+
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_006 end";
+}
+
+/**
+ * @tc.name: GetVisibleFormRect_Adapter_007
+ * @tc.desc: Verify all hosts return non-ERR_OK -> final GET_INFO_FAILED.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetVisibleFormRect_Adapter_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_007 start";
+
+    constexpr int32_t HOST_UID_1 = 30000004;
+    int32_t callingUid = TEST_CALLING_UID;
+    Rect rect;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = callingUid;
+    record.formUserUids = { HOST_UID_1 };
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Clear();
+
+    // Host returns GET_INFO_FAILED, loop continues but no more hosts.
+    auto mock = new MockFormHostDelegateStub();
+    mock->getVisibleFormRectResult_ = ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Register(
+        HOST_UID_1, sptr<IRemoteObject>(mock)), ERR_OK);
+
+    auto result = FormCallbackAdapter::GetInstance().GetVisibleFormRect(TEST_FORM_ID, callingUid, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+
+    // Cleanup
+    FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Clear();
+
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_007 end";
+}
+
+/**
+ * @tc.name: GetVisibleFormRect_Adapter_008
+ * @tc.desc: Verify re-register same uid overwrites token (idempotent), then unregister succeeds.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, GetVisibleFormRect_Adapter_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_008 start";
+
+    int32_t callingUid = TEST_CALLING_UID;
+    Rect rect;
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = callingUid;
+    record.formUserUids = { callingUid };
+
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillRepeatedly(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    FormCallbackAdapter::GetInstance().visibleFormRectRegistry_->Clear();
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(callingUid));
+
+    // First registration: proxy returns non-ERR_OK.
+    auto mock1 = new MockFormHostDelegateStub();
+    mock1->getVisibleFormRectResult_ = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    auto *mock1Ptr = mock1;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().RegisterGetVisibleFormRectProxy(
+        sptr<IRemoteObject>(mock1Ptr)), ERR_OK);
+
+    // Second registration with same uid: overwrites old token. New proxy returns ERR_OK.
+    auto mock2 = new MockFormHostDelegateStub();
+    mock2->getVisibleFormRectResult_ = ERR_OK;
+    auto *mock2Ptr = mock2;
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().RegisterGetVisibleFormRectProxy(
+        sptr<IRemoteObject>(mock2Ptr)), ERR_OK);
+
+    auto result = FormCallbackAdapter::GetInstance().GetVisibleFormRect(TEST_FORM_ID, callingUid, rect);
+    // The second (overwritten) proxy is used, returning ERR_OK.
+    EXPECT_EQ(result, ERR_OK);
+
+    // Unregister succeeds.
+    EXPECT_EQ(FormCallbackAdapter::GetInstance().UnregisterGetVisibleFormRectProxy(), ERR_OK);
+
+    // After unregister, registry is empty -> GET_INFO_FAILED.
+    record.formUserUids = { callingUid };
+    result = FormCallbackAdapter::GetInstance().GetVisibleFormRect(TEST_FORM_ID, callingUid, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+
+    GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_008 end";
 }
 
 }  // namespace AppExecFwk

@@ -101,6 +101,7 @@ const int32_t API_TIME_OUT = 5;
 const int32_t API_TIME_OUT_30S = 30;
 const int32_t CONDITION_NETWORK = 1;
 const long FORM_DISCON_NETWORK_CHECK_TIME = 600000; // ms
+constexpr int32_t FORM_VISIBLE_RECT_QUERY_TIMEOUT_SEC = 5;
 constexpr const char *APP_PROVISION_TYPE_DEBUG = "debug";
 constexpr const char *FORM_MGR_SERVICE_QUEUE = "FormMgrServiceQueue";
 #ifdef RES_SCHEDULE_ENABLE
@@ -2382,6 +2383,48 @@ ErrCode FormMgrService::GetFormRect(const int64_t formId, Rect &rect)
     HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapterFacade::GetInstance().GetFormRect(formId, callingUid, rect);
+}
+
+ErrCode FormMgrService::RegisterGetVisibleFormRectProxy(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+    return FormMgrAdapterFacade::GetInstance().RegisterGetVisibleFormRectProxy(callerToken);
+}
+
+ErrCode FormMgrService::UnregisterGetVisibleFormRectProxy()
+{
+    HILOG_INFO("call");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+    return FormMgrAdapterFacade::GetInstance().UnregisterGetVisibleFormRectProxy();
+}
+
+ErrCode FormMgrService::GetVisibleFormRect(const int64_t formId, Rect &rect)
+{
+#ifndef WATCH_API_DISABLE
+    HILOG_INFO("call, formId:%{public}" PRId64, formId);
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS:GetVisibleFormRect",
+        FORM_VISIBLE_RECT_QUERY_TIMEOUT_SEC, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    ErrCode result = FormMgrAdapterFacade::GetInstance().GetVisibleFormRect(
+        formId, IPCSkeleton::GetCallingUid(), rect);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return result;
+#else
+    return ERR_APPEXECFWK_SYSTEMCAP_ERROR;
+#endif
 }
 
 ErrCode FormMgrService::UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect)

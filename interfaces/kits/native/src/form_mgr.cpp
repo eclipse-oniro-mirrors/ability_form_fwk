@@ -2537,6 +2537,55 @@ ErrCode FormMgr::GetFormRect(const int64_t formId, Rect &rect)
     return remoteProxy_->GetFormRect(formId, rect);
 }
 
+ErrCode FormMgr::RegisterGetVisibleFormRectProxy(const sptr<IRemoteObject> &callerToken)
+{
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->RegisterGetVisibleFormRectProxy(callerToken);
+}
+
+ErrCode FormMgr::UnregisterGetVisibleFormRectProxy()
+{
+    HILOG_INFO("call");
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->UnregisterGetVisibleFormRectProxy();
+}
+
+ErrCode FormMgr::GetVisibleFormRect(const int64_t formId, Rect &rect)
+{
+    if (formId <= 0) {
+        HILOG_ERROR("invalid formId");
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->GetVisibleFormRect(formId, rect);
+}
+
 ErrCode FormMgr::UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect)
 {
     HILOG_INFO("UpdateFormSize formid:%{public}" PRId64, formId);

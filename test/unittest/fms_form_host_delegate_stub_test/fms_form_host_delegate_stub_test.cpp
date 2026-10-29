@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <map>
 #include <string>
-#include <thread>
 
 #include "appexecfwk_errors.h"
 #include "data_proxy_observer_stub.h"
@@ -28,6 +26,7 @@
 #include "data_center/form_info/form_item_info.h"
 #undef private
 #include "form_mgr_errors.h"
+#include "form_instance.h"
 #include "data_center/form_record/form_record.h"
 #include "common/util/form_util.h"
 #include "fms_log_wrapper.h"
@@ -121,8 +120,15 @@ public:
     {
         return ERR_OK;
     }
+    ErrCode GetVisibleFormRect(const int64_t formId, Rect &rect) override
+    {
+        rect = mockRect_;
+        return ERR_OK;
+    }
 
     bool asObject_ = true;
+
+    Rect mockRect_ {};
 };
 
 /**
@@ -444,5 +450,80 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_017, TestSize.Lev
     constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_GET_LIVE_FORM_STATUS);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FmsFormHostDelegateStubTest_Conv_001
+ * @tc.desc: Verify [out] stub dispatch: request carries formId only, delegate fills the reply rect.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostDelegateStubTest, FmsFormHostDelegateStubTest_Conv_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostDelegateStubTest_Conv_001 starts";
+
+    // [out] rect: request carries formId only; the stub writes the delegate-filled rect to the reply.
+    Rect expected;
+    expected.left = 10.0;
+    expected.top = 20.0;
+    expected.width = 320.0;
+    expected.height = 240.0;
+
+    MessageParcel data;
+    data.WriteInterfaceToken(MockFormHostDelegateCallback::GetDescriptor());
+    data.WriteInt64(TEST_FORM_ID);
+
+    // Verify the stub dispatch code for GetVisibleFormRect exists.
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_GET_VISIBLE_FORM_RECT);
+    EXPECT_EQ(code, 4011u);
+
+    // Verify the dispatch returns ERR_OK with the mock.
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
+    ASSERT_NE(callback, nullptr);
+    callback->mockRect_ = expected;
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "FmsFormHostDelegateStubTest_Conv_001 ends";
+}
+
+/**
+ * @tc.name: FmsFormHostDelegateStubTest_Conv_007
+ * @tc.desc: Verify the invisible -1 Rect travels delegate-to-reply and stub dispatch succeeds.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostDelegateStubTest, FmsFormHostDelegateStubTest_Conv_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostDelegateStubTest_Conv_007 starts";
+
+    // The -1,-1,-1,-1 Rect that a host may use to indicate "invisible" state.
+    Rect invisibleRect;
+    invisibleRect.left = -1.0;
+    invisibleRect.top = -1.0;
+    invisibleRect.width = -1.0;
+    invisibleRect.height = -1.0;
+
+    // DISCREPANCY NOTE: createFormRectInfo also checks (width < 0 || height < 0)
+    // at napi_form_util.cpp:1135. -1 width/height FAILS this check, which means
+    // the current implementation would REJECT the -1 rect, contrary to the design doc
+    // Conv_007 expectation. This is flagged in the final report.
+
+    // [out] rect: request carries formId only; the -1 invisible rect travels delegate->reply.
+    MessageParcel data;
+    data.WriteInterfaceToken(MockFormHostDelegateCallback::GetDescriptor());
+    data.WriteInt64(TEST_FORM_ID);
+
+    // Verify the IPC dispatch for GetVisibleFormRect.
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_GET_VISIBLE_FORM_RECT);
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
+    ASSERT_NE(callback, nullptr);
+    callback->mockRect_ = invisibleRect;
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "FmsFormHostDelegateStubTest_Conv_007 ends";
 }
 }

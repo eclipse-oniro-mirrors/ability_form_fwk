@@ -39,6 +39,7 @@ static napi_value JsFormAgentInit(napi_env env, napi_value exports)
         JsFormAgent::GetAvailableFormHostServices);
     BindNativeFunction(env, exports, "requestPublishFormCrossDevice", moduleName,
         JsFormAgent::RequestPublishFormCrossDevice);
+    BindNativeFunction(env, exports, "getVisibleFormRect", moduleName, JsFormAgent::GetVisibleFormRect);
     return exports;
 }
 

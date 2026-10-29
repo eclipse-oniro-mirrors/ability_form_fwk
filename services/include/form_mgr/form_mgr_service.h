@@ -888,6 +888,27 @@ public:
     ErrCode GetFormRect(const int64_t formId, Rect &rect) override;
 
     /**
+     * @brief Register get visible form rect proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Returns ERR_OK on success, others on failure
+     */
+    ErrCode RegisterGetVisibleFormRectProxy(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister get visible form rect proxy in fms.
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode UnregisterGetVisibleFormRectProxy() override;
+
+    /**
+     * @brief Get the rect of the visible form.
+     * @param formId The formId.
+     * @param rect The rect of the visible form related to the specified formId.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetVisibleFormRect(const int64_t formId, Rect &rect) override;
+
+    /**
      * @brief Update form size.
      * @param formId The Id of the form to update.
      * @param newDimension The dimension value to be updated.

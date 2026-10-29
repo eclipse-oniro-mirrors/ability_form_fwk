@@ -101,6 +101,7 @@ void FormMgrTest::TearDown(void)
     GTEST_LOG_(INFO) << "FormMgrTest_TearDown start";
     FormMgr::GetInstance().SetFormMgrService(nullptr);
     mockProxy = nullptr;
+    // Dropping the last sptr reference here deletes the mock; no AllowLeak suppression is needed.
     GTEST_LOG_(INFO) << "FormMgrTest_TearDown end";
 }
 
@@ -128,8 +129,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0001, TestSize.Level1) {
     FormMgr::GetInstance().GetFormsInfo(filter, formInfos);
     // expect result.
     EXPECT_THAT(formInfos, ContainerEq(expectFormInfos));
-    // FormMgr is a singleton, therefore, deleteing it will cause segfault for other invocations.
-    testing::Mock::AllowLeak(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0001 test ends";
 }
 
@@ -158,7 +157,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0002, TestSize.Level1) {
     FormMgr::GetInstance().GetFormsInfo(filter, formInfos);
     // expect result.
     EXPECT_EQ(formInfos.size(), 0);
-    testing::Mock::AllowLeak(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0002 test ends";
 }
 
@@ -2284,7 +2282,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0122, TestSize.Level1) {
         .WillOnce(DoAll(SetArgReferee<1>(expectFormInfos), Return(ERR_OK)));
     FormMgr::GetInstance().GetFormsInfoByFilter(filter, formInfos);
     EXPECT_THAT(formInfos, ContainerEq(expectFormInfos));
-    testing::Mock::AllowLeak(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0122 test ends";
 }
 
@@ -5790,5 +5787,194 @@ HWTEST_F(FormMgrTest, FormMgr_UpdateFormCrossBundle_RecoverStatus_003, TestSize.
         ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
     FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
     GTEST_LOG_(INFO) << "FormMgr_UpdateFormCrossBundle_RecoverStatus_003 end";
+}
+/**
+ * @tc.name: FormMgrTest_GetVisibleFormRect_001
+ * @tc.desc: Verify GetVisibleFormRect success path: proxy returns ERR_OK and fills Rect.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetVisibleFormRect_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_001 starts";
+    Rect expectRect;
+    expectRect.left = 100.0;
+    expectRect.top = 200.0;
+    expectRect.width = 300.0;
+    expectRect.height = 400.0;
+    EXPECT_CALL(*mockProxy, GetVisibleFormRect(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(expectRect), Return(ERR_OK)));
+    Rect rect;
+    ErrCode result = FormMgr::GetInstance().GetVisibleFormRect(1, rect);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(rect.left, 100.0);
+    EXPECT_EQ(rect.top, 200.0);
+    EXPECT_EQ(rect.width, 300.0);
+    EXPECT_EQ(rect.height, 400.0);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_001 ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetVisibleFormRect_002
+ * @tc.desc: Verify GetVisibleFormRect rejects a negative formId with ERR_APPEXECFWK_FORM_NOT_EXIST_ID.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetVisibleFormRect_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_002 starts";
+    Rect rect;
+    ErrCode result = FormMgr::GetInstance().GetVisibleFormRect(-1, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_002 ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetVisibleFormRect_002b
+ * @tc.desc: Verify GetVisibleFormRect rejects a zero formId with ERR_APPEXECFWK_FORM_NOT_EXIST_ID.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetVisibleFormRect_002b, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_002b starts";
+    Rect rect;
+    ErrCode result = FormMgr::GetInstance().GetVisibleFormRect(0, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_002b ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetVisibleFormRect_003
+ * @tc.desc: Verify GetVisibleFormRect returns COMMON_CODE when the form mgr service is unavailable.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetVisibleFormRect_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_003 starts";
+    FormMgr::GetInstance().SetFormMgrService(nullptr);
+    mockProxy = nullptr;
+    Rect rect;
+    ErrCode result = FormMgr::GetInstance().GetVisibleFormRect(1, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_003 ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetVisibleFormRect_004
+ * @tc.desc: Verify GetVisibleFormRect passes SEND_FMS_MSG error through unchanged (no remap).
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetVisibleFormRect_004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_004 starts";
+    EXPECT_CALL(*mockProxy, GetVisibleFormRect(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_SEND_FMS_MSG));
+    Rect rect;
+    ErrCode result = FormMgr::GetInstance().GetVisibleFormRect(1, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_004 ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetVisibleFormRect_005
+ * @tc.desc: Verify GetVisibleFormRect passes the GET_INFO_FAILED service error through unchanged.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetVisibleFormRect_005, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_005 starts";
+    Rect rect;
+    EXPECT_CALL(*mockProxy, GetVisibleFormRect(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_INFO_FAILED));
+    ErrCode result = FormMgr::GetInstance().GetVisibleFormRect(1, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_005 ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetVisibleFormRect_005b
+ * @tc.desc: Verify GetVisibleFormRect passes the NOT_EXIST_ID service error through unchanged.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetVisibleFormRect_005b, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_005b starts";
+    Rect rect;
+    EXPECT_CALL(*mockProxy, GetVisibleFormRect(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+    ErrCode result = FormMgr::GetInstance().GetVisibleFormRect(1, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_005b ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_GetVisibleFormRect_005c
+ * @tc.desc: Verify GetVisibleFormRect passes the OPERATION_NOT_SELF service error through unchanged.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetVisibleFormRect_005c, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_005c starts";
+    Rect rect;
+    EXPECT_CALL(*mockProxy, GetVisibleFormRect(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF));
+    ErrCode result = FormMgr::GetInstance().GetVisibleFormRect(1, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+    GTEST_LOG_(INFO) << "FormMgrTest_GetVisibleFormRect_005c ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_RegisterGetVisibleFormRectProxy_001
+ * @tc.desc: Verify RegisterGetVisibleFormRectProxy success path.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_RegisterGetVisibleFormRectProxy_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterGetVisibleFormRectProxy_001 starts";
+    EXPECT_CALL(*mockProxy, RegisterGetVisibleFormRectProxy(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    ErrCode result = FormMgr::GetInstance().RegisterGetVisibleFormRectProxy(callerToken);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterGetVisibleFormRectProxy_001 ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_RegisterGetVisibleFormRectProxy_002
+ * @tc.desc: Verify RegisterGetVisibleFormRectProxy returns COMMON_CODE when the form mgr service is unavailable.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_RegisterGetVisibleFormRectProxy_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterGetVisibleFormRectProxy_002 starts";
+    FormMgr::GetInstance().SetFormMgrService(nullptr);
+    mockProxy = nullptr;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    ErrCode result = FormMgr::GetInstance().RegisterGetVisibleFormRectProxy(callerToken);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgrTest_RegisterGetVisibleFormRectProxy_002 ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_UnregisterGetVisibleFormRectProxy_001
+ * @tc.desc: Verify UnregisterGetVisibleFormRectProxy success path.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_UnregisterGetVisibleFormRectProxy_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterGetVisibleFormRectProxy_001 starts";
+    EXPECT_CALL(*mockProxy, UnregisterGetVisibleFormRectProxy())
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    ErrCode result = FormMgr::GetInstance().UnregisterGetVisibleFormRectProxy();
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterGetVisibleFormRectProxy_001 ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_UnregisterGetVisibleFormRectProxy_002
+ * @tc.desc: Verify UnregisterGetVisibleFormRectProxy returns COMMON_CODE when the form mgr service is unavailable.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_UnregisterGetVisibleFormRectProxy_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterGetVisibleFormRectProxy_002 starts";
+    FormMgr::GetInstance().SetFormMgrService(nullptr);
+    mockProxy = nullptr;
+    ErrCode result = FormMgr::GetInstance().UnregisterGetVisibleFormRectProxy();
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgrTest_UnregisterGetVisibleFormRectProxy_002 ends";
 }
 } // namespace

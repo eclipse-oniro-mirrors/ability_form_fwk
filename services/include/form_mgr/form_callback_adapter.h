@@ -84,6 +84,12 @@ public:
 
     ErrCode GetFormRect(const int64_t formId, const int32_t callingUid, Rect &rect);
 
+    ErrCode RegisterGetVisibleFormRectProxy(const sptr<IRemoteObject> &callerToken);
+
+    ErrCode UnregisterGetVisibleFormRectProxy();
+
+    ErrCode GetVisibleFormRect(const int64_t formId, const int32_t callingUid, Rect &rect);
+
     ErrCode RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken);
 
     ErrCode UnregisterGetLiveFormStatusProxy();
@@ -147,6 +153,8 @@ private:
     std::shared_ptr<FormProxyRegistry> overflowRegistry_ = std::make_shared<FormProxyRegistry>("Overflow");
     std::shared_ptr<FormProxyRegistry> sceneAnimationRegistry_ = std::make_shared<FormProxyRegistry>("SceneAnimation");
     std::shared_ptr<FormProxyRegistry> formRectRegistry_ = std::make_shared<FormProxyRegistry>("FormRect");
+    std::shared_ptr<FormProxyRegistry> visibleFormRectRegistry_ =
+        std::make_shared<FormProxyRegistry>("VisibleFormRect");
     std::shared_ptr<FormProxyRegistry> liveFormStatusRegistry_ = std::make_shared<FormProxyRegistry>("LiveFormStatus");
     std::shared_ptr<FormProxyRegistry> crossBundleControlRegistry_ =
         std::make_shared<FormProxyRegistry>("CrossBundleControl");

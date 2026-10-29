@@ -21,6 +21,7 @@
 #include <condition_variable>
 #include "parcel.h"
 #include "errors.h"
+#include "form_mgr_errors.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -119,5 +120,18 @@ typedef struct LiveFormInterfaceParam {
     std::unordered_map<std::string, std::string> liveFormStatusMap;
     ErrCode errCode = ERR_OK;
 } LiveFormInterfaceParam;
+
+/*
+ * formId: the Id of the form.
+ * rect: the rect answered by the host callback.
+ * errCode: the settlement error code of the host callback.
+ * result: whether the callback has been settled.
+ */
+typedef struct FormRectParam {
+    std::string formId;
+    AppExecFwk::Rect rect;
+    ErrCode errCode = ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    bool result = false;
+} FormRectParam;
 } // namespace OHOS
 #endif // FOUNDATION_APPEXECFWK_OHOS_FORM_INSTANCE_H

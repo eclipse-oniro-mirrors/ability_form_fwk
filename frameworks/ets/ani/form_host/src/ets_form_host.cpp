@@ -822,6 +822,12 @@ ErrCode EtsFormRouterProxyMgr::GetFormRect(int64_t formId, AppExecFwk::Rect &rec
     return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
+ErrCode EtsFormRouterProxyMgr::GetVisibleFormRect(const int64_t formId, AppExecFwk::Rect &rect)
+{
+    HILOG_WARN("ANI channel not implemented, formId:%{public}" PRId64 ".", formId);
+    return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+}
+
 bool EtsFormRouterProxyMgr::BindNativeMethod(ani_env *env, ani_class cls, LiveFormInterfaceParam *dataParam,
     ani_object callbackObj)
 {

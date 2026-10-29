@@ -971,6 +971,36 @@ public:
     }
 
     /**
+     * @brief Register the proxy of get visible form rect from form host.
+     * @param callerToken The remote object of form host.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RegisterGetVisibleFormRectProxy(const sptr<IRemoteObject> &callerToken)
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Unregister the proxy of get visible form rect, keyed by calling uid.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UnregisterGetVisibleFormRectProxy()
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Get the rect of the visible form.
+     * @param formId Indicates the form to query.
+     * @param rect [out] The rect of the visible form (stack scenario: visible member).
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode GetVisibleFormRect(const int64_t formId, Rect &rect)
+    {
+        return ERR_OK;
+    }
+
+    /**
      * @brief Update form size.
      * @param formId The Id of the form to update.
      * @param newDimension The dimension value to be updated.
@@ -1364,6 +1394,9 @@ public:
         FORM_MGR_GET_AVAILABLE_FORM_HOST_SERVICES,
         FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_DEVICE,
         FORM_MGR_INSIGHT_INTENT_EVENT,
+        FORM_MGR_REGISTER_GET_VISIBLE_FORM_RECT_PROXY,
+        FORM_MGR_UNREGISTER_GET_VISIBLE_FORM_RECT_PROXY,
+        FORM_MGR_GET_VISIBLE_FORM_RECT,
     };
 };
 }  // namespace AppExecFwk

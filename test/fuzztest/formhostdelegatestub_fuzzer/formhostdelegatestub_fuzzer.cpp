@@ -93,6 +93,11 @@ public:
     {
         return ERR_OK;
     }
+    // GetVisibleFormRect (ipccode 4011) - newly added via IDL
+    ErrCode GetVisibleFormRect(const int64_t formId, Rect &rect) override
+    {
+        return ERR_OK;
+    }
 };
 
 uint32_t GetU32Data(const char* ptr)

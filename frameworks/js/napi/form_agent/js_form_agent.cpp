@@ -311,6 +311,62 @@ napi_value JsFormAgent::OnRequestPublishFormCrossDevice(napi_env env, size_t arg
     return promise;
 }
 
+napi_value JsFormAgent::GetVisibleFormRect(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormAgent, OnGetVisibleFormRect);
+}
+
+napi_value JsFormAgent::OnGetVisibleFormRect(napi_env env, size_t argc, napi_value* argv)
+{
+    if (argc != ARGS_SIZE_ONE) {
+        HILOG_ERROR("wrong number of arguments.");
+        NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
+        return CreateJsUndefined(env);
+    }
+
+    int64_t formId = 0;
+    if (!ConvertFormId(env, argv[PARAM_INDEX_ZERO], formId)) {
+        HILOG_ERROR("convert formId failed.");
+        NapiFormUtil::ThrowParamError(env, "The formId is invalid");
+        return CreateJsUndefined(env);
+    }
+
+    auto rect = std::make_shared<Rect>();
+    auto errCode = std::make_shared<int32_t>();
+    NapiAsyncTask::ExecuteCallback execute = [formId, rect, errCode]() {
+        *errCode = FormMgr::GetInstance().GetVisibleFormRect(formId, *rect);
+    };
+
+    NapiAsyncTask::CompleteCallback complete =
+        [rect, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
+            // Any failure is uniformly mapped by the error table; codes outside the
+            // d.ts contract (proxy miss / IPC send / parcel) converge to 16500050.
+            if (errCode == nullptr || rect == nullptr || *errCode != ERR_OK) {
+                int32_t code = (errCode == nullptr) ? ERR_APPEXECFWK_FORM_GET_INFO_FAILED : *errCode;
+                if (code == ERR_APPEXECFWK_FORM_COMMON_CODE || code == ERR_APPEXECFWK_FORM_SEND_FMS_MSG ||
+                    code == ERR_APPEXECFWK_PARCEL_ERROR) {
+                    code = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
+                }
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, code));
+                return;
+            }
+            napi_handle_scope scope = nullptr;
+            napi_open_handle_scope(env, &scope);
+            if (scope == nullptr) {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(
+                    env, ERR_APPEXECFWK_FORM_GET_INFO_FAILED));
+                return;
+            }
+            task.ResolveWithNoError(env, CreateFormRect(env, *rect));
+            napi_close_handle_scope(env, scope);
+        };
+
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("JsFormAgent::OnGetVisibleFormRect",
+        env, CreateAsyncTaskWithLastParam(env, nullptr, std::move(execute), std::move(complete), &result));
+    return result;
+}
+
 napi_value JsFormAgent::UpdateFormCrossBundle(napi_env env, napi_callback_info info)
 {
     GET_CB_INFO_AND_CALL(env, info, JsFormAgent, OnUpdateFormCrossBundle);

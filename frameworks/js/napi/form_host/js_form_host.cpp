@@ -545,6 +545,16 @@ public:
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnUnregisterGetWantParamsCallback);
     }
 
+    static napi_value OnGetVisibleFormRect(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnOnGetVisibleFormRect);
+    }
+
+    static napi_value OffGetVisibleFormRect(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnOffGetVisibleFormRect);
+    }
+
 private:
     bool CheckCallerIsSystemApp()
     {
@@ -2669,6 +2679,119 @@ private:
         return CreateJsValue(env, ret);
     }
 
+    napi_value OnOnGetVisibleFormRect(napi_env env, size_t argc, napi_value *argv)
+    {
+        FormHistogramUtils::ReportHistogramBoolean(
+            "Form.Host.onGetVisibleFormRect", HISTOGRAM_BOOLEAN_SAMPLE);
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("the app not system-app,can't use system-api");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return CreateJsUndefined(env);
+        }
+        if (argc != ARGS_ONE) {
+            HILOG_ERROR("invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
+            return CreateJsUndefined(env);
+        }
+        if (!IsTypeForNapiValue(env, argv[PARAM0], napi_function)) {
+            HILOG_ERROR("invalid param0");
+            NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<string>");
+            return CreateJsUndefined(env);
+        }
+        napi_value callback = argv[PARAM0];
+        return OnRegisterGetVisibleFormRectListener(env, callback);
+    }
+
+    napi_value OnRegisterGetVisibleFormRectListener(napi_env env, napi_value callback)
+    {
+        HILOG_INFO("call");
+        napi_ref callbackRef = nullptr;
+        napi_status refStatus = napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+        if (refStatus != napi_ok || callbackRef == nullptr) {
+            HILOG_ERROR("create reference failed");
+            // Converge to the d.ts-declared 16500050 (codes beyond the contract are not thrown).
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+            return CreateJsUndefined(env);
+        }
+        ErrCode result = FormMgr::GetInstance().RegisterGetVisibleFormRectProxy(
+            JsFormRouterProxyMgr::GetInstance());
+        if (result != ERR_OK) {
+            result = NapiFormUtil::NormalizeIpcErrorCode(result);
+            napi_delete_reference(env, callbackRef);
+            NapiFormUtil::ThrowByInternalErrorCode(env, result);
+            return CreateJsUndefined(env);
+        }
+        bool ret = JsFormRouterProxyMgr::GetInstance()->RegisterGetVisibleFormRectListener(
+            env, callbackRef);
+        if (!ret) {
+            HILOG_ERROR("RegisterGetVisibleFormRectListener failed");
+            // The caller owns the ref on failure; the manager stores it (or absorbs a dedup) on success.
+            napi_delete_reference(env, callbackRef);
+            // Rollback the service-side proxy registered above to avoid a dangling registration.
+            FormMgr::GetInstance().UnregisterGetVisibleFormRectProxy();
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+        }
+        return CreateJsUndefined(env);
+    }
+
+    napi_value OnOffGetVisibleFormRect(napi_env env, size_t argc, napi_value *argv)
+    {
+        FormHistogramUtils::ReportHistogramBoolean(
+            "Form.Host.offGetVisibleFormRect", HISTOGRAM_BOOLEAN_SAMPLE);
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("the app not system-app,can't use system-api");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return CreateJsUndefined(env);
+        }
+        if (argc > ARGS_ONE) {
+            HILOG_ERROR("invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0 or 1");
+            return CreateJsUndefined(env);
+        }
+        if (argc == ARGS_ONE) {
+            if (!IsTypeForNapiValue(env, argv[PARAM0], napi_function)) {
+                HILOG_ERROR("invalid param0");
+                NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<string>");
+                return CreateJsUndefined(env);
+            }
+            return OffGetVisibleFormRectListener(env, argv[PARAM0]);
+        }
+        // No callback arg: unregister all listeners and the fms proxy.
+        HILOG_INFO("SubEvent op=off_all kit=FormKit event=getVisibleFormRect");
+        return OffUnregisterAllGetVisibleFormRectListeners(env);
+    }
+
+    napi_value OffGetVisibleFormRectListener(napi_env env, napi_value callback)
+    {
+        auto mgr = JsFormRouterProxyMgr::GetInstance();
+        bool removed = mgr->RemoveGetVisibleFormRectListener(env, callback);
+        if (removed && !mgr->HasGetVisibleFormRectListener()) {
+            ErrCode result = FormMgr::GetInstance().UnregisterGetVisibleFormRectProxy();
+            if (result != ERR_OK) {
+                result = NapiFormUtil::NormalizeIpcErrorCode(result);
+                NapiFormUtil::ThrowByInternalErrorCode(env, result);
+            }
+        }
+        return CreateJsUndefined(env);
+    }
+
+    napi_value OffUnregisterAllGetVisibleFormRectListeners(napi_env env)
+    {
+        bool ret = JsFormRouterProxyMgr::GetInstance()->UnregisterGetVisibleFormRectListener();
+        ErrCode result = FormMgr::GetInstance().UnregisterGetVisibleFormRectProxy();
+        if (result != ERR_OK) {
+            result = NapiFormUtil::NormalizeIpcErrorCode(result);
+            NapiFormUtil::ThrowByInternalErrorCode(env, result);
+            return CreateJsUndefined(env);
+        }
+        if (!ret) {
+            HILOG_ERROR("UnregisterGetVisibleFormRectListener failed");
+            // Converge to the d.ts-declared 16500050 (codes beyond the contract are not thrown).
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
+        }
+        return CreateJsUndefined(env);
+    }
+
     napi_value OnRegisterUpdateFormsConfigCallbackObserver(napi_env env, size_t argc, napi_value *argv)
     {
         HILOG_INFO("call");
@@ -3016,6 +3139,8 @@ const std::pair<const char *, napi_callback> JS_FORM_HOST_BINDINGS[] = {
     { "offGetWantParamsCallback", JsFormHost::UnregisterGetWantParamsCallback },
     { "registerFormHostService", JsFormHost::RegisterFormHostService },
     { "unregisterFormHostService", JsFormHost::UnregisterFormHostService },
+    { "onGetVisibleFormRect", JsFormHost::OnGetVisibleFormRect },
+    { "offGetVisibleFormRect", JsFormHost::OffGetVisibleFormRect },
 };
 }
 
@@ -3548,6 +3673,341 @@ bool JsFormRouterProxyMgr::UnregisterGetFormRectListener()
     }
     getFormRectCallbacks_.clear();
     return true;
+}
+
+bool JsFormRouterProxyMgr::RegisterGetVisibleFormRectListener(napi_env env, napi_ref callbackRef)
+{
+    std::lock_guard<std::mutex> lock(registerGetVisibleFormRectProxyMutex_);
+    // napi calls below create local handles; scope keeps them from piling up in the caller's scope.
+    AbilityRuntime::HandleScope scopeGuard(env);
+    if (callbackRef == nullptr) {
+        HILOG_ERROR("Invalid callback reference");
+        return false;
+    }
+
+    napi_value newCallback = nullptr;
+    napi_get_reference_value(env, callbackRef, &newCallback);
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, newCallback, &valueType);
+    if (valueType != napi_function) {
+        HILOG_ERROR("Callback is not a function");
+        return false;
+    }
+
+    // Dedup within the same env; napi_strict_equals is invalid across envs.
+    for (auto &entry : getVisibleFormRectCallbacks_) {
+        if (entry.first != env) {
+            continue;
+        }
+        napi_value storedCallback = nullptr;
+        if (napi_get_reference_value(env, entry.second, &storedCallback) != napi_ok) {
+            continue;
+        }
+        bool isEqual = false;
+        if (napi_strict_equals(env, storedCallback, newCallback, &isEqual) == napi_ok && isEqual) {
+            napi_delete_reference(env, callbackRef);
+            return true;
+        }
+    }
+
+    getVisibleFormRectCallbacks_.emplace_back(env, callbackRef);
+    HILOG_INFO("Listener registered successfully");
+    return true;
+}
+
+bool JsFormRouterProxyMgr::RemoveGetVisibleFormRectListener(napi_env env, napi_value callback)
+{
+    std::lock_guard<std::mutex> lock(registerGetVisibleFormRectProxyMutex_);
+    AbilityRuntime::HandleScope scopeGuard(env);
+    for (auto iter = getVisibleFormRectCallbacks_.begin(); iter != getVisibleFormRectCallbacks_.end(); ++iter) {
+        if (iter->first != env) {
+            continue;
+        }
+        napi_value storedCallback = nullptr;
+        if (napi_get_reference_value(env, iter->second, &storedCallback) != napi_ok) {
+            continue;
+        }
+        bool isEqual = false;
+        if (napi_strict_equals(env, storedCallback, callback, &isEqual) == napi_ok && isEqual) {
+            if (getVisibleFormRectDispatchActive_) {
+                getVisibleFormRectPendingDeleteRefs_.emplace_back(iter->first, iter->second);
+            } else {
+                napi_delete_reference(iter->first, iter->second);
+            }
+            getVisibleFormRectCallbacks_.erase(iter);
+            HILOG_INFO("Listener removed");
+            return true;
+        }
+    }
+    return false;
+}
+
+bool JsFormRouterProxyMgr::HasGetVisibleFormRectListener()
+{
+    std::lock_guard<std::mutex> lock(registerGetVisibleFormRectProxyMutex_);
+    return !getVisibleFormRectCallbacks_.empty();
+}
+
+bool JsFormRouterProxyMgr::UnregisterGetVisibleFormRectListener()
+{
+    std::lock_guard<std::mutex> lock(registerGetVisibleFormRectProxyMutex_);
+    for (auto &entry : getVisibleFormRectCallbacks_) {
+        if (getVisibleFormRectDispatchActive_) {
+            getVisibleFormRectPendingDeleteRefs_.emplace_back(entry.first, entry.second);
+        } else {
+            napi_delete_reference(entry.first, entry.second);
+        }
+    }
+    getVisibleFormRectCallbacks_.clear();
+    return true;
+}
+
+ErrCode JsFormRouterProxyMgr::GetVisibleFormRect(const int64_t formId, AppExecFwk::Rect &rect)
+{
+    HILOG_INFO("call, formId:%{public}" PRId64, formId);
+    std::shared_ptr<FormRectParam> dataParam = std::make_shared<FormRectParam>();
+    dataParam->formId = std::to_string(formId);
+
+    auto runner = EventRunner::GetMainEventRunner();
+    if (runner == nullptr) {
+        HILOG_ERROR("GetMainEventRunner returned nullptr");
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+    std::shared_ptr<EventHandler> mainHandler = std::make_shared<EventHandler>(runner);
+    std::function<void()> func = [dataParam]() {
+        JsFormRouterProxyMgr::GetInstance()->GetVisibleFormRectInner(dataParam);
+    };
+    mainHandler->PostSyncTask(func, "JsFormRouterProxyMgr::GetVisibleFormRect");
+    if (!dataParam->result) {
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+    rect = dataParam->rect;
+    return dataParam->errCode;
+}
+
+static void VisibleFormRectCallBackReturn(const Rect &item, FormRectParam *p,
+    ErrCode errCode)
+{
+    if (p == nullptr) {
+        HILOG_INFO("getVisibleFormRect callback param has been released");
+        return;
+    }
+    // First terminal settlement wins: ignore subsequent callbacks.
+    if (p->result) {
+        HILOG_INFO("getVisibleFormRect already settled; dropping duplicate answer");
+        return;
+    }
+    p->result = true;
+    p->rect = item;
+    p->errCode = errCode;
+    HILOG_INFO("getVisibleFormRect end, errCode:%{public}d", errCode);
+}
+
+void JsFormRouterProxyMgr::GetVisibleFormRectInner(std::shared_ptr<FormRectParam> dataParam)
+{
+    std::vector<std::pair<napi_env, napi_ref>> callbacks;
+    {
+        std::lock_guard<std::mutex> lock(registerGetVisibleFormRectProxyMutex_);
+        callbacks = getVisibleFormRectCallbacks_;
+        if (!callbacks.empty()) {
+            getVisibleFormRectDispatchActive_ = true;
+        }
+    }
+    if (callbacks.empty()) {
+        return;
+    }
+    // Latest registered callback returning a synchronous valid Rect wins.
+    for (auto iter = callbacks.rbegin(); iter != callbacks.rend(); ++iter) {
+        if (InvokeGetVisibleFormRectCallback(iter->first, iter->second, dataParam)) {
+            break;
+        }
+    }
+    {
+        std::lock_guard<std::mutex> lock(registerGetVisibleFormRectProxyMutex_);
+        getVisibleFormRectDispatchActive_ = false;
+        for (auto &entry : getVisibleFormRectPendingDeleteRefs_) {
+            napi_delete_reference(entry.first, entry.second);
+        }
+        getVisibleFormRectPendingDeleteRefs_.clear();
+    }
+}
+
+// Returns true when this callback synchronously supplies a valid Rect (chain stops); promise is a miss.
+bool JsFormRouterProxyMgr::InvokeGetVisibleFormRectCallback(napi_env env, napi_ref callbackRef,
+    std::shared_ptr<FormRectParam> dataParam)
+{
+    AbilityRuntime::HandleScope scopeGuard(env);
+    AbilityRuntime::HandleEscape handleEscape(env);
+    napi_value myCallback = nullptr;
+    if (napi_get_reference_value(env, callbackRef, &myCallback) != napi_ok) {
+        HILOG_ERROR("napi_get_reference_value failed");
+        return false;
+    }
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, myCallback, &valueType);
+    if (valueType != napi_function) {
+        return false;
+    }
+    napi_value callbackValue = nullptr;
+    if (napi_create_string_utf8(env, dataParam->formId.c_str(), NAPI_AUTO_LENGTH, &callbackValue) != napi_ok) {
+        HILOG_ERROR("napi_create_string_utf8 failed");
+        return false;
+    }
+    napi_value callResult = nullptr;
+    if (napi_call_function(env, nullptr, myCallback, ARGS_ONE, &callbackValue, &callResult) != napi_ok) {
+        return false;
+    }
+    napi_valuetype returnType = napi_undefined;
+    napi_typeof(env, callResult, &returnType);
+    if (returnType == napi_undefined) {
+        return false;
+    }
+    napi_value funcResult = handleEscape.Escape(callResult);
+    bool isPromise = false;
+    napi_is_promise(env, funcResult, &isPromise);
+    if (isPromise) {
+        CallVisibleFormRectPromise(env, funcResult, dataParam);
+        return false;
+    }
+    HILOG_INFO("result not promise");
+    std::unique_ptr<AppExecFwk::Rect> item = std::make_unique<AppExecFwk::Rect>();
+    if (ConvertFunctionResult(env, funcResult, *item)) {
+        VisibleFormRectCallBackReturn(*item, dataParam.get(), ERR_OK);
+        return true;
+    }
+    return false;
+}
+
+// Deduplicates napi_create_function + destroy-on-failure for the two promise callbacks.
+napi_value CreateVisibleFormRectPromiseCallback(napi_env env, const char *name, napi_callback callback,
+    PromiseCallbackInfoT<FormRectParam> *callbackInfo)
+{
+    napi_value result = nullptr;
+    napi_status createStatus = napi_create_function(env, name, strlen(name), callback, callbackInfo, &result);
+    if (createStatus != napi_ok || result == nullptr) {
+        HILOG_ERROR("napi_create_function failed for %{public}s", name);
+        PromiseCallbackInfoT<FormRectParam>::Destroy(callbackInfo);
+        return nullptr;
+    }
+    return result;
+}
+
+void JsFormRouterProxyMgr::CallVisibleFormRectPromise(napi_env env, napi_value funcResult,
+    std::shared_ptr<FormRectParam> params)
+{
+    napi_value promiseThen = nullptr;
+    napi_value promiseCatch = nullptr;
+    napi_get_named_property(env, funcResult, "then", &promiseThen);
+    napi_get_named_property(env, funcResult, "catch", &promiseCatch);
+
+    bool isCallable = false;
+    napi_is_callable(env, promiseThen, &isCallable);
+    if (!isCallable) {
+        HILOG_ERROR("property then is not callable.");
+        return;
+    }
+    napi_is_callable(env, promiseCatch, &isCallable);
+    if (!isCallable) {
+        HILOG_ERROR("property catch is not callable.");
+        return;
+    }
+
+    auto *callbackInfo = PromiseCallbackInfoT<FormRectParam>::Create(env, nullptr, params);
+    if (callbackInfo == nullptr) {
+        HILOG_ERROR("Failed to new promise callbackInfo.");
+        return;
+    }
+
+    napi_value resolveCallback = CreateVisibleFormRectPromiseCallback(
+        env, "visibleFormRectResolveCallback", VisibleFormRectResolveCallback, callbackInfo);
+    if (resolveCallback == nullptr) {
+        return;
+    }
+
+    napi_value rejectCallback = CreateVisibleFormRectPromiseCallback(
+        env, "visibleFormRectRejectCallback", VisibleFormRectRejectCallback, callbackInfo);
+    if (rejectCallback == nullptr) {
+        return;
+    }
+
+    napi_status status;
+    napi_value argvResolve[1] = { resolveCallback };
+    status = napi_call_function(env, funcResult, promiseThen, ARGS_ONE, argvResolve, nullptr);
+    if (status != napi_ok) {
+        HILOG_ERROR("Invoke getVisibleFormRect promise then error.");
+        PromiseCallbackInfoT<FormRectParam>::Destroy(callbackInfo);
+        return;
+    }
+
+    napi_value argvReject[1] = { rejectCallback };
+    status = napi_call_function(env, funcResult, promiseCatch, ARGS_ONE, argvReject, nullptr);
+    if (status != napi_ok) {
+        HILOG_ERROR("Invoke getVisibleFormRect promise catch error.");
+        // then() already bound the resolve callback to callbackInfo; destroying here would
+        // leave the promise holding a dangling ref (UAF on a later resolve). Accept the leak.
+        return;
+    }
+}
+
+// Called when the promise resolves with a Rect-like value (or on any settlement path for the legacy
+// one-callback pattern). Settles as {rect, ERR_OK, result=true} when the value is valid.
+napi_value JsFormRouterProxyMgr::VisibleFormRectResolveCallback(napi_env env, napi_callback_info info)
+{
+    HILOG_INFO("enter");
+    if (info == nullptr) {
+        HILOG_ERROR("VisibleFormRectResolveCallback, invalid input info");
+        return nullptr;
+    }
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    void *data = nullptr;
+    napi_get_cb_info(env, info, &argc, &argv[PARAM0], nullptr, &data);
+    if (data == nullptr) {
+        HILOG_ERROR("VisibleFormRectResolveCallback, invalid data");
+        return nullptr;
+    }
+    auto *callbackInfo = static_cast<PromiseCallbackInfoT<FormRectParam> *>(data);
+    if (callbackInfo == nullptr) {
+        HILOG_ERROR("VisibleFormRectResolveCallback, invalid callbackInfo");
+        return nullptr;
+    }
+    std::unique_ptr<AppExecFwk::Rect> item = std::make_unique<AppExecFwk::Rect>();
+    bool ret = ConvertFunctionResult(env, argv[PARAM0], *item);
+    if (ret) {
+        VisibleFormRectCallBackReturn(*item, callbackInfo->GetParam(), ERR_OK);
+    }
+    // Non-Rect value on the resolve path: miss (no overwrite of a prior settlement).
+    PromiseCallbackInfoT<FormRectParam>::Destroy(callbackInfo);
+    callbackInfo = nullptr;
+    return nullptr;
+}
+
+// Called when the promise is rejected. A host-side rejection is treated as a miss
+// (no answer propagated), consistent with the existing GetFormRect promise semantics.
+napi_value JsFormRouterProxyMgr::VisibleFormRectRejectCallback(napi_env env, napi_callback_info info)
+{
+    HILOG_INFO("enter");
+    if (info == nullptr) {
+        HILOG_ERROR("VisibleFormRectRejectCallback, invalid input info");
+        return nullptr;
+    }
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    void *data = nullptr;
+    napi_get_cb_info(env, info, &argc, &argv[PARAM0], nullptr, &data);
+    if (data == nullptr) {
+        HILOG_ERROR("VisibleFormRectRejectCallback, invalid data");
+        return nullptr;
+    }
+    auto *callbackInfo = static_cast<PromiseCallbackInfoT<FormRectParam> *>(data);
+    if (callbackInfo == nullptr) {
+        HILOG_ERROR("VisibleFormRectRejectCallback, invalid callbackInfo");
+        return nullptr;
+    }
+    // Rejection = miss. No answer propagated.
+    PromiseCallbackInfoT<FormRectParam>::Destroy(callbackInfo);
+    callbackInfo = nullptr;
+    return nullptr;
 }
 
 ErrCode JsFormRouterProxyMgr::GetFormRect(const int64_t formId, AppExecFwk::Rect &rect)

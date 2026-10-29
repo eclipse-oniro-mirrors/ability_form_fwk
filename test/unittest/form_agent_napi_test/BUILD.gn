@@ -16,7 +16,12 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 config("form_agent_napi_test_config") {
   include_dirs = [
     "${form_fwk_path}/frameworks/js/napi/form_agent",
+    "${form_fwk_path}/frameworks/js/napi/form_host",
     "${form_fwk_path}/frameworks/js/napi/formUtil",
+    "${form_fwk_path}/interfaces/inner_api/include",
+    "${form_fwk_path}/interfaces/kits/native/include",
+    "${form_fwk_path}/services/include/common/util",
+    "${form_fwk_path}/test/mock/include",
   ]
 }
 
@@ -26,12 +31,18 @@ ohos_unittest("FormAgentNapiTest") {
 
   configs = [ ":form_agent_napi_test_config" ]
 
-  sources = [ "form_agent_napi_test.cpp" ]
+  sources = [
+    "form_agent_napi_test.cpp",
+    "${form_fwk_path}/frameworks/js/napi/form_host/js_form_host.cpp",
+  ]
 
   deps = [
     "${form_fwk_napi_path}:formagent",
+    "${form_fwk_napi_path}:formhost",
     "${form_fwk_napi_path}:formutil_napi",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}:form_host_delegate_stub",
   ]
 
   external_deps = [
@@ -39,12 +50,15 @@ ohos_unittest("FormAgentNapiTest") {
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "ability_runtime:napi_common",
+    "ability_runtime:runtime",
+    "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "googletest:gmock_main",
     "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
