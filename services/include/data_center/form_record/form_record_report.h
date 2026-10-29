@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,10 @@ enum HiSysEventPointType {
 };
 
 struct FormRecordReportInfo {
+    std::string abilityName;
+    std::string bundleName;
+    std::string moduleName;
+    std::string formName;
     int32_t dailyRefreshTimes = 0;
     int32_t invisibleRefreshTimes = 0;
     int32_t hfRefreshBlockTimes = 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,8 +15,8 @@
 
 #include "data_center/form_record/form_record_report.h"
 #include "fms_log_wrapper.h"
+#include "form_constants.h"
 #include "form_event_report.h"
-#include "data_center/form_basic_info_mgr.h"
 #include "data_center/form_data_mgr.h"
 
 namespace OHOS {
@@ -43,6 +43,10 @@ std::map<int64_t, std::queue<FormRecordReportInfo>>& FormRecordReport::GetFormRe
 void FormRecordReport::SetFormRecordRecordInfo(int64_t formId, const Want &want)
 {
     FormRecordReportInfo info {};
+    info.abilityName = want.GetElement().GetAbilityName();
+    info.bundleName = want.GetElement().GetBundleName();
+    info.moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
+    info.formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
     std::lock_guard<std::mutex> guard(formRecordReportMutex_);
     if (formRecordReportMap_.find(formId) == formRecordReportMap_.end()) {
         std::queue<FormRecordReportInfo> queue;
@@ -125,10 +129,10 @@ void FormRecordReport::HandleFormRefreshCount()
         FormRecordReportInfo &record = queue.front();
         NewFormEventInfo eventInfo;
         eventInfo.formId = formId;
-        eventInfo.abilityName = FormBasicInfoMgr::GetInstance().GetFormAbilityName(formId);
-        eventInfo.bundleName = FormBasicInfoMgr::GetInstance().GetFormBundleName(formId);
-        eventInfo.moduleName = FormBasicInfoMgr::GetInstance().GetFormModuleName(formId);
-        eventInfo.formName = FormBasicInfoMgr::GetInstance().GetFormName(formId);
+        eventInfo.abilityName = record.abilityName;
+        eventInfo.bundleName = record.bundleName;
+        eventInfo.moduleName = record.moduleName;
+        eventInfo.formName = record.formName;
         eventInfo.dailyRefreshTimes = record.dailyRefreshTimes;
         eventInfo.invisibleRefreshTimes = record.invisibleRefreshTimes;
         eventInfo.hfRefreshBlockTimes = record.hfRefreshBlockTimes;

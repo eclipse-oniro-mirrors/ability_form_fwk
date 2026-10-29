@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,7 +30,6 @@
 #include "form_render_service_mgr.h"
 #include "status_mgr_center/form_render_status_mgr.h"
 #include "status_mgr_center/form_render_status_task_mgr.h"
-#include "data_center/form_basic_info_mgr.h"
 #undef private
 #undef protected
 #include "message_parcel.h"
