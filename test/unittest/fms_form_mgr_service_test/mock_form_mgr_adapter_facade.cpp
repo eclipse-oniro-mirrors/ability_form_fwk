@@ -88,6 +88,9 @@ namespace {
     int g_registerDeleteFormsCallback = OHOS::ERR_OK;
     int g_unregisterDeleteFormsCallback = OHOS::ERR_OK;
     int g_deleteForms = OHOS::ERR_OK;
+    int g_getVisibleFormRect = OHOS::ERR_OK;
+    int g_registerGetVisibleFormRectProxy = OHOS::ERR_OK;
+    int g_unregisterGetVisibleFormRectProxy = OHOS::ERR_OK;
 }
 
 void MockEnableUpdateForm(int mockRet)
@@ -276,6 +279,21 @@ void MockDeleteForms(int mockRet)
 void MockUpdateFormCrossBundle(int mockRet)
 {
     g_updateFormCrossBundle = mockRet;
+}
+
+void MockFormMgrAdapterFacadeGetVisibleFormRect(int mockRet)
+{
+    g_getVisibleFormRect = mockRet;
+}
+
+void MockFormMgrAdapterFacadeRegisterGetVisibleFormRectProxy(int mockRet)
+{
+    g_registerGetVisibleFormRectProxy = mockRet;
+}
+
+void MockFormMgrAdapterFacadeUnregisterGetVisibleFormRectProxy(int mockRet)
+{
+    g_unregisterGetVisibleFormRectProxy = mockRet;
 }
 
 int FormMgrAdapterFacade::EnableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
@@ -639,6 +657,24 @@ ErrCode FormMgrAdapterFacade::UpdateFormCrossBundle(const int64_t formId, const 
     const FormProviderData &formProviderData)
 {
     return g_updateFormCrossBundle;
+}
+
+ErrCode FormMgrAdapterFacade::GetVisibleFormRect(const int64_t formId, const int32_t callingUid, Rect &rect)
+{
+    GTEST_LOG_(INFO) << "GetVisibleFormRect called " << g_getVisibleFormRect;
+    return g_getVisibleFormRect;
+}
+
+ErrCode FormMgrAdapterFacade::RegisterGetVisibleFormRectProxy(const sptr<IRemoteObject> &callerToken)
+{
+    GTEST_LOG_(INFO) << "RegisterGetVisibleFormRectProxy called " << g_registerGetVisibleFormRectProxy;
+    return g_registerGetVisibleFormRectProxy;
+}
+
+ErrCode FormMgrAdapterFacade::UnregisterGetVisibleFormRectProxy()
+{
+    GTEST_LOG_(INFO) << "UnregisterGetVisibleFormRectProxy called " << g_unregisterGetVisibleFormRectProxy;
+    return g_unregisterGetVisibleFormRectProxy;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

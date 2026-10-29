@@ -417,6 +417,12 @@ int FormMgrStub::OnRemoteRequestSeventh(uint32_t code, MessageParcel &data, Mess
             return HandleRequestPublishFormCrossDevice(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_INSIGHT_INTENT_EVENT):
             return HandleInsightIntentEvent(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_GET_VISIBLE_FORM_RECT_PROXY):
+            return HandleRegisterGetVisibleFormRectProxy(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_GET_VISIBLE_FORM_RECT_PROXY):
+            return HandleUnregisterGetVisibleFormRectProxy(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_VISIBLE_FORM_RECT):
+            return HandleGetVisibleFormRect(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -3252,6 +3258,50 @@ ErrCode FormMgrStub::HandleRequestPublishFormCrossDevice(MessageParcel &data, Me
     ErrCode result = RequestPublishFormCrossDevice(*request, callerToken, callback);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleRegisterGetVisibleFormRectProxy(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("handle save query visible form rect proxy to service");
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("read callerToken failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = RegisterGetVisibleFormRectProxy(callerToken);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write proxy failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUnregisterGetVisibleFormRectProxy(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    ErrCode result = UnregisterGetVisibleFormRectProxy();
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleGetVisibleFormRect(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    Rect rect;
+    ErrCode result = GetVisibleFormRect(formId, rect);
+    if (!reply.WriteInt32(result)) {
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (result == ERR_OK && !reply.WriteParcelable(&rect)) {
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;

@@ -122,6 +122,10 @@ public:
     static void RejectCurrentTask(napi_env env, NapiAsyncTask &task, int32_t errCode);
 
     static int CatchErrorCode(napi_env env);
+
+    // Keep d.ts-declared permission denials; converge other transport failures to the
+    // TEMPLATE_FORM_IPC_CONNECTION_FAILED carrier (maps to the declared 16500050).
+    static int32_t NormalizeIpcErrorCode(int32_t errCode);
 private:
     static std::string CreateParamTypeErrorMessage(const std::string &paramName, const std::string &type);
 };
@@ -130,6 +134,7 @@ std::string QueryRetMsg(int32_t errorCode);
 int32_t QueryRetCode(int32_t innerErrorCode);
 napi_value NapiGetResult(napi_env env, int iResult);
 bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value);
+bool ConvertFormId(napi_env env, napi_value jsValue, int64_t &formId);
 void InnerCreateCallbackRetMsg(napi_env env, int32_t code, napi_value (&result)[CALLBACK_RETURN_MSG_SIZE]);
 void InnerCreatePromiseRetMsg(napi_env env, int32_t code, napi_value* result);
 napi_value RetErrMsg(AsyncErrMsgCallbackInfo* asyncCallbackInfo);
@@ -165,6 +170,8 @@ napi_value CreateFunInteractionParamsDatas(napi_env env,
 napi_value CreateSceneAnimationParamsDatas(napi_env env,
     const OHOS::AppExecFwk::FormSceneAnimationParams &sceneAnimationParamsDatas);
 bool CreateFormRectInfo(napi_env env, napi_value value, AppExecFwk::Rect &rect);
+// C++ Rect -> JS {left, top, width, height}; inverse of CreateFormRectInfo above.
+napi_value CreateFormRect(napi_env env, const AppExecFwk::Rect &rect);
 napi_value CreateNewRunningFormInfos(napi_env env,
     const std::vector<AppExecFwk::RunningFormInfo> &runningFormInfos);
 napi_value CreateNewRunningFormInfo(napi_env env, const AppExecFwk::RunningFormInfo &runningFormInfo);

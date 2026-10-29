@@ -56,8 +56,8 @@ namespace OHOS {
 
 constexpr size_t U32_AT_SIZE = 4;
 constexpr size_t MESSAGE_BASE = 3001;
-constexpr size_t MESSAGE_MAX = 3077;
-constexpr size_t MESSAGE_RANGE = 77;
+constexpr size_t MESSAGE_MAX = 3080;
+constexpr size_t MESSAGE_RANGE = 80;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.appexecfwk.FormMgr";
 
 class FormMgrStubFuzzTest : public FormMgrStub {
@@ -314,6 +314,20 @@ public:
     ErrCode SendNonTransparencyRatio(int64_t formId, int32_t ratio) override
     {
         return ERR_OK;
+    }
+
+    // GetVisibleFormRect family (newly added virtual methods)
+    ErrCode GetVisibleFormRect(int64_t formId, Rect &rect) override
+    {
+        return 0;
+    }
+    ErrCode RegisterGetVisibleFormRectProxy(const sptr<IRemoteObject> &callerToken) override
+    {
+        return 0;
+    }
+    ErrCode UnregisterGetVisibleFormRectProxy() override
+    {
+        return 0;
     }
 };
 

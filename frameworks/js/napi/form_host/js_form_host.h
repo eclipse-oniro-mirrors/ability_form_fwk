@@ -25,9 +25,11 @@
 #include "napi_common_want.h"
 #include "form_instance.h"
 #include "form_custom_config.h"
+#include "form_mgr_errors.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
+
 napi_value JsFormHostInit(napi_env env, napi_value exportObj);
 
 class FormRouterProxyCallbackClient : public std::enable_shared_from_this<FormRouterProxyCallbackClient> {
@@ -73,6 +75,14 @@ public:
     bool HasGetFormRectListener();
 
     bool UnregisterGetFormRectListener();
+
+    bool RegisterGetVisibleFormRectListener(napi_env env, napi_ref callback);
+
+    bool RemoveGetVisibleFormRectListener(napi_env env, napi_value callback);
+
+    bool HasGetVisibleFormRectListener();
+
+    bool UnregisterGetVisibleFormRectListener();
 
     bool RegisterGetLiveFormStatusListener(napi_env env, napi_ref callback);
 
@@ -125,6 +135,21 @@ private:
         std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam);
     static napi_value PromiseCallback(napi_env env, napi_callback_info info);
     static bool ConvertFunctionResult(napi_env env, napi_value funcResult, AppExecFwk::Rect &rect);
+    std::vector<std::pair<napi_env, napi_ref>> getVisibleFormRectCallbacks_;
+    bool getVisibleFormRectDispatchActive_ = false;
+    // Refs removed during dispatch; deleted after it ends to keep the snapshot valid.
+    std::vector<std::pair<napi_env, napi_ref>> getVisibleFormRectPendingDeleteRefs_;
+    // GetVisibleFormRect: reverse-IPC receiver for host-side visibility query.
+    ErrCode GetVisibleFormRect(const int64_t formId, AppExecFwk::Rect &rect);
+    void GetVisibleFormRectInner(std::shared_ptr<FormRectParam> dataParam);
+    // Returns true when this callback synchronously supplies a valid Rect (chain stops);
+    // promise is a miss (settlement lands in dataParam at the microtask checkpoint).
+    bool InvokeGetVisibleFormRectCallback(napi_env env, napi_ref callbackRef,
+        std::shared_ptr<FormRectParam> dataParam);
+    void CallVisibleFormRectPromise(napi_env env, napi_value funcResult,
+        std::shared_ptr<FormRectParam> dataParam);
+    static napi_value VisibleFormRectResolveCallback(napi_env env, napi_callback_info info);
+    static napi_value VisibleFormRectRejectCallback(napi_env env, napi_callback_info info);
 
     napi_ref getLiveFormStatusCallbackRef_ = nullptr;
     napi_env getLiveFormStatusEnv_ = nullptr;
@@ -167,6 +192,7 @@ private:
     mutable std::mutex registerOverflowProxyMutex_;
     mutable std::mutex registerChangeSceneAnimationStateProxyMutex_;
     mutable std::mutex registerGetFormRectProxyMutex_;
+    mutable std::mutex registerGetVisibleFormRectProxyMutex_;
     mutable std::mutex registerGetLiveFormStatusProxyMutex_;
     mutable std::mutex registerTemplateFormDetailInfoChangeMutex_;
     mutable std::mutex registerUpdateFormsConfigMutex_;
@@ -188,6 +214,52 @@ private:
     ~PromiseCallbackInfo();
  
     std::shared_ptr<LiveFormInterfaceParam> liveFormInterfaceParam_;
+};
+
+// Generic callback info bridging a ParamT across the promise settlement boundary.
+// Owns a shared_ptr so both resolve/reject callbacks (and the PostSyncTask lambda)
+// keep the underlying storage alive until all consumers are done.
+// Owns the napi_ref (if any) and releases it on destruction.
+template <typename ParamT>
+class PromiseCallbackInfoT {
+public:
+    static PromiseCallbackInfoT* Create(napi_env env, napi_ref ref, std::shared_ptr<ParamT> param)
+    {
+        return new (std::nothrow) PromiseCallbackInfoT(env, ref, param);
+    }
+
+    static void Destroy(PromiseCallbackInfoT *callbackInfo)
+    {
+        if (callbackInfo == nullptr) {
+            return;
+        }
+        delete callbackInfo;
+    }
+
+    napi_ref GetRef() const
+    {
+        return ref_;
+    }
+
+    ParamT* GetParam() const
+    {
+        return param_.get();
+    }
+
+private:
+    PromiseCallbackInfoT(napi_env env, napi_ref ref, std::shared_ptr<ParamT> param)
+        : env_(env), ref_(ref), param_(param) {}
+
+    ~PromiseCallbackInfoT()
+    {
+        if (ref_ != nullptr && env_ != nullptr) {
+            napi_delete_reference(env_, ref_);
+        }
+    }
+
+    napi_env env_ {nullptr};
+    napi_ref ref_ {nullptr};
+    std::shared_ptr<ParamT> param_;
 };
 } // namespace AbilityRuntime
 } // namespace OHOS

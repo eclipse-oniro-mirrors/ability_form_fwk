@@ -20,6 +20,7 @@
 #include "gmock/gmock.h"
 #include "mock_form_mgr_service.h"
 #include "mock_form_token.h"
+#include "mock_i_remote_object.h"
 #include "form_provider_proxy.h"
 #include "form_mgr_errors.h"
 #include "form_record_filter.h"
@@ -62,6 +63,7 @@ public:
         mockFormMgrService = new MockFormMgrService();
         formMgrProxy = new FormMgrProxy(mockFormMgrService);
         formProviderProxy = new FormProviderProxy(mockFormMgrService);
+        ASSERT_TRUE(mockFormMgrService != nullptr);
     }
     // TearDown() is unnecessary.
     sptr<MockFormMgrService> mockFormMgrService;
@@ -3832,4 +3834,100 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UpdateFormCrossBundle_003, TestSize.
         ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormCrossBundle_003 ends";
 }
+
+/**
+ * @tc.name: FormMgrProxyTest_GetVisibleFormRect_001
+ * @tc.desc: Verify GetVisibleFormRect parcel write/read roundtrip.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_GetVisibleFormRect_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_GetVisibleFormRect_001 starts";
+    Rect expectRect;
+    expectRect.left = 10.0;
+    expectRect.top = 20.0;
+    expectRect.width = 30.0;
+    expectRect.height = 40.0;
+    EXPECT_CALL(*mockFormMgrService, GetVisibleFormRect(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(expectRect), Return(ERR_OK)));
+    constexpr int64_t formId = 1;
+    Rect rect;
+    auto result = formMgrProxy->GetVisibleFormRect(formId, rect);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(rect.left, 10.0);
+    EXPECT_EQ(rect.top, 20.0);
+    EXPECT_EQ(rect.width, 30.0);
+    EXPECT_EQ(rect.height, 40.0);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_GetVisibleFormRect_001 ends";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_GetVisibleFormRect_002
+ * @tc.desc: Verify GetVisibleFormRect returns the original error for a non-ERR_OK service result.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_GetVisibleFormRect_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_GetVisibleFormRect_002 starts";
+    EXPECT_CALL(*mockFormMgrService, GetVisibleFormRect(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_INFO_FAILED));
+    constexpr int64_t formId = 1;
+    Rect rect;
+    auto result = formMgrProxy->GetVisibleFormRect(formId, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_GetVisibleFormRect_002 ends";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_GetVisibleFormRect_003
+ * @tc.desc: Verify GetVisibleFormRect returns SEND_FMS_MSG when SendTransactCmd fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_GetVisibleFormRect_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_GetVisibleFormRect_003 starts";
+    // Construct a proxy backed by a MockIRemoteObject whose SendRequest fails
+    sptr<MockIRemoteObject> failRemote = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(failRemote, nullptr);
+    EXPECT_CALL(*failRemote, SendRequest(_, _, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_SEND_FMS_MSG));
+    sptr<FormMgrProxy> failProxy = new (std::nothrow) FormMgrProxy(failRemote);
+    ASSERT_NE(failProxy, nullptr);
+    Rect rect;
+    auto result = failProxy->GetVisibleFormRect(1, rect);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_GetVisibleFormRect_003 ends";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_RegisterGetVisibleFormRectProxy_001
+ * @tc.desc: Verify RegisterGetVisibleFormRectProxy writes callerToken and returns the reply result.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_RegisterGetVisibleFormRectProxy_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterGetVisibleFormRectProxy_001 starts";
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    EXPECT_CALL(*mockFormMgrService, RegisterGetVisibleFormRectProxy(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = formMgrProxy->RegisterGetVisibleFormRectProxy(token);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_RegisterGetVisibleFormRectProxy_001 ends";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_UnregisterGetVisibleFormRectProxy_001
+ * @tc.desc: Verify UnregisterGetVisibleFormRectProxy sends the request and returns the reply result.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UnregisterGetVisibleFormRectProxy_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterGetVisibleFormRectProxy_001 starts";
+    EXPECT_CALL(*mockFormMgrService, UnregisterGetVisibleFormRectProxy())
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = formMgrProxy->UnregisterGetVisibleFormRectProxy();
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterGetVisibleFormRectProxy_001 ends";
+}
+
 }

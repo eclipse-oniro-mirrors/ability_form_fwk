@@ -336,6 +336,64 @@ ErrCode FormCallbackAdapter::GetFormRect(const int64_t formId,
     return result;
 }
 
+ErrCode FormCallbackAdapter::RegisterGetVisibleFormRectProxy(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    return visibleFormRectRegistry_->Register(callingUid, callerToken);
+}
+
+ErrCode FormCallbackAdapter::UnregisterGetVisibleFormRectProxy()
+{
+    HILOG_INFO("call");
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    return visibleFormRectRegistry_->Unregister(callingUid);
+}
+
+ErrCode FormCallbackAdapter::GetVisibleFormRect(const int64_t formId,
+    const int32_t callingUid, Rect &rect)
+{
+    HILOG_INFO("call");
+    // Inline caller checks (mirrors CallerCheck semantics/order) — avoids
+    // duplicate FindMatchedFormId + GetFormRecord lookups.
+    if (formId <= 0) {
+        HILOG_ERROR("invalid formId");
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
+        HILOG_ERROR("not exist such form:%{public}" PRId64 ".", matchedFormId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    if (formRecord.uid != callingUid) {
+        HILOG_ERROR("not match providerUid:%{public}d and callingUid:%{public}d",
+            formRecord.uid, callingUid);
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+    // Miss sentinel: no host answer is a "failed to obtain" result (16500100).
+    ErrCode result = ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    for (int uid : formRecord.formUserUids) {
+        sptr<IRemoteObject> callerToken;
+        if (visibleFormRectRegistry_->Get(uid, callerToken) != ERR_OK) {
+            continue;
+        }
+        sptr<IFormHostDelegate> proxy = iface_cast<IFormHostDelegate>(callerToken);
+        if (proxy == nullptr) {
+            continue;
+        }
+        result = proxy->GetVisibleFormRect(formId, rect);
+        // Only ERR_OK terminates; other results fall through to next host.
+        if (result == ERR_OK) {
+            break;
+        }
+    }
+    HILOG_DEBUG("GetVisibleFormRect, result:%{public}d", result);
+    // Only ERR_OK exits the loop early; any other result (no host answered, or a
+    // host-side IPC failure) settles as the declared 16500100.
+    return (result == ERR_OK) ? result : ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+}
+
 ErrCode FormCallbackAdapter::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");

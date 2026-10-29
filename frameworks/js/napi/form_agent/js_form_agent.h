@@ -54,6 +54,7 @@ public:
     static napi_value UpdateFormCrossBundle(napi_env env, napi_callback_info info);
     static napi_value GetAvailableFormHostServices(napi_env env, napi_callback_info info);
     static napi_value RequestPublishFormCrossDevice(napi_env env, napi_callback_info info);
+    static napi_value GetVisibleFormRect(napi_env env, napi_callback_info info);
 private:
     napi_value OnRequestPublishForm(napi_env env, size_t argc, napi_value* argv);
     napi_value OnUpdateFormCrossBundle(napi_env env, size_t argc, napi_value* argv);
@@ -61,6 +62,7 @@ private:
         std::shared_ptr<UpdateFormCrossBundleCallbackInfo> &callbackInfo, napi_value &lastParam);
     napi_value OnGetAvailableFormHostServices(napi_env env, size_t argc, napi_value* argv);
     napi_value OnRequestPublishFormCrossDevice(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnGetVisibleFormRect(napi_env env, size_t argc, napi_value* argv);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

@@ -845,6 +845,30 @@ private:
     ErrCode HandleGetFormRect(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Handle register get visible form rect proxy in fms.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleRegisterGetVisibleFormRectProxy(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle unregister get visible form rect proxy in fms.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleUnregisterGetVisibleFormRectProxy(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle get visible form rect.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleGetVisibleFormRect(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief Handle notify update form size.
      * @param data input param.
      * @param reply output param.

@@ -43,7 +43,10 @@ void MockRegisterDeleteFormsCallback(int mockRet);
 void MockUnregisterDeleteFormsCallback(int mockRet);
 void MockDeleteForms(int mockRet);
 void MockUpdateFormCrossBundle(int mockRet);
-
+void MockUpdateFormCrossBundle(int mockRet);
+void MockFormMgrAdapterFacadeGetVisibleFormRect(int mockRet);
+void MockFormMgrAdapterFacadeRegisterGetVisibleFormRectProxy(int mockRet);
+void MockFormMgrAdapterFacadeUnregisterGetVisibleFormRectProxy(int mockRet);
 }  // namespace AppExecFwk
 }  // namespace OHOS
 

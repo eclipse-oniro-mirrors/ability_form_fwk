@@ -915,6 +915,27 @@ public:
     ErrCode GetFormRect(const int64_t formId, Rect &rect);
 
     /**
+     * @brief Register get visible form rect proxy in fms.
+     * @param callerToken The form host proxy.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterGetVisibleFormRectProxy(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister get visible form rect proxy in fms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterGetVisibleFormRectProxy();
+
+    /**
+     * @brief Get the rect of the visible form.
+     * @param formId The formId.
+     * @param rect The rect of the visible form related to the specified formId.
+     * @return Returns error code of method execute, which ERR_OK represents success.
+     */
+    ErrCode GetVisibleFormRect(const int64_t formId, Rect &rect);
+
+    /**
      * @brief Register getLiveFormStatus proxy in fms.
      * @param callerToken The form host proxy.
      * @return Returns ERR_OK on success, others on failure.

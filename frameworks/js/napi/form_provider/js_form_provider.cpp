@@ -102,21 +102,6 @@ static bool ConvertFormInfoFilterThrow(napi_env env, napi_value jsValue, AppExec
     return true;
 }
 
-static bool ConvertFormId(napi_env env, napi_value jsValue, int64_t &formId)
-{
-    std::string strFormId;
-    if (!ConvertFromJsValue(env, jsValue, strFormId)) {
-        HILOG_ERROR("convert strFormId failed");
-        return false;
-    }
-
-    if (!ConvertStringToInt64(strFormId, formId)) {
-        HILOG_ERROR("convert string formId to int64 failed");
-        return false;
-    }
-    return true;
-}
-
 bool CheckUIAbilityContext(napi_env env, napi_value jsContextValue)
 {
     bool stageMode = false;
@@ -1109,24 +1094,6 @@ bool JsFormProvider::ConvertOverflowInfoArea(napi_env env, napi_value rangeArea,
 napi_value JsFormProvider::GetFormRect(napi_env env, napi_callback_info info)
 {
     GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnGetFormRect);
-}
-
-napi_value CreateFormRect(napi_env env, const AppExecFwk::Rect &rect)
-{
-    HILOG_DEBUG("call");
-
-    napi_value objContext = nullptr;
-    if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
-        HILOG_ERROR("napi_create_object failed");
-        return nullptr;
-    }
-
-    napi_set_named_property(env, objContext, "left", CreateJsValue(env, rect.left));
-    napi_set_named_property(env, objContext, "top", CreateJsValue(env, rect.top));
-    napi_set_named_property(env, objContext, "width", CreateJsValue(env, rect.width));
-    napi_set_named_property(env, objContext, "height", CreateJsValue(env, rect.height));
-
-    return objContext;
 }
 
 napi_value JsFormProvider::OnGetFormRect(napi_env env, size_t argc, napi_value* argv)

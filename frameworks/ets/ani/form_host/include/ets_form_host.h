@@ -161,6 +161,8 @@ private:
     void EndGetFormRectDispatch(ani_env *env);
     ani_long GetWrapperId(ani_env *env, ani_object callback);
     bool ReplaceGetFormRectCallbackRef(ani_env *env, std::pair<int64_t, ani_ref> &entry, ani_object callback);
+    // Reverse-IPC receiver; ANI static channel is deliberately not implemented.
+    ErrCode GetVisibleFormRect(const int64_t formId, AppExecFwk::Rect &rect);
     ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
     void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
     ani_env* GetAniEnv();

@@ -123,6 +123,9 @@ public:
     MOCK_METHOD1(RegisterGetFormRectProxy, ErrCode(const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD0(UnregisterGetFormRectProxy, ErrCode());
     MOCK_METHOD2(GetFormRect, ErrCode(const int64_t formId, Rect &rect));
+    MOCK_METHOD1(RegisterGetVisibleFormRectProxy, ErrCode(const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD0(UnregisterGetVisibleFormRectProxy, ErrCode());
+    MOCK_METHOD2(GetVisibleFormRect, ErrCode(const int64_t formId, Rect &rect));
     MOCK_METHOD1(RegisterGetLiveFormStatusProxy, ErrCode(const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD0(UnregisterGetLiveFormStatusProxy, ErrCode());
     MOCK_METHOD4(ReloadForms, ErrCode(int32_t &reloadNum, const std::string &moduleName,

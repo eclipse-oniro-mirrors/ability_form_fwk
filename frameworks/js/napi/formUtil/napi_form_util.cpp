@@ -170,6 +170,18 @@ napi_value NapiFormUtil::CreateErrorByExternalErrorCode(napi_env env, int32_t ex
     return CreateJsError(env, externalErrorCode, externalErrorMessage);
 }
 
+int32_t NapiFormUtil::NormalizeIpcErrorCode(int32_t errCode)
+{
+    // Keep d.ts-declared permission denials; other transport failures converge to
+    // TEMPLATE_FORM_IPC_CONNECTION_FAILED, which maps to the declared 16500050.
+    if (errCode == ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS ||
+        errCode == ERR_APPEXECFWK_FORM_PERMISSION_DENY ||
+        errCode == ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE) {
+        return errCode;
+    }
+    return ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
+}
+
 bool NapiFormUtil::ThrowParamTypeError(napi_env env, const std::string &paramName, const std::string &type)
 {
     return Throw(env, ERR_FORM_EXTERNAL_PARAM_INVALID, CreateParamTypeErrorMessage(paramName, type));
@@ -313,6 +325,20 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
     }
     HILOG_DEBUG("regex_match failed");
     return false;
+}
+
+bool ConvertFormId(napi_env env, napi_value jsValue, int64_t &formId)
+{
+    std::string strFormId;
+    if (!ConvertFromJsValue(env, jsValue, strFormId)) {
+        HILOG_ERROR("convert strFormId failed");
+        return false;
+    }
+    if (!ConvertStringToInt64(strFormId, formId)) {
+        HILOG_ERROR("convert string formId to int64 failed");
+        return false;
+    }
+    return true;
 }
 
 /**
@@ -1149,6 +1175,23 @@ bool CreateFormRectInfo(napi_env env, napi_value value, AppExecFwk::Rect &rect)
 
     return true;
 }
+
+// C++ Rect -> JS {left, top, width, height}; inverse of CreateFormRectInfo above.
+napi_value CreateFormRect(napi_env env, const AppExecFwk::Rect &rect)
+{
+    HILOG_DEBUG("call");
+    napi_value objContext = nullptr;
+    if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
+        HILOG_ERROR("napi_create_object failed");
+        return nullptr;
+    }
+    napi_set_named_property(env, objContext, "left", CreateJsValue(env, rect.left));
+    napi_set_named_property(env, objContext, "top", CreateJsValue(env, rect.top));
+    napi_set_named_property(env, objContext, "width", CreateJsValue(env, rect.width));
+    napi_set_named_property(env, objContext, "height", CreateJsValue(env, rect.height));
+    return objContext;
+}
+
 int NapiFormUtil::CatchErrorCode(napi_env env)
 {
     napi_value errResult;

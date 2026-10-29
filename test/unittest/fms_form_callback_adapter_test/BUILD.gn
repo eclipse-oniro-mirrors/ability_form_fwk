@@ -62,6 +62,11 @@ ohos_unittest("FmsFormCallbackAdapterTest") {
   cflags = []
   ldflags = [ "-Wl,--allow-multiple-definition" ]
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
