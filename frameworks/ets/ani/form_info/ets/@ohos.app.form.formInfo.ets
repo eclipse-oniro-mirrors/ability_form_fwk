@@ -196,6 +196,7 @@ export default namespace formInfo {
     formUsageState: FormUsageState;
     formDescription: string;
     extraData?: Record<string, Object>;
+    isColorModeRefreshEnabled?: boolean;
   }
 
   enum FormUsageState {
