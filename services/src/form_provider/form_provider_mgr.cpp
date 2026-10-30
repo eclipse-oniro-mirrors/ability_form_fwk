@@ -24,6 +24,8 @@
 #include "form_constants.h"
 #include "form_constants_util.h"
 #include "data_center/form_data_mgr.h"
+#include "data_center/database/form_db_cache.h"
+#include "data_center/database/form_db_info.h"
 #include "form_provider/connection/form_delete_connection.h"
 #include "form_mgr_errors.h"
 #include "form_provider/connection/form_msg_event_connection.h"
@@ -83,7 +85,7 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
 
     if (formRecord.isInited) {
         if (IsFormCached(formRecord)) {
-            formRecord.formProviderInfo = formProviderInfo;
+            UpdateProviderInfoAndDB(formId, formProviderInfo, formRecord);
             for (auto &iter : clientHosts) {
                 iter.OnAcquire(formId, formRecord);
             }
@@ -97,7 +99,7 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
     formRecord.needRefresh = false;
     FormDataMgr::GetInstance().SetFormCacheInited(formId, true);
 
-    formRecord.formProviderInfo = formProviderInfo;
+    UpdateProviderInfoAndDB(formId, formProviderInfo, formRecord);
     for (auto &iter : clientHosts) {
         iter.OnAcquire(formId, formRecord);
     }
@@ -116,6 +118,38 @@ void FormProviderMgr::DataProxyUpdate(const int64_t formId, const FormRecord &re
         formProviderData.EnableDbCache(true);
         FormMgrAdapterFacade::GetInstance().UpdateForm(formId, record.uid, formProviderData);
         HILOG_INFO("Upgrade APP data agent card update, formId:%{public}" PRId64, formId);
+    }
+}
+
+void FormProviderMgr::UpdateProviderInfoAndDB(int64_t formId, const FormProviderInfo &formProviderInfo,
+    FormRecord &formRecord)
+{
+    FormRecord oldRecord;
+    FormDataMgr::GetInstance().GetFormRecord(formId, oldRecord);
+    FormDataMgr::GetInstance().UpdateFormRecord(formId, [&formProviderInfo](FormRecord &record) {
+        record.formProviderInfo = formProviderInfo;
+    });
+    if (FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        FormDBInfo oldDbInfo(formId, oldRecord);
+        FormDBInfo newDbInfo(formId, formRecord);
+        if (!oldDbInfo.Compare(newDbInfo)) {
+            FormDbCache::GetInstance().UpdateDBRecord(formId, formRecord);
+        }
+    }
+}
+
+void FormProviderMgr::UpdateSupportMoreImagesAndDB(int64_t formId, const FormProviderInfo &formProviderInfo,
+    FormRecord &formRecord)
+{
+    FormDBInfo oldDbInfo(formId, formRecord);
+    FormDataMgr::GetInstance().UpdateFormRecord(formId, [&formProviderInfo](FormRecord &record) {
+        record.formProviderInfo.SetSupportMoreImages(formProviderInfo.IsSupportMoreImages());
+    });
+    if (FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        FormDBInfo newDbInfo(formId, formRecord);
+        if (!oldDbInfo.Compare(newDbInfo)) {
+            FormDbCache::GetInstance().UpdateDBRecord(formId, formRecord);
+        }
     }
 }
 
@@ -514,6 +548,7 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId, const FormProviderInfo
         HILOG_ERROR("not exist such form:%{public}" PRId64 ".", formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
+    UpdateSupportMoreImagesAndDB(formId, formProviderInfo, formRecord);
     return UpdateForm(formId, formRecord, formProviderInfo.GetFormData());
 }
 /**
@@ -538,7 +573,6 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId,
         auto formData = formRecord.formProviderInfo.GetFormData();
         formData.SetImageDataState(formProviderData.GetImageDataState());
         formData.SetImageDataMap(formProviderData.GetImageDataMap());
-        formData.SetSupportMoreImages(formProviderData.IsSupportMoreImages());
         formRecord.formProviderInfo.SetFormData(formData);
     }
 

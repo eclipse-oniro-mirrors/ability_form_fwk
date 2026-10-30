@@ -105,19 +105,10 @@ ErrCode FormDataAdapter::ValidateAndGetFormRecord(
     return ERR_OK;
 }
 
-int FormDataAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
-    const FormProviderData &formProviderData,
+int FormDataAdapter::RefreshAndUpdateProxies(int64_t matchedFormId, int32_t callingUid,
+    const FormRecord &formRecord, const FormProviderData &formProviderData,
     const std::vector<FormDataProxy> &formDataProxies)
 {
-    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-
-    int64_t matchedFormId = 0;
-    FormRecord formRecord;
-    ErrCode err = ValidateAndGetFormRecord(formId, matchedFormId, formRecord);
-    if (err != ERR_OK) {
-        return err;
-    }
-
     RefreshData data;
     data.formId = matchedFormId;
     data.record = formRecord;
@@ -134,6 +125,40 @@ int FormDataAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
         FormDataProxyMgr::GetInstance().UpdateSubscribeFormData(matchedFormId, formDataProxies);
     }
     return ret;
+}
+
+int FormDataAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
+    const FormProviderData &formProviderData,
+    const std::vector<FormDataProxy> &formDataProxies)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+
+    int64_t matchedFormId = 0;
+    FormRecord formRecord;
+    ErrCode err = ValidateAndGetFormRecord(formId, matchedFormId, formRecord);
+    if (err != ERR_OK) {
+        return err;
+    }
+
+    return RefreshAndUpdateProxies(matchedFormId, callingUid, formRecord, formProviderData, formDataProxies);
+}
+
+int FormDataAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
+    const FormProviderInfo &formProviderInfo)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+
+    int64_t matchedFormId = 0;
+    FormRecord formRecord;
+    ErrCode err = ValidateAndGetFormRecord(formId, matchedFormId, formRecord);
+    if (err != ERR_OK) {
+        return err;
+    }
+
+    FormProviderMgr::GetInstance().UpdateSupportMoreImagesAndDB(matchedFormId, formProviderInfo, formRecord);
+
+    return RefreshAndUpdateProxies(matchedFormId, callingUid, formRecord, formProviderInfo.GetFormData(),
+        formProviderInfo.GetFormProxies());
 }
 
 ErrCode FormDataAdapter::UpdateFormCrossBundle(const int64_t formId, const int32_t callingUid,

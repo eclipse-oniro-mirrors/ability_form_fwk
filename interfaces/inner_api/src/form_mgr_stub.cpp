@@ -417,6 +417,8 @@ int FormMgrStub::OnRemoteRequestSeventh(uint32_t code, MessageParcel &data, Mess
             return HandleRequestPublishFormCrossDevice(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_INSIGHT_INTENT_EVENT):
             return HandleInsightIntentEvent(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_PROVIDER_INFO):
+            return HandleUpdateFormProviderInfo(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_GET_VISIBLE_FORM_RECT_PROXY):
             return HandleRegisterGetVisibleFormRectProxy(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_GET_VISIBLE_FORM_RECT_PROXY):
@@ -593,6 +595,27 @@ int32_t FormMgrStub::HandleUpdateForm(MessageParcel &data, MessageParcel &reply)
     }
     return result;
 }
+
+int32_t FormMgrStub::HandleUpdateFormProviderInfo(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = 0;
+    if (!data.ReadInt64(formId)) {
+        HILOG_ERROR("read formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::unique_ptr<FormProviderInfo> formProviderInfo(data.ReadParcelable<FormProviderInfo>());
+    if (formProviderInfo == nullptr) {
+        HILOG_ERROR("fail get formProviderInfo");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = UpdateForm(formId, *formProviderInfo);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
 /**
  * @brief handle UpdateFormCrossBundle message.
  * @param data input param.

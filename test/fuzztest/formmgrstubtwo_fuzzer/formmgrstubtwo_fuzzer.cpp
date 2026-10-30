@@ -85,6 +85,10 @@ public:
     {
         return ZERO_NUM;
     }
+    int UpdateForm(const int64_t formId, const FormProviderInfo &formProviderInfo) override
+    {
+        return ZERO_NUM;
+    }
     int UpdateFormCrossBundle(const int64_t formId, const FormProviderData &formProviderData) override
     {
         return ZERO_NUM;

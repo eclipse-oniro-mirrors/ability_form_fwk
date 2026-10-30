@@ -378,8 +378,6 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
     }
 
     FormProviderData formProviderData;
-    formProviderData.SetSupportMoreImages(
-        record.formProviderInfo.GetFormData().IsSupportMoreImages());
     if (FormStatus::GetInstance().GetFormLastStatus(record.formId) != FormFsmStatus::RENDERED) {
         (void)FormDataMgr::GetInstance().MergeFormData(record.formId, formProviderData);
     }

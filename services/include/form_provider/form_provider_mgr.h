@@ -174,6 +174,12 @@ public:
      */
      ErrCode ConnectAmsUpdateSize(const int32_t newDimension, const Rect &newRect, const FormRecord &formRecord);
 
+    // Persist provider info into form record cache and DB, then refresh local snapshot.
+    void UpdateProviderInfoAndDB(int64_t formId, const FormProviderInfo &formProviderInfo, FormRecord &formRecord);
+
+    // Persist only isSupportMoreImages flag into form record cache and DB, skip write if unchanged.
+    void UpdateSupportMoreImagesAndDB(int64_t formId, const FormProviderInfo &formProviderInfo, FormRecord &formRecord);
+
 private:
     bool IsNeedToFresh(FormRecord &record, int64_t formId, bool isVisibleToFresh);
 
@@ -192,7 +198,7 @@ private:
      */
     ErrCode RebindByFreeInstall(const FormRecord &record, Want &want,
         const sptr<AAFwk::IAbilityConnection> formRefreshConnection);
-    
+
     void DataProxyUpdate(const int64_t formId, const FormRecord &record, bool isFormProviderUpdate);
     void PostEnterpriseAppInstallFailedRetryTask(const int64_t formId, const Want &want, bool isVisibleToFresh);
 };

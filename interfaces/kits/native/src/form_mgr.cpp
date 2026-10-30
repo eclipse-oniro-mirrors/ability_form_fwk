@@ -283,6 +283,48 @@ int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindin
     return remoteProxy_->UpdateProxyForm(formId, formBindingData, formDataProxies);
 }
 
+int FormMgr::UpdateForm(const int64_t formId, const FormProviderInfo &formProviderInfo)
+{
+    HILOG_DEBUG("UpdateForm with FormProviderInfo call");
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("Failed, form is in recover status, can't do action on form");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    if (formId <= 0) {
+        HILOG_ERROR("Failed, the passed in formId can't be negative or zero");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+
+    const auto &formBindingData = formProviderInfo.GetFormData();
+    const auto &formDataProxies = formProviderInfo.GetFormProxies();
+    if (formBindingData.GetDataString().empty() && formDataProxies.empty()) {
+        HILOG_ERROR("Failed,null formProviderData");
+        return ERR_APPEXECFWK_FORM_PROVIDER_DATA_EMPTY;
+    }
+
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+
+    auto hostCaller = FormCallerMgr::GetInstance().GetFormHostCaller(formId);
+    if (hostCaller != nullptr) {
+        hostCaller->UpdateForm(formId, formBindingData);
+    } else {
+        std::vector<std::shared_ptr<FormProviderCaller>> formProviderCallers;
+        FormCallerMgr::GetInstance().GetFormProviderCaller(formId, formProviderCallers);
+        for (const auto &formProviderCaller : formProviderCallers) {
+            formProviderCaller->UpdateForm(formId, formBindingData);
+        }
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->UpdateForm(formId, formProviderInfo);
+}
+
 /**
  * @brief Update form with formId by cross bundle, restricted to system apps with UPDATE_FORM_CROSS_BUNDLE.
  * @param formId The Id of the form to update.

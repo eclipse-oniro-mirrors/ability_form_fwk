@@ -124,6 +124,14 @@ public:
     int UpdateForm(const int64_t formId, const FormProviderData &FormProviderData) override;
 
     /**
+     * @brief Update form with formId and FormProviderInfo.
+     * @param formId The Id of the form to update.
+     * @param formProviderInfo Form provider info including isSupportMoreImages.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int UpdateForm(const int64_t formId, const FormProviderInfo &formProviderInfo) override;
+
+    /**
      * @brief Update form by cross bundle, restricted to system apps with UPDATE_FORM_CROSS_BUNDLE permission.
      * @param formId The Id of the form to update.
      * @param FormProviderData Form binding data.

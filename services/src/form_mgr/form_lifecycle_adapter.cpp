@@ -1404,6 +1404,15 @@ ErrCode FormLifecycleAdapter::AddNewFormRecord(const FormItemInfo &info, const i
     // allot form record
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(newInfo, callingUid, currentUserId);
 
+    // Restore isSupportMoreImages from DB Cache for forms that already exist in DB Cache
+    FormRecord dbRecord;
+    if (FormDbCache::GetInstance().GetDBRecord(formId, dbRecord) == ERR_OK) {
+        FormDataMgr::GetInstance().UpdateFormRecord(formId, [&dbRecord](FormRecord &record) {
+            record.formProviderInfo.SetSupportMoreImages(dbRecord.formProviderInfo.IsSupportMoreImages());
+        });
+        FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
+    }
+
     FormRenderMgr::GetInstance().RenderForm(formRecord, wantParams, callerToken);
 
     // acquire formInfo from provider

@@ -555,7 +555,6 @@ napi_value JsFormProvider::OnUpdateForm(napi_env env, size_t argc, napi_value* a
             }
         }
     }
-    formProviderData->SetSupportMoreImages(isSupportMoreImages);
 
     formProviderData->ParseImagesData();
 
@@ -567,8 +566,13 @@ napi_value JsFormProvider::OnUpdateForm(napi_env env, size_t argc, napi_value* a
     }
 
     NapiAsyncTask::CompleteCallback complete =
-        [formId, data = formProviderData, formDataProxies](napi_env env, NapiAsyncTask &task, int32_t status) {
-            int32_t ret = FormMgr::GetInstance().UpdateForm(formId, *data, formDataProxies);
+        [formId, data = formProviderData, isSupportMoreImages, formDataProxies](
+            napi_env env, NapiAsyncTask &task, int32_t status) {
+            OHOS::AppExecFwk::FormProviderInfo formProviderInfo;
+            formProviderInfo.SetFormData(*data);
+            formProviderInfo.SetSupportMoreImages(isSupportMoreImages);
+            formProviderInfo.SetFormDataProxies(formDataProxies);
+            int32_t ret = FormMgr::GetInstance().UpdateForm(formId, formProviderInfo);
             if (ret != ERR_OK) {
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
                 return;

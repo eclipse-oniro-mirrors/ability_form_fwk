@@ -38,6 +38,7 @@ struct FormDBInfo {
     bool enableForm = true;
     bool lockForm = false;
     int32_t appIndex = Constants::MAIN_APP_INDEX;
+    bool isSupportMoreImages = false;
     /**
      * @brief Constructors
      *
@@ -63,6 +64,7 @@ struct FormDBInfo {
         enableForm = formRecord.enableForm;
         lockForm = formRecord.lockForm;
         appIndex = formRecord.appIndex;
+        isSupportMoreImages = formRecord.formProviderInfo.IsSupportMoreImages();
     }
     bool Contains(const int uId) const
     {
@@ -128,6 +130,9 @@ struct FormDBInfo {
         if (appIndex != formDBInfo.appIndex) {
             return false;
         }
+        if (isSupportMoreImages != formDBInfo.isSupportMoreImages) {
+            return false;
+        }
 
         return true;
     }
@@ -161,6 +166,7 @@ public:
         formDBInfo_.enableForm = formDBInfo.enableForm;
         formDBInfo_.lockForm = formDBInfo.lockForm;
         formDBInfo_.appIndex = formDBInfo.appIndex;
+        formDBInfo_.isSupportMoreImages = formDBInfo.isSupportMoreImages;
     }
     /**
      * @brief Constructors
@@ -181,6 +187,7 @@ public:
         formDBInfo_.enableForm = innerFormInfo.formDBInfo_.enableForm;
         formDBInfo_.lockForm = innerFormInfo.formDBInfo_.lockForm;
         formDBInfo_.appIndex = innerFormInfo.formDBInfo_.appIndex;
+        formDBInfo_.isSupportMoreImages = innerFormInfo.formDBInfo_.isSupportMoreImages;
     }
      /**
      * @brief Constructors
@@ -201,6 +208,7 @@ public:
         formDBInfo_.enableForm = formRecord.enableForm;
         formDBInfo_.lockForm = formRecord.lockForm;
         formDBInfo_.appIndex = formRecord.appIndex;
+        formDBInfo_.isSupportMoreImages = formRecord.formProviderInfo.IsSupportMoreImages();
     }
     std::string ToString() const
     {
@@ -218,6 +226,7 @@ public:
         obj["enableForm"] = formDBInfo_.enableForm;
         obj["lockForm"] = formDBInfo_.lockForm;
         obj["appIndex"] = formDBInfo_.appIndex;
+        obj["isSupportMoreImages"] = formDBInfo_.isSupportMoreImages;
         return obj.dump();
     }
     /**

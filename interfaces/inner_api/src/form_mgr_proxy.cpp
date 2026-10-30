@@ -249,6 +249,43 @@ int FormMgrProxy::UpdateForm(const int64_t formId, const FormProviderData &FormP
     return result;
 }
 
+int FormMgrProxy::UpdateForm(const int64_t formId, const FormProviderInfo &formProviderInfo)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("write formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&formProviderInfo)) {
+        HILOG_ERROR("write formProviderInfo failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UPDATE_FORM_PROVIDER_INFO,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        if (error == ERR_APPEXECFWK_PARCEL_ERROR) {
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    int32_t result = 0;
+    if (!reply.ReadInt32(result)) {
+        HILOG_ERROR("read result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
 /**
  * @brief Update form with formId by cross bundle.
  * @param formId The Id of the form to update.

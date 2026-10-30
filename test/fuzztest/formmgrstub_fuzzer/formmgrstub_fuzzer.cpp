@@ -81,6 +81,10 @@ public:
     {
         return 0;
     }
+    int UpdateForm(const int64_t formId, const FormProviderInfo &formProviderInfo) override
+    {
+        return 0;
+    }
     int SetNextRefreshTime(const int64_t formId, const int64_t nextTime) override
     {
         return 0;

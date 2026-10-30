@@ -7390,7 +7390,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormJsInfo_IsSupportMoreIm
     nlohmann::json jsonData;
     jsonData["key"] = "value";
     FormProviderData formProviderData(jsonData);
-    formProviderData.SetSupportMoreImages(true);
+    record.formProviderInfo.SetSupportMoreImages(true);
     record.formProviderInfo.SetFormData(formProviderData);
     FormJsInfo formJsInfo;
     formDataMgr_.CreateFormJsInfo(formId, record, formProviderData, formJsInfo);

@@ -24,6 +24,7 @@
 #include "form_callback_interface.h"
 #include "form_constants.h"
 #include "form_errors.h"
+#include "form_provider_info.h"
 #include "form_death_callback.h"
 #include "form_info.h"
 #include "form_instance.h"
@@ -135,6 +136,14 @@ public:
      */
     int UpdateForm(const int64_t formId, const FormProviderData &formBindingData,
         const std::vector<FormDataProxy> &formDataProxies = {});
+
+    /**
+     * @brief Update form with formId and FormProviderInfo.
+     * @param formId The Id of the form to update.
+     * @param formProviderInfo Form provider info including isSupportMoreImages.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int UpdateForm(const int64_t formId, const FormProviderInfo &formProviderInfo);
 
     /**
      * @brief Update form with formId by cross bundle.

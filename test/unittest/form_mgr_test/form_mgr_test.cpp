@@ -203,7 +203,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0004, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0005, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0005 starts";
-    EXPECT_CALL(*mockProxy, UpdateForm(_, _))
+    EXPECT_CALL(*mockProxy, UpdateForm(testing::An<int64_t>(), testing::An<const FormProviderData &>()))
         .Times(1)
         .WillOnce(Return(0));
     FormJsInfo formJsInfo;
@@ -1183,7 +1183,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0057, TestSize.Level1)
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0058, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0058 starts";
-    EXPECT_CALL(*mockProxy, UpdateForm(_, _))
+    EXPECT_CALL(*mockProxy, UpdateForm(testing::An<int64_t>(), testing::An<const FormProviderData &>()))
         .Times(1)
         .WillOnce(Return(NEGATIVE_NUM));
     FormJsInfo formJsInfo;

@@ -27,6 +27,7 @@
 #include "form_js_info.h"
 #include "form_mgr_errors.h"
 #include "form_provider_data.h"
+#include "form_provider_info.h"
 #include "form_state_info.h"
 #include "form_mgr_interface.h"
 #include "running_form_info.h"
@@ -122,6 +123,9 @@ public:
     int UpdateForm(const int64_t formId, const int32_t callingUid,
         const FormProviderData &formProviderData,
         const std::vector<FormDataProxy> &formDataProxies = {});
+
+    int UpdateForm(const int64_t formId, const int32_t callingUid,
+        const FormProviderInfo &formProviderInfo);
 
     ErrCode UpdateFormCrossBundle(const int64_t formId, const int32_t callingUid,
         const FormProviderData &formProviderData);

@@ -24,6 +24,7 @@
 #include "form_js_info.h"
 #include "form_provider_data.h"
 #include "form_provider_data_proxy.h"
+#include "form_provider_info.h"
 #include "form_share_info.h"
 #include "form_state_info.h"
 #include "ipc_types.h"
@@ -109,6 +110,17 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int UpdateForm(const int64_t formId, const FormProviderData &formProviderData) = 0;
+
+    /**
+     * @brief Update form with formId and FormProviderInfo.
+     * @param formId The Id of the form to update.
+     * @param formProviderInfo Form provider info including isSupportMoreImages.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int UpdateForm(const int64_t formId, const FormProviderInfo &formProviderInfo)
+    {
+        return ERR_OK;
+    }
 
     /**
      * @brief Update form with formId by cross bundle, restricted to system apps.
@@ -1394,6 +1406,7 @@ public:
         FORM_MGR_GET_AVAILABLE_FORM_HOST_SERVICES,
         FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_DEVICE,
         FORM_MGR_INSIGHT_INTENT_EVENT,
+        FORM_MGR_UPDATE_FORM_PROVIDER_INFO,
         FORM_MGR_REGISTER_GET_VISIBLE_FORM_RECT_PROXY,
         FORM_MGR_UNREGISTER_GET_VISIBLE_FORM_RECT_PROXY,
         FORM_MGR_GET_VISIBLE_FORM_RECT,

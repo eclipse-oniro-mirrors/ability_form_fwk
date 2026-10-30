@@ -55,6 +55,17 @@ public:
     {
         return jsBindingData_;
     }
+
+    inline void SetSupportMoreImages(bool support)
+    {
+        isSupportMoreImages_ = support;
+    }
+
+    inline bool IsSupportMoreImages() const
+    {
+        return isSupportMoreImages_;
+    }
+
     /**
      * @brief Get the form data.
      * @return the form data.
@@ -111,7 +122,7 @@ public:
      */
     bool NeedCache() const;
 
-    void SetFormDataProxies(std::vector<FormDataProxy> &formDataProxies)
+    void SetFormDataProxies(const std::vector<FormDataProxy> &formDataProxies)
     {
         formDataProxies_ = formDataProxies;
     }
@@ -128,6 +139,7 @@ private:
     FormProviderData jsBindingData_;
     bool upgradeFlg_ = false;
     std::vector<FormDataProxy> formDataProxies_;
+    bool isSupportMoreImages_ = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

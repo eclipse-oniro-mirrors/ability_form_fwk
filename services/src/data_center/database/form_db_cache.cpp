@@ -197,6 +197,7 @@ ErrCode FormDbCache::GetDBRecord(const int64_t formId, FormRecord &record) const
             record.formLocation = dbInfo.formLocation;
             record.enableForm = dbInfo.enableForm;
             record.lockForm = dbInfo.lockForm;
+            record.formProviderInfo.SetSupportMoreImages(dbInfo.isSupportMoreImages);
             return ERR_OK;
         }
     }
