@@ -20,7 +20,6 @@ group("fuzztest") {
   deps = [
     "bundleforminfo_fuzzer:fuzztest",
     "facrconnectionFourth_fuzzer:fuzztest",
-    "facrconnectionThree_fuzzer:fuzztest",
     "facrconnectionTwo_fuzzer:fuzztest",
     "formabilityconnection_fuzzer:fuzztest",
     "formabilityconnectionreporter_fuzzer:fuzztest",

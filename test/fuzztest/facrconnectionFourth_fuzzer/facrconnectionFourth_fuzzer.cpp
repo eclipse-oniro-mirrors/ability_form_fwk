@@ -28,7 +28,6 @@
 #include "form_render_service_mgr.h"
 #include "status_mgr_center/form_render_status_mgr.h"
 #include "status_mgr_center/form_render_status_task_mgr.h"
-#include "data_center/form_basic_info_mgr.h"
 #undef private
 #undef protected
 #include "message_parcel.h"

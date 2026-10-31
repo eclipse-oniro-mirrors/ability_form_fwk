@@ -25,7 +25,6 @@
 #include "data_center/form_cache_mgr.h"
 #include "form_constants.h"
 #include "form_constants_util.h"
-#include "data_center/form_basic_info_mgr.h"
 #include "data_center/form_info/form_info_mgr.h"
 #include "data_center/form_data_proxy_mgr.h"
 #include "data_center/database/form_db_cache.h"
@@ -230,13 +229,9 @@ FormRecord FormDataMgr::AllotFormRecord(const FormItemInfo &formInfo, const int 
         NetConnCallbackManager::GetInstance().RegisterNetConnCallback();
     }
     HILOG_INFO("end formId: %{public}" PRId64, formInfo.GetFormId());
-    FormBasicInfo basic {
-        record.formId, record.abilityName, record.bundleName, record.moduleName, record.formName, record.packageName
-    };
     if (record.formLocation == Constants::FormLocation::SCREEN_LOCK) {
         ReportDistributedFormEvent(FormEventName::ADD_DISTRIBUTED_FORM, record);
     }
-    FormBasicInfoMgr::GetInstance().AddFormBasicInfo(basic);
     return record;
 }
 /**
@@ -264,7 +259,6 @@ bool FormDataMgr::DeleteFormRecord(const int64_t formId)
         NetConnCallbackManager::GetInstance().UnregisterNetConnCallback();
     }
     FormUtil::DeleteFormId(formId);
-    FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
     FormProviderErrorHandlerFactory::GetRefreshHandler()->RemoveRetryPolicy(formId);
     FormProviderErrorHandlerFactory::GetAcquireHandler()->RemoveRetryPolicy(formId);
     auto location = formRecord.formLocation;
@@ -1580,7 +1574,6 @@ void FormDataMgr::CleanRemovedFormRecords(const std::string &bundleName, std::se
     for (const auto& [formId, formRecord] : deleteForms) {
         FormCacheMgr::GetInstance().DeleteData(formId);
         FormRenderMgr::GetInstance().StopRenderingForm(formId, formRecord);
-        FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
     }
 
     if (hadNetCondition && !HasNetworkConditionForm()) {
@@ -1611,7 +1604,6 @@ void FormDataMgr::CleanRemovedTempFormRecords(const std::string &bundleName, con
                     hadNetCondition = true;
                 }
                 itFormRecord = formRecords_.erase(itFormRecord);
-                FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
             } else {
                 itFormRecord++;
             }
@@ -2212,7 +2204,6 @@ void FormDataMgr::DeleteFormsByUserId(const int32_t userId, std::vector<int64_t>
                 }
                 removedFormIds.emplace_back(formId);
                 itFormRecord = formRecords_.erase(itFormRecord);
-                FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
             } else {
                 ++itFormRecord;
             }
@@ -3588,7 +3579,6 @@ void FormDataMgr::DeleteRecordTempForms(const std::vector<int64_t> &recordTempFo
                     hadNetCondition = true;
                 }
                 itFormRecord = formRecords_.erase(itFormRecord);
-                FormBasicInfoMgr::GetInstance().DeleteFormBasicInfo(formId);
                 deletedRecords.emplace_back(formId, formRecord);
             } else {
                 itFormRecord++;
