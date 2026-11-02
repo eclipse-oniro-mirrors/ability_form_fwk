@@ -43,6 +43,7 @@ bool FormProviderInfo::ReadFromParcel(Parcel &parcel)
         formDataProxies_.push_back(formDataProxy);
     }
 
+    parcel.ReadBool(isSupportMoreImages_);
     return true;
 }
 
@@ -76,6 +77,10 @@ bool FormProviderInfo::Marshalling(Parcel &parcel) const
                 formDataProxy.subscribeId.c_str());
             return false;
         }
+    }
+    if (!parcel.WriteBool(isSupportMoreImages_)) {
+        HILOG_ERROR("WriteBool isSupportMoreImages_ failed");
+        return false;
     }
     return true;
 }

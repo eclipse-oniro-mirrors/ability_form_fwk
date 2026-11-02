@@ -33,6 +33,7 @@ constexpr const char *INNER_FORM_INFO_FORM_ENABLE = "enableForm";
 constexpr const char *INNER_FORM_INFO_FORM_LOCK = "lockForm";
 constexpr const char *INNER_FORM_INFO_IS_THEMEFORM = "isThemeForm";
 constexpr const char *INNER_FORM_INFO_APP_INDEX = "appIndex";
+constexpr const char *INNER_FORM_INFO_IS_SUPPORT_MORE_IMAGES = "isSupportMoreImages";
 } // namespace
 
 /**
@@ -54,6 +55,7 @@ void InnerFormInfo::ToJson(nlohmann::json &jsonObject) const
     jsonObject[INNER_FORM_INFO_FORM_LOCK] = formDBInfo_.lockForm;
     jsonObject[INNER_FORM_INFO_IS_THEMEFORM] = formDBInfo_.isThemeForm;
     jsonObject[INNER_FORM_INFO_APP_INDEX] = formDBInfo_.appIndex;
+    jsonObject[INNER_FORM_INFO_IS_SUPPORT_MORE_IMAGES] = formDBInfo_.isSupportMoreImages;
 }
 
 /**
@@ -102,6 +104,9 @@ bool InnerFormInfo::FromJson(const nlohmann::json &jsonObject)
 
     GetValueIfFindKey<int32_t>(jsonObject, jsonObjectEnd, INNER_FORM_INFO_APP_INDEX,
         formDBInfo_.appIndex, JsonType::NUMBER, false, parseResult, ArrayType::NOT_ARRAY);
+
+    GetValueIfFindKey<bool>(jsonObject, jsonObjectEnd, INNER_FORM_INFO_IS_SUPPORT_MORE_IMAGES,
+        formDBInfo_.isSupportMoreImages, JsonType::BOOLEAN, false, parseResult, ArrayType::NOT_ARRAY);
 
     return parseResult == ERR_OK;
 }

@@ -104,7 +104,7 @@ static ani_object CreateFormBindingDataEx(ani_env *env, ani_object paramObject)
         return formBindingDataObj;
     }
     ani_method setSupportMethod;
-    status = env->Class_FindMethod(formBindingDataCls, "<set>isSupportMoreImages", "Z:V", &setSupportMethod);
+    status = env->Class_FindMethod(formBindingDataCls, "<set>isSupportMoreImages", "z:", &setSupportMethod);
     if (status != ANI_OK) {
         HILOG_ERROR("FindMethod <set>isSupportMoreImages failed status %{public}d", static_cast<int>(status));
         env->DestroyLocalScope();

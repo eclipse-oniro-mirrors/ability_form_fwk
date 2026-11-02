@@ -86,10 +86,12 @@ void RefreshCacheMgr::ConsumeHealthyControlFlag(std::vector<FormRecord>::iterato
     if (record->isUpdateDuringDisableForm) {
         FormDataMgr::GetInstance().SetUpdateDuringDisableForm(record->formId, false);
         FormProviderData data = record->formProviderInfo.GetFormData();
+        bool supportMoreImages = record->formProviderInfo.IsSupportMoreImages();
         RefreshExecMgr::UpdateByProviderData(record->formId, data, true);
-        // Consume cached formProviderInfo.
-        FormDataMgr::GetInstance().UpdateFormRecord(record->formId, [](FormRecord &formRecord) {
+        // Consume cached formProviderInfo but preserve isSupportMoreImages.
+        FormDataMgr::GetInstance().UpdateFormRecord(record->formId, [supportMoreImages](FormRecord &formRecord) {
             formRecord.formProviderInfo = FormProviderInfo();
+            formRecord.formProviderInfo.SetSupportMoreImages(supportMoreImages);
         });
     }
 }

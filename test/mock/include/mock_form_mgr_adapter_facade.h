@@ -20,6 +20,7 @@
 #include "configuration.h"
 #include "data_center/form_record/form_record.h"
 #include "form_provider_data.h"
+#include "form_provider_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -29,6 +30,7 @@ public:
     virtual bool IsDeleteCacheInUpgradeScene(const FormRecord &record) = 0;
     virtual int UpdateForm(int64_t formId, int32_t callingUid,
         const FormProviderData &formProviderData, const std::vector<FormDataProxy> &formDataProxies) = 0;
+    virtual int UpdateForm(int64_t formId, int32_t callingUid, const FormProviderInfo &formProviderInfo) = 0;
     virtual ErrCode UpdateFormCrossBundle(int64_t formId, int32_t callingUid,
         const FormProviderData &formProviderData) = 0;
     virtual ErrCode BatchNotifyFormsColorModeUpdate(int32_t userId, const Configuration &configuration) = 0;
@@ -42,6 +44,7 @@ public:
     ~MockFormMgrAdapterFacade() override = default;
     MOCK_METHOD1(IsDeleteCacheInUpgradeScene, bool(const FormRecord &record));
     MOCK_METHOD4(UpdateForm, int(int64_t, int32_t, const FormProviderData&, const std::vector<FormDataProxy>&));
+    MOCK_METHOD3(UpdateForm, int(int64_t, int32_t, const FormProviderInfo&));
     MOCK_METHOD3(UpdateFormCrossBundle, ErrCode(int64_t, int32_t, const FormProviderData&));
     MOCK_METHOD2(BatchNotifyFormsColorModeUpdate, ErrCode(int32_t, const Configuration&));
     MOCK_METHOD1(BatchNotifyFormsConfigurationUpdate, ErrCode(const Configuration&));

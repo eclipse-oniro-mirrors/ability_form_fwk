@@ -188,6 +188,12 @@ int FormMgrAdapterFacade::UpdateForm(const int64_t formId, const int32_t calling
     return FormDataAdapter::GetInstance().UpdateForm(formId, callingUid, formProviderData, formDataProxies);
 }
 
+int FormMgrAdapterFacade::UpdateForm(const int64_t formId, const int32_t callingUid,
+    const FormProviderInfo &formProviderInfo)
+{
+    return FormDataAdapter::GetInstance().UpdateForm(formId, callingUid, formProviderInfo);
+}
+
 ErrCode FormMgrAdapterFacade::UpdateFormCrossBundle(const int64_t formId, const int32_t callingUid,
     const FormProviderData &formProviderData)
 {

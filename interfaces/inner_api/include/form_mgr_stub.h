@@ -93,6 +93,14 @@ private:
     int32_t HandleUpdateForm(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Handle updateForm with FormProviderInfo message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleUpdateFormProviderInfo(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief Handle UpdateFormCrossBundle message.
      * @param data input param.
      * @param reply output param.

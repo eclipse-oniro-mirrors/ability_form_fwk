@@ -57,6 +57,9 @@ public:
         const FormProviderData &formProviderData,
         const std::vector<FormDataProxy> &formDataProxies = {});
 
+    int UpdateForm(const int64_t formId, const int32_t callingUid,
+        const FormProviderInfo &formProviderInfo);
+
     ErrCode UpdateFormCrossBundle(const int64_t formId, const int32_t callingUid,
         const FormProviderData &formProviderData);
 
@@ -112,6 +115,8 @@ private:
         const FormItemInfo &info, const WantParams &wantParams);
 
     ErrCode ValidateAndGetFormRecord(const int64_t formId, int64_t &matchedFormId, FormRecord &formRecord);
+    int RefreshAndUpdateProxies(int64_t matchedFormId, int32_t callingUid, const FormRecord &formRecord,
+        const FormProviderData &formProviderData, const std::vector<FormDataProxy> &formDataProxies);
     ErrCode HandleUpdateFormFlag(const std::vector<int64_t> &formIds,
         const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate);
     void UpdateFormRenderParamsAfterReload(const int64_t formId);

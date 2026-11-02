@@ -553,7 +553,9 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0017, TestSize.Level1) {
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteInt64(formId);
     data.WriteParcelable(&formProviderData);
-    EXPECT_CALL(*mockFormMgrService, UpdateForm(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, UpdateForm(testing::An<int64_t>(), testing::An<const FormProviderData &>()))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0017 ends";

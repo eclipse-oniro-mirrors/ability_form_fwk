@@ -47,6 +47,8 @@ HWTEST_F(FormProviderInfoTest, FormProviderInfo_ReadFromParcel_001, TestSize.Lev
     formProvicerData.imageDataState_ = FormProviderData::IMAGE_DATA_STATE_REMOVED;
     Parcel parcel;
     parcel.WriteParcelable(&formProvicerData);
+    parcel.WriteInt32(0); // proxies number
+    parcel.WriteBool(false); // isSupportMoreImages
     auto result = formProviderInfo.ReadFromParcel(parcel);
     EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "FormProviderInfo_ReadFromParcel_001 ends";

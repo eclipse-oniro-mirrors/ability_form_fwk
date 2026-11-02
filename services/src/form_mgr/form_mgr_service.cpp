@@ -88,7 +88,6 @@
 #include "common/event/system_event/form_os_account_subscriber.h"
 #include "common/util/form_task_common.h"
 #include "scene_board_judgement.h"
-#include "form_provider/form_provider_mgr.h"
 #include "form_host/form_mgr_host_adapter.h"
 
 namespace OHOS {
@@ -400,6 +399,13 @@ int FormMgrService::UpdateForm(const int64_t formId, const FormProviderData &for
     HILOG_DEBUG("call");
     auto callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapterFacade::GetInstance().UpdateForm(formId, callingUid, formBindingData);
+}
+
+int FormMgrService::UpdateForm(const int64_t formId, const FormProviderInfo &formProviderInfo)
+{
+    HILOG_DEBUG("call");
+    auto callingUid = IPCSkeleton::GetCallingUid();
+    return FormMgrAdapterFacade::GetInstance().UpdateForm(formId, callingUid, formProviderInfo);
 }
 
 /**

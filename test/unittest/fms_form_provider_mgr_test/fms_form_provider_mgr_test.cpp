@@ -1617,10 +1617,10 @@ HWTEST_F(FmsFormProviderMgrTest, UpdateForm_IsSupportMoreImages_001, TestSize.Le
     nlohmann::json newData;
     newData["newKey"] = "newValue";
     FormProviderData formProviderData(newData);
-    formProviderData.SetSupportMoreImages(true);
+    formRecord.formProviderInfo.SetSupportMoreImages(true);
     ErrCode result = FormProviderMgr::GetInstance().UpdateForm(formId, formRecord, formProviderData);
     EXPECT_EQ(result, ERR_OK);
-    EXPECT_TRUE(formRecord.formProviderInfo.GetFormData().IsSupportMoreImages());
+    EXPECT_TRUE(formRecord.formProviderInfo.IsSupportMoreImages());
     FormDataMgr::GetInstance().DeleteFormRecord(formId);
     GTEST_LOG_(INFO) << "UpdateForm_IsSupportMoreImages_001 end";
 }
@@ -1650,7 +1650,7 @@ HWTEST_F(FmsFormProviderMgrTest, UpdateForm_IsSupportMoreImages_002, TestSize.Le
     FormProviderData formProviderData(newData);
     ErrCode result = FormProviderMgr::GetInstance().UpdateForm(formId, formRecord, formProviderData);
     EXPECT_EQ(result, ERR_OK);
-    EXPECT_FALSE(formRecord.formProviderInfo.GetFormData().IsSupportMoreImages());
+    EXPECT_FALSE(formRecord.formProviderInfo.IsSupportMoreImages());
     FormDataMgr::GetInstance().DeleteFormRecord(formId);
     GTEST_LOG_(INFO) << "UpdateForm_IsSupportMoreImages_002 end";
 }
@@ -1675,10 +1675,10 @@ HWTEST_F(FmsFormProviderMgrTest, UpdateForm_IsSupportMoreImages_003, TestSize.Le
     nlohmann::json jsonData;
     jsonData["key"] = "value";
     FormProviderData formProviderData(jsonData);
-    formProviderData.SetSupportMoreImages(true);
+    formRecord.formProviderInfo.SetSupportMoreImages(true);
     ErrCode result = FormProviderMgr::GetInstance().UpdateForm(formId, formRecord, formProviderData);
     EXPECT_EQ(result, ERR_OK);
-    EXPECT_TRUE(formRecord.formProviderInfo.GetFormData().IsSupportMoreImages());
+    EXPECT_TRUE(formRecord.formProviderInfo.IsSupportMoreImages());
     FormDataMgr::GetInstance().DeleteFormRecord(formId);
     GTEST_LOG_(INFO) << "UpdateForm_IsSupportMoreImages_003 end";
 }
