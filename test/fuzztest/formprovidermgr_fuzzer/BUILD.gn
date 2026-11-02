@@ -33,6 +33,7 @@ ohos_fuzztest("FormProviderMgrFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
   sources = [ "formprovidermgr_fuzzer.cpp" ]
 
   deps = [
