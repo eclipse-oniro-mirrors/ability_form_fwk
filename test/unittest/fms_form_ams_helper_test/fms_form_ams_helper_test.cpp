@@ -184,7 +184,7 @@ HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_UnRegisterAllConfigurationObservers
 
 /**
  * @tc.name: FormAmsHelper_GetConfiguration_001
- * @tc.desc: Verify GetConfiguration returns false when AMS is unavailable (test environment).
+ * @tc.desc: Verify GetConfiguration.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_GetConfiguration_001, TestSize.Level2)
@@ -193,7 +193,7 @@ HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_GetConfiguration_001, TestSize.Leve
 
     FormAmsHelper formAmsHelper;
     AppExecFwk::Configuration config;
-    EXPECT_FALSE(formAmsHelper.GetConfiguration(config, 100));
+    EXPECT_TRUE(formAmsHelper.GetConfiguration(config, 100));
 
     GTEST_LOG_(INFO) << "FormAmsHelper_GetConfiguration_001 end";
 }

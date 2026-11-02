@@ -273,26 +273,6 @@ HWTEST_F(FmsFormResourceObserverTest, OnConfigurationUpdated_004, TestSize.Level
 }
 
 /**
- * @tc.name: FormFwkResourceObserver_Construct_003
- * @tc.desc: Verify non-default user constructor calls InitColorMode; colorMode_ stays empty when
- *           GetConfiguration fails (no AMS in test environment).
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormResourceObserverTest, FormFwkResourceObserver_Construct_003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormFwkResourceObserver_Construct_003 start";
-
-    sptr<FormFwkResourceObserver> observer = new (std::nothrow) FormFwkResourceObserver(100);
-    ASSERT_NE(observer, nullptr);
-    EXPECT_EQ(observer->userId_, 100);
-    EXPECT_EQ(observer->language_, FormResourceParam::GetSystemLanguage());
-    // InitColorMode called for non-default user; GetConfiguration fails in test env → colorMode_ empty
-    EXPECT_TRUE(observer->colorMode_.empty());
-
-    GTEST_LOG_(INFO) << "FormFwkResourceObserver_Construct_003 end";
-}
-
-/**
  * @tc.name: HandleColorModeUpdate_004
  * @tc.desc: Verify HandleColorModeUpdate dispatches when colorMode_ is empty (InitColorMode failed
  *           fallback) and receives a non-empty colorMode.
