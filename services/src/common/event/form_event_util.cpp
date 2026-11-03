@@ -777,7 +777,6 @@ void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formR
     oldFormUpgradeInfo.enableBlurBackground = formInfo.enableBlurBackground;
     formRecord.formUpgradeInfo = oldFormUpgradeInfo;
     HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
-    FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
     bool wasAccountForm = FormDataMgr::IsAccountConditionForm(formRecord);
     formRecord.conditionUpdate = formInfo.conditionUpdate;
     bool isAccountForm = FormDataMgr::IsAccountConditionForm(formRecord);
