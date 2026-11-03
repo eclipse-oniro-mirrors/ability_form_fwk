@@ -18,6 +18,8 @@ group("fuzztest") {
   testonly = true
 
   deps = [
+    "accountcommoneventmanager_fuzzer:fuzztest",
+    "accountcommoneventobserver_fuzzer:fuzztest",
     "bundleforminfo_fuzzer:fuzztest",
     "facrconnectionFourth_fuzzer:fuzztest",
     "facrconnectionThree_fuzzer:fuzztest",
@@ -26,6 +28,7 @@ group("fuzztest") {
     "formabilityconnectionreporter_fuzzer:fuzztest",
     "formamsadapter_fuzzer:fuzztest",
     "formeditservice_fuzzer:fuzztest",
+    "formaccountrefreshimpl_fuzzer:fuzztest",
     "formappupgraderefreshimpl_fuzzer:fuzztest",
     "formashmem_fuzzer:fuzztest",
     "formbmshelper_fuzzer:fuzztest",
