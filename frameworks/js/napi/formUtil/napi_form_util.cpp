@@ -572,6 +572,8 @@ void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFo
     napi_set_named_property(env, result, "formDescription", CreateJsValue(env, runningFormInfo.description));
     napi_set_named_property(env, result, "formLocation", CreateJsValue(env,
         static_cast<int32_t>(runningFormInfo.formLocation)));
+    napi_set_named_property(env, result, "isColorModeRefreshEnabled",
+        CreateJsValue(env, runningFormInfo.isColorModeRefreshEnabled));
 }
 
 inline FormType GetFormType(const FormInfo &formInfo)
@@ -765,6 +767,8 @@ napi_value CreateNewRunningFormInfo(napi_env env, const RunningFormInfo &running
     napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, runningFormInfo.dimension));
     napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env,
         static_cast<int32_t>(runningFormInfo.formLocation)));
+    napi_set_named_property(env, objContext, "isColorModeRefreshEnabled",
+        CreateJsValue(env, runningFormInfo.isColorModeRefreshEnabled));
 
     return objContext;
 }

@@ -1026,6 +1026,7 @@ ErrCode FormLifecycleAdapter::EnableForms(const std::string &bundleName, const i
     }
     HILOG_INFO("userId:%{public}d, bundleName:%{public}s, infosSize:%{public}zu, enable:%{public}d",
         userId, bundleName.c_str(), formInfos.size(), enable);
+    std::vector<int64_t> enabledFormIds;
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
         HILOG_DEBUG("enableForm:%{public}d, transparencyEnabled:%{public}d",
             iter->enableForm, iter->transparencyEnabled);
@@ -1041,11 +1042,18 @@ ErrCode FormLifecycleAdapter::EnableForms(const std::string &bundleName, const i
         FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
         if (enable) {
             RefreshCacheMgr::GetInstance().ConsumeHealthyControlFlag(iter, userId);
+            enabledFormIds.push_back(iter->formId);
         }
         ++iter;
     }
     if (!formInfos.empty()) {
         FormDataMgr::GetInstance().EnableForms(std::move(formInfos), enable);
+    }
+    // Dispatch cached colorMode updates to forms released from healthy control
+    if (!enabledFormIds.empty()) {
+        HILOG_INFO("consume colorMode cache after healthy control release, "
+            "formIds size:%{public}zu, userId:%{public}d", enabledFormIds.size(), userId);
+        ConsumeColorModeCache(enabledFormIds, userId);
     }
     return ERR_OK;
 }
@@ -1658,6 +1666,11 @@ void FormLifecycleAdapter::ConsumeColorModeCache(const std::vector<int64_t> &for
             }
             // App under healthy device control: keep cache, skip callback
             if (RefreshControlMgr::GetInstance().IsHealthyControl(formRecord)) {
+                continue;
+            }
+            // Only consume when form is visible; invisible forms get cached updates on visibility change
+            if (!FormDataMgr::GetInstance().GetFormVisible(formRecord.formId)) {
+                HILOG_INFO("form not visible, keep cache, key:%{public}s", key.c_str());
                 continue;
             }
             // Snapshot configuration under lock, IPC outside lock to avoid long hold

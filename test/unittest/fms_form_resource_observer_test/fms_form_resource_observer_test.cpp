@@ -86,7 +86,7 @@ HWTEST_F(FmsFormResourceObserverTest, FormFwkResourceObserver_Construct_002, Tes
     sptr<FormFwkResourceObserver> observer = new (std::nothrow) FormFwkResourceObserver(0);
     ASSERT_NE(observer, nullptr);
     EXPECT_EQ(observer->language_, FormResourceParam::GetSystemLanguage());
-    EXPECT_EQ(observer->colorMode_, FormResourceParam::GetSystemColorMode());
+    EXPECT_TRUE(observer->colorMode_.empty());
 
     GTEST_LOG_(INFO) << "FormFwkResourceObserver_Construct_002 end";
 }
@@ -270,4 +270,43 @@ HWTEST_F(FmsFormResourceObserverTest, OnConfigurationUpdated_004, TestSize.Level
     EXPECT_EQ(observer->language_, "en-US");
 
     GTEST_LOG_(INFO) << "OnConfigurationUpdated_004 end";
+}
+
+/**
+ * @tc.name: HandleColorModeUpdate_004
+ * @tc.desc: Verify HandleColorModeUpdate dispatches when colorMode_ is empty (InitColorMode failed
+ *           fallback) and receives a non-empty colorMode.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormResourceObserverTest, HandleColorModeUpdate_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "HandleColorModeUpdate_004 start";
+
+    sptr<FormFwkResourceObserver> observer = new (std::nothrow) FormFwkResourceObserver(100);
+    ASSERT_NE(observer, nullptr);
+    observer->colorMode_ = "";
+    observer->HandleColorModeUpdate(BuildConfigWithColorMode("dark"));
+    // Empty baseline + non-empty input → must update (not silently set baseline)
+    EXPECT_EQ(observer->colorMode_, "dark");
+
+    GTEST_LOG_(INFO) << "HandleColorModeUpdate_004 end";
+}
+
+/**
+ * @tc.name: InitColorMode_001
+ * @tc.desc: Verify InitColorMode does not modify colorMode_ when GetConfiguration fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormResourceObserverTest, InitColorMode_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "InitColorMode_001 start";
+
+    sptr<FormFwkResourceObserver> observer = new (std::nothrow) FormFwkResourceObserver(100);
+    ASSERT_NE(observer, nullptr);
+    observer->colorMode_ = "light";
+    EXPECT_NO_FATAL_FAILURE(observer->InitColorMode());
+    // GetConfiguration fails in test env → colorMode_ unchanged
+    EXPECT_EQ(observer->colorMode_, "light");
+
+    GTEST_LOG_(INFO) << "InitColorMode_001 end";
 }

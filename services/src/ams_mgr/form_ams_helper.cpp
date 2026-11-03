@@ -199,6 +199,20 @@ ErrCode FormAmsHelper::StartAbility(const Want &want, int32_t userId)
     return IN_PROCESS_CALL(ams->StartAbility(want, userId));
 }
 
+bool FormAmsHelper::GetConfiguration(AppExecFwk::Configuration& config, int32_t userId)
+{
+    auto appMgrClient = std::make_unique<AppMgrClient>();
+    if (appMgrClient == nullptr) {
+        HILOG_ERROR("create appMgrClient failed");
+        return false;
+    }
+    if (appMgrClient->GetConfiguration(config, userId) != AppMgrResultCode::RESULT_OK) {
+        HILOG_ERROR("GetConfiguration failed, userId:%{public}d", userId);
+        return false;
+    }
+    return true;
+}
+
 void FormAmsHelper::RegisterConfigurationObserver(int32_t userId)
 {
     HILOG_INFO("begin, userId:%{public}d", userId);
@@ -240,6 +254,11 @@ void FormAmsHelper::UnRegisterConfigurationObserver(int32_t userId)
         HILOG_WARN("no configurationObserver for userId:%{public}d", userId);
         return;
     }
+    if (it->second == nullptr) {
+        HILOG_ERROR("configurationObserver is null, userId:%{public}d", userId);
+        configurationObservers_.erase(it);
+        return;
+    }
     auto appMgrClient = std::make_unique<AppMgrClient>();
     if (appMgrClient == nullptr) {
         HILOG_ERROR("create appMgrClient failed");
@@ -272,6 +291,10 @@ void FormAmsHelper::UnRegisterAllConfigurationObservers()
     }
     // IPC outside lock to avoid deadlock; local sptr copies keep observers alive
     for (auto &item : observers) {
+        if (item.second == nullptr) {
+            HILOG_ERROR("configurationObserver is null, userId:%{public}d", item.first);
+            continue;
+        }
         AppMgrResultCode resCode = appMgrClient->UnregisterConfigurationObserver(item.second);
         if (resCode != AppMgrResultCode::RESULT_OK) {
             HILOG_ERROR("UnregisterConfigurationObserver failed, userId:%{public}d", item.first);

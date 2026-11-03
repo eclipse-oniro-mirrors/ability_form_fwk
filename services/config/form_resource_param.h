@@ -24,8 +24,6 @@ class FormResourceParam {
 public:
     static std::string GetSystemLanguage();
 
-    static std::string GetSystemColorMode();
-
     static bool IsBopdMode();
 
 private:
