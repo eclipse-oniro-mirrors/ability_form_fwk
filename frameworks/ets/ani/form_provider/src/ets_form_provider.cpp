@@ -513,14 +513,11 @@ void CancelOverflow(ani_env *env, ani_string formId, ani_object callback)
     ErrCode ret = FormMgr::GetInstance().RequestOverflow(formIdInt, *overflowInfo, false);
     delete overflowInfo;
     if (ret != ERR_OK) {
-        HILOG_INFO("complete ret false");
-        AsyncCallback(env, PROVIDER_CLASSNAME_ASYNC_CALLBACK_WRAPPER,
-            callback, EtsFormErrorUtil::CreateErrorByInternalErrorCode(env, ret), nullptr);
-        return;
+        HILOG_ERROR("RequestOverflow failed, formId:%{public}" PRId64 ", errCode: %{public}d", formIdInt, ret);
     }
-    HILOG_INFO("complete ret true");
-    AsyncCallback(env, PROVIDER_CLASSNAME_ASYNC_CALLBACK_WRAPPER, callback, EtsFormErrorUtil::CreateError(env, ret),
-        nullptr);
+    // Do not reject: historically no error codes were thrown to JS, keep for compatibility.
+    AsyncCallback(env, PROVIDER_CLASSNAME_ASYNC_CALLBACK_WRAPPER,
+        callback, EtsFormErrorUtil::CreateError(env, ERR_OK), nullptr);
     return;
 }
 
