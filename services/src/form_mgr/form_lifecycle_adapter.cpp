@@ -1050,7 +1050,7 @@ ErrCode FormLifecycleAdapter::EnableForms(const std::string &bundleName, const i
         FormDataMgr::GetInstance().EnableForms(std::move(formInfos), enable);
     }
     // Dispatch cached colorMode updates to forms released from healthy control
-    if (enable && !enabledFormIds.empty()) {
+    if (!enabledFormIds.empty()) {
         HILOG_INFO("consume colorMode cache after healthy control release, "
             "formIds size:%{public}zu, userId:%{public}d", enabledFormIds.size(), userId);
         ConsumeColorModeCache(enabledFormIds, userId);
