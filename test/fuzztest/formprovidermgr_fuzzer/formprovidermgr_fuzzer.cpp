@@ -25,6 +25,7 @@
 #include "form_provider/form_provider_mgr.h"
 #undef private
 #undef protected
+#include "ams_mgr/form_ams_helper.h"
 #include "securec.h"
 #include "ffrt.h"
 
@@ -45,10 +46,29 @@ extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
     return nullptr;
 }
 
+extern "C" void ffrt_submit_base(ffrt_function_header_t* f, const ffrt_deps_t* in_deps,
+    const ffrt_deps_t* out_deps, const ffrt_task_attr_t* attr)
+{
+    if (f != nullptr) {
+        if (f->destroy != nullptr) {
+            f->destroy(f);
+        }
+        free(f);
+    }
+}
+
 extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
 {
     return 0;
 }
+
+// Interpose to bail out early and avoid IPC stub threads racing with destruction.
+namespace OHOS::AppExecFwk {
+sptr<AAFwk::IAbilityManager> FormAmsHelper::GetAbilityManager()
+{
+    return nullptr;
+}
+} // namespace OHOS::AppExecFwk
 
 using namespace OHOS::AppExecFwk;
 

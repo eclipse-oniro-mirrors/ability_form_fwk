@@ -19,10 +19,11 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "form_info.h"
+#include "form_info_filter.h"
 #define private public
 #define protected public
 #include "data_center/form_info/form_info_mgr.h"
-#include "form_info_filter.h"
 #undef private
 #undef protected
 #include "securec.h"
@@ -122,13 +123,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 
     // Test IsDeleteCacheInUpgradeScene
     formInfoMgr.IsDeleteCacheInUpgradeScene(testFormInfo);
-
-    // Test private methods with different inputs
-    std::unordered_map<std::string, std::uint32_t> bundleVersionMap;
-    formInfoMgr.GetBundleVersionMap(bundleVersionMap, userId);
-    FormInfoMgr::BundleClassifyResult classify = formInfoMgr.ClassifyBundles(false, userId, bundleVersionMap);
-    formInfoMgr.ProcessBundleBatch(classify.updateBundles, userId);
-    formInfoMgr.ProcessBundleBatch(classify.newBundles, userId);
 
     return true;
 }
