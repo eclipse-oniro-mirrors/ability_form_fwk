@@ -899,16 +899,12 @@ napi_value JsFormProvider::OnCancelOverflow(napi_env env, size_t argc, napi_valu
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ERR_APPEXECFWK_FORM_COMMON_CODE));
                 return;
             }
-            bool ret = FormMgr::GetInstance().RequestOverflow(formId, *overflowInfo, false);
-            if (!ret) {
-                HILOG_INFO("complete ret false");
-                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
-                return;
+            ErrCode ret = FormMgr::GetInstance().RequestOverflow(formId, *overflowInfo, false);
+            if (ret != ERR_OK) {
+                HILOG_ERROR("RequestOverflow failed, formId:%{public}" PRId64 ", errCode: %{public}d", formId, ret);
             }
-            HILOG_INFO("complete ret true");
-            napi_value jsValue = nullptr;
-            napi_get_boolean(env, ret, &jsValue);
-            task.ResolveWithNoError(env, jsValue);
+            // Do not reject: historically no error codes were thrown to JS, keep for compatibility.
+            task.ResolveWithNoError(env, CreateJsUndefined(env));
         };
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnCancelOverflow",
