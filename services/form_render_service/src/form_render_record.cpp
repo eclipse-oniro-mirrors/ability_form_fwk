@@ -934,6 +934,7 @@ int32_t FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const W
         OnNotifyRefreshForm(formJsInfo.formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_FORM_REQUEST;
     }
+
     const Ace::FormRequest *currentRequest = FindCurrentRequest(formRequests);
     std::string compMaxId = (currentRequest != nullptr) ? currentRequest->compId : "0";
 
