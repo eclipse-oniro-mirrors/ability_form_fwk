@@ -921,15 +921,6 @@ bool FormRenderMgrInner::GetRenderFormConnection(sptr<FormRenderConnection> &con
     auto conIterator = renderFormConnections_.find(formId);
     if (conIterator != renderFormConnections_.end()) {
         connection = conIterator->second;
-        // Only a CONNECTED connection can serve render requests: CONNECTING means
-        // FRS is starting up (renderRemoteObj_ is still null) and DISCONNECTED means
-        // the connection is dead. Let the caller create a fresh connection — it
-        // connects to the same FRS instance and carries its own render request.
-        if (connection->GetConnectState() != ConnectState::CONNECTED) {
-            HILOG_INFO("formId:%{public}" PRId64 " connection state:%{public}d, create new connection",
-                formId, static_cast<int32_t>(connection->GetConnectState()));
-            return false;
-        }
         return true;
     }
     return false;
