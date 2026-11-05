@@ -67,6 +67,7 @@ using namespace FormAdapterConstants;
 
 namespace {
 constexpr int32_t ESTIMATED_REPORT_STR_SIZE_PER_FORM = 50;
+constexpr int32_t UNDEFINED_USER_ID = -1;
 const static std::unordered_map<int32_t, int32_t> CONDITION_TYPE_MAP = {
     {Constants::CONDITION_NETWORK, FormRefreshType::TYPE_NETWORK},
     {Constants::CONDITION_ACCOUNT, FormRefreshType::TYPE_ACCOUNT},
@@ -695,12 +696,15 @@ int32_t FormDataAdapter::OnNotifyRefreshForm(const int64_t &formId)
 
 ErrCode FormDataAdapter::UpdateFormByCondition(int32_t type)
 {
-    return UpdateFormByCondition(type, -1);
+    return UpdateFormByCondition(type, UNDEFINED_USER_ID);
 }
 
 ErrCode FormDataAdapter::UpdateFormByCondition(int32_t type, int32_t userId)
 {
     HILOG_INFO("UpdateFormByCondition type:%{public}d userId:%{public}d", type, userId);
+    if (userId < 0 && type == Constants::CONDITION_ACCOUNT) {
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     auto mapIt = CONDITION_TYPE_MAP.find(type);
     if (mapIt == CONDITION_TYPE_MAP.end()) {
         return ERR_APPEXECFWK_FORM_COMMON_CODE;

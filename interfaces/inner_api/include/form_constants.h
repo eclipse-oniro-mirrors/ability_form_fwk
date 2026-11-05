@@ -376,12 +376,14 @@ namespace Constants {
     constexpr int32_t REFRESHTYPE_UPDATETIMES = 2;
     constexpr int32_t REFRESHTYPE_UPDATENEXTTIME = 3;
     constexpr int32_t REFRESHTYPE_NETWORKCHANGED = 4;
+    // skip 5 for ReminderAgent
+    // refresh type for account change (Want param PARAM_FORM_REFRESH_TYPE value)
+    constexpr int32_t REFRESHTYPE_ACCOUNT_CHANGED = 6;
     constexpr int32_t REFRESHTYPE_VISIABLE = 99;
     // condition update type
     constexpr int32_t CONDITION_NETWORK = 1;
+    // skip 2 for ReminderAgent
     constexpr int32_t CONDITION_ACCOUNT = 3;
-    // refresh type for account change (Want param PARAM_FORM_REFRESH_TYPE value)
-    constexpr int32_t REFRESHTYPE_ACCOUNT_CHANGED = 6;
     // condition refresh type set, used by IsConditionRefreshType
     inline const std::unordered_set<int32_t> CONDITION_REFRESHTYPE_SET = {
         REFRESHTYPE_NETWORKCHANGED,

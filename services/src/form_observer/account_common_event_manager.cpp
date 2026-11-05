@@ -51,7 +51,9 @@ void AccountCommonEventManager::RegisterAccountCallback()
 {
     HILOG_DEBUG("Register account callback begin, post to queue");
     auto task = []() {
-        AccountCommonEventManager::GetInstance().RegisterAccountCallbackInternal();
+        auto &instance = AccountCommonEventManager::GetInstance();
+        instance.retryCount_.store(0);
+        instance.RegisterAccountCallbackInternal();
     };
     FormMgrQueue::GetInstance().ScheduleTask(0, task);
 }
@@ -109,17 +111,17 @@ void AccountCommonEventManager::UnregisterAccountCallback()
 void AccountCommonEventManager::UnregisterAccountCallbackInternal()
 {
     HILOG_INFO("Unregister account callback begin");
-    if (isRegistered_.load() && observer_ != nullptr) {
-        EventFwk::CommonEventManager::UnSubscribeCommonEvent(observer_);
-        observer_ = nullptr;
-    }
-    if (!isRegistered_.load()) {
+    if (isRegistered_.load()) {
+        if (observer_ != nullptr) {
+            EventFwk::CommonEventManager::UnSubscribeCommonEvent(observer_);
+            observer_ = nullptr;
+        }
+        isRegistered_.store(false);
+        retryCount_.store(0);
+        HILOG_INFO("Unregister account callback end");
+    } else {
         HILOG_WARN("AccountCommonEventObserver not registered");
-        return;
     }
-    isRegistered_.store(false);
-    retryCount_.store(0);
-    HILOG_INFO("Unregister account callback end");
 }
 
 void AccountCommonEventManager::PostRetryRegister()

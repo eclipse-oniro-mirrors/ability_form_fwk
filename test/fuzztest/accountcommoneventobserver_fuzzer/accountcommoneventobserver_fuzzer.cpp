@@ -24,11 +24,6 @@
 #include <common_event_subscriber.h>
 #include <common_event_support.h>
 #include "want.h"
-
-// ffrt.h must be included before the interpose functions below so the ffrt C
-// types (ffrt_function_header_t, ffrt_function_kind_t, ffrt_task_handle_t,
-// ffrt_queue_t, ffrt_task_attr_t, ffrt_auto_managed_function_storage_size)
-// are visible in the function signatures.
 #include "ffrt.h"
 
 // Interpose ffrt queue submit so the task posted by OnReceiveEvent
@@ -72,7 +67,7 @@ namespace OHOS {
 constexpr int32_t MAX_LENGTH = 256;
 constexpr int32_t MAX_NUM = 10000;
 constexpr int32_t MIN_NUM = 0;
-constexpr int32_t INVALID_USER_ID = -1;
+constexpr int32_t ACTION_SELECTOR_RANGE = 3;
 
 Want GenerateFuzzedWant(FuzzedDataProvider *fdp)
 {
@@ -85,7 +80,6 @@ Want GenerateFuzzedWant(FuzzedDataProvider *fdp)
     // Bias action toward the two real account events to exercise the
     // filtering logic, but still allow arbitrary strings to hit the
     // ignore-non-account-event branch.
-    constexpr int32_t ACTION_SELECTOR_RANGE = 3;
     int32_t actionChoice = fdp->ConsumeIntegralInRange<int32_t>(MIN_NUM, ACTION_SELECTOR_RANGE);
     std::string action;
     if (actionChoice == 0) {

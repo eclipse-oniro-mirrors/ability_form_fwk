@@ -22,10 +22,6 @@
 #include <fuzzer/FuzzedDataProvider.h>
 #include <thread>
 
-// ffrt.h must be included before the interpose functions below so the ffrt C
-// types (ffrt_function_header_t, ffrt_function_kind_t, ffrt_task_handle_t,
-// ffrt_queue_t, ffrt_task_attr_t, ffrt_auto_managed_function_storage_size)
-// are visible in the function signatures.
 #include "ffrt.h"
 
 #define private public

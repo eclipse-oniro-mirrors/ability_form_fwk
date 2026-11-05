@@ -18,7 +18,6 @@ group("fuzztest") {
   testonly = true
 
   deps = [
-    "accountcommoneventmanager_fuzzer:fuzztest",
     "accountcommoneventobserver_fuzzer:fuzztest",
     "bundleforminfo_fuzzer:fuzztest",
     "facrconnectionFourth_fuzzer:fuzztest",
