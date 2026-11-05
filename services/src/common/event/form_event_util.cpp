@@ -24,6 +24,7 @@
 #include "data_center/form_cache_mgr.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_data_proxy_mgr.h"
+#include "form_observer/account_common_event_manager.h"
 #include "data_center/database/form_db_cache.h"
 #include "data_center/form_info/form_info_mgr.h"
 #include "form_mgr/form_mgr_adapter_facade.h"
@@ -776,7 +777,17 @@ void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formR
     oldFormUpgradeInfo.enableBlurBackground = formInfo.enableBlurBackground;
     formRecord.formUpgradeInfo = oldFormUpgradeInfo;
     HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
+    bool wasAccountForm = FormDataMgr::IsAccountConditionForm(formRecord);
+    formRecord.conditionUpdate = formInfo.conditionUpdate;
+    bool isAccountForm = FormDataMgr::IsAccountConditionForm(formRecord);
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
+    if (!wasAccountForm && isAccountForm) {
+        // New account-condition form appears after upgrade, ensure observer registered.
+        AccountCommonEventManager::GetInstance().RegisterAccountCallback();
+    } else if (wasAccountForm && !isAccountForm && !FormDataMgr::GetInstance().HasAccountConditionForm()) {
+        // Last account-condition form drops condition after upgrade, unregister observer.
+        AccountCommonEventManager::GetInstance().UnregisterAccountCallback();
+    }
 }
 
 void FormEventUtil::UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord)

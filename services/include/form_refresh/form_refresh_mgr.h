@@ -34,6 +34,8 @@ enum FormRefreshType {
     TYPE_UNCONTROL,
     TYPE_APP_UPGRADE,
     TYPE_PROVIDER,
+    // skip 9 for ReminderAgent
+    TYPE_ACCOUNT = 10,
 };
 
 /**

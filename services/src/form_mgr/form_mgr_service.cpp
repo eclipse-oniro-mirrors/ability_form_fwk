@@ -98,7 +98,6 @@ constexpr int MILLISECOND_WIDTH = 3;
 constexpr char MILLISECOND_FILLCHAR = '0';
 const int32_t API_TIME_OUT = 5;
 const int32_t API_TIME_OUT_30S = 30;
-const int32_t CONDITION_NETWORK = 1;
 const long FORM_DISCON_NETWORK_CHECK_TIME = 600000; // ms
 constexpr int32_t FORM_VISIBLE_RECT_QUERY_TIMEOUT_SEC = 5;
 constexpr const char *APP_PROVISION_TYPE_DEBUG = "debug";

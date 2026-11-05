@@ -1,0 +1,127 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "formaccountrefreshimpl_fuzzer.h"
+
+#include <chrono>
+#include <cstdlib>
+#include <cstddef>
+#include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
+#include <thread>
+
+#include "ffrt.h"
+
+#define private public
+#define protected public
+#include "form_refresh/refresh_impl/form_account_refresh_impl.h"
+#include "form_refresh/strategy/refresh_config.h"
+#undef private
+#undef protected
+
+#include "form_constants.h"
+
+extern "C" void* ffrt_alloc_auto_managed_function_storage_base(ffrt_function_kind_t kind)
+{
+    return malloc(ffrt_auto_managed_function_storage_size);
+}
+
+extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
+    ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
+{
+    if (f != nullptr) {
+        if (f->destroy != nullptr) {
+            f->destroy(f);
+        }
+        free(f);
+    }
+    return nullptr;
+}
+
+extern "C" int WatchParameter(const char *, void (*)(const char *, const char *, void *), void *)
+{
+    return 0;
+}
+
+using namespace OHOS::AppExecFwk;
+
+namespace OHOS {
+
+constexpr int32_t MAX_LENGTH = 256;
+constexpr int32_t MAX_NUM = 10000;
+constexpr int32_t MIN_NUM = 0;
+constexpr int32_t CONDITION_ACCOUNT = 3;
+constexpr int32_t REFRESHTYPE_ACCOUNT_CHANGED = 6;
+
+RefreshData GenerateFuzzedRefreshData(FuzzedDataProvider *fdp)
+{
+    RefreshData data;
+    if (fdp == nullptr) {
+        return data;
+    }
+    data.formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
+    data.nextTime = fdp->ConsumeIntegral<int64_t>();
+    data.callingUid = fdp->ConsumeIntegral<int32_t>();
+    data.record.formId = data.formId;
+    data.record.bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    data.record.moduleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    data.record.abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    data.record.formName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+    data.record.isEnableUpdate = fdp->ConsumeBool();
+    data.record.isSystemApp = fdp->ConsumeBool();
+    data.record.isVisible = fdp->ConsumeBool();
+    data.record.updateDuration = fdp->ConsumeIntegral<int64_t>();
+    data.record.userId = fdp->ConsumeIntegralInRange<int32_t>(MIN_NUM, MAX_NUM);
+    if (fdp->ConsumeBool()) {
+        data.record.conditionUpdate = { CONDITION_ACCOUNT };
+    }
+    data.formTimer.formId = data.formId;
+    data.formTimer.refreshTime = fdp->ConsumeIntegral<int64_t>();
+    data.formTimer.userId = fdp->ConsumeIntegralInRange<int32_t>(MIN_NUM, MAX_NUM);
+    data.callerToken = nullptr;
+    data.want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, REFRESHTYPE_ACCOUNT_CHANGED);
+    return data;
+}
+
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
+{
+    if (fdp == nullptr) {
+        return true;
+    }
+
+    FormAccountRefreshImpl formAccountRefresh;
+    RefreshData data = GenerateFuzzedRefreshData(fdp);
+
+    // Test public method (template method entry)
+    formAccountRefresh.RefreshFormRequest(data);
+
+    // Test protected override DoRefresh (system app branch sets refresh type param)
+    formAccountRefresh.DoRefresh(data);
+
+    return true;
+}
+}
+
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    return 0;
+}
+
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+{
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(&fdp);
+    return 0;
+}

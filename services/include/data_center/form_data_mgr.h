@@ -226,6 +226,15 @@ public:
      */
     bool GetFormRecordByCondition(int32_t conditionType, std::vector<FormRecord> &formInfos) const;
     /**
+     * @brief Get form records by condition type and userId.
+     * @param conditionType refresh type.
+     * @param userId User ID for filtering.
+     * @param formInfos The form record list.
+     * @return Returns true if found, false otherwise.
+     */
+    bool GetFormRecordByCondition(int32_t conditionType, int32_t userId,
+        std::vector<FormRecord> &formInfos) const;
+    /**
      * @brief Check if a form record has network condition in its conditionUpdate.
      * @param record The form record to check.
      * @return Returns true if the form needs network monitoring.
@@ -236,6 +245,18 @@ public:
      * @return Returns true if at least one form needs network monitoring.
      */
     bool HasNetworkConditionForm() const;
+    /**
+     * @brief Check if a form record has account condition in its conditionUpdate.
+     *        Also checks isSystemApp for double-insurance.
+     * @param record The form record to check.
+     * @return Returns true if the form needs account monitoring and is system app.
+     */
+    static bool IsAccountConditionForm(const FormRecord &record);
+    /**
+     * @brief Check if any form record has account condition.
+     * @return Returns true if at least one form needs account monitoring.
+     */
+    bool HasAccountConditionForm() const;
     /**
      * @brief Get temporary form record.
      * @param formTempRecords The temp form record.

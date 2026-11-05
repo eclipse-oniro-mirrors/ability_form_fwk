@@ -67,7 +67,12 @@ using namespace FormAdapterConstants;
 
 namespace {
 constexpr int32_t ESTIMATED_REPORT_STR_SIZE_PER_FORM = 50;
-}
+constexpr int32_t UNDEFINED_USER_ID = -1;
+const static std::unordered_map<int32_t, int32_t> CONDITION_TYPE_MAP = {
+    {Constants::CONDITION_NETWORK, FormRefreshType::TYPE_NETWORK},
+    {Constants::CONDITION_ACCOUNT, FormRefreshType::TYPE_ACCOUNT},
+};
+}  // namespace
 
 FormDataAdapter::FormDataAdapter()
 {
@@ -716,9 +721,24 @@ int32_t FormDataAdapter::OnNotifyRefreshForm(const int64_t &formId)
 
 ErrCode FormDataAdapter::UpdateFormByCondition(int32_t type)
 {
-    HILOG_INFO("UpdateFormByCondition type:%{public}d", type);
+    return UpdateFormByCondition(type, UNDEFINED_USER_ID);
+}
+
+ErrCode FormDataAdapter::UpdateFormByCondition(int32_t type, int32_t userId)
+{
+    HILOG_INFO("UpdateFormByCondition type:%{public}d userId:%{public}d", type, userId);
+    if (userId < 0 && type == Constants::CONDITION_ACCOUNT) {
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    auto mapIt = CONDITION_TYPE_MAP.find(type);
+    if (mapIt == CONDITION_TYPE_MAP.end()) {
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    const auto refreshType = mapIt->second;
     std::vector<FormRecord> formInfos;
-    if (!FormDataMgr::GetInstance().GetFormRecordByCondition(type, formInfos)) {
+    bool found = (userId < 0) ? FormDataMgr::GetInstance().GetFormRecordByCondition(type, formInfos)
+        : FormDataMgr::GetInstance().GetFormRecordByCondition(type, userId, formInfos);
+    if (!found) {
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
@@ -726,21 +746,21 @@ ErrCode FormDataAdapter::UpdateFormByCondition(int32_t type)
     reportStr.reserve(formInfos.size() * ESTIMATED_REPORT_STR_SIZE_PER_FORM);
 
     std::vector<RefreshData> batch;
-    for (const FormRecord& formRecord : formInfos) {
+    for (const FormRecord &formRecord : formInfos) {
         RefreshData data;
         data.formId = formRecord.formId;
         data.record = formRecord;
         batch.push_back(data);
         reportStr.append(formRecord.bundleName).append("_").append(formRecord.formName);
     }
-    FormRefreshMgr::GetInstance().BatchRequestRefresh(TYPE_NETWORK, StaggerStrategyType::VISIBLE_DELAY, batch);
-    std::string subStr = reportStr.substr(0, std::min((int)reportStr.size(), 30));
-    HILOG_INFO("UpdateFormByCondition reportStr:%{public}s", subStr.c_str());
+    FormRefreshMgr::GetInstance().BatchRequestRefresh(refreshType, StaggerStrategyType::VISIBLE_DELAY, batch);
+    std::string subStr = reportStr.substr(0, std::min(static_cast<int>(reportStr.size()), 30));
+    HILOG_DEBUG("UpdateFormByCondition reportStr:%{public}s", subStr.c_str());
     NewFormEventInfo eventInfo;
     eventInfo.conditionType = static_cast<int32_t>(type);
     eventInfo.bundleAndFormName = reportStr;
-    FormEventReport::SendConditonUpdateFormEvent(FormEventName::CONDITION_UPDATE_FORM,
-        HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendConditonUpdateFormEvent(
+        FormEventName::CONDITION_UPDATE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return ERR_OK;
 }
