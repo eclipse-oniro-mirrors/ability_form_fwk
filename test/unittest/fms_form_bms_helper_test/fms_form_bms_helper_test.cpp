@@ -1351,5 +1351,27 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_GetUidByBundleName_002, Test
     EXPECT_EQ(formBmsHelper.GetUidByBundleName("com.test", 1, 1), 600);
     GTEST_LOG_(INFO) << "FmsFormBmsHelperTest FmsFormBmsHelperTest_GetUidByBundleName_002 end";
 }
+
+/**
+ * @tc.name: FormBmsHelper_SetAndClearBundleManager_001
+ * @tc.desc: SetBundleManager caches the BMS proxy, ClearBundleManager clears it after BMS death
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FormBmsHelper_SetAndClearBundleManager_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormBmsHelper_SetAndClearBundleManager_001 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_NE(formBmsHelper.iBundleMgr_, nullptr);
+
+    formBmsHelper.ClearBundleManager();
+    EXPECT_EQ(formBmsHelper.iBundleMgr_, nullptr);
+    EXPECT_EQ(formBmsHelper.bundleMgrDeath_, nullptr);
+    EXPECT_EQ(formBmsHelper.bundleInstallerProxy_, nullptr);
+    EXPECT_EQ(formBmsHelper.hasRegisterBundleEvent_, false);
+    GTEST_LOG_(INFO) << "FormBmsHelper_SetAndClearBundleManager_001 end";
+}
 } // namespace AppExecFwk
 } // namespace OHOS

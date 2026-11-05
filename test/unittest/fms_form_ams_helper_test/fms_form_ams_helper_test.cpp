@@ -217,5 +217,24 @@ HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_UnRegisterConfigurationObserver_002
 
     GTEST_LOG_(INFO) << "FormAmsHelper_UnRegisterConfigurationObserver_002 end";
 }
+
+/**
+ * @tc.name: FormAmsHelper_SetAndClearAbilityManager_001
+ * @tc.desc: SetAbilityManager caches the AMS proxy, ClearAbilityManager clears it after AMS death
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_SetAndClearAbilityManager_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormAmsHelper_SetAndClearAbilityManager_001 start";
+    FormAmsHelper formAmsHelper;
+    sptr<AAFwk::IAbilityManager> mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
+    formAmsHelper.SetAbilityManager(mockAmsMgr);
+    EXPECT_NE(formAmsHelper.abilityManager_, nullptr);
+
+    formAmsHelper.ClearAbilityManager();
+    EXPECT_EQ(formAmsHelper.abilityManager_, nullptr);
+    EXPECT_EQ(formAmsHelper.abilityManagerDeath_, nullptr);
+    GTEST_LOG_(INFO) << "FormAmsHelper_SetAndClearAbilityManager_001 end";
+}
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -38,6 +38,7 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &object) override
     {
         (void)object;
+        HILOG_ERROR("AbilityManager died");
         FormAmsHelper::GetInstance().ClearAbilityManager();
     }
 };
@@ -85,14 +86,21 @@ sptr<AAFwk::IAbilityManager> FormAmsHelper::GetAbilityManager()
         return nullptr;
     }
     std::lock_guard<std::mutex> lock(abilityManagerMutex_);
-    if (abilityManager_ == nullptr) {
-        abilityManager_ = abilityManager;
-        if (abilityManagerDeath_ == nullptr) {
-            abilityManagerDeath_ = new (std::nothrow) AbilityManagerDeathRecipient();
-            if (abilityManagerDeath_ != nullptr) {
-                abilityManager_->AsObject()->AddDeathRecipient(abilityManagerDeath_);
-            }
-        }
+    if (abilityManager_ != nullptr) {
+        return abilityManager_;
+    }
+    abilityManager_ = abilityManager;
+    abilityManagerDeath_ = new (std::nothrow) AbilityManagerDeathRecipient();
+    if (abilityManagerDeath_ == nullptr) {
+        HILOG_ERROR("Create AbilityManagerDeathRecipient failed");
+        abilityManager_ = nullptr;
+        return nullptr;
+    }
+    if (!abilityManager_->AsObject()->AddDeathRecipient(abilityManagerDeath_)) {
+        HILOG_ERROR("AddDeathRecipient failed");
+        abilityManager_ = nullptr;
+        abilityManagerDeath_ = nullptr;
+        return nullptr;
     }
     return abilityManager_;
 }

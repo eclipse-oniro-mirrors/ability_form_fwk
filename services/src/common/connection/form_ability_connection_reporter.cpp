@@ -135,14 +135,21 @@ sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnectionReporter::GetAppMgr()
         return nullptr;
     }
     std::lock_guard<std::mutex> lock(appManagerMutex_);
-    if (appManager_ == nullptr) {
-        appManager_ = appMgr;
-        if (appMgrDeath_ == nullptr) {
-            appMgrDeath_ = new (std::nothrow) AppMgrDeathRecipient();
-            if (appMgrDeath_ != nullptr) {
-                appManager_->AsObject()->AddDeathRecipient(appMgrDeath_);
-            }
-        }
+    if (appManager_ != nullptr) {
+        return appManager_;
+    }
+    appManager_ = appMgr;
+    appMgrDeath_ = new (std::nothrow) AppMgrDeathRecipient();
+    if (appMgrDeath_ == nullptr) {
+        HILOG_ERROR("Create AppMgrDeathRecipient failed");
+        appManager_ = nullptr;
+        return nullptr;
+    }
+    if (!appManager_->AsObject()->AddDeathRecipient(appMgrDeath_)) {
+        HILOG_ERROR("AddDeathRecipient failed");
+        appManager_ = nullptr;
+        appMgrDeath_ = nullptr;
+        return nullptr;
     }
     return appManager_;
 }

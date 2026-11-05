@@ -32,6 +32,7 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &object) override
     {
         (void)object;
+        HILOG_ERROR("BundleMgr died");
         FormBmsHelper::GetInstance().ClearBundleManager();
     }
 };
@@ -60,10 +61,13 @@ bool FormBmsHelper::IsBundleMgrValid()
 sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
 {
     HILOG_DEBUG("call");
-    std::lock_guard<std::mutex> lock(ibundleMutex_);
-    if (iBundleMgr_ != nullptr) {
-        return iBundleMgr_;
+    {
+        std::lock_guard<std::mutex> lock(ibundleMutex_);
+        if (iBundleMgr_ != nullptr) {
+            return iBundleMgr_;
+        }
     }
+    // Query samgr without holding the lock to avoid blocking concurrent callers.
     sptr<ISystemAbilityManager> systemAbilityManager =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityManager == nullptr) {
@@ -75,16 +79,27 @@ sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
         HILOG_ERROR("fail get bundle manager service");
         return nullptr;
     }
-    iBundleMgr_ = iface_cast<IBundleMgr>(remoteObject);
-    if (iBundleMgr_ == nullptr) {
+    sptr<IBundleMgr> iBundleMgr = iface_cast<IBundleMgr>(remoteObject);
+    if (iBundleMgr == nullptr) {
         HILOG_ERROR("fail get bundle manager service");
         return nullptr;
     }
+    std::lock_guard<std::mutex> lock(ibundleMutex_);
+    if (iBundleMgr_ != nullptr) {
+        return iBundleMgr_;
+    }
+    iBundleMgr_ = iBundleMgr;
+    bundleMgrDeath_ = new (std::nothrow) BundleMgrDeathRecipient();
     if (bundleMgrDeath_ == nullptr) {
-        bundleMgrDeath_ = new (std::nothrow) BundleMgrDeathRecipient();
-        if (bundleMgrDeath_ != nullptr) {
-            iBundleMgr_->AsObject()->AddDeathRecipient(bundleMgrDeath_);
-        }
+        HILOG_ERROR("Create BundleMgrDeathRecipient failed");
+        iBundleMgr_ = nullptr;
+        return nullptr;
+    }
+    if (!iBundleMgr_->AsObject()->AddDeathRecipient(bundleMgrDeath_)) {
+        HILOG_ERROR("AddDeathRecipient failed");
+        iBundleMgr_ = nullptr;
+        bundleMgrDeath_ = nullptr;
+        return nullptr;
     }
     return iBundleMgr_;
 }
