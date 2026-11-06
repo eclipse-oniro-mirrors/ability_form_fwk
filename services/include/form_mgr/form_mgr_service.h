@@ -1155,6 +1155,10 @@ private:
     std::shared_ptr<FormEventHandler> handler_ = nullptr;
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
     std::shared_ptr<FormSysEventReceiver> formSysEventReceiver_ = nullptr;
+    // Guards subscription state below; retry may run on SA ready callback threads.
+    mutable std::mutex sysEventSubscribeMutex_;
+    bool isCesSubscribed_ = false;
+    bool isOsAccountSubscribed_ = false;
     uint32_t NetSceneCallbackId_ = 0;
     std::set<int64_t> requestPublishFormWithSnapshotSet_;
     mutable std::mutex instanceMutex_;
@@ -1162,7 +1166,10 @@ private:
 #ifdef MEM_MGR_ENABLE
     std::shared_ptr<MemStatusListener> memStatusListener_ = nullptr;
 #endif
-    void SubscribeSysEventReceiver();
+    // Subscribe CES system events and OsAccount state; idempotent, safe to retry on SA ready callback.
+    void SubscribeSystemEvents();
+    void UnsubscribeSystemEvents();
+    void RegisterSystemAbilityListener();
 
     /**
      * @brief report add form event

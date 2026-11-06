@@ -160,11 +160,8 @@ FormMgrService::FormMgrService()
 FormMgrService::~FormMgrService()
 {
     HILOG_INFO("call");
-    if (formSysEventReceiver_ != nullptr) {
-        EventFwk::CommonEventManager::UnSubscribeCommonEvent(formSysEventReceiver_);
-        formSysEventReceiver_ = nullptr;
-        FormBmsHelper::GetInstance().UnregisterBundleEventCallback();
-    }
+    // Safety net: OnStop normally tears down subscriptions first; guards make this idempotent.
+    UnsubscribeSystemEvents();
 #ifdef MEM_MGR_ENABLE
     if (memStatusListener_ != nullptr) {
         Memory::MemMgrClient::GetInstance().UnsubscribeAppState(*memStatusListener_);
@@ -849,6 +846,28 @@ int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr
     return FormMgrAdapterFacade::GetInstance().BackgroundEvent(formId, want, callerToken);
 }
 
+void FormMgrService::RegisterSystemAbilityListener()
+{
+    auto addListener = [this](int32_t systemAbilityId) {
+        if (!AddSystemAbilityListener(systemAbilityId)) {
+            HILOG_WARN("AddSystemAbilityListener failed, saId:%{public}d", systemAbilityId);
+        }
+    };
+    // listener for FormDataProxyMgr
+    addListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+    // CES/OsAccount may start later than subfoundation at boot, retry subscription on their ready callback.
+    addListener(COMMON_EVENT_SERVICE_ID);
+    addListener(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN);
+
+#ifdef MEM_MGR_ENABLE
+    addListener(MEMORY_MANAGER_SA_ID);
+#endif // MEM_MGR_ENABLE
+
+#ifdef RES_SCHEDULE_ENABLE
+    addListener(RES_SCHED_SYS_ABILITY_ID);
+#endif // RES_SCHEDULE_ENABLE
+}
+
 /**
  * @brief Start event for the form manager service.
  */
@@ -873,16 +892,7 @@ void FormMgrService::OnStart()
     }
 
     state_ = ServiceRunningState::STATE_RUNNING;
-    // listener for FormDataProxyMgr
-    AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
-
-#ifdef MEM_MGR_ENABLE
-    AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
-#endif // MEM_MGR_ENABLE
-
-#ifdef RES_SCHEDULE_ENABLE
-    AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
-#endif // RES_SCHEDULE_ENABLE
+    RegisterSystemAbilityListener();
     onStartEndTime_ = GetCurrentDateTime();
     HILOG_INFO("success,time:%{public}s,onKvDataServiceAddTime:%{public}s",
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
@@ -898,10 +908,7 @@ void FormMgrService::OnStop()
 
     state_ = ServiceRunningState::STATE_NOT_START;
 
-    if (osAccountSubscriber_ != nullptr) {
-        AccountSA::OsAccountManager::UnsubscribeOsAccount(osAccountSubscriber_);
-        osAccountSubscriber_ = nullptr;
-    }
+    UnsubscribeSystemEvents();
 
     DelayedSingleton<FormShareMgr>::GetInstance()->UnregisterObserver();
 
@@ -930,26 +937,64 @@ ErrCode FormMgrService::ReadFormConfigXML()
 }
 
 
-void FormMgrService::SubscribeSysEventReceiver()
+void FormMgrService::SubscribeSystemEvents()
 {
-    if (formSysEventReceiver_ == nullptr) {
-        EventFwk::MatchingSkills matchingSkills;
-        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_ABILITY_UPDATED);
-        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED);
-        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED);
-        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED);
-        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED);
-        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED);
-        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
-        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
-        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED);
-        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_STARTED);
-        // init TimerReceiver
-        EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
-        subscribeInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-        formSysEventReceiver_ = std::make_shared<FormSysEventReceiver>(subscribeInfo);
-        EventFwk::CommonEventManager::SubscribeCommonEvent(formSysEventReceiver_);
+    std::lock_guard<std::mutex> lock(sysEventSubscribeMutex_);
+    if (!isCesSubscribed_) {
+        if (formSysEventReceiver_ == nullptr) {
+            EventFwk::MatchingSkills matchingSkills;
+            matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_ABILITY_UPDATED);
+            matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED);
+            matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED);
+            matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED);
+            matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED);
+            matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED);
+            matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
+            matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+            matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED);
+            matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_STARTED);
+            // init TimerReceiver
+            EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
+            subscribeInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+            formSysEventReceiver_ = std::make_shared<FormSysEventReceiver>(subscribeInfo);
+        }
+        if (EventFwk::CommonEventManager::SubscribeCommonEvent(formSysEventReceiver_)) {
+            isCesSubscribed_ = true;
+        } else {
+            HILOG_ERROR("SubscribeCommonEvent failed, retry on common event service ready");
+        }
     }
+
+    if (!isOsAccountSubscribed_) {
+        if (osAccountSubscriber_ == nullptr) {
+            AccountSA::OsAccountSubscribeInfo osAccountSubscribeInfo(
+                std::set<AccountSA::OsAccountState>{ AccountSA::OsAccountState::CREATED });
+            osAccountSubscriber_ = std::make_shared<FormOsAccountSubscriber>(osAccountSubscribeInfo);
+        }
+        ErrCode subscribeRet = AccountSA::OsAccountManager::SubscribeOsAccount(osAccountSubscriber_);
+        if (subscribeRet == ERR_OK) {
+            isOsAccountSubscribed_ = true;
+        } else {
+            HILOG_ERROR("SubscribeOsAccount failed, err:%{public}d, retry on account service ready", subscribeRet);
+        }
+    }
+}
+
+void FormMgrService::UnsubscribeSystemEvents()
+{
+    std::lock_guard<std::mutex> lock(sysEventSubscribeMutex_);
+    if (formSysEventReceiver_ != nullptr) {
+        EventFwk::CommonEventManager::UnSubscribeCommonEvent(formSysEventReceiver_);
+        formSysEventReceiver_ = nullptr;
+        FormBmsHelper::GetInstance().UnregisterBundleEventCallback();
+    }
+    if (osAccountSubscriber_ != nullptr) {
+        AccountSA::OsAccountManager::UnsubscribeOsAccount(osAccountSubscriber_);
+        osAccountSubscriber_ = nullptr;
+    }
+    // Reset so a later OnStart re-subscribes instead of trusting stale process-lifetime state.
+    isCesSubscribed_ = false;
+    isOsAccountSubscribed_ = false;
 }
 
 /**
@@ -980,16 +1025,8 @@ ErrCode FormMgrService::Init()
     onStartPublishTime_ = GetCurrentDateTime();
     HILOG_INFO("FMS onStart publish done, time:%{public}s", onStartPublishTime_.c_str());
 
-    SubscribeSysEventReceiver();
+    SubscribeSystemEvents();
 
-    // Direct CREATED subscription triggers reload earlier than the CES broadcast.
-    AccountSA::OsAccountSubscribeInfo subscribeInfo(
-        std::set<AccountSA::OsAccountState>{ AccountSA::OsAccountState::CREATED });
-    osAccountSubscriber_ = std::make_shared<FormOsAccountSubscriber>(subscribeInfo);
-    ErrCode subscribeRet = AccountSA::OsAccountManager::SubscribeOsAccount(osAccountSubscriber_);
-    if (subscribeRet != ERR_OK) {
-        HILOG_ERROR("SubscribeOsAccount failed, fallback to broadcast only, err:%{public}d", subscribeRet);
-    }
 #ifdef MEM_MGR_ENABLE
     memStatusListener_ = std::make_shared<MemStatusListener>();
     Memory::MemMgrClient::GetInstance().SubscribeAppState(*memStatusListener_);
@@ -1632,6 +1669,12 @@ int32_t FormMgrService::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
 
 void FormMgrService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
+    if (systemAbilityId == COMMON_EVENT_SERVICE_ID ||
+        systemAbilityId == SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
+        HILOG_INFO("SA:%{public}d ready, retry system event subscription", systemAbilityId);
+        SubscribeSystemEvents();
+        return;
+    }
 #ifdef RES_SCHEDULE_ENABLE
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         auto formSystemloadLevelCb = [weakThis = weak_from_this()](int32_t level) {
