@@ -60,9 +60,9 @@ export namespace formProvider {
 
   const ERR_OK: int = 0;
   const INVALID_PARAM_ERROR_CODE: int = 401;
-  const INVALID_PARAM_MESSAGE_ETS: string = "Parameter error. Possible causes: 1.Mandatory parameters are left unspecified;"
-    + " 2.Incorrect parameter types;"
-    + " 3.Parameter verification failed.";
+  const INVALID_PARAM_MESSAGE_ETS: string = "Parameter error. Possible causes: 1. Mandatory parameters are left unspecified;"
+    + " 2. Incorrect parameter types;"
+    + " 3. Parameter verification failed.";
 
   function getFormInfoInstance(): formInfo.FormInfo {
     let emptyInstance: formInfo.FormInfo = {

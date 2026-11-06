@@ -113,9 +113,9 @@ export default namespace formHost {
 
   const ERR_OK: int = 0;
   const INVALID_PARAM_ERROR_CODE: int = 401;
-  const INVALID_PARAM_MESSAGE_ETS: string = "Parameter error. Possible causes: 1.Mandatory parameters are left unspecified;"
-    + " 2.Incorrect parameter types;"
-    + " 3.Parameter verification failed.";
+  const INVALID_PARAM_MESSAGE_ETS: string = "Parameter error. Possible causes: 1. Mandatory parameters are left unspecified;"
+    + " 2. Incorrect parameter types;"
+    + " 3. Parameter verification failed.";
   const INVALID_CALLBACK_INDEX: int = -1;
 
   export function acquireFormState(want: Want, callback: AsyncCallback<formInfo.FormStateInfo>): void {
