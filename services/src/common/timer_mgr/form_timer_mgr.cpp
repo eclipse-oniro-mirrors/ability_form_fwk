@@ -50,8 +50,6 @@ constexpr int REQUEST_DYNAMIC_CODE = 3;
 constexpr int SHIFT_BIT_LENGTH = 32;
 constexpr char FMS_TIME_SPEED[] = "fms.time_speed";
 constexpr char FMS_DUE_PARAM[] = "fms.due_param";
-// Specified custom timer event publisher uid, publisher must be foundation
-constexpr int32_t FOUNDATION_UID = 5523;
 constexpr int64_t TIMER_UPDATE_INTERVAL = 5 * 60 * 1000;
 constexpr int64_t TIMER_UPDATEAT_CREATE_BEHIND_TRIGGER = 10 * 1000;
 constexpr int64_t CHECK_INTERVAL = 6 * 60 * 60 * 1000;
@@ -1573,7 +1571,7 @@ void FormTimerMgr::Init()
     customEventMatchingSkills.AddEvent(Constants::ACTION_UPDATEATTIMER);
     EventFwk::CommonEventSubscribeInfo customTimerEventSubInfo(customEventMatchingSkills);
     customTimerEventSubInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    customTimerEventSubInfo.SetPublisherUid(FOUNDATION_UID);
+    customTimerEventSubInfo.SetPublisherUid(FormConstants::SUBFOUNDATION_UID);
     customTimerEventReceiver_ = std::make_shared<TimerReceiver>(customTimerEventSubInfo);
     EventFwk::CommonEventManager::SubscribeCommonEvent(customTimerEventReceiver_);
 

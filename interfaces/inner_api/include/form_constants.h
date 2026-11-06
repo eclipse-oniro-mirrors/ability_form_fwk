@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace FormConstants {
-    constexpr int32_t FOUNDATION_UID = 5523;
+    constexpr int32_t SUBFOUNDATION_UID = 6061;
 }
 namespace Constants {
     constexpr const char* PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS = "ohos.permission.INTERACT_ACROSS_LOCAL_ACCOUNTS";

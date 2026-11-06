@@ -30,6 +30,15 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr const char *FORM_CONNECTION_PROCESS_NAME_SUFFIX = ":form";
+
+class AppMgrDeathRecipient : public IRemoteObject::DeathRecipient {
+public:
+    void OnRemoteDied(const wptr<IRemoteObject> &object) override
+    {
+        (void)object;
+        FormAbilityConnectionReporter::GetInstance().ClearAppMgr();
+    }
+};
 }
 
 FormAbilityConnectionReporter::FormAbilityConnectionReporter()
@@ -40,6 +49,10 @@ FormAbilityConnectionReporter::FormAbilityConnectionReporter()
 FormAbilityConnectionReporter::~FormAbilityConnectionReporter()
 {
     HILOG_INFO("Call");
+    std::lock_guard<std::mutex> lock(appManagerMutex_);
+    if (appManager_ != nullptr && appMgrDeath_ != nullptr) {
+        appManager_->AsObject()->RemoveDeathRecipient(appMgrDeath_);
+    }
 }
 
 void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::string &bundleName, int32_t userId)
@@ -98,21 +111,55 @@ void FormAbilityConnectionReporter::ReportFormAbilityDisconnection(const std::st
 
 sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnectionReporter::GetAppMgr()
 {
-    if (appManager_ == nullptr) {
-        sptr<ISystemAbilityManager> systemMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (systemMgr == nullptr) {
-            HILOG_ERROR("connect systemAbilityManager failed");
-            return nullptr;
+    {
+        std::lock_guard<std::mutex> lock(appManagerMutex_);
+        if (appManager_ != nullptr) {
+            return appManager_;
         }
-        sptr<IRemoteObject> remoteObject = systemMgr->GetSystemAbility(APP_MGR_SERVICE_ID);
-        if (remoteObject == nullptr) {
-            HILOG_ERROR("connect appMgrService failed");
-            return nullptr;
-        }
-        HILOG_INFO("ConnectAMS succeed");
-        appManager_ = iface_cast<OHOS::AppExecFwk::IAppMgr>(remoteObject);
+    }
+    // Query samgr without holding the lock to avoid blocking concurrent callers.
+    sptr<ISystemAbilityManager> systemMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemMgr == nullptr) {
+        HILOG_ERROR("connect systemAbilityManager failed");
+        return nullptr;
+    }
+    sptr<IRemoteObject> remoteObject = systemMgr->GetSystemAbility(APP_MGR_SERVICE_ID);
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("connect appMgrService failed");
+        return nullptr;
+    }
+    HILOG_INFO("ConnectAMS succeed");
+    sptr<OHOS::AppExecFwk::IAppMgr> appMgr = iface_cast<OHOS::AppExecFwk::IAppMgr>(remoteObject);
+    if (appMgr == nullptr) {
+        HILOG_ERROR("iface_cast AppMgr failed");
+        return nullptr;
+    }
+    std::lock_guard<std::mutex> lock(appManagerMutex_);
+    if (appManager_ != nullptr) {
+        return appManager_;
+    }
+    appManager_ = appMgr;
+    appMgrDeath_ = new (std::nothrow) AppMgrDeathRecipient();
+    if (appMgrDeath_ == nullptr) {
+        HILOG_ERROR("Create AppMgrDeathRecipient failed");
+        appManager_ = nullptr;
+        return nullptr;
+    }
+    if (!appManager_->AsObject()->AddDeathRecipient(appMgrDeath_)) {
+        HILOG_ERROR("AddDeathRecipient failed");
+        appManager_ = nullptr;
+        appMgrDeath_ = nullptr;
+        return nullptr;
     }
     return appManager_;
+}
+
+void FormAbilityConnectionReporter::ClearAppMgr()
+{
+    HILOG_INFO("Call");
+    std::lock_guard<std::mutex> lock(appManagerMutex_);
+    appManager_ = nullptr;
+    appMgrDeath_ = nullptr;
 }
 
 void FormAbilityConnectionReporter::AddFormAbilityConnectProcessInfo(const std::string& bundleName,

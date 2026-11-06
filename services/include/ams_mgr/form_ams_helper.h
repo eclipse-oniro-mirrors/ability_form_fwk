@@ -86,6 +86,10 @@ public:
      */
     void SetAbilityManager(const sptr<AAFwk::IAbilityManager> &abilityManager);
     /**
+     * @brief Clear the ability manager instance when AMS died.
+     */
+    void ClearAbilityManager();
+    /**
      * @brief StopExtensionAbility with want, send want to ability manager service.
      * @param want The want of the ability to start.
      * @return Returns ERR_OK on success, others on failure.
@@ -188,6 +192,7 @@ private:
 private:
     sptr<AAFwk::IAbilityManager> abilityManager_ = nullptr;
     std::mutex abilityManagerMutex_;
+    sptr<IRemoteObject::DeathRecipient> abilityManagerDeath_ = nullptr;
     std::unordered_map<int32_t, sptr<IConfigurationObserver>> configurationObservers_;
     std::mutex configObserverMutex_;
 };
