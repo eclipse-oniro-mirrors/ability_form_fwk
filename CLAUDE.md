@@ -301,6 +301,17 @@ HiviewDFX::XCollie::GetInstance().SetTimer(...)
 - **必须注释**：IPC 接口（含 TF_ASYNC/TF_SYNC 语义）、状态机转换、算法、持锁/跨线程等非显式副作用、魔法值/阈值/超时（注明取值依据）、绕过常规检查的特例
 - **禁止**：注释掉的死代码（交给 git）、用注释记变更历史、零信息注释（`i++; // i 自增`）；改代码必须同步改注释
 
+#### 10. 错误码规范
+
+通用错误码 401 的 API Message 默认为完整描述（见 `EXTERNAL_ERR_RELATED_MSG`），其他非默认的 401 Message 统一以 `"Parameter error. "` 开头。
+
+`FORM_ERROR_CODES` 中的 `detailMsg` 在通过 `QueryExternalErrorMessage` 返回时，若 `detailMsg` 非空则直接覆盖默认消息，因此 401 相关的 `detailMsg` 必须以 `"Parameter error. "` 开头。示例见 `interfaces/kits/native/src/form_errors.cpp`：
+
+```cpp
+ERR_APPEXECFWK_FORM_INVALID_FORM_ID,
+{ ERR_FORM_EXTERNAL_PARAM_INVALID, "Parameter error. The formId is invalid." }
+```
+
 ## 相关仓库
 
 - [interface_sdk-js](https://gitcode.com/openharmony/interface_sdk-js) - ArkTS API 接口

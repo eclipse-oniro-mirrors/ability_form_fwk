@@ -48,7 +48,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
         {
             ERR_FORM_EXTERNAL_NOT_SYSTEM_APP,
-            "The application is not a system application, check permission denied, need system permission."
+            ""
         }
     },
     {
@@ -62,13 +62,16 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         ERR_APPEXECFWK_FORM_INVALID_PARAM, { ERR_FORM_EXTERNAL_PARAM_INVALID, "" }
     },
     {
-        ERR_APPEXECFWK_FORM_INVALID_FORM_ID, { ERR_FORM_EXTERNAL_PARAM_INVALID, "The formId is invalid." }
+        ERR_APPEXECFWK_FORM_INVALID_FORM_ID,
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "Parameter error. The formId is invalid." }
     },
     {
-        ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR, { ERR_FORM_EXTERNAL_PARAM_INVALID, "formId must be a numeric string." }
+        ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR,
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "Parameter error. formId must be a numeric string." }
     },
     {
-        ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR, { ERR_FORM_EXTERNAL_PARAM_INVALID, "formIds must be a array." }
+        ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR,
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "Parameter error. formIds must be a array." }
     },
     {
         ERR_APPEXECFWK_FORM_RELEASE_FLG_ERR,
@@ -79,19 +82,23 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR, "refresh time must be a number." }
     },
     {
-        ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME, { ERR_FORM_EXTERNAL_PARAM_INVALID, "bundleName is not available." }
+        ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME,
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "Parameter error. bundleName is not available." }
     },
     {
-        ERR_APPEXECFWK_FORM_INVALID_MODULENAME, { ERR_FORM_EXTERNAL_PARAM_INVALID, "moduleName is not available." }
+        ERR_APPEXECFWK_FORM_INVALID_MODULENAME,
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "Parameter error. moduleName is not available." }
     },
     {
         ERR_APPEXECFWK_FORM_INVALID_PROVIDER_DATA, { ERR_FORM_EXTERNAL_PARAM_INVALID, "" }
     },
     {
-        ERR_APPEXECFWK_FORM_INVALID_REFRESH_TIME, { ERR_FORM_EXTERNAL_PARAM_INVALID, "refresh time is not available." }
+        ERR_APPEXECFWK_FORM_INVALID_REFRESH_TIME,
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "Parameter error. refresh time is not available." }
     },
     {
-        ERR_APPEXECFWK_FORM_FORM_ID_ARRAY_ERR, { ERR_FORM_EXTERNAL_PARAM_INVALID, "formId array is empty." }
+        ERR_APPEXECFWK_FORM_FORM_ID_ARRAY_ERR,
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "Parameter error. formId array is empty." }
     },
     {
         ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR, { ERR_FORM_EXTERNAL_SERVICE_CONNECTION_ERROR, "" }
@@ -137,14 +144,16 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
         { ERR_FORM_EXTERNAL_FORM_NUM_EXCEEDS_UPPER_BOUND, "exceed max temp forms in system" }
     },
     {
-        ERR_APPEXECFWK_FORM_NO_SUCH_MODULE, { ERR_FORM_EXTERNAL_PARAM_INVALID, "the module not exist in the bundle." }
+        ERR_APPEXECFWK_FORM_NO_SUCH_MODULE,
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "Parameter error. the module not exist in the bundle." }
     },
     {
-        ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY, { ERR_FORM_EXTERNAL_PARAM_INVALID, "the ability not exist in the module." }
+        ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY,
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "Parameter error. the ability not exist in the module." }
     },
     {
         ERR_APPEXECFWK_FORM_NO_SUCH_DIMENSION,
-        { ERR_FORM_EXTERNAL_PARAM_INVALID, "the dimension not exist in the form." }
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "Parameter error. the dimension not exist in the form." }
     },
     {
         ERR_APPEXECFWK_FORM_FA_NOT_INSTALLED,
@@ -263,7 +272,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
     },
     {
         ERR_APPEXECFWK_CALLING_NOT_UI_ABILITY,
-        { ERR_FORM_EXTERNAL_PARAM_INVALID, "The context is not ability context." }
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "Parameter error. The context is not ability context." }
     },
     {
         ERR_APPEXECFWK_LIVE_FORM_IS_ACTIVING,
@@ -361,7 +370,7 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
     },
     {
         ERR_APPEXECFWK_FORM_CD_INVALID_PARAM,
-        { ERR_FORM_EXTERNAL_PARAM_INVALID, "Invalid cross-device parameter." }
+        { ERR_FORM_EXTERNAL_PARAM_INVALID, "Parameter error. Invalid cross-device parameter." }
     },
     {
         ERR_APPEXECFWK_FORM_CD_PEER_SERVICE_UNAVAILABLE,
@@ -385,16 +394,17 @@ static const std::unordered_map<int32_t, FormErrInfo> FORM_ERROR_CODES = {
 static const std::unordered_map<int32_t, std::string> EXTERNAL_ERR_RELATED_MSG = {
     { ERR_OK,                                         "success" },
     { ERR_FORM_EXTERNAL_PERMISSION_DENIED,            "Permissions denied." },
-    { ERR_FORM_EXTERNAL_PARAM_INVALID,                "Parameter error. Possible causes: 1.Mandatory parameters are "
-        "left unspecified; 2.Incorrect parameter types; 3.Parameter verification failed." },
-    { ERR_FORM_EXTERNAL_SYSTEMCAP_ERROR,              "Capability not supported. Failed to call ${functionName} due "
-        "to limited device capabilities." },
+    { ERR_FORM_EXTERNAL_PARAM_INVALID,                "Parameter error. Possible causes: 1. Mandatory parameters are "
+        "left unspecified; 2. Incorrect parameter types; 3. Parameter verification failed." },
+    { ERR_FORM_EXTERNAL_SYSTEMCAP_ERROR,              "Capability not supported because due to "
+        "limited device capabilities." },
     { ERR_FORM_EXTERNAL_KERNEL_ERROR,                 "A generic kernel error occurred." },
     { ERR_FORM_EXTERNAL_KERNEL_MALLOC_ERROR,          "Failed to alloc." },
     { ERR_FORM_EXTERNAL_IPC_ERROR,                    "IPC connection error." },
     { ERR_FORM_EXTERNAL_SERVICE_CONNECTION_ERROR,     "Service connection error." },
     { ERR_FORM_EXTERNAL_GET_INFO_FAILED,              "Failed to obtain the configuration information." },
-    { ERR_FORM_EXTERNAL_NOT_SYSTEM_APP,               "The application is not a system application." },
+    { ERR_FORM_EXTERNAL_NOT_SYSTEM_APP,               "Permission verification failed. A non-system "
+        "application calls a system API." },
     { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR,             "An internal functional error occurred." },
     { ERR_FORM_EXTERNAL_FORM_NUM_EXCEEDS_UPPER_BOUND, "The number of forms exceeds the maximum allowed." },
     { ERR_FORM_EXTERNAL_FORM_ID_NOT_EXIST,            "The ID of the form to be operated does not exist" },

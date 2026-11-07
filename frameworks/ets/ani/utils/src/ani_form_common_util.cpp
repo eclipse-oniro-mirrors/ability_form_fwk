@@ -1301,7 +1301,7 @@ ani_object NewRecordClass(ani_env *env)
     ani_status status = env->FindClass(CLASSNAME_RECORD, &recordCls);
     if (status != ANI_OK) {
         HILOG_ERROR("FindClass status = %{public}d", status);
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return nullptr;
     }
 
@@ -1309,14 +1309,14 @@ ani_object NewRecordClass(ani_env *env)
     status = env->Class_FindMethod(recordCls, "<ctor>", nullptr, &ctor);
     if (status != ANI_OK) {
         HILOG_ERROR("Class_FindMethod status = %{public}d", status);
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return nullptr;
     }
 
     status = env->Object_New(recordCls, ctor, &recordObj);
     if (status != ANI_OK) {
         HILOG_ERROR("Object_New status = %{public}d", status);
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return nullptr;
     }
     HILOG_INFO("End");
@@ -1335,7 +1335,7 @@ ani_status GetEnumValueInt(ani_env *env, ani_object obj, ani_int &enumValue)
         &enumIndex);
     if (enumIndexStatus != ANI_OK) {
         HILOG_ERROR("EnumItem_GetIndex failed");
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return ANI_ERROR;
     }
 
@@ -1343,7 +1343,7 @@ ani_status GetEnumValueInt(ani_env *env, ani_object obj, ani_int &enumValue)
     ani_status aniEnumStatus = env->EnumItem_GetEnum(static_cast<ani_enum_item>(obj), &aniEnum);
     if (aniEnumStatus != ANI_OK) {
         HILOG_ERROR("EnumItem_GetEnum failed");
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return ANI_ERROR;
     }
 
@@ -1352,14 +1352,14 @@ ani_status GetEnumValueInt(ani_env *env, ani_object obj, ani_int &enumValue)
         enumIndex, &aniEnumItem);
     if (aniEnumItemStatus != ANI_OK) {
         HILOG_ERROR("Enum_GetEnumItemByIndex failed");
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return ANI_ERROR;
     }
 
     ani_status enumValueStatus = env->EnumItem_GetValue_Int(aniEnumItem, &enumValue);
     if (enumValueStatus != ANI_OK) {
         HILOG_ERROR("EnumItem_GetValue_Int failed");
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return ANI_ERROR;
     }
 
@@ -1476,7 +1476,7 @@ void CheckIfRefValidOrThrow(ani_env *env, ani_object obj)
     ani_status status = env->Reference_IsUndefined(reinterpret_cast<ani_ref>(obj), &isUndefined);
     if (status != ANI_OK || isUndefined) {
         HILOG_ERROR("Object reference is not valid");
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
     }
 }
 
@@ -1627,7 +1627,7 @@ void SetRecordKeyValue(ani_env *env, ani_object &recordObject, std::string &key,
     ani_status status = env->FindClass(CLASSNAME_RECORD, &recordCls);
     if (status != ANI_OK) {
         HILOG_ERROR("FindClass failed status: %{public}d", status);
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return;
     }
 
@@ -1635,7 +1635,7 @@ void SetRecordKeyValue(ani_env *env, ani_object &recordObject, std::string &key,
     status = env->Class_FindMethod(recordCls, ANI_SETTER_MARKER, nullptr, &setFunc);
     if (status != ANI_OK) {
         HILOG_ERROR("Class_FindMethod can not find: %{public}s", ANI_SETTER_MARKER);
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return;
     }
 
@@ -1643,14 +1643,14 @@ void SetRecordKeyValue(ani_env *env, ani_object &recordObject, std::string &key,
     status = env->String_NewUTF8(key.c_str(), key.length(), &ani_key);
     if (status != ANI_OK) {
         HILOG_ERROR("String_NewUTF8 failed, status: %{public}d", status);
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return;
     }
 
     status = env->Object_CallMethod_Void(recordObject, setFunc, ani_key, static_cast<ani_ref>(value));
     if (status != ANI_OK) {
         HILOG_ERROR("set key value failed, status: %{public}d", status);
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return;
     }
     HILOG_INFO("End");
@@ -1685,7 +1685,7 @@ bool ConvertStringArrayToInt64Vector(ani_env *env, const ani_object arrayObj, st
 {
     if (env == nullptr) {
         HILOG_ERROR("env is nullptr");
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return false;
     }
 
@@ -1693,7 +1693,7 @@ bool ConvertStringArrayToInt64Vector(ani_env *env, const ani_object arrayObj, st
     ani_status status = env->Array_GetLength(reinterpret_cast<ani_array>(arrayObj), &arrayLength);
     if (status != ANI_OK) {
         HILOG_ERROR("Array_GetLength failed, status: %{public}d", status);
-        PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+        PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return false;
     }
 
@@ -1703,7 +1703,7 @@ bool ConvertStringArrayToInt64Vector(ani_env *env, const ani_object arrayObj, st
             &stringEntryRef, static_cast<ani_int>(i));
         if (status != ANI_OK) {
             HILOG_ERROR("Object_CallMethodByName_Ref failed, status: %{public}d", status);
-            PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+            PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
             return false;
         }
 
@@ -1711,7 +1711,7 @@ bool ConvertStringArrayToInt64Vector(ani_env *env, const ani_object arrayObj, st
         int64_t formIdNum = 0;
         if (!ConvertStringToInt64(stdFormID, formIdNum)) {
             HILOG_ERROR("ConvertStringToInt64 failed for entry %zu", i);
-            PrepareExceptionAndThrow(env, static_cast<int>(ERR_FORM_EXTERNAL_PARAM_INVALID));
+            PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
             return false;
         }
 
