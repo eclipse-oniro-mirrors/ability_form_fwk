@@ -301,6 +301,10 @@ HiviewDFX::XCollie::GetInstance().SetTimer(...)
 - **必须注释**：IPC 接口（含 TF_ASYNC/TF_SYNC 语义）、状态机转换、算法、持锁/跨线程等非显式副作用、魔法值/阈值/超时（注明取值依据）、绕过常规检查的特例
 - **禁止**：注释掉的死代码（交给 git）、用注释记变更历史、零信息注释（`i++; // i 自增`）；改代码必须同步改注释
 
+#### 9. 错误码规范
+
+通用错误码401例外场景的API Message统一以"Parameter error. "开头。
+
 ## 相关仓库
 
 - [interface_sdk-js](https://gitcode.com/openharmony/interface_sdk-js) - ArkTS API 接口
