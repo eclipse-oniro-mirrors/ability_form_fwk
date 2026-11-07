@@ -301,9 +301,6 @@ ErrCode FormProviderMgr::ConnectForConfigUpdate(const AppExecFwk::Configuration 
         connectWant, abilityConnection, record.providerUserId);
     if (errorCode != ERR_OK) {
         HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
-        if (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) {
-            return ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED;
-        }
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
