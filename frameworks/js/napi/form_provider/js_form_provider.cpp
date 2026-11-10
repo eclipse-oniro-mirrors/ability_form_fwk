@@ -565,24 +565,28 @@ napi_value JsFormProvider::OnUpdateForm(napi_env env, size_t argc, napi_value* a
         ConvertFromDataProxies(env, nativeProxies, formDataProxies);
     }
 
-    NapiAsyncTask::CompleteCallback complete =
-        [formId, data = formProviderData, isSupportMoreImages, formDataProxies](
-            napi_env env, NapiAsyncTask &task, int32_t status) {
-            OHOS::AppExecFwk::FormProviderInfo formProviderInfo;
-            formProviderInfo.SetFormData(*data);
-            formProviderInfo.SetSupportMoreImages(isSupportMoreImages);
-            formProviderInfo.SetFormDataProxies(formDataProxies);
-            int32_t ret = FormMgr::GetInstance().UpdateForm(formId, formProviderInfo);
-            if (ret != ERR_OK) {
-                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
-                return;
-            }
-            task.ResolveWithNoError(env, CreateJsUndefined(env));
-        };
+    // Run the synchronous IPC on the worker thread to keep the JS thread free.
+    auto apiResult = std::make_shared<int32_t>();
+    NapiAsyncTask::ExecuteCallback execute = [formId, data = formProviderData, isSupportMoreImages,
+        formDataProxies, ret = apiResult]() {
+        OHOS::AppExecFwk::FormProviderInfo formProviderInfo;
+        formProviderInfo.SetFormData(*data);
+        formProviderInfo.SetSupportMoreImages(isSupportMoreImages);
+        formProviderInfo.SetFormDataProxies(formDataProxies);
+        *ret = FormMgr::GetInstance().UpdateForm(formId, formProviderInfo);
+    };
+    NapiAsyncTask::CompleteCallback complete = [ret = apiResult](napi_env env, NapiAsyncTask &task,
+        int32_t status) {
+        if (*ret != ERR_OK) {
+            task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
+            return;
+        }
+        task.ResolveWithNoError(env, CreateJsUndefined(env));
+    };
     napi_value lastParam = (argc == ARGS_SIZE_THREE) ? argv[PARAM2] : nullptr;
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnUpdateForm",
-        env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+        env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
     return result;
 }
 
