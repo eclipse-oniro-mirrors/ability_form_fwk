@@ -26,6 +26,7 @@
 #undef protected
 #include "securec.h"
 #include "ffrt.h"
+#include "rdb_helper.h"
 
 extern "C" void* ffrt_alloc_auto_managed_function_storage_base(ffrt_function_kind_t kind)
 {
@@ -48,6 +49,18 @@ extern "C" int WatchParameter(const char *, void (*)(const char *, const char *,
 {
     return 0;
 }
+
+// Avoid opening a real rdb store: its background thread races static teardown at exit (UAF).
+namespace OHOS {
+namespace NativeRdb {
+std::shared_ptr<RdbStore> RdbHelper::GetRdbStore(
+    const RdbStoreConfig &config, int version, RdbOpenCallback &openCallback, int &errCode)
+{
+    errCode = E_ERROR;
+    return nullptr;
+}
+} // namespace NativeRdb
+} // namespace OHOS
 
 using namespace OHOS::AppExecFwk;
 
