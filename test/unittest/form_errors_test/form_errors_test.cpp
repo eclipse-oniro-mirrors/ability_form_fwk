@@ -107,7 +107,7 @@ HWTEST_F(FormErrorsTest, FormErrors_QueryExternalErrorMessage_001, TestSize.Leve
     GTEST_LOG_(INFO) << "FormErrors_QueryExternalErrorMessage_001 starts";
     FormErrors formErrors;
     std::string ret = formErrors.QueryExternalErrorMessage(ERR_APPEXECFWK_FORM_INVALID_FORM_ID, ERR_OK);
-    EXPECT_EQ(ret, "The formId is invalid.");
+    EXPECT_EQ(ret, "Parameter error. The formId is invalid.");
     GTEST_LOG_(INFO) << "FormErrors_QueryExternalErrorMessage_001 ends";
 }
 
