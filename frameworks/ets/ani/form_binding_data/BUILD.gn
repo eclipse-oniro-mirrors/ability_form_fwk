@@ -37,11 +37,15 @@ ohos_shared_library("formBindingData_ani") {
     "-Wl,--gc-sections",
   ]
 
-  include_dirs = []
+  include_dirs = [
+    "${form_fwk_path}/interfaces/kits/native/include",
+    "${form_fwk_path}/frameworks/ets/ani/utils/include",
+  ]
 
   sources = [ "src/ets_form_binding_data.cpp" ]
 
   deps = [
+    "${form_fwk_ani_path}/utils:util_ani",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
@@ -50,6 +54,7 @@ ohos_shared_library("formBindingData_ani") {
 
   external_deps = [
     "ability_runtime:abilitykit_native",
+    "ability_runtime:ani_common",
     "ability_runtime:extensionkit_native",
     "ability_runtime:runtime",
     "c_utils:utils",
