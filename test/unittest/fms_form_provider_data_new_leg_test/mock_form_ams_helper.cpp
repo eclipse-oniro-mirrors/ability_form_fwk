@@ -42,5 +42,15 @@ ErrCode FormAmsHelper::ConnectServiceAbility(
         return ERR_OK;
     }
 }
+
+ErrCode FormAmsHelper::ConnectServiceAbilityWithUserId(
+    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId)
+{
+    if (g_mockConnectServiceAbilityRet == false) {
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    } else {
+        return ERR_OK;
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

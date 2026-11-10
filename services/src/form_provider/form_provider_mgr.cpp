@@ -297,12 +297,10 @@ ErrCode FormProviderMgr::ConnectForConfigUpdate(const AppExecFwk::Configuration 
         connectWant.SetModuleName(record.moduleName);
     }
 
-    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(connectWant, abilityConnection);
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
+        connectWant, abilityConnection, record.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbility failed");
-        if (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) {
-            return ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED;
-        }
+        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
@@ -441,9 +439,10 @@ ErrCode FormProviderMgr::ConnectAmsForRefreshPermission(const int64_t formId, Wa
         connectWant.AddFlags(Want::FLAG_INSTALL_ON_DEMAND | Want::FLAG_INSTALL_WITH_BACKGROUND_MODE);
     }
 
-    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(connectWant, formRefreshConnection);
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
+        connectWant, formRefreshConnection, record.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbility failed");
+        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
@@ -483,9 +482,10 @@ ErrCode FormProviderMgr::NotifyProviderFormDelete(const int64_t formId, const Fo
         want.SetModuleName(formRecord.moduleName);
     }
 
-    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, formDeleteConnection);
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
+        want, formDeleteConnection, formRecord.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbility failed");
+        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
@@ -527,9 +527,10 @@ ErrCode FormProviderMgr::NotifyProviderFormsBatchDelete(const std::string &bundl
         want.SetModuleName(moduleName);
     }
 
-    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, batchDeleteConnection);
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
+        want, batchDeleteConnection, userId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbility failed");
+        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
@@ -675,9 +676,10 @@ int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record
     if (!record.moduleName.empty()) {
         connectWant.SetModuleName(record.moduleName);
     }
-    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(connectWant, formLocationConnection);
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
+        connectWant, formLocationConnection, record.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbility failed");
+        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
         if (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) {
             return ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED;
         }
@@ -762,9 +764,10 @@ ErrCode FormProviderMgr::RebindByFreeInstall(const FormRecord &record, Want &wan
     HILOG_INFO("start");
     want.AddFlags(Want::FLAG_INSTALL_ON_DEMAND | Want::FLAG_INSTALL_WITH_BACKGROUND_MODE);
     want.SetModuleName(record.moduleName);
-    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, formRefreshConnection);
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
+        want, formRefreshConnection, record.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbility failed, err:%{public}d", errorCode);
+        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, err:%{public}d", errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
@@ -793,9 +796,10 @@ ErrCode FormProviderMgr::ConnectAmsUpdateSize(const int32_t newDimension,
     if (!record.moduleName.empty()) {
         connectWant.SetModuleName(record.moduleName);
     }
-    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(connectWant, formUpdateSizeConnection);
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
+        connectWant, formUpdateSizeConnection, record.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbility failed");
+        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
         if (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) {
             return ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED;
         }
