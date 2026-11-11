@@ -52,6 +52,7 @@ FormMgr& FormMgr::GetInstance()
 FormMgr::FormMgr()
 {
     HILOG_DEBUG("call");
+    deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(new (std::nothrow) FormMgrDeathRecipient());
 }
 
 FormMgr::~FormMgr()
@@ -1111,7 +1112,6 @@ ErrCode FormMgr::Connect(const sptr<IRemoteObject> &remoteObject)
             return ERR_APPEXECFWK_FORM_GET_FMS_FAILED;
         }
     }
-    deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(new (std::nothrow) FormMgrDeathRecipient());
     if (deathRecipient_ == nullptr) {
         HILOG_ERROR("null deathRecipient_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
