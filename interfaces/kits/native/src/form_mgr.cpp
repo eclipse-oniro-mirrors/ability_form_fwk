@@ -1010,6 +1010,7 @@ void FormMgr::NotifyDeathCallbacks()
 
 void FormMgr::Reconnect()
 {
+    HILOG_INFO("request fms on-demand load");
     auto systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemManager == nullptr) {
         HILOG_ERROR("get system ability manager failed");
