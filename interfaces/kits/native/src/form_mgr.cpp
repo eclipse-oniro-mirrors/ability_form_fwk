@@ -1019,11 +1019,11 @@ void FormMgr::Reconnect()
     }
     if (loadCallback_ == nullptr) {
         loadCallback_ = sptr<ISystemAbilityLoadCallback>(new (std::nothrow) FmsLoadCallback());
-        if (loadCallback_ == nullptr) {
-            HILOG_ERROR("null loadCallback_");
-            FormMgr::SetRecoverStatus(Constants::RECOVER_FAIL);
-            return;
-        }
+    }
+    if (loadCallback_ == nullptr) {
+        HILOG_ERROR("null loadCallback_");
+        FormMgr::SetRecoverStatus(Constants::RECOVER_FAIL);
+        return;
     }
     int32_t ret = systemManager->LoadSystemAbility(FORM_MGR_SERVICE_ID, loadCallback_);
     if (ret != ERR_OK) {

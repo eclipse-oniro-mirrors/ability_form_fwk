@@ -68,6 +68,24 @@ const std::int32_t NEGATIVE_NUM = -1;
 const std::int32_t POSITIVE_NUM = 1;
 const std::int32_t ERR_FAILED = -1;
 const std::int64_t FORM_ID = 10;
+
+class MockDeathCallback final : public FormCallbackInterface {
+public:
+    void ProcessFormUpdate(const FormJsInfo &formJsInfo) override {}
+    void ProcessFormUninstall(const int64_t formId) override {}
+    void OnDeathReceived() override { deathCount++; }
+    void OnError(const int32_t errorCode, const std::string &errorMsg) override {}
+    int32_t deathCount = 0;
+};
+
+class FailLoadSamgr : public MockSystemAbilityManager {
+public:
+    int32_t LoadSystemAbility(int32_t systemAbilityId, const sptr<ISystemAbilityLoadCallback>& callback) override
+    {
+        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
+    }
+};
+
 class FormMgrTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -1392,29 +1410,21 @@ HWTEST_F(FormMgrTest, FormMgrTest_0071, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0071 test ends";
 }
 
-class MockDeathCallback final : public FormCallbackInterface {
-public:
-    void ProcessFormUpdate(const FormJsInfo &formJsInfo) override {}
-    void ProcessFormUninstall(const int64_t formId) override {}
-    void OnDeathReceived() override { deathCount++; }
-    void OnError(const int32_t errorCode, const std::string &errorMsg) override {}
-    int32_t deathCount = 0;
-};
-
 /**
  * @tc.name: FormMgrTest_0073
- * @tc.desc: Verify Reconnect
+ * @tc.desc: Verify Reconnect sets recover status to RECOVER_FAIL when samgr rejects the load request
  * @tc.type: FUNC
  * @tc.require: issueI63Y7Y
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0073, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0073 starts";
-    auto callback = std::make_shared<MockDeathCallback>();
-    FormMgr::GetInstance().RegisterDeathCallback(callback);
+    sptr<FailLoadSamgr> failSamgr = new (std::nothrow) FailLoadSamgr();
+    sptr<ISystemAbilityManager> backupSamgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = failSamgr;
     FormMgr::GetInstance().Reconnect();
-    EXPECT_EQ(callback->deathCount, 0);
-    EXPECT_EQ(&FormMgr::GetInstance(), &FormMgr::GetInstance());
-    FormMgr::GetInstance().UnRegisterDeathCallback(callback);
+    EXPECT_EQ(FormMgr::GetRecoverStatus(), Constants::RECOVER_FAIL);
+    SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = backupSamgr;
+    FormMgr::SetRecoverStatus(Constants::NOT_IN_RECOVERY);
     GTEST_LOG_(INFO) << "FormMgrTest_0073 test ends";
 }
 
@@ -5989,18 +5999,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_UnregisterGetVisibleFormRectProxy_002, TestSiz
     ErrCode result = FormMgr::GetInstance().UnregisterGetVisibleFormRectProxy();
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgrTest_UnregisterGetVisibleFormRectProxy_002 ends";
-}
-
-/**
- * @tc.name: FormMgrTest_GetInstanceSingleton_001
- * @tc.desc: Verify GetInstance always returns the same instance.
- * @tc.type: FUNC
- */
-HWTEST_F(FormMgrTest, FormMgrTest_GetInstanceSingleton_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrTest_GetInstanceSingleton_001 starts";
-    EXPECT_EQ(&FormMgr::GetInstance(), &FormMgr::GetInstance());
-    GTEST_LOG_(INFO) << "FormMgrTest_GetInstanceSingleton_001 ends";
 }
 
 /**
