@@ -30,11 +30,24 @@
 #include "iservice_registry.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
+#include "system_ability_load_callback_stub.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+class FormMgr::FmsLoadCallback : public SystemAbilityLoadCallbackStub {
+public:
+    void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject) override;
+    void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
+};
 
 std::atomic<int> FormMgr::recoverStatus_ = Constants::NOT_IN_RECOVERY;
+
+// Do not inherit DelayedRefSingleton: it splits the registry across so files.
+FormMgr& FormMgr::GetInstance()
+{
+    static FormMgr* instance = new FormMgr();
+    return *instance;
+}
 
 FormMgr::FormMgr()
 {
@@ -43,13 +56,7 @@ FormMgr::FormMgr()
 
 FormMgr::~FormMgr()
 {
-    HILOG_INFO("call");
-    if (remoteProxy_ != nullptr) {
-        auto remoteObject = remoteProxy_->AsObject();
-        if (remoteObject != nullptr) {
-            remoteObject->RemoveDeathRecipient(deathRecipient_);
-        }
-    }
+    // Never destroyed: the death recipient is removed in ResetProxy.
 }
 
 /**
@@ -986,43 +993,78 @@ void FormMgr::FormMgrDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &rem
     // Reset proxy
     FormMgr::GetInstance().ResetProxy(remote);
 
-    if (!FormMgr::GetInstance().Reconnect()) {
-        HILOG_ERROR("form mgr service died,try to reconnect to fms failed");
-        FormMgr::SetRecoverStatus(Constants::RECOVER_FAIL);
-        return;
-    }
+    FormMgr::GetInstance().Reconnect();
+}
+
+void FormMgr::NotifyDeathCallbacks()
+{
     std::vector<std::shared_ptr<FormCallbackInterface>> callbacksSnapshot;
     {
-        std::shared_lock<std::shared_mutex> lock(FormMgr::GetInstance().formDeathCallbacksMutex_);
-        callbacksSnapshot = FormMgr::GetInstance().formDeathCallbacks_;
+        std::shared_lock<std::shared_mutex> lock(formDeathCallbacksMutex_);
+        callbacksSnapshot = formDeathCallbacks_;
     }
     for (auto &deathCallback : callbacksSnapshot) {
         deathCallback->OnDeathReceived();
     }
-    FormMgr::SetRecoverStatus(Constants::NOT_IN_RECOVERY);
 }
 
-/**
- * @brief Reconnect form manager service once per 1000 milliseconds,
- *        until the connection succeeds or reaching the max retry times.
- * @return Returns true if execute success, false otherwise.
- */
-bool FormMgr::Reconnect()
+void FormMgr::Reconnect()
 {
-    HILOG_DEBUG("call");
-    for (int i = 0; i < Constants::MAX_RETRY_TIME; i++) {
-        // try to connect fms
-        if (Connect() == ERR_OK) {
-            HILOG_INFO("sucess");
-            return true;
-        }
-
-        HILOG_ERROR("get fms proxy fail,try again");
-        // Sleep 1000 milliseconds before reconnect.
-        std::this_thread::sleep_for(std::chrono::milliseconds(Constants::SLEEP_TIME));
+    auto systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemManager == nullptr) {
+        HILOG_ERROR("get system ability manager failed");
+        FormMgr::SetRecoverStatus(Constants::RECOVER_FAIL);
+        return;
     }
+    if (loadCallback_ == nullptr) {
+        loadCallback_ = sptr<ISystemAbilityLoadCallback>(new (std::nothrow) FmsLoadCallback());
+        if (loadCallback_ == nullptr) {
+            HILOG_ERROR("null loadCallback_");
+            FormMgr::SetRecoverStatus(Constants::RECOVER_FAIL);
+            return;
+        }
+    }
+    int32_t ret = systemManager->LoadSystemAbility(FORM_MGR_SERVICE_ID, loadCallback_);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("request fms load failed, ret:%{public}d", ret);
+        FormMgr::SetRecoverStatus(Constants::RECOVER_FAIL);
+    }
+}
 
-    return false;
+void FormMgr::FmsLoadCallback::OnLoadSystemAbilitySuccess(
+    int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject)
+{
+    if (systemAbilityId != FORM_MGR_SERVICE_ID) {
+        return;
+    }
+    FormMgr::GetInstance().OnFmsLoaded(remoteObject);
+}
+
+void FormMgr::FmsLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
+{
+    if (systemAbilityId != FORM_MGR_SERVICE_ID) {
+        return;
+    }
+    FormMgr::GetInstance().OnFmsLoadFail();
+}
+
+void FormMgr::OnFmsLoaded(const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("call");
+    if (remoteObject == nullptr || remoteObject->IsObjectDead()) {
+        OnFmsLoadFail();
+        return;
+    }
+    if (Connect(remoteObject) == ERR_OK) {
+        NotifyDeathCallbacks();
+        FormMgr::SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    }
+}
+
+void FormMgr::OnFmsLoadFail()
+{
+    HILOG_ERROR("load fms failed");
+    FormMgr::SetRecoverStatus(Constants::RECOVER_FAIL);
 }
 
 bool FormMgr::IsRemoteProxyValid()
@@ -1047,34 +1089,38 @@ bool FormMgr::IsRemoteProxyValid()
  * @brief Connect form manager service.
  * @return Returns ERR_OK on success, others on failure.
  */
-ErrCode FormMgr::Connect()
+ErrCode FormMgr::Connect(const sptr<IRemoteObject> &remoteObject)
 {
     if (IsRemoteProxyValid()) {
         return ERR_OK;
     }
 
     std::lock_guard<std::shared_mutex> lock(connectMutex_);
-    sptr<ISystemAbilityManager> systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemManager == nullptr) {
-        HILOG_ERROR("get registry failed");
-        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
-    }
-    sptr<IRemoteObject> remoteObject = systemManager->GetSystemAbility(FORM_MGR_SERVICE_ID);
-    if (remoteObject == nullptr || remoteObject->IsObjectDead()) {
-        HILOG_ERROR("connect FormMgrService failed");
-        return ERR_APPEXECFWK_FORM_GET_FMS_FAILED;
+    sptr<IRemoteObject> remote = remoteObject;
+    if (remote == nullptr) {
+        sptr<ISystemAbilityManager> systemManager =
+            SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (systemManager == nullptr) {
+            HILOG_ERROR("get registry failed");
+            return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
+        }
+        remote = systemManager->GetSystemAbility(FORM_MGR_SERVICE_ID);
+        if (remote == nullptr || remote->IsObjectDead()) {
+            HILOG_ERROR("connect FormMgrService failed");
+            return ERR_APPEXECFWK_FORM_GET_FMS_FAILED;
+        }
     }
     deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(new (std::nothrow) FormMgrDeathRecipient());
     if (deathRecipient_ == nullptr) {
         HILOG_ERROR("null deathRecipient_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    if ((remoteObject->IsProxyObject()) && (!remoteObject->AddDeathRecipient(deathRecipient_))) {
+    if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipient_))) {
         HILOG_ERROR("fail add death recipient to FormMgrService");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    remoteProxy_ = iface_cast<IFormMgr>(remoteObject);
+    remoteProxy_ = iface_cast<IFormMgr>(remote);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;

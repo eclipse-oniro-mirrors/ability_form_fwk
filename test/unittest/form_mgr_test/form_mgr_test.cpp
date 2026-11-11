@@ -1392,6 +1392,15 @@ HWTEST_F(FormMgrTest, FormMgrTest_0071, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0071 test ends";
 }
 
+class MockDeathCallback final : public FormCallbackInterface {
+public:
+    void ProcessFormUpdate(const FormJsInfo &formJsInfo) override {}
+    void ProcessFormUninstall(const int64_t formId) override {}
+    void OnDeathReceived() override { deathCount++; }
+    void OnError(const int32_t errorCode, const std::string &errorMsg) override {}
+    int32_t deathCount = 0;
+};
+
 /**
  * @tc.name: FormMgrTest_0073
  * @tc.desc: Verify Reconnect
@@ -1400,8 +1409,12 @@ HWTEST_F(FormMgrTest, FormMgrTest_0071, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0073, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0073 starts";
-    bool data =  FormMgr::GetInstance().Reconnect();
-    EXPECT_EQ(data, true);
+    auto callback = std::make_shared<MockDeathCallback>();
+    FormMgr::GetInstance().RegisterDeathCallback(callback);
+    FormMgr::GetInstance().Reconnect();
+    EXPECT_EQ(callback->deathCount, 0);
+    EXPECT_EQ(&FormMgr::GetInstance(), &FormMgr::GetInstance());
+    FormMgr::GetInstance().UnRegisterDeathCallback(callback);
     GTEST_LOG_(INFO) << "FormMgrTest_0073 test ends";
 }
 
@@ -5977,4 +5990,75 @@ HWTEST_F(FormMgrTest, FormMgrTest_UnregisterGetVisibleFormRectProxy_002, TestSiz
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgrTest_UnregisterGetVisibleFormRectProxy_002 ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_GetInstanceSingleton_001
+ * @tc.desc: Verify GetInstance always returns the same instance.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_GetInstanceSingleton_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_GetInstanceSingleton_001 starts";
+    EXPECT_EQ(&FormMgr::GetInstance(), &FormMgr::GetInstance());
+    GTEST_LOG_(INFO) << "FormMgrTest_GetInstanceSingleton_001 ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_DeathCallbackRegistryLifecycle_001
+ * @tc.desc: Verify death callback register and unregister lifecycle.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_DeathCallbackRegistryLifecycle_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_DeathCallbackRegistryLifecycle_001 starts";
+    auto callback = std::make_shared<MockDeathCallback>();
+    EXPECT_FALSE(FormMgr::GetInstance().CheckIsDeathCallbackRegistered(callback));
+    FormMgr::GetInstance().RegisterDeathCallback(callback);
+    EXPECT_TRUE(FormMgr::GetInstance().CheckIsDeathCallbackRegistered(callback));
+    FormMgr::GetInstance().UnRegisterDeathCallback(callback);
+    EXPECT_FALSE(FormMgr::GetInstance().CheckIsDeathCallbackRegistered(callback));
+    GTEST_LOG_(INFO) << "FormMgrTest_DeathCallbackRegistryLifecycle_001 ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_DeathCallbackRegistryMultiple_002
+ * @tc.desc: Verify registry keeps callbacks independently by object identity.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_DeathCallbackRegistryMultiple_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_DeathCallbackRegistryMultiple_002 starts";
+    auto callbackA = std::make_shared<MockDeathCallback>();
+    auto callbackB = std::make_shared<MockDeathCallback>();
+    FormMgr::GetInstance().RegisterDeathCallback(callbackA);
+    FormMgr::GetInstance().RegisterDeathCallback(callbackB);
+    FormMgr::GetInstance().UnRegisterDeathCallback(callbackA);
+    EXPECT_FALSE(FormMgr::GetInstance().CheckIsDeathCallbackRegistered(callbackA));
+    EXPECT_TRUE(FormMgr::GetInstance().CheckIsDeathCallbackRegistered(callbackB));
+    FormMgr::GetInstance().UnRegisterDeathCallback(callbackB);
+    GTEST_LOG_(INFO) << "FormMgrTest_DeathCallbackRegistryMultiple_002 ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_NotifyDeathCallbacks_001
+ * @tc.desc: Verify NotifyDeathCallbacks invokes OnDeathReceived of all registered callbacks.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_NotifyDeathCallbacks_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_NotifyDeathCallbacks_001 starts";
+    auto callbackA = std::make_shared<MockDeathCallback>();
+    auto callbackB = std::make_shared<MockDeathCallback>();
+    FormMgr::GetInstance().RegisterDeathCallback(callbackA);
+    FormMgr::GetInstance().RegisterDeathCallback(callbackB);
+
+    FormMgr::GetInstance().NotifyDeathCallbacks();
+
+    EXPECT_EQ(callbackA->deathCount, 1);
+    EXPECT_EQ(callbackB->deathCount, 1);
+    FormMgr::GetInstance().UnRegisterDeathCallback(callbackA);
+    FormMgr::GetInstance().UnRegisterDeathCallback(callbackB);
+    GTEST_LOG_(INFO) << "FormMgrTest_NotifyDeathCallbacks_001 ends";
+}
+
 } // namespace

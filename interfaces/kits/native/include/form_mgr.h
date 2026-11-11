@@ -18,7 +18,6 @@
 
 #include <mutex>
 #include <shared_mutex>
-#include <singleton.h>
 #include <thread>
 
 #include "form_callback_interface.h"
@@ -42,6 +41,7 @@
 #include "want.h"
 
 namespace OHOS {
+class ISystemAbilityLoadCallback;
 namespace AppExecFwk {
 using OHOS::AAFwk::Want;
 
@@ -49,10 +49,11 @@ using OHOS::AAFwk::Want;
  * @class FormMgr
  * FormMgr is used to access form manager services.
  */
-class FormMgr final : public DelayedRefSingleton<FormMgr> {
-    DECLARE_DELAYED_REF_SINGLETON(FormMgr)
+class FormMgr final {
 public:
     DISALLOW_COPY_AND_MOVE(FormMgr);
+
+    static FormMgr& GetInstance();
 
     friend class FormMgrDeathRecipient;
 
@@ -1096,18 +1097,25 @@ public:
     ErrCode DeleteForms(const std::vector<FormRecordFilter> &filters);
 
 private:
-    /**
-     * @brief Connect form manager service.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode Connect();
+    FormMgr();
+    ~FormMgr();
+
+    class FmsLoadCallback;
 
     /**
-    * @brief Reconnect form manager service once per 1000 milliseconds,
-    *        until the connection succeeds or reaching the max retry times.
-    * @return Returns true if execute success, false otherwise.
+     * @brief Connect form manager service.
+     * @param remoteObject Remote object from the samgr load callback; when null,
+     *        it is fetched from samgr synchronously.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode Connect(const sptr<IRemoteObject> &remoteObject = nullptr);
+
+    /**
+    * @brief Reconnect to fms by requesting samgr on-demand load; registered death
+    *        callbacks are notified when the service is loaded.
     */
-    bool Reconnect();
+    void Reconnect();
+
     /**
      * @brief Reset proxy.
      * @param remote remote object.
@@ -1119,6 +1127,12 @@ private:
      * @return Returns true if the remote proxy is valid.
      */
     bool IsRemoteProxyValid();
+
+    void NotifyDeathCallbacks();
+
+    void OnFmsLoaded(const sptr<IRemoteObject> &remoteObject);
+
+    void OnFmsLoadFail();
 
     /**
     * @brief Filter template forms.
@@ -1158,6 +1172,8 @@ private:
     volatile bool resetFlag_ = false;
 
     static std::atomic<int> recoverStatus_;
+
+    sptr<ISystemAbilityLoadCallback> loadCallback_;
 
     // Protects formDeathCallbacks_ from concurrent access:
     // OnRemoteDied (binder thread) uses shared_lock for read;
