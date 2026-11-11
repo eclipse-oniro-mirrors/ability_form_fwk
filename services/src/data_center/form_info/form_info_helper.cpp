@@ -126,6 +126,17 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleNames(const std::vector<std::s
     return ERR_OK;
 }
 
+void FormInfoHelper::ResolveEnableTint(FormInfo &formInfo, bool isSystemApp)
+{
+    if (isSystemApp) {
+        if (formInfo.enableTint == BoolEnum::BOOL_UNSPECIFIED) {
+            formInfo.enableTint = BoolEnum::BOOL_TRUE;
+        }
+    } else {
+        formInfo.enableTint = BoolEnum::BOOL_FALSE;
+    }
+}
+
 std::shared_ptr<Global::Resource::ResourceManager> FormInfoHelper::GetResMgr(
     std::unordered_map<std::string, std::shared_ptr<Global::Resource::ResourceManager>> &resMgrCache,
     const ExtensionAbilityInfo &extensionInfo)
@@ -332,6 +343,7 @@ void FormInfoHelper::LoadFormInfos(std::vector<FormInfo> &formInfos, const Bundl
         formInfo.bundleType = bundleInfo.applicationInfo.bundleType;
         formInfo.privacyLevel = privacyLevel;
         formInfo.isTemplateForm = extraFormInfo.isTemplateForm;
+        ResolveEnableTint(formInfo, bundleInfo.applicationInfo.isSystemApp);
         PrintLoadStageFormConfigInfo(formInfo, extraFormInfo.isDistributedForm);
         formInfos.emplace_back(std::move(formInfo));
     }

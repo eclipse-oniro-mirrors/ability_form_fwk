@@ -41,6 +41,8 @@ public:
     static ErrCode LoadFormConfigInfoByBundleNames(const std::vector<std::string> &bundleNames, int32_t userId,
         std::unordered_map<std::string, std::vector<FormInfo>> &formInfosMap);
 
+    static void ResolveEnableTint(FormInfo &formInfo, bool isSystemApp);
+
 private:
     static bool IsAccountMetadataEnabled(const BundleInfo &bundleInfo,
         const std::vector<FormCustomizeData> &customizeDatas);
