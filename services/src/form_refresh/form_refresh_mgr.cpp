@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,6 +32,7 @@
 #include "form_refresh/refresh_impl/form_app_upgrade_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_provider_refresh_impl.h"
 #include "form_refresh/refresh_impl/form_account_refresh_impl.h"
+#include "form_refresh/refresh_impl/form_reminder_agent_refresh_impl.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -54,6 +55,7 @@ const std::unordered_map<int32_t, IFormRefresh *> REFRESH_MAP = {
     { TYPE_UNCONTROL, &FormRefreshAfterUncontrolImpl::GetInstance() },
     { TYPE_APP_UPGRADE, &FormAppUpgradeRefreshImpl::GetInstance() },
     { TYPE_PROVIDER, &FormProviderRefreshImpl::GetInstance() },
+    { TYPE_REMINDER_AGENT, &FormReminderAgentRefreshImpl::GetInstance() },
     { TYPE_ACCOUNT, &FormAccountRefreshImpl::GetInstance() },
 };
 }

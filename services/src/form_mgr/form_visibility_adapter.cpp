@@ -115,7 +115,7 @@ ErrCode FormVisibilityAdapter::NotifyWhetherVisibleForms(const std::vector<int64
         bool updateRet = UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord);
         // Check if the form needs visibility refresh
         if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE &&
-            (formRecord.isTimerRefresh || formRecord.isHostRefresh)) {
+            (formRecord.isTimerRefresh || formRecord.isHostRefresh || formRecord.isReminderAgentRefresh)) {
             needRefreshRecords.emplace_back(formRecord);
         }
 
@@ -443,11 +443,13 @@ bool FormVisibilityAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormI
     }
 
     HILOG_INFO("formId:%{public}" PRId64 ",needRefresh:%{public}d,formVisibleType:%{public}d,"
-        "isTimerRefresh:%{public}d,refreshWantMapSize:%{public}d,isHostRefresh:%{public}d", matchedFormId,
+        "isTimerRefresh:%{public}d,refreshWantMapSize:%{public}d,isHostRefresh:%{public}d,"
+        "isReminderAgentRefresh:%{public}d", matchedFormId,
         formRecord.needRefresh, static_cast<int32_t>(formVisibleType), formRecord.isTimerRefresh,
-        static_cast<int32_t>(formRecord.refreshWantMap.size()), formRecord.isHostRefresh);
+        static_cast<int32_t>(formRecord.refreshWantMap.size()), formRecord.isHostRefresh,
+        formRecord.isReminderAgentRefresh);
     if (!formRecord.needRefresh || formVisibleType != Constants::FORM_VISIBLE ||
-        formRecord.isTimerRefresh || formRecord.isHostRefresh) {
+        formRecord.isTimerRefresh || formRecord.isHostRefresh || formRecord.isReminderAgentRefresh) {
         return true;
     }
 

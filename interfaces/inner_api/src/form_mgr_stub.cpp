@@ -425,6 +425,8 @@ int FormMgrStub::OnRemoteRequestSeventh(uint32_t code, MessageParcel &data, Mess
             return HandleUnregisterGetVisibleFormRectProxy(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_VISIBLE_FORM_RECT):
             return HandleGetVisibleFormRect(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT):
+            return HandleUpdateFormsWithReminderAgent(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -635,6 +637,36 @@ int32_t FormMgrStub::HandleUpdateFormCrossBundle(MessageParcel &data, MessagePar
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = UpdateFormCrossBundle(formId, *formBindingData);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t FormMgrStub::HandleUpdateFormsWithReminderAgent(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::string bundleName;
+    if (!data.ReadString(bundleName)) {
+        HILOG_ERROR("read bundleName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (bundleName.empty()) {
+        HILOG_ERROR("bundleName is empty");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t userId = 0;
+    if (!data.ReadInt32(userId)) {
+        HILOG_ERROR("read userId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("ReadParcelable<Want> failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = UpdateFormsWithReminderAgent(bundleName, userId, *want);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

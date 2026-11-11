@@ -244,6 +244,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     refreshRecord.isCountTimerRefresh = isCountTimerRefresh;
     refreshRecord.isTimerRefresh = isTimerRefresh;
     refreshRecord.isHostRefresh = record.isHostRefresh;
+    refreshRecord.isReminderAgentRefresh = record.isReminderAgentRefresh;
     return ConnectAmsForRefresh(formId, refreshRecord, newWant);
 }
 

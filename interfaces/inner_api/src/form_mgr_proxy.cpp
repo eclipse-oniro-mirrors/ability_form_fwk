@@ -325,6 +325,49 @@ int FormMgrProxy::UpdateFormCrossBundle(const int64_t formId, const FormProvider
     return reply.ReadInt32();
 }
 
+int32_t FormMgrProxy::UpdateFormsWithReminderAgent(
+    const std::string &bundleName, const int32_t userId, const Want &want)
+{
+    HILOG_DEBUG("call, bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("write bundleName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt32(userId)) {
+        HILOG_ERROR("write userId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("write want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        if (error == ERR_APPEXECFWK_PARCEL_ERROR) {
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    int32_t result = 0;
+    if (!reply.ReadInt32(result)) {
+        HILOG_ERROR("read result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
 /**
  * @brief Set next refresh time.
  * @param formId The Id of the form to update.
