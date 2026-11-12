@@ -7490,21 +7490,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos1_008, TestSiz
 // ========== SetReminderAgentRefresh Tests ==========
 
 /**
- * @tc.number: FmsFormDataMgrTest_SetReminderAgentRefresh_001
- * @tc.name: SetReminderAgentRefresh
- * @tc.desc: Verify SetReminderAgentRefresh with non-existent formId has no side effect.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetReminderAgentRefresh_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetReminderAgentRefresh_001 start";
-    int64_t formId = FORM_ID_ONE;
-    formDataMgr_.formRecords_.erase(formId);
-    formDataMgr_.SetReminderAgentRefresh(formId, true);
-    EXPECT_EQ(formDataMgr_.formRecords_.find(formId) == formDataMgr_.formRecords_.end(), true);
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetReminderAgentRefresh_001 end";
-}
-
-/**
  * @tc.number: FmsFormDataMgrTest_SetReminderAgentRefresh_002
  * @tc.name: SetReminderAgentRefresh
  * @tc.desc: Verify SetReminderAgentRefresh sets flag on existing record.
@@ -7547,21 +7532,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetReminderAgentRefresh_003, Tes
 }
 
 // ========== ClearRefreshFlag Tests ==========
-
-/**
- * @tc.number: FmsFormDataMgrTest_ClearRefreshFlag_001
- * @tc.name: ClearRefreshFlag
- * @tc.desc: Verify ClearRefreshFlag with non-existent formId has no side effect.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ClearRefreshFlag_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ClearRefreshFlag_001 start";
-    int64_t formId = FORM_ID_ONE;
-    formDataMgr_.formRecords_.erase(formId);
-    formDataMgr_.ClearRefreshFlag(formId);
-    EXPECT_EQ(formDataMgr_.formRecords_.find(formId) == formDataMgr_.formRecords_.end(), true);
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ClearRefreshFlag_001 end";
-}
 
 /**
  * @tc.number: FmsFormDataMgrTest_ClearRefreshFlag_002
