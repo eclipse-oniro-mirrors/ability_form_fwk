@@ -673,6 +673,7 @@ int32_t FormMgrStub::HandleUpdateFormsWithReminderAgent(MessageParcel &data, Mes
     }
     return ERR_OK;
 }
+
 /**
      * @brief handle SetNextRefreshTime message.
      * @param data input param.

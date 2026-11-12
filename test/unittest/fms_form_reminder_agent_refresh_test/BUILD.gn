@@ -58,6 +58,7 @@ ohos_unittest("FmsFormReminderAgentRefreshTest") {
     "${form_fwk_path}:form_render_info",
     "${form_fwk_path}:form_utils",
     "${form_fwk_path}:form_common_info",
+    "${form_fwk_path}:form_manager",
   ]
 
   external_deps = [
@@ -70,7 +71,6 @@ ohos_unittest("FmsFormReminderAgentRefreshTest") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "ffrt:libffrt",
-    "form_fwk:form_manager",
     "googletest:gmock_main",
     "hilog:libhilog",
     "ipc:ipc_core",
