@@ -16,6 +16,7 @@
 #include <memory>
 #define private public
 #include "appexecfwk_errors.h"
+#include "form_ipc_handlers.h"
 #include "form_mgr_stub.h"
 #undef private
 #include "gmock/gmock.h"
@@ -129,7 +130,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0001, TestSize.Level1) {
         .Times(1)
         .WillOnce(DoAll(SetArgReferee<1>(returnInfos), Return(ERR_OK)));
     // test.
-    mockFormMgrService->HandleGetFormsInfo(data, reply);
+    FormIpcHandlers::HandleGetFormsInfo(*mockFormMgrService, data, reply);
     // check errorcode
     EXPECT_EQ(ERR_OK, reply.ReadInt32());
     // check resulting infos.
@@ -157,7 +158,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0002, TestSize.Level1) {
         .Times(1)
         .WillOnce(Return(-1));
     // test.
-    mockFormMgrService->HandleGetFormsInfo(data, reply);
+    FormIpcHandlers::HandleGetFormsInfo(*mockFormMgrService, data, reply);
     // check errorcode
     EXPECT_NE(ERR_OK, reply.ReadInt32());
     // check resulting infos.
@@ -180,7 +181,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0003, TestSize.Level1) {
     MessageParcel reply;
     EXPECT_CALL(*mockFormMgrService, IsRequestPublishFormSupported()).Times(1).WillOnce(Return(true));
     // test.
-    int32_t errCode = mockFormMgrService->HandleIsRequestPublishFormSupported(data, reply);
+    int32_t errCode = FormIpcHandlers::HandleIsRequestPublishFormSupported(*mockFormMgrService, data, reply);
     // check errorcode
     EXPECT_EQ(ERR_OK, errCode);
     // check resulting infos.
@@ -212,7 +213,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0004, TestSize.Level1) {
         .Times(1)
         .WillOnce(Return(0));
     // test.
-    int32_t errCode = mockFormMgrService->HandleStartAbility(data, reply);
+    int32_t errCode = FormIpcHandlers::HandleStartAbility(*mockFormMgrService, data, reply);
     // check errorcode
     EXPECT_EQ(ERR_OK, errCode);
     // check resulting infos.
@@ -250,7 +251,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0005, TestSize.Level1) {
         .Times(1)
         .WillOnce(Return(0));
     // test.
-    int32_t errCode = mockFormMgrService->HandleNotifyFormsPrivacyProtected(data, reply);
+    int32_t errCode = FormIpcHandlers::HandleNotifyFormsPrivacyProtected(*mockFormMgrService, data, reply);
     // check errorcode
     EXPECT_EQ(0, errCode);
     // check resulting infos.
@@ -288,7 +289,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0006, TestSize.Level1) {
         .Times(1)
         .WillOnce(Return(0));
     // test.
-    int32_t errCode = mockFormMgrService->HandleNotifyFormsPrivacyProtected(data, reply);
+    int32_t errCode = FormIpcHandlers::HandleNotifyFormsPrivacyProtected(*mockFormMgrService, data, reply);
     // check errorcode
     EXPECT_EQ(0, errCode);
     // check resulting infos.
@@ -328,7 +329,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0007, TestSize.Level1) {
         .Times(1)
         .WillOnce(Return(0));
     // test.
-    int32_t errCode = mockFormMgrService->HandleNotifyFormsPrivacyProtected(data, reply);
+    int32_t errCode = FormIpcHandlers::HandleNotifyFormsPrivacyProtected(*mockFormMgrService, data, reply);
     // check errorcode
     EXPECT_EQ(0, errCode);
     // check resulting infos.
@@ -368,7 +369,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0008, TestSize.Level1) {
         .Times(1)
         .WillOnce(Return(0));
     // test.
-    int32_t errCode = mockFormMgrService->HandleNotifyFormsPrivacyProtected(data, reply);
+    int32_t errCode = FormIpcHandlers::HandleNotifyFormsPrivacyProtected(*mockFormMgrService, data, reply);
     // check errorcode
     EXPECT_EQ(0, errCode);
     // check resulting infos.
@@ -2427,7 +2428,7 @@ HWTEST_F(FormMgrStubTest, HandleGetFormInstanceById_0100, TestSize.Level1) {
     data.WriteInt64(1);
     data.WriteBool(false);
     EXPECT_CALL(*mockFormMgrService, GetFormInstanceById(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
-    auto result = mockFormMgrService->HandleGetFormInstanceById(data, reply);
+    auto result = FormIpcHandlers::HandleGetFormInstanceById(*mockFormMgrService, data, reply);
     std::vector<FormInfo> resultInfos;
     GetParcelableInfos(reply, resultInfos);
     EXPECT_EQ(resultInfos.size(), 0);
@@ -2446,7 +2447,7 @@ HWTEST_F(FormMgrStubTest, HandleGetRunningFormInfos_0100, TestSize.Level1) {
     data.WriteBool(false);
     MessageParcel reply;
     EXPECT_CALL(*mockFormMgrService, GetRunningFormInfos(_, _)).Times(1).WillOnce(Return(ERR_OK));
-    auto result = mockFormMgrService->HandleGetRunningFormInfos(data, reply);
+    auto result = FormIpcHandlers::HandleGetRunningFormInfos(*mockFormMgrService, data, reply);
     std::vector<FormInfo> resultInfos;
     GetParcelableInfos(reply, resultInfos);
     EXPECT_EQ(resultInfos.size(), 0);
@@ -2467,7 +2468,7 @@ HWTEST_F(FormMgrStubTest, HandleUpdateFormLocation_0100, TestSize.Level1) {
     data.WriteInt64(1);
     data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::DESKTOP));
     EXPECT_CALL(*mockFormMgrService, UpdateFormLocation(_, _)).Times(1).WillOnce(Return(ERR_OK));
-    EXPECT_EQ(ERR_OK, mockFormMgrService->HandleUpdateFormLocation(data, reply));
+    EXPECT_EQ(ERR_OK, FormIpcHandlers::HandleUpdateFormLocation(*mockFormMgrService, data, reply));
     GTEST_LOG_(INFO) << "HandleUpdateFormLocation_0100 ends";
 }
 
@@ -2483,7 +2484,7 @@ HWTEST_F(FormMgrStubTest, HandleGetRunningFormInfosByBundleName_0100, TestSize.L
     data.WriteBool(false);
     MessageParcel reply;
     EXPECT_CALL(*mockFormMgrService, GetRunningFormInfosByBundleName(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
-    auto result = mockFormMgrService->HandleGetRunningFormInfosByBundleName(data, reply);
+    auto result = FormIpcHandlers::HandleGetRunningFormInfosByBundleName(*mockFormMgrService, data, reply);
     std::vector<FormInfo> resultInfos;
     GetParcelableInfos(reply, resultInfos);
     EXPECT_EQ(resultInfos.size(), 0);
@@ -2535,7 +2536,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0102, TestSize.Level1) {
     data.WriteString("test");
     data.WriteInt32(static_cast<int32_t>(Constants::PublishFormErrorCode::SUCCESS));
     EXPECT_CALL(*mockFormMgrService, SetPublishFormResult(_, _)).Times(1).WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleSetPublishFormResult(data, reply), ERR_OK);
+    EXPECT_EQ(FormIpcHandlers::HandleSetPublishFormResult(*mockFormMgrService, data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0102 ends";
 }
 
@@ -2551,7 +2552,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0103, TestSize.Level1) {
     MessageParcel reply;
     data.WriteInt64(1);
     EXPECT_CALL(*mockFormMgrService, AcquireAddFormResult(_)).Times(1).WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleAcquireAddFormResult(data, reply), ERR_OK);
+    EXPECT_EQ(FormIpcHandlers::HandleAcquireAddFormResult(*mockFormMgrService, data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0103 ends";
 }
 
@@ -2775,7 +2776,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0114, TestSize.Level1) {
     std::vector<int64_t> formIds;
     data.WriteInt64Vector(formIds);
     EXPECT_CALL(*mockFormMgrService, SetFormsRecyclable(_)).Times(1).WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleSetFormsRecyclable(data, reply), ERR_OK);
+    EXPECT_EQ(FormIpcHandlers::HandleSetFormsRecyclable(*mockFormMgrService, data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0114 ends";
 }
 
@@ -3113,7 +3114,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleIsFormBundleForbidden_001, TestS
     MessageParcel reply;
     const std::string bundleName = "bundleName";
     data.WriteString(bundleName);
-    EXPECT_EQ(mockFormMgrService->HandleIsFormBundleForbidden(data, reply), ERR_OK);
+    EXPECT_EQ(FormIpcHandlers::HandleIsFormBundleForbidden(*mockFormMgrService, data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleIsFormBundleForbidden_001 ends";
 }
 
@@ -3128,7 +3129,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleBatchRefreshForms_001, TestSize.
     MessageParcel reply;
     data.WriteInt32(Constants::REFRESH_ALL_FORM);
     EXPECT_CALL(*mockFormMgrService, BatchRefreshForms(_)).Times(1).WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleBatchRefreshForms(data, reply), ERR_OK);
+    EXPECT_EQ(FormIpcHandlers::HandleBatchRefreshForms(*mockFormMgrService, data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleBatchRefreshForms_001 ends";
 }
 
@@ -3143,7 +3144,8 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleBatchRefreshForms_002, TestSize.
     MessageParcel reply;
     data.WriteInt32(Constants::REFRESH_SYSTEMAPP_FORM + 1);
     EXPECT_CALL(*mockFormMgrService, BatchRefreshForms(_)).Times(0);
-    EXPECT_EQ(mockFormMgrService->HandleBatchRefreshForms(data, reply), ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    EXPECT_EQ(FormIpcHandlers::HandleBatchRefreshForms(*mockFormMgrService, data, reply),
+        ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleBatchRefreshForms_002 ends";
 }
 
@@ -3158,7 +3160,8 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleBatchRefreshForms_003, TestSize.
     MessageParcel reply;
     data.WriteInt32(-1);
     EXPECT_CALL(*mockFormMgrService, BatchRefreshForms(_)).Times(0);
-    EXPECT_EQ(mockFormMgrService->HandleBatchRefreshForms(data, reply), ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    EXPECT_EQ(FormIpcHandlers::HandleBatchRefreshForms(*mockFormMgrService, data, reply),
+        ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleBatchRefreshForms_003 ends";
 }
 
@@ -3177,7 +3180,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleEnableForms_001, TestSize.Level1
     data.WriteInt32(userId);
     data.WriteBool(true);
     EXPECT_CALL(*mockFormMgrService, EnableForms(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleEnableForms(data, reply), ERR_OK);
+    EXPECT_EQ(FormIpcHandlers::HandleEnableForms(*mockFormMgrService, data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleEnableForms_001 ends";
 }
 
@@ -3215,7 +3218,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleHasFormVisible_001, TestSize.Lev
     constexpr int64_t tokenId = 1;
     data.WriteInt64(tokenId);
     EXPECT_CALL(*mockFormMgrService, HasFormVisible(_)).Times(1).WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleHasFormVisible(data, reply), ERR_OK);
+    EXPECT_EQ(FormIpcHandlers::HandleHasFormVisible(*mockFormMgrService, data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleHasFormVisible_001 ends";
 }
 
@@ -3231,7 +3234,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleCreateForm_001, TestSize.Level1)
     const Want want = {};
     data.WriteParcelable(&want);
     EXPECT_CALL(*mockFormMgrService, CreateForm(_, _)).Times(1).WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleCreateForm(data, reply), ERR_OK);
+    EXPECT_EQ(FormIpcHandlers::HandleCreateForm(*mockFormMgrService, data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleCreateForm_001 ends";
 }
 
@@ -3245,7 +3248,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleCreateForm_002, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleCreateForm_002 starts";
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_EQ(mockFormMgrService->HandleCreateForm(data, reply), ERR_APPEXECFWK_PARCEL_ERROR);
+    EXPECT_EQ(FormIpcHandlers::HandleCreateForm(*mockFormMgrService, data, reply), ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleCreateForm_002 ends";
 }
 
@@ -3261,7 +3264,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleIsSystemAppForm_001, TestSize.Le
     const std::string bundleName = "bundleName";
     data.WriteString(bundleName);
     EXPECT_CALL(*mockFormMgrService, IsSystemAppForm(_)).Times(1).WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleIsSystemAppForm(data, reply), ERR_OK);
+    EXPECT_EQ(FormIpcHandlers::HandleIsSystemAppForm(*mockFormMgrService, data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleIsSystemAppForm_001 ends";
 }
 
@@ -3334,7 +3337,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0135, TestSize.Level1) {
     EXPECT_CALL(*mockFormMgrService, RegisterGetFormRectProxy(_))
         .Times(1)
         .WillOnce(Return(true));
-    auto result = mockFormMgrService->HandleRegisterGetFormRectProxy(data, reply);
+    auto result = FormIpcHandlers::HandleRegisterGetFormRectProxy(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0135 ends";
 }
@@ -3353,7 +3356,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0136, TestSize.Level1) {
     EXPECT_CALL(*mockFormMgrService, UnregisterGetFormRectProxy())
         .Times(1)
         .WillOnce(Return(true));
-    auto result = mockFormMgrService->HandleUnregisterGetFormRectProxy(data, reply);
+    auto result = FormIpcHandlers::HandleUnregisterGetFormRectProxy(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0136 ends";
 }
@@ -3372,7 +3375,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0137, TestSize.Level1) {
     MessageParcel reply;
     data.WriteInt64(formId);
     EXPECT_CALL(*mockFormMgrService, GetFormRect(_, _)).Times(1).WillOnce(Return(ERR_OK));
-    auto result = mockFormMgrService->HandleGetFormRect(data, reply);
+    auto result = FormIpcHandlers::HandleGetFormRect(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0137 ends";
 }
@@ -3392,7 +3395,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0138, TestSize.Level1) {
     EXPECT_CALL(*mockFormMgrService, RegisterGetLiveFormStatusProxy(_))
         .Times(1)
         .WillOnce(Return(true));
-    auto result = mockFormMgrService->HandleRegisterGetLiveFormStatusProxy(data, reply);
+    auto result = FormIpcHandlers::HandleRegisterGetLiveFormStatusProxy(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0138 ends";
 }
@@ -3411,7 +3414,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0139, TestSize.Level1) {
     EXPECT_CALL(*mockFormMgrService, UnregisterGetLiveFormStatusProxy())
         .Times(1)
         .WillOnce(Return(true));
-    auto result = mockFormMgrService->HandleUnregisterGetLiveFormStatusProxy(data, reply);
+    auto result = FormIpcHandlers::HandleUnregisterGetLiveFormStatusProxy(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0139 ends";
 }
@@ -3435,7 +3438,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleReloadForms_001, TestSize.Level1
     data.WriteString(moduleName);
     data.WriteString(abilityName);
     data.WriteString(formName);
-    auto result = mockFormMgrService->HandleReloadForms(data, reply);
+    auto result = FormIpcHandlers::HandleReloadForms(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleReloadForms_001 ends";
 }
@@ -3453,7 +3456,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleReloadAllForms_001, TestSize.Lev
         .WillOnce(Return(ERR_OK));
     MessageParcel data;
     MessageParcel reply;
-    auto result = mockFormMgrService->HandleReloadAllForms(data, reply);
+    auto result = FormIpcHandlers::HandleReloadAllForms(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleReloadAllForms_001 ends";
 }
@@ -3474,7 +3477,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_001, TestSize
     MessageParcel data;
     data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::DESKTOP));
     MessageParcel reply;
-    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    int32_t result = FormIpcHandlers::HandleGetFormIdsByFormLocation(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     int32_t errCode = reply.ReadInt32();
     EXPECT_EQ(errCode, ERR_OK);
@@ -3500,7 +3503,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_002, TestSize
     MessageParcel data;
     data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::FORM_CENTER));
     MessageParcel reply;
-    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    int32_t result = FormIpcHandlers::HandleGetFormIdsByFormLocation(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     int32_t errCode = reply.ReadInt32();
     EXPECT_EQ(errCode, ERR_OK);
@@ -3526,7 +3529,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_003, TestSize
     MessageParcel data;
     data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::FORM_MANAGER));
     MessageParcel reply;
-    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    int32_t result = FormIpcHandlers::HandleGetFormIdsByFormLocation(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     int32_t errCode = reply.ReadInt32();
     EXPECT_EQ(errCode, ERR_OK);
@@ -3552,7 +3555,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_004, TestSize
     MessageParcel data;
     data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::NEGATIVE_SCREEN));
     MessageParcel reply;
-    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    int32_t result = FormIpcHandlers::HandleGetFormIdsByFormLocation(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     int32_t errCode = reply.ReadInt32();
     EXPECT_EQ(errCode, ERR_OK);
@@ -3578,7 +3581,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_005, TestSize
     MessageParcel data;
     data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::SCREEN_LOCK));
     MessageParcel reply;
-    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    int32_t result = FormIpcHandlers::HandleGetFormIdsByFormLocation(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     int32_t errCode = reply.ReadInt32();
     EXPECT_EQ(errCode, ERR_OK);
@@ -3604,7 +3607,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_006, TestSize
     MessageParcel data;
     data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::AI_SUGGESTION));
     MessageParcel reply;
-    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    int32_t result = FormIpcHandlers::HandleGetFormIdsByFormLocation(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     int32_t errCode = reply.ReadInt32();
     EXPECT_EQ(errCode, ERR_OK);
@@ -3630,7 +3633,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_007, TestSize
     MessageParcel data;
     data.WriteInt32(static_cast<int32_t>(Constants::FormLocation::STANDBY));
     MessageParcel reply;
-    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    int32_t result = FormIpcHandlers::HandleGetFormIdsByFormLocation(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     int32_t errCode = reply.ReadInt32();
     EXPECT_EQ(errCode, ERR_OK);
@@ -3656,7 +3659,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_008, TestSize
     MessageParcel data;
     data.WriteInt32(formLocation);
     MessageParcel reply;
-    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    int32_t result = FormIpcHandlers::HandleGetFormIdsByFormLocation(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     int32_t errCode = reply.ReadInt32();
     EXPECT_EQ(errCode, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
@@ -3680,7 +3683,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetFormIdsByFormLocation_009, TestSize
     MessageParcel data;
     data.WriteInt32(formLocation);
     MessageParcel reply;
-    int32_t result = mockFormMgrService->HandleGetFormIdsByFormLocation(data, reply);
+    int32_t result = FormIpcHandlers::HandleGetFormIdsByFormLocation(*mockFormMgrService, data, reply);
     EXPECT_EQ(result, ERR_OK);
     int32_t errCode = reply.ReadInt32();
     EXPECT_EQ(errCode, ERR_OK);
@@ -3904,7 +3907,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterDeleteFormsCallback_003, TestS
     MessageParcel reply;
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteRemoteObject(nullptr);
-    auto errCode = mockFormMgrService->HandleRegisterDeleteFormsCallback(data, reply);
+    auto errCode = FormIpcHandlers::HandleRegisterDeleteFormsCallback(*mockFormMgrService, data, reply);
     EXPECT_EQ(errCode, ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "FormMgrStubTest_RegisterDeleteFormsCallback_003 ends";
 }
@@ -3925,7 +3928,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_RegisterDeleteFormsCallback_004, TestS
     EXPECT_CALL(*mockFormMgrService, RegisterDeleteFormsCallback(_))
         .Times(1)
         .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS));
-    auto errCode = mockFormMgrService->HandleRegisterDeleteFormsCallback(data, reply);
+    auto errCode = FormIpcHandlers::HandleRegisterDeleteFormsCallback(*mockFormMgrService, data, reply);
     EXPECT_EQ(errCode, ERR_OK);
     auto result = reply.ReadInt32();
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
@@ -3984,7 +3987,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_UnregisterDeleteFormsCallback_003, Tes
     EXPECT_CALL(*mockFormMgrService, UnregisterDeleteFormsCallback())
         .Times(1)
         .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS));
-    auto errCode = mockFormMgrService->HandleUnregisterDeleteFormsCallback(data, reply);
+    auto errCode = FormIpcHandlers::HandleUnregisterDeleteFormsCallback(*mockFormMgrService, data, reply);
     EXPECT_EQ(errCode, ERR_OK);
     auto result = reply.ReadInt32();
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
@@ -4055,7 +4058,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_003, TestSize.Level1) {
     MessageParcel data;
     MessageParcel reply;
     data.WriteInt32(0);
-    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    auto errCode = FormIpcHandlers::HandleDeleteForms(*mockFormMgrService, data, reply);
     EXPECT_EQ(errCode, ERR_OK);
     auto result = reply.ReadInt32();
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
@@ -4074,7 +4077,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_004, TestSize.Level1) {
     MessageParcel data;
     MessageParcel reply;
     data.WriteInt32(Constants::DELETE_FORMS_FILTER_MAX_NUM + 1);
-    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    auto errCode = FormIpcHandlers::HandleDeleteForms(*mockFormMgrService, data, reply);
     EXPECT_EQ(errCode, ERR_OK);
     auto result = reply.ReadInt32();
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
@@ -4095,7 +4098,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_005, TestSize.Level1) {
     data.WriteInt32(1);
     // Write nullptr for filter
     data.WriteParcelable(nullptr);
-    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    auto errCode = FormIpcHandlers::HandleDeleteForms(*mockFormMgrService, data, reply);
     EXPECT_EQ(errCode, ERR_OK);
     auto result = reply.ReadInt32();
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
@@ -4127,7 +4130,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_006, TestSize.Level1) {
     EXPECT_CALL(*mockFormMgrService, DeleteForms(_))
         .Times(1)
         .WillOnce(Return(ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG));
-    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    auto errCode = FormIpcHandlers::HandleDeleteForms(*mockFormMgrService, data, reply);
     EXPECT_EQ(errCode, ERR_OK);
     auto result = reply.ReadInt32();
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG);
@@ -4162,7 +4165,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_007, TestSize.Level1) {
     }
 
     EXPECT_CALL(*mockFormMgrService, DeleteForms(_)).Times(1).WillOnce(Return(ERR_OK));
-    auto errCode = mockFormMgrService->HandleDeleteForms(data, reply);
+    auto errCode = FormIpcHandlers::HandleDeleteForms(*mockFormMgrService, data, reply);
     EXPECT_EQ(errCode, ERR_OK);
     auto result = reply.ReadInt32();
     EXPECT_EQ(result, ERR_OK);
@@ -4240,7 +4243,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_001, TestSize.Level
     EXPECT_CALL(*mockFormMgrService, GetVisibleFormRect(_, _))
         .Times(1)
         .WillOnce(DoAll(SetArgReferee<1>(expectRect), Return(ERR_OK)));
-    auto handlerResult = mockFormMgrService->HandleGetVisibleFormRect(data, reply);
+    auto handlerResult = FormIpcHandlers::HandleGetVisibleFormRect(*mockFormMgrService, data, reply);
     EXPECT_EQ(handlerResult, ERR_OK);
     // Handler writes GetVisibleFormRect result (ERR_OK) into reply
     int32_t serviceResult = 0;
@@ -4267,7 +4270,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_002, TestSize.Level
     MessageParcel data;
     MessageParcel reply;
     // Do NOT write formId — ReadInt64 will fail inside the handler
-    auto handlerResult = mockFormMgrService->HandleGetVisibleFormRect(data, reply);
+    auto handlerResult = FormIpcHandlers::HandleGetVisibleFormRect(*mockFormMgrService, data, reply);
     EXPECT_EQ(handlerResult, ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_002 ends";
 }
@@ -4287,7 +4290,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_003, TestSize.Level
     EXPECT_CALL(*mockFormMgrService, GetVisibleFormRect(_, _))
         .Times(1)
         .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
-    auto handlerResult = mockFormMgrService->HandleGetVisibleFormRect(data, reply);
+    auto handlerResult = FormIpcHandlers::HandleGetVisibleFormRect(*mockFormMgrService, data, reply);
     // Handler itself succeeded writing to reply
     EXPECT_EQ(handlerResult, ERR_OK);
     int32_t serviceResult = 0;

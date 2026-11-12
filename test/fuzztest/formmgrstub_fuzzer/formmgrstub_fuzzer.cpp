@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 
 #define private public
 #define protected public
+#include "form_ipc_handlers.h"
 #include "form_mgr_stub.h"
 #undef private
 #undef protected
@@ -340,50 +341,50 @@ void HandleFormMessage(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &
     if (formMgrStub == nullptr) {
         return;
     }
-    formMgrStub->HandleRegisterFormRemoveObserverByBundle(data, reply);
-    formMgrStub->HandleGetFormsCount(data, reply);
-    formMgrStub->HandleGetHostFormsCount(data, reply);
-    formMgrStub->HandleGetRunningFormInfos(data, reply);
-    formMgrStub->HandleGetRunningFormInfosByBundleName(data, reply);
-    formMgrStub->HandleGetFormInstanceById(data, reply);
-    formMgrStub->HandleGetAllFormsInfo(data, reply);
-    formMgrStub->HandleGetFormsInfoByApp(data, reply);
-    formMgrStub->HandleGetFormsInfoByModule(data, reply);
-    formMgrStub->HandleIsRequestPublishFormSupported(data, reply);
-    formMgrStub->HandleShareForm(data, reply);
-    formMgrStub->HandleCheckFMSReady(data, reply);
-    formMgrStub->HandleDeleteForm(data, reply);
-    formMgrStub->HandleStopRenderingForm(data, reply);
-    formMgrStub->HandleReleaseForm(data, reply);
-    formMgrStub->HandleSetNextRefreshTime(data, reply);
-    formMgrStub->HandleLifecycleUpdate(data, reply);
-    formMgrStub->HandleRequestForm(data, reply);
-    formMgrStub->HandleNotifyWhetherVisibleForms(data, reply);
-    formMgrStub->HandleCastTempForm(data, reply);
-    formMgrStub->HandleDumpFormInfoByBundleName(data, reply);
-    formMgrStub->HandleDumpFormInfoByFormId(data, reply);
-    formMgrStub->HandleDumpFormTimerByFormId(data, reply);
-    formMgrStub->HandleDeleteInvalidForms(data, reply);
-    formMgrStub->HandleNotifyFormsVisible(data, reply);
-    formMgrStub->HandleNotifyFormsPrivacyProtected(data, reply);
-    formMgrStub->HandleNotifyFormsEnableUpdate(data, reply);
-    formMgrStub->HandleRegisterFormAddObserverByBundle(data, reply);
-    formMgrStub->HandleAddForm(data, reply);
-    formMgrStub->HandleUpdateForm(data, reply);
-    formMgrStub->HandleRequestPublishForm(data, reply);
-    formMgrStub->HandleMessageEvent(data, reply);
-    formMgrStub->HandleBackgroundEvent(data, reply);
-    formMgrStub->HandleRouterEvent(data, reply);
-    formMgrStub->HandleInsightIntentEvent(data, reply);
-    formMgrStub->HandleAcquireFormState(data, reply);
-    formMgrStub->HandleGetFormsInfo(data, reply);
-    formMgrStub->HandleStartAbility(data, reply);
-    formMgrStub->HandleRecvFormShareInfoFromRemote(data, reply);
-    formMgrStub->HandleAcquireFormData(data, reply);
-    formMgrStub->HandleGetFormInstancesByFilter(data, reply);
-    formMgrStub->HandleGetAllTemplateFormsInfo(data, reply);
-    formMgrStub->HandleGetTemplateFormsInfoByApp(data, reply);
-    formMgrStub->HandleGetTemplateFormsInfoByModule(data, reply);
+    FormIpcHandlers::HandleRegisterFormRemoveObserverByBundle(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetFormsCount(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetHostFormsCount(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetRunningFormInfos(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetRunningFormInfosByBundleName(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetFormInstanceById(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetAllFormsInfo(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetFormsInfoByApp(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetFormsInfoByModule(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleIsRequestPublishFormSupported(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleShareForm(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleCheckFMSReady(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleDeleteForm(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleStopRenderingForm(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleReleaseForm(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleSetNextRefreshTime(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleLifecycleUpdate(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRequestForm(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleNotifyWhetherVisibleForms(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleCastTempForm(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleDumpFormInfoByBundleName(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleDumpFormInfoByFormId(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleDumpFormTimerByFormId(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleDeleteInvalidForms(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleNotifyFormsVisible(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleNotifyFormsPrivacyProtected(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleNotifyFormsEnableUpdate(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterFormAddObserverByBundle(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleAddForm(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUpdateForm(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRequestPublishForm(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleMessageEvent(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleBackgroundEvent(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRouterEvent(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleInsightIntentEvent(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleAcquireFormState(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetFormsInfo(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleStartAbility(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRecvFormShareInfoFromRemote(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleAcquireFormData(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetFormInstancesByFilter(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetAllTemplateFormsInfo(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetTemplateFormsInfoByApp(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetTemplateFormsInfoByModule(*formMgrStub, data, reply);
 }
 
 void HandleFormRequest(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &data, MessageParcel &reply)
@@ -391,32 +392,32 @@ void HandleFormRequest(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &
     if (formMgrStub == nullptr) {
         return;
     }
-    formMgrStub->HandleCreateForm(data, reply);
-    formMgrStub->HandleReleaseRenderer(data, reply);
-    formMgrStub->HandleSetPublishFormResult(data, reply);
-    formMgrStub->HandleAcquireAddFormResult(data, reply);
-    formMgrStub->HandleHasFormVisible(data, reply);
-    formMgrStub->HandleDumpStorageFormInfos(data, reply);
-    formMgrStub->HandleGetFormsInfoByFilter(data, reply);
-    formMgrStub->HandleIsSystemAppForm(data, reply);
-    formMgrStub->HandleRegisterAddObserver(data, reply);
-    formMgrStub->HandleRegisterRemoveObserver(data, reply);
-    formMgrStub->HandleRegisterFormRouterProxy(data, reply);
-    formMgrStub->HandleUnregisterFormRouterProxy(data, reply);
-    formMgrStub->HandleUpdateProxyForm(data, reply);
-    formMgrStub->HandleRequestPublishProxyForm(data, reply);
-    formMgrStub->HandleUnregisterPublishFormInterceptor(data, reply);
-    formMgrStub->HandleRegisterClickCallbackEventObserver(data, reply);
-    formMgrStub->HandleUnregisterClickCallbackEventObserver(data, reply);
+    FormIpcHandlers::HandleCreateForm(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleReleaseRenderer(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleSetPublishFormResult(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleAcquireAddFormResult(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleHasFormVisible(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleDumpStorageFormInfos(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetFormsInfoByFilter(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleIsSystemAppForm(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterAddObserver(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterRemoveObserver(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterFormRouterProxy(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUnregisterFormRouterProxy(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUpdateProxyForm(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRequestPublishProxyForm(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUnregisterPublishFormInterceptor(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterClickCallbackEventObserver(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUnregisterClickCallbackEventObserver(*formMgrStub, data, reply);
     std::vector<FormDataProxy> formDataProxies;
-    formMgrStub->ReadFormDataProxies(data, formDataProxies);
-    formMgrStub->HandleSetFormsRecyclable(data, reply);
-    formMgrStub->HandleRecoverForms(data, reply);
-    formMgrStub->HandleUpdateFormLocation(data, reply);
-    formMgrStub->HandleRequestPublishFormWithSnapshot(data, reply);
-    formMgrStub->HandleBatchRefreshForms(data, reply);
-    formMgrStub->HandleEnableForms(data, reply);
-    formMgrStub->HandleIsFormBundleForbidden(data, reply);
+    ReadFormDataProxies(data, formDataProxies);
+    FormIpcHandlers::HandleSetFormsRecyclable(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRecoverForms(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUpdateFormLocation(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRequestPublishFormWithSnapshot(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleBatchRefreshForms(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleEnableForms(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleIsFormBundleForbidden(*formMgrStub, data, reply);
 }
 
 uint32_t GetU32Data(const char* ptr)

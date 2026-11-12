@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 #define private public
 #define protected public
 #include "form_mgr/form_mgr_service.h"
+#include "form_mgr/form_mgr_dump_handler.h"
 #undef private
 #undef protected
 #include "securec.h"
@@ -111,10 +112,10 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     std::vector<std::u16string> args = {u"-h"};
     formMgrService.Dump(fd, args);
     std::string result(data, size);
-    formMgrService.Dump(args, result);
+    FormMgrDumpHandler::Dump(args, result);
     std::string value(data, size);
-    formMgrService.HiDumpFormInfoByBundleName(value, result);
-    formMgrService.HiDumpFormInfoByFormId(value, result);
+    FormMgrDumpHandler::HiDumpFormInfoByBundleName(value, result);
+    FormMgrDumpHandler::HiDumpFormInfoByFormId(value, result);
     return true;
 }
 }

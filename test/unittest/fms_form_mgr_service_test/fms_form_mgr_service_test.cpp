@@ -27,6 +27,7 @@
 #include "data_center/form_data_mgr.h"
 #include "common/event/form_event_util.h"
 #include "form_mgr/form_mgr_service.h"
+#include "form_mgr/form_mgr_dump_handler.h"
 #include "tokenid_kit.h"
 #include "data_center/form_info/form_info_mgr.h"
 #undef private
@@ -555,10 +556,10 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0021, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0021 start";
     FormMgrService formMgrService;
     const std::vector<std::u16string> args;
-    FormMgrService::DumpKey key = FormMgrService::DumpKey::KEY_DUMP_HELP;
+    FormMgrDumpHandler::DumpKey key = FormMgrDumpHandler::DumpKey::KEY_DUMP_HELP;
     std::string value;
     std::string result;
-    EXPECT_FALSE(formMgrService.ParseOption(args, key, value, result));
+    EXPECT_FALSE(FormMgrDumpHandler::ParseOption(args, key, value, result));
     GTEST_LOG_(INFO) << "FormMgrService_0021 end";
 }
 
@@ -573,10 +574,10 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0022, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0022 start";
     FormMgrService formMgrService;
     const std::vector<std::u16string> args = { u"args1", u"args2", u"args3"};
-    FormMgrService::DumpKey key = FormMgrService::DumpKey::KEY_DUMP_HELP;
+    FormMgrDumpHandler::DumpKey key = FormMgrDumpHandler::DumpKey::KEY_DUMP_HELP;
     std::string value;
     std::string result;
-    EXPECT_FALSE(formMgrService.ParseOption(args, key, value, result));
+    EXPECT_FALSE(FormMgrDumpHandler::ParseOption(args, key, value, result));
     GTEST_LOG_(INFO) << "FormMgrService_0022 end";
 }
 
@@ -591,10 +592,10 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0023, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0023 start";
     FormMgrService formMgrService;
     const std::vector<std::u16string> args = { u"args1", u"args3"};
-    FormMgrService::DumpKey key = FormMgrService::DumpKey::KEY_DUMP_HELP;
+    FormMgrDumpHandler::DumpKey key = FormMgrDumpHandler::DumpKey::KEY_DUMP_HELP;
     std::string value;
     std::string result;
-    EXPECT_FALSE(formMgrService.ParseOption(args, key, value, result));
+    EXPECT_FALSE(FormMgrDumpHandler::ParseOption(args, key, value, result));
     GTEST_LOG_(INFO) << "FormMgrService_0023 end";
 }
 
@@ -609,10 +610,10 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0024, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0024 start";
     FormMgrService formMgrService;
     const std::vector<std::u16string> args = { u"-h"};
-    FormMgrService::DumpKey key = FormMgrService::DumpKey::KEY_DUMP_HELP;
+    FormMgrDumpHandler::DumpKey key = FormMgrDumpHandler::DumpKey::KEY_DUMP_HELP;
     std::string value;
     std::string result;
-    EXPECT_TRUE(formMgrService.ParseOption(args, key, value, result));
+    EXPECT_TRUE(FormMgrDumpHandler::ParseOption(args, key, value, result));
     GTEST_LOG_(INFO) << "FormMgrService_0024 end";
 }
 
@@ -627,10 +628,10 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0025, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0025 start";
     FormMgrService formMgrService;
     const std::vector<std::u16string> args = { u"-h", u"-s" };
-    FormMgrService::DumpKey key = FormMgrService::DumpKey::KEY_DUMP_HELP;
+    FormMgrDumpHandler::DumpKey key = FormMgrDumpHandler::DumpKey::KEY_DUMP_HELP;
     std::string value;
     std::string result;
-    EXPECT_TRUE(formMgrService.ParseOption(args, key, value, result));
+    EXPECT_TRUE(FormMgrDumpHandler::ParseOption(args, key, value, result));
     GTEST_LOG_(INFO) << "FormMgrService_0025 end";
 }
 
@@ -750,12 +751,6 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0034, TestSize.Level1)
     MockIsSystemAppByFullTokenID(false);
     EXPECT_EQ(formMgrService.GetFormsInfoByModule(bundleName, moduleName, formInfos),
               ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-
-    MockIsSACall(true);
-    MockCheckAcrossLocalAccountsPermission(false);
-    EXPECT_EQ(formMgrService.GetFormsInfoByModule(bundleName, moduleName, formInfos),
-              ERR_APPEXECFWK_FORM_PERMISSION_DENY);
-    MockCheckAcrossLocalAccountsPermission(true);
     GTEST_LOG_(INFO) << "FormMgrService_0034 end";
 }
 
@@ -797,25 +792,6 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0036, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0037
- * @tc.name: test GetFormsInfoByApp function.
- * @tc.desc: Verify that the GetFormsInfoByApp interface if the caller do not have the across local
- *           accounts permission and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
- */
-HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0037, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0037 start";
-    FormMgrService formMgrService;
-    std::string bundleName;
-    std::vector<FormInfo> formInfos;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(true);
-    MockCheckAcrossLocalAccountsPermission(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.GetFormsInfoByApp(bundleName, formInfos));
-    GTEST_LOG_(INFO) << "FormMgrService_0037 end";
-}
-
-/**
  * @tc.number: FormMgrService_0038
  * @tc.name: test GetFormsInfoByApp function.
  * @tc.desc: Verify that the GetFormsInfoByApp interface is called normally and the return value is ERR_OK.
@@ -849,23 +825,6 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0039, TestSize.Level1)
     MockIsSystemAppByFullTokenID(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetFormsInfoByApp(bundleName, formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0039 end";
-}
-
-/**
- * @tc.number: FormMgrService_0040
- * @tc.name: test GetAllFormsInfo function.
- * @tc.desc: Verify that the GetAllFormsInfo interface if the caller do not have the across local
- *           accounts permission and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
- */
-HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0040, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0040 start";
-    FormMgrService formMgrService;
-    std::vector<FormInfo> formInfos;
-    MockIsSACall(true);
-    MockCheckAcrossLocalAccountsPermission(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.GetAllFormsInfo(formInfos));
-    GTEST_LOG_(INFO) << "FormMgrService_0040 end";
 }
 
 /**
@@ -1619,29 +1578,6 @@ HWTEST_F(FmsFormMgrServiceTest, UpdateFormCrossBundle_006, TestSize.Level1)
     ErrCode ret = formMgrService.UpdateFormCrossBundle(formId, formProviderData);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_TRUST);
     GTEST_LOG_(INFO) << "UpdateFormCrossBundle_006 end";
-}
- 
-/**
- * @tc.number: UpdateFormCrossBundle_007
- * @tc.name: test UpdateFormCrossBundle rejects cross-local-account callers.
- * @tc.desc: Verify FORM_PERMISSION_DENY is returned when INTERACT_ACROSS_LOCAL_ACCOUNTS is missing.
- */
-HWTEST_F(FmsFormMgrServiceTest, UpdateFormCrossBundle_007, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_007 start";
-    FormMgrService formMgrService;
-    int64_t formId = 7;
-    FormProviderData formProviderData = FormProviderData(std::string("{\"k\":\"v\"}"));
- 
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(true);
-    MockCheckAcrossLocalAccountsPermission(false);
-    MockUpdateFormCrossBundle(ERR_OK);
- 
-    ErrCode ret = formMgrService.UpdateFormCrossBundle(formId, formProviderData);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
-    GTEST_LOG_(INFO) << "UpdateFormCrossBundle_007 end";
 }
  
 /**

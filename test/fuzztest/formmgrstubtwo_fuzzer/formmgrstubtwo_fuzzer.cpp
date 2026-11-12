@@ -22,6 +22,7 @@
 
 #define private public
 #define protected public
+#include "form_ipc_handlers.h"
 #include "form_mgr_stub.h"
 #undef private
 #undef protected
@@ -579,52 +580,52 @@ void HandleFormMessageTwo(std::shared_ptr<FormMgrStub> formMgrStub, MessageParce
     if (formMgrStub == nullptr) {
         return;
     }
-    formMgrStub->HandleRequestPublishFormCrossUser(data, reply);
-    formMgrStub->HandleRegisterFormWantCallback(data, reply);
-    formMgrStub->HandleUnregisterFormWantCallback(data, reply);
-    formMgrStub->HandleGetPublishedFormInfoById(data, reply);
-    formMgrStub->HandleGetPublishedFormInfos(data, reply);
-    formMgrStub->HandleStartAbilityByFms(data, reply);
-    formMgrStub->HandleStartUIAbilityByFms(data, reply);
-    formMgrStub->HandleStartAbilityByCrossBundle(data, reply);
-    formMgrStub->HandleRegisterPublishFormInterceptor(data, reply);
-    formMgrStub->HandleLockForms(data, reply);
-    formMgrStub->HandleIsFormExempt(data, reply);
-    formMgrStub->HandleIsFormProtected(data, reply);
-    formMgrStub->HandleIsFormDebugSignature(data, reply);
-    formMgrStub->HandleNotifyFormLocked(data, reply);
-    formMgrStub->HandleUpdateFormSize(data, reply);
-    formMgrStub->HandleOpenFormEditAbility(data, reply);
-    formMgrStub->HandleCloseFormEditAbility(data, reply);
-    formMgrStub->HandleRegisterOverflowProxy(data, reply);
-    formMgrStub->HandleUnregisterOverflowProxy(data, reply);
-    formMgrStub->HandleRequestOverflow(data, reply);
-    formMgrStub->HandleRegisterChangeSceneAnimationStateProxy(data, reply);
-    formMgrStub->HandleUnregisterChangeSceneAnimationStateProxy(data, reply);
-    formMgrStub->HandleChangeSceneAnimationState(data, reply);
-    formMgrStub->HandleRegisterGetFormRectProxy(data, reply);
-    formMgrStub->HandleUnregisterGetFormRectProxy(data, reply);
-    formMgrStub->HandleGetFormRect(data, reply);
-    formMgrStub->HandleNotifyUpdateFormSize(data, reply);
-    formMgrStub->HandleRegisterGetLiveFormStatusProxy(data, reply);
-    formMgrStub->HandleUnregisterGetLiveFormStatusProxy(data, reply);
-    formMgrStub->HandleReloadForms(data, reply);
-    formMgrStub->HandleReloadAllForms(data, reply);
-    formMgrStub->HandleIsFormDueControl(data, reply);
-    formMgrStub->HandleSendNonTransparencyRatio(data, reply);
-    formMgrStub->HandleRegisterPublishFormCrossBundleControl(data, reply);
-    formMgrStub->HandleUnregisterPublishFormCrossBundleControl(data, reply);
-    formMgrStub->HandleRegisterTemplateFormDetailInfoChange(data, reply);
-    formMgrStub->HandleUnregisterTemplateFormDetailInfoChange(data, reply);
-    formMgrStub->HandleUpdateTemplateFormDetailInfo(data, reply);
-    formMgrStub->HandleGetFormIdsByFormLocation(data, reply);
-    formMgrStub->HandleRegisterUpdateFormsConfigCallback(data, reply);
-    formMgrStub->HandleUnregisterUpdateFormsConfigCallback(data, reply);
-    formMgrStub->HandleUpdateFormsConfig(data, reply);
-    formMgrStub->HandleRegisterDeleteFormsCallback(data, reply);
-    formMgrStub->HandleUnregisterDeleteFormsCallback(data, reply);
-    formMgrStub->HandleDeleteForms(data, reply);
-    formMgrStub->HandleRecycleForms(data, reply);
+    FormIpcHandlers::HandleRequestPublishFormCrossUser(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterFormWantCallback(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUnregisterFormWantCallback(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetPublishedFormInfoById(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetPublishedFormInfos(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleStartAbilityByFms(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleStartUIAbilityByFms(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleStartAbilityByCrossBundle(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterPublishFormInterceptor(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleLockForms(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleIsFormExempt(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleIsFormProtected(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleIsFormDebugSignature(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleNotifyFormLocked(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUpdateFormSize(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleOpenFormEditAbility(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleCloseFormEditAbility(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterOverflowProxy(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUnregisterOverflowProxy(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRequestOverflow(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterChangeSceneAnimationStateProxy(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUnregisterChangeSceneAnimationStateProxy(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleChangeSceneAnimationState(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterGetFormRectProxy(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUnregisterGetFormRectProxy(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetFormRect(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleNotifyUpdateFormSize(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterGetLiveFormStatusProxy(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUnregisterGetLiveFormStatusProxy(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleReloadForms(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleReloadAllForms(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleIsFormDueControl(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleSendNonTransparencyRatio(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterPublishFormCrossBundleControl(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUnregisterPublishFormCrossBundleControl(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterTemplateFormDetailInfoChange(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUnregisterTemplateFormDetailInfoChange(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUpdateTemplateFormDetailInfo(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleGetFormIdsByFormLocation(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterUpdateFormsConfigCallback(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUnregisterUpdateFormsConfigCallback(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUpdateFormsConfig(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRegisterDeleteFormsCallback(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleUnregisterDeleteFormsCallback(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleDeleteForms(*formMgrStub, data, reply);
+    FormIpcHandlers::HandleRecycleForms(*formMgrStub, data, reply);
 }
 
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)

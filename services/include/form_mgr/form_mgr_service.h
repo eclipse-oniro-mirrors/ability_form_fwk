@@ -1099,18 +1099,6 @@ private:
      */
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 
-    enum class DumpKey {
-        KEY_DUMP_HELP = 0,
-        KEY_DUMP_STORAGE,
-        KEY_DUMP_BY_BUNDLE_NAME,
-        KEY_DUMP_BY_FORM_ID,
-        KEY_DUMP_TEMPORARY,
-        KEY_DUMP_STATIC,
-        KEY_DUMP_VISIBLE,
-        KEY_DUMP_RUNNING,
-        KEY_DUMP_BLOCKED_APPS,
-        KEY_DUMP_CROSS_DEVICE,
-    };
     /**
      * @brief initialization of form manager service.
      */
@@ -1123,18 +1111,6 @@ private:
 
     void InitFormShareMgrSerialQueue();
 
-    void Dump(const std::vector<std::u16string> &args, std::string &result);
-    bool ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value, std::string &result);
-    void HiDumpHelp([[maybe_unused]] const std::string &args, std::string &result);
-    void HiDumpStorageFormInfos([[maybe_unused]] const std::string &args, std::string &result);
-    void HiDumpTemporaryFormInfos([[maybe_unused]] const std::string &args, std::string &result);
-    void HiDumpStaticBundleFormInfos([[maybe_unused]] const std::string &args, std::string &result);
-    void HiDumpHasFormVisible(const std::string &args, std::string &result);
-    void HiDumpFormInfoByBundleName(const std::string &args, std::string &result);
-    void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
-    void HiDumpFormRunningFormInfos([[maybe_unused]] const std::string &args, std::string &result);
-    void HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result);
-    void HiDumpCrossDevice([[maybe_unused]] const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;
     static std::string GetCurrentDateTime();
     bool PublishFormCrossBundleControl(const Want &want);
@@ -1145,7 +1121,6 @@ private:
     std::shared_ptr<FormOsAccountSubscriber> osAccountSubscriber_;
     std::mutex snapshotSetMutex_;
     static const int32_t ENABLE_FORM_UPDATE = 5;
-    const static std::map<std::string, DumpKey> dumpKeyMap_;
     std::string onStartBeginTime_;
     std::string onStartPublishTime_;
     std::string onStartEndTime_;
