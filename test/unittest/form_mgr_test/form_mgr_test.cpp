@@ -68,6 +68,24 @@ const std::int32_t NEGATIVE_NUM = -1;
 const std::int32_t POSITIVE_NUM = 1;
 const std::int32_t ERR_FAILED = -1;
 const std::int64_t FORM_ID = 10;
+
+class MockDeathCallback final : public FormCallbackInterface {
+public:
+    void ProcessFormUpdate(const FormJsInfo &formJsInfo) override {}
+    void ProcessFormUninstall(const int64_t formId) override {}
+    void OnDeathReceived() override { deathCount++; }
+    void OnError(const int32_t errorCode, const std::string &errorMsg) override {}
+    int32_t deathCount = 0;
+};
+
+class FailLoadSamgr : public MockSystemAbilityManager {
+public:
+    int32_t LoadSystemAbility(int32_t systemAbilityId, const sptr<ISystemAbilityLoadCallback>& callback) override
+    {
+        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
+    }
+};
+
 class FormMgrTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -1394,14 +1412,19 @@ HWTEST_F(FormMgrTest, FormMgrTest_0071, TestSize.Level1) {
 
 /**
  * @tc.name: FormMgrTest_0073
- * @tc.desc: Verify Reconnect
+ * @tc.desc: Verify Reconnect sets recover status to RECOVER_FAIL when samgr rejects the load request
  * @tc.type: FUNC
  * @tc.require: issueI63Y7Y
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0073, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0073 starts";
-    bool data =  FormMgr::GetInstance().Reconnect();
-    EXPECT_EQ(data, true);
+    sptr<FailLoadSamgr> failSamgr = new (std::nothrow) FailLoadSamgr();
+    sptr<ISystemAbilityManager> backupSamgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = failSamgr;
+    FormMgr::GetInstance().Reconnect();
+    EXPECT_EQ(FormMgr::GetRecoverStatus(), Constants::RECOVER_FAIL);
+    SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = backupSamgr;
+    FormMgr::SetRecoverStatus(Constants::NOT_IN_RECOVERY);
     GTEST_LOG_(INFO) << "FormMgrTest_0073 test ends";
 }
 
@@ -5977,4 +6000,63 @@ HWTEST_F(FormMgrTest, FormMgrTest_UnregisterGetVisibleFormRectProxy_002, TestSiz
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgrTest_UnregisterGetVisibleFormRectProxy_002 ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_DeathCallbackRegistryLifecycle_001
+ * @tc.desc: Verify death callback register and unregister lifecycle.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_DeathCallbackRegistryLifecycle_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_DeathCallbackRegistryLifecycle_001 starts";
+    auto callback = std::make_shared<MockDeathCallback>();
+    EXPECT_FALSE(FormMgr::GetInstance().CheckIsDeathCallbackRegistered(callback));
+    FormMgr::GetInstance().RegisterDeathCallback(callback);
+    EXPECT_TRUE(FormMgr::GetInstance().CheckIsDeathCallbackRegistered(callback));
+    FormMgr::GetInstance().UnRegisterDeathCallback(callback);
+    EXPECT_FALSE(FormMgr::GetInstance().CheckIsDeathCallbackRegistered(callback));
+    GTEST_LOG_(INFO) << "FormMgrTest_DeathCallbackRegistryLifecycle_001 ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_DeathCallbackRegistryMultiple_002
+ * @tc.desc: Verify registry keeps callbacks independently by object identity.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_DeathCallbackRegistryMultiple_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_DeathCallbackRegistryMultiple_002 starts";
+    auto callbackA = std::make_shared<MockDeathCallback>();
+    auto callbackB = std::make_shared<MockDeathCallback>();
+    FormMgr::GetInstance().RegisterDeathCallback(callbackA);
+    FormMgr::GetInstance().RegisterDeathCallback(callbackB);
+    FormMgr::GetInstance().UnRegisterDeathCallback(callbackA);
+    EXPECT_FALSE(FormMgr::GetInstance().CheckIsDeathCallbackRegistered(callbackA));
+    EXPECT_TRUE(FormMgr::GetInstance().CheckIsDeathCallbackRegistered(callbackB));
+    FormMgr::GetInstance().UnRegisterDeathCallback(callbackB);
+    GTEST_LOG_(INFO) << "FormMgrTest_DeathCallbackRegistryMultiple_002 ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_NotifyDeathCallbacks_001
+ * @tc.desc: Verify NotifyDeathCallbacks invokes OnDeathReceived of all registered callbacks.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_NotifyDeathCallbacks_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_NotifyDeathCallbacks_001 starts";
+    auto callbackA = std::make_shared<MockDeathCallback>();
+    auto callbackB = std::make_shared<MockDeathCallback>();
+    FormMgr::GetInstance().RegisterDeathCallback(callbackA);
+    FormMgr::GetInstance().RegisterDeathCallback(callbackB);
+
+    FormMgr::GetInstance().NotifyDeathCallbacks();
+
+    EXPECT_EQ(callbackA->deathCount, 1);
+    EXPECT_EQ(callbackB->deathCount, 1);
+    FormMgr::GetInstance().UnRegisterDeathCallback(callbackA);
+    FormMgr::GetInstance().UnRegisterDeathCallback(callbackB);
+    GTEST_LOG_(INFO) << "FormMgrTest_NotifyDeathCallbacks_001 ends";
+}
+
 } // namespace
