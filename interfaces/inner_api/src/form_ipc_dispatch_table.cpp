@@ -494,6 +494,15 @@ constexpr HandlerEntry kEntries[] = {
     {IFormMgr::Message::FORM_MGR_GET_VISIBLE_FORM_RECT,
         FormIpcHandlers::HandleGetVisibleFormRect,
         MakePolicy({CheckType::SystemCaller})},
+    {IFormMgr::Message::FORM_MGR_OPEN_FORM_MANAGE_PAGE,
+        FormIpcHandlers::HandleOpenFormManagePage,
+        MakePolicy()},
+    {IFormMgr::Message::FORM_MGR_OPEN_FORM_EDIT_PAGE,
+        FormIpcHandlers::HandleOpenFormEditPage,
+        MakePolicy()},
+    {IFormMgr::Message::FORM_MGR_OPEN_LIVE_FORM_PAGE,
+        FormIpcHandlers::HandleOpenLiveFormPage,
+        MakePolicy()},
 };
 
 constexpr size_t ENTRY_COUNT = sizeof(kEntries) / sizeof(kEntries[0]);

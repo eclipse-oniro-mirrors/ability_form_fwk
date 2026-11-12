@@ -94,6 +94,7 @@ namespace Constants {
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_FORM_EDIT = 3;
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_LIVE_FORM = 4;
     constexpr const char* PARMA_REQUEST_METHOD = "requestMethod";
+    constexpr const char* START_ABILITY_BY_LIVE_FORM = "startAbilityByLiveForm";
     constexpr const char* PARAM_OPEN_FORM_EDIT_VIEW = "openFormEditView";
     constexpr const char* PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW = "openFormEditSecPageView";
     constexpr const char* PARAM_CLOSE_FORM_EDIT_VIEW = "closeFormEditView";

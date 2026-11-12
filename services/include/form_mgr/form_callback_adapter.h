@@ -98,6 +98,16 @@ public:
 
     ErrCode StartAbilityByFms(const Want &want);
 
+    ErrCode OpenFormManagePage(const Want &want);
+
+    ErrCode OpenFormEditPage(const Want &want);
+
+    ErrCode OpenLiveFormPage(const Want &want, const std::string &formId);
+
+    ErrCode StartHostPage(const Want &want, int32_t routerCode, const std::string &requestMethod);
+
+    bool IsForegroundApp();
+
     ErrCode RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken);
 
     ErrCode UnregisterPublishFormCrossBundleControl();
@@ -143,7 +153,7 @@ private:
 
     ErrCode SceneAnimationCheck(const int64_t formId, const int32_t callingUid);
 
-    bool IsForegroundApp();
+    ErrCode CheckDestinationIsCaller(const Want &want, std::string &callerName);
 
     void NotifyCachedFormConfigs(const sptr<IRemoteObject> &callerToken);
 

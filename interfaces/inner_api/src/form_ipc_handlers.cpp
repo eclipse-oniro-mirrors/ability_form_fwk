@@ -2940,6 +2940,55 @@ int32_t HandleGetVisibleFormRect(IFormMgr &svc, MessageParcel &data, MessageParc
     }
     return ERR_OK;
 }
+
+int32_t HandleOpenFormManagePage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("get want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = svc.OpenFormManagePage(*want);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+int32_t HandleOpenFormEditPage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("get want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = svc.OpenFormEditPage(*want);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+int32_t HandleOpenLiveFormPage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("get want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::string formId = data.ReadString();
+    int32_t result = svc.OpenLiveFormPage(*want, formId);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
 } // namespace FormIpcHandlers
 } // namespace AppExecFwk
 } // namespace OHOS

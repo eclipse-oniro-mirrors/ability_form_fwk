@@ -1228,7 +1228,33 @@ int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
         HILOG_ERROR("PublishFormCrossBundleControl failed.");
         return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
     }
-    return FormMgrAdapterFacade::GetInstance().StartAbilityByFms(want);
+    if (!FormMgrAdapterFacade::GetInstance().IsForegroundApp()) {
+        HILOG_ERROR("This application is not a foreground program");
+        return ERR_APPEXECFWK_FORM_NOT_TRUST;
+    }
+    return FormMgrAdapterFacade::GetInstance().StartHostPage(want,
+        Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE, Constants::OPEN_FORM_MANAGE_VIEW);
+}
+
+int32_t FormMgrService::OpenFormManagePage(const Want &want)
+{
+    HILOG_INFO("call");
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    return FormMgrAdapterFacade::GetInstance().OpenFormManagePage(want);
+}
+
+int32_t FormMgrService::OpenFormEditPage(const Want &want)
+{
+    HILOG_INFO("call");
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    return FormMgrAdapterFacade::GetInstance().OpenFormEditPage(want);
+}
+
+int32_t FormMgrService::OpenLiveFormPage(const Want &want, const std::string &formId)
+{
+    HILOG_INFO("call");
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    return FormMgrAdapterFacade::GetInstance().OpenLiveFormPage(want, formId);
 }
 
 void FormMgrService::InitFormShareMgrSerialQueue()
@@ -1752,19 +1778,15 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
         formInfoParam.SetParam("cardId", String::Box(std::to_string(formId)));
         formInfoParam.SetParam("formConfigAbility", String::Box(abilityName));
         wantarams.SetParam("formInfo", WantParamWrapper::Box(formInfoParam));
-        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARAM_OPEN_FORM_EDIT_VIEW));
     } else {
-        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW));
         wantarams.SetParam(Constants::PARAM_SEC_PAGE_ABILITY_NAME, String::Box(abilityName));
     }
-    wantarams.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
-        Integer::Box(Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT));
 
     Want want;
-    want.SetAction(Constants::FORM_PAGE_ACTION);
     want.SetElementName(callerName, abilityName);
     want.SetParams(wantarams);
-    return FormMgrAdapterFacade::GetInstance().StartAbilityByFms(want);
+    return FormMgrAdapterFacade::GetInstance().StartHostPage(want, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT,
+        isMainPage ? Constants::PARAM_OPEN_FORM_EDIT_VIEW : Constants::PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW);
 }
 
 ErrCode FormMgrService::CloseFormEditAbility(bool isMainPage)

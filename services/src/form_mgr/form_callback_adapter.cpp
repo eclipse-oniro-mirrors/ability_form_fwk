@@ -792,6 +792,136 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
     return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
 }
 
+ErrCode FormCallbackAdapter::OpenFormManagePage(const Want &want)
+{
+    HILOG_INFO("call");
+    std::string callerName;
+    ErrCode ret = CheckDestinationIsCaller(want, callerName);
+    if (ret != ERR_OK) {
+        return ret;
+    }
+    if (!IsForegroundApp()) {
+        HILOG_ERROR("This application is not a foreground program");
+        return ERR_APPEXECFWK_FORM_NOT_TRUST;
+    }
+    return StartHostPage(want, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE,
+        Constants::OPEN_FORM_MANAGE_VIEW);
+}
+
+ErrCode FormCallbackAdapter::OpenFormEditPage(const Want &want)
+{
+    HILOG_INFO("call");
+    std::string callerName;
+    ErrCode ret = CheckDestinationIsCaller(want, callerName);
+    if (ret != ERR_OK) {
+        return ret;
+    }
+    return StartHostPage(want, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT,
+        Constants::PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW);
+}
+
+ErrCode FormCallbackAdapter::OpenLiveFormPage(const Want &want, const std::string &formId)
+{
+    HILOG_INFO("call");
+    std::string callerName;
+    ErrCode ret = CheckDestinationIsCaller(want, callerName);
+    if (ret != ERR_OK) {
+        return ret;
+    }
+    HILOG_DEBUG("support launcher check start");
+    std::unordered_map<std::string, std::string> liveFormStatusMap;
+    GetLiveFormStatus(liveFormStatusMap);
+    auto it = liveFormStatusMap.find(formId);
+    if (it == liveFormStatusMap.end()) {
+        HILOG_ERROR("This live form is non-existent, formId:%{public}s", formId.c_str());
+        return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
+    }
+    std::string status = it->second;
+    if (!FormConstantsUtil::IsLiveFormSupportLauncher(status)) {
+        HILOG_ERROR("This live form is not support launcher, status:%{public}s", status.c_str());
+        return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
+    }
+    HILOG_DEBUG("support launcher check success");
+    Want liveWant(want);
+    // The formId from the explicit IPC argument is pinned into the Want sent to the host.
+    liveWant.SetParam(Constants::PARAM_LIVE_FORM_ID_KEY, formId);
+    return StartHostPage(liveWant, Constants::PAGE_ROUTER_SERVICE_CODE_LIVE_FORM,
+        Constants::START_ABILITY_BY_LIVE_FORM);
+}
+
+ErrCode FormCallbackAdapter::StartHostPage(const Want &want, int32_t routerCode,
+    const std::string &requestMethod)
+{
+    Want wantToHost(want);
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    wantToHost.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+
+    wantToHost.SetAction(Constants::FORM_PAGE_ACTION);
+    if (routerCode >= 0) {
+        wantToHost.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, routerCode);
+    }
+    if (!requestMethod.empty()) {
+        wantToHost.SetParam(Constants::PARMA_REQUEST_METHOD, requestMethod);
+    }
+
+    ElementName elementName = want.GetElement();
+    std::string dstBundleName = elementName.GetBundleName();
+    std::string dstAbilityName = elementName.GetAbilityName();
+    wantToHost.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, dstBundleName);
+    wantToHost.SetParam(Constants::PARAM_ABILITY_NAME_KEY, dstAbilityName);
+
+    HILOG_INFO("dstBundleName:%{public}s, dstAbilityName:%{public}s",
+        dstBundleName.c_str(), dstAbilityName.c_str());
+
+    AppExecFwk::AbilityInfo abilityInfo;
+    AppExecFwk::ExtensionAbilityInfo extensionAbilityInfo;
+    if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
+        Constants::FORM_PAGE_ACTION, userId, abilityInfo, extensionAbilityInfo)) {
+        HILOG_ERROR("fail ImplicitQueryInfoByPriority for publishing form");
+        if (requestMethod == Constants::OPEN_FORM_MANAGE_VIEW) {
+            FormEventReport::SendRequestPublicFormEvent(dstBundleName, "",
+                RequestFormType::OPEN_FORM_MANAGER);
+        }
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+
+    if (!abilityInfo.name.empty()) {
+        HILOG_DEBUG("Query highest priority ability success. bundleName:%{public}s, ability:%{public}s",
+            abilityInfo.bundleName.c_str(), abilityInfo.name.c_str());
+        wantToHost.SetElementName(abilityInfo.bundleName, abilityInfo.name);
+    } else if (!extensionAbilityInfo.name.empty()) {
+        HILOG_DEBUG("Query highest priority extension ability success. bundleName:%{public}s, ability:%{public}s",
+            extensionAbilityInfo.bundleName.c_str(), extensionAbilityInfo.name.c_str());
+        wantToHost.SetElementName(extensionAbilityInfo.bundleName, extensionAbilityInfo.name);
+    } else {
+        HILOG_ERROR("Query highest priority ability failed, no form host ability found");
+        if (requestMethod == Constants::OPEN_FORM_MANAGE_VIEW) {
+            FormEventReport::SendRequestPublicFormEvent(dstBundleName, "",
+                RequestFormType::OPEN_FORM_MANAGER);
+        }
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+
+    HILOG_INFO("StartAbility wantToHost:%{public}s", wantToHost.ToString().c_str());
+    return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
+}
+
+ErrCode FormCallbackAdapter::CheckDestinationIsCaller(const Want &want, std::string &callerName)
+{
+    std::string dstBundleName = want.GetElement().GetBundleName();
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("get BundleName failed");
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+    if (dstBundleName != callerName) {
+        HILOG_ERROR("dstBundleName not self");
+        return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
+    }
+    return ERR_OK;
+}
+
 bool FormCallbackAdapter::IsForegroundApp()
 {
     bool checkFlag = false;

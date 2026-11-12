@@ -1271,6 +1271,40 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Open the form manage page. Split router entry: the foreground-app
+     *        authorization is bound to this method at the service entry.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OpenFormManagePage(const Want &want)
+    {
+        return 0;
+    }
+
+    /**
+     * @brief Open the form edit page. Split router entry: requires a foreground
+     *        FORM_EDIT extension of the caller at the service entry.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OpenFormEditPage(const Want &want)
+    {
+        return 0;
+    }
+
+    /**
+     * @brief Open the live form page. Split router entry: formId is an explicit
+     *        IPC argument validated as caller-owned at the service entry.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @param formId Indicates the unique id of the live form owned by the caller.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OpenLiveFormPage(const Want &want, const std::string &formId)
+    {
+        return 0;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -1410,6 +1444,9 @@ public:
         FORM_MGR_REGISTER_GET_VISIBLE_FORM_RECT_PROXY,
         FORM_MGR_UNREGISTER_GET_VISIBLE_FORM_RECT_PROXY,
         FORM_MGR_GET_VISIBLE_FORM_RECT,
+        FORM_MGR_OPEN_FORM_MANAGE_PAGE = 3135,
+        FORM_MGR_OPEN_FORM_EDIT_PAGE = 3136,
+        FORM_MGR_OPEN_LIVE_FORM_PAGE = 3137,
     };
 };
 }  // namespace AppExecFwk

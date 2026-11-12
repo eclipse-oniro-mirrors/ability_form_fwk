@@ -1629,6 +1629,51 @@ int32_t FormMgr::StartAbilityByFms(const Want &want)
     return remoteProxy_->StartAbilityByFms(want);
 }
 
+int32_t FormMgr::OpenFormManagePage(const Want &want)
+{
+    HILOG_DEBUG("call");
+    int32_t errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->OpenFormManagePage(want);
+}
+
+int32_t FormMgr::OpenFormEditPage(const Want &want)
+{
+    HILOG_DEBUG("call");
+    int32_t errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->OpenFormEditPage(want);
+}
+
+int32_t FormMgr::OpenLiveFormPage(const Want &want, const std::string &formId)
+{
+    HILOG_DEBUG("call");
+    int32_t errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->OpenLiveFormPage(want, formId);
+}
+
 ErrCode FormMgr::StartUIAbilityByFms(const Want &want)
 {
     HILOG_DEBUG("call");

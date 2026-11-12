@@ -147,6 +147,9 @@ int32_t HandleRequestPublishFormCrossDevice(IFormMgr &svc, MessageParcel &data, 
 int32_t HandleRegisterGetVisibleFormRectProxy(IFormMgr &svc, MessageParcel &data, MessageParcel &reply);
 int32_t HandleUnregisterGetVisibleFormRectProxy(IFormMgr &svc, MessageParcel &data, MessageParcel &reply);
 int32_t HandleGetVisibleFormRect(IFormMgr &svc, MessageParcel &data, MessageParcel &reply);
+int32_t HandleOpenFormManagePage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply);
+int32_t HandleOpenFormEditPage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply);
+int32_t HandleOpenLiveFormPage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply);
 } // namespace FormIpcHandlers
 } // namespace AppExecFwk
 } // namespace OHOS

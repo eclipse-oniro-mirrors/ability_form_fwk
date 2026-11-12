@@ -299,6 +299,16 @@ public:
 
     ErrCode StartAbilityByFms(const Want &want);
 
+    ErrCode OpenFormManagePage(const Want &want);
+
+    ErrCode OpenFormEditPage(const Want &want);
+
+    ErrCode OpenLiveFormPage(const Want &want, const std::string &formId);
+
+    ErrCode StartHostPage(const Want &want, int32_t routerCode, const std::string &requestMethod);
+
+    bool IsForegroundApp();
+
     // ==================== Callback Management ====================
 
     ErrCode RegisterFormRouterProxy(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken);

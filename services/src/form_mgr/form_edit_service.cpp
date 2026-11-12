@@ -54,19 +54,14 @@ ErrCode FormEditService::CloseFormEditAbility(const int32_t uid, bool isMainPage
         return ERR_APPEXECFWK_FORM_EDIT_UNSUPPORT_OPERATION;
     }
 
-    auto requestMethod = String::Box(
-        isMainPage ? Constants::PARAM_CLOSE_FORM_EDIT_VIEW : Constants::PARAM_CLOSE_FORM_EDIT_SEC_PAGE_VIEW);
     WantParams wantarams;
-    wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, requestMethod);
-    wantarams.SetParam(
-        Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, Integer::Box(Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT));
     wantarams.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, String::Box(callerName));
 
     Want want;
-    want.SetAction(Constants::FORM_PAGE_ACTION);
     want.SetBundle(callerName);
     want.SetParams(wantarams);
-    return FormMgrAdapterFacade::GetInstance().StartAbilityByFms(want);
+    return FormMgrAdapterFacade::GetInstance().StartHostPage(want, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT,
+        isMainPage ? Constants::PARAM_CLOSE_FORM_EDIT_VIEW : Constants::PARAM_CLOSE_FORM_EDIT_SEC_PAGE_VIEW);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

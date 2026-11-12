@@ -782,6 +782,37 @@ ErrCode FormMgrAdapterFacade::StartAbilityByFms(const Want &want)
     return FormCallbackAdapter::GetInstance().StartAbilityByFms(want);
 }
 
+ErrCode FormMgrAdapterFacade::OpenFormManagePage(const Want &want)
+{
+    HILOG_INFO("called");
+    return FormCallbackAdapter::GetInstance().OpenFormManagePage(want);
+}
+
+ErrCode FormMgrAdapterFacade::OpenFormEditPage(const Want &want)
+{
+    HILOG_INFO("called");
+    return FormCallbackAdapter::GetInstance().OpenFormEditPage(want);
+}
+
+ErrCode FormMgrAdapterFacade::OpenLiveFormPage(const Want &want, const std::string &formId)
+{
+    HILOG_INFO("called");
+    return FormCallbackAdapter::GetInstance().OpenLiveFormPage(want, formId);
+}
+
+ErrCode FormMgrAdapterFacade::StartHostPage(const Want &want, int32_t routerCode,
+    const std::string &requestMethod)
+{
+    HILOG_INFO("called");
+    return FormCallbackAdapter::GetInstance().StartHostPage(want, routerCode, requestMethod);
+}
+
+bool FormMgrAdapterFacade::IsForegroundApp()
+{
+    HILOG_INFO("called");
+    return FormCallbackAdapter::GetInstance().IsForegroundApp();
+}
+
 int FormMgrAdapterFacade::DumpStorageFormInfos(std::string &formInfos) const
 {
     HILOG_INFO("called");

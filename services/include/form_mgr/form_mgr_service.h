@@ -497,6 +497,31 @@ public:
     int32_t StartAbilityByCrossBundle(const Want &want) override;
 
     /**
+     * @brief Open the form manage page by form manager service. Thin split router
+     *        entry; the page logic and authorization live in FormCallbackAdapter.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OpenFormManagePage(const Want &want) override;
+
+    /**
+     * @brief Open the form edit page by form manager service. Thin split router
+     *        entry; the page logic and authorization live in FormCallbackAdapter.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OpenFormEditPage(const Want &want) override;
+
+    /**
+     * @brief Open the live form page by form manager service. Thin split router
+     *        entry; the formId validation and page logic live in FormCallbackAdapter.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @param formId Indicates the unique id of the live form owned by the caller.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OpenLiveFormPage(const Want &want, const std::string &formId) override;
+
+    /**
      * @brief Share form by formID and deviceID.
      * @param formId Indicates the unique id of form.
      * @param deviceId Indicates the remote device ID.
