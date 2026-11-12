@@ -4303,12 +4303,14 @@ bool JsFormRouterProxyMgr::InvokeGetLiveFormStatusCallback(napi_env env, napi_re
         HILOG_ERROR("null getLiveFormStatusCallbackRef_");
         return false;
     }
-    napi_get_reference_value(env, callbackRef, &myCallback);
+    if (napi_get_reference_value(env, callbackRef, &myCallback) != napi_ok || myCallback == nullptr) {
+        HILOG_ERROR("get reference value failed");
+        return false;
+    }
 
-    napi_valuetype callbackType;
-    napi_typeof(env, myCallback, &callbackType);
-    if (callbackType != napi_function) {
-        HILOG_ERROR("callbackType is not napi_function.");
+    napi_valuetype callbackType = napi_undefined;
+    if (napi_typeof(env, myCallback, &callbackType) != napi_ok || callbackType != napi_function) {
+        HILOG_ERROR("callback type is not function");
         return false;
     }
 
@@ -4969,10 +4971,13 @@ bool JsFormRouterProxyMgr::InvokeFormWantCallback(napi_env env, napi_ref callbac
         HILOG_ERROR("null formWantCallbackRef_");
         return false;
     }
-    napi_get_reference_value(env, callbackRef, &myCallback);
-    napi_valuetype valueType;
-    napi_typeof(env, myCallback, &valueType);
-    if (valueType != napi_function) {
+    if (napi_get_reference_value(env, callbackRef, &myCallback) != napi_ok || myCallback == nullptr) {
+        HILOG_ERROR("get reference value failed");
+        return false;
+    }
+    napi_valuetype valueType = napi_undefined;
+    if (napi_typeof(env, myCallback, &valueType) != napi_ok || valueType != napi_function) {
+        HILOG_ERROR("callback type is not function");
         return false;
     }
 
