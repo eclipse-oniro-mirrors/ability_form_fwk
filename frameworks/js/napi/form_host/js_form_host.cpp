@@ -4296,6 +4296,37 @@ ErrCode JsFormRouterProxyMgr::GetLiveFormStatus(std::unordered_map<std::string, 
     return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
+bool JsFormRouterProxyMgr::InvokeGetLiveFormStatusCallback(napi_env env, napi_ref callbackRef, napi_value &callResult)
+{
+    napi_value myCallback = nullptr;
+    if (callbackRef == nullptr) {
+        HILOG_ERROR("null getLiveFormStatusCallbackRef_");
+        return false;
+    }
+    napi_get_reference_value(env, callbackRef, &myCallback);
+
+    napi_valuetype callbackType;
+    napi_typeof(env, myCallback, &callbackType);
+    if (callbackType != napi_function) {
+        HILOG_ERROR("callbackType is not napi_function.");
+        return false;
+    }
+
+    napi_status status = napi_call_function(env, nullptr, myCallback, 0, nullptr, &callResult);
+    if (status != napi_ok) {
+        HILOG_ERROR("status is not napi_ok.");
+        return false;
+    }
+
+    napi_valuetype returnType;
+    napi_typeof(env, callResult, &returnType);
+    if (returnType == napi_undefined) {
+        HILOG_ERROR("returnType is napi_undefined.");
+        return false;
+    }
+    return true;
+}
+
 void JsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam)
 {
     HILOG_INFO("call");
@@ -4322,34 +4353,8 @@ void JsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataPa
         return;
     }
 
-    napi_value myCallback = nullptr;
-    if (callbackRef == nullptr) {
-        HILOG_ERROR("null getLiveFormStatusCallbackRef_");
-        napi_close_handle_scope(env, scope);
-        return;
-    }
-    napi_get_reference_value(env, callbackRef, &myCallback);
-
-    napi_valuetype callbackType;
-    napi_typeof(env, myCallback, &callbackType);
-    if (callbackType != napi_function) {
-        HILOG_ERROR("callbackType is not napi_function.");
-        napi_close_handle_scope(env, scope);
-        return;
-    }
-
     napi_value callResult;
-    napi_status status = napi_call_function(env, nullptr, myCallback, 0, nullptr, &callResult);
-    if (status != napi_ok) {
-        HILOG_ERROR("status is not napi_ok.");
-        napi_close_handle_scope(env, scope);
-        return;
-    }
-
-    napi_valuetype returnType;
-    napi_typeof(env, callResult, &returnType);
-    if (returnType == napi_undefined) {
-        HILOG_ERROR("returnType is napi_undefined.");
+    if (!InvokeGetLiveFormStatusCallback(env, callbackRef, callResult)) {
         napi_close_handle_scope(env, scope);
         return;
     }
@@ -4956,6 +4961,36 @@ ErrCode JsFormRouterProxyMgr::RequestFormWants(const std::vector<AppExecFwk::For
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
+bool JsFormRouterProxyMgr::InvokeFormWantCallback(napi_env env, napi_ref callbackRef,
+    const std::vector<AppExecFwk::FormInfo> &formInfos, napi_value &callResult)
+{
+    napi_value myCallback = nullptr;
+    if (callbackRef == nullptr) {
+        HILOG_ERROR("null formWantCallbackRef_");
+        return false;
+    }
+    napi_get_reference_value(env, callbackRef, &myCallback);
+    napi_valuetype valueType;
+    napi_typeof(env, myCallback, &valueType);
+    if (valueType != napi_function) {
+        return false;
+    }
+
+    napi_value formInfoArray = CreateFormInfos(env, formInfos);
+    napi_status status = napi_call_function(env, nullptr, myCallback, ARGS_ONE, &formInfoArray, &callResult);
+    if (status != napi_ok) {
+        HILOG_ERROR("napi_call_function failed");
+        return false;
+    }
+
+    napi_valuetype returnType;
+    napi_typeof(env, callResult, &returnType);
+    if (returnType == napi_undefined) {
+        return false;
+    }
+    return true;
+}
+
 bool JsFormRouterProxyMgr::RequestFormWantsInner(const std::vector<AppExecFwk::FormInfo> &formInfos,
     std::vector<AAFwk::WantParams> &wantParamsList)
 {
@@ -4979,32 +5014,8 @@ bool JsFormRouterProxyMgr::RequestFormWantsInner(const std::vector<AppExecFwk::F
     }
     AbilityRuntime::HandleEscape handleEscape(env);
 
-    napi_value myCallback = nullptr;
-    if (callbackRef == nullptr) {
-        HILOG_ERROR("null formWantCallbackRef_");
-        napi_close_handle_scope(env, scope);
-        return false;
-    }
-    napi_get_reference_value(env, callbackRef, &myCallback);
-    napi_valuetype valueType;
-    napi_typeof(env, myCallback, &valueType);
-    if (valueType != napi_function) {
-        napi_close_handle_scope(env, scope);
-        return false;
-    }
-
-    napi_value formInfoArray = CreateFormInfos(env, formInfos);
     napi_value callResult = nullptr;
-    napi_status status = napi_call_function(env, nullptr, myCallback, ARGS_ONE, &formInfoArray, &callResult);
-    if (status != napi_ok) {
-        HILOG_ERROR("napi_call_function failed");
-        napi_close_handle_scope(env, scope);
-        return false;
-    }
-
-    napi_valuetype returnType;
-    napi_typeof(env, callResult, &returnType);
-    if (returnType == napi_undefined) {
+    if (!InvokeFormWantCallback(env, callbackRef, formInfos, callResult)) {
         napi_close_handle_scope(env, scope);
         return false;
     }

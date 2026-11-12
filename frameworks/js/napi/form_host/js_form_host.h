@@ -155,6 +155,7 @@ private:
     napi_env getLiveFormStatusEnv_ = nullptr;
     ErrCode GetLiveFormStatus(std::unordered_map<std::string, std::string> &liveFormStatusMap);
     void GetLiveFormStatusInner(LiveFormInterfaceParam *dataParam);
+    bool InvokeGetLiveFormStatusCallback(napi_env env, napi_ref callbackRef, napi_value &callResult);
     bool ConvertNapiValueToMap(napi_env env, napi_value value, std::unordered_map<std::string, std::string> &uMap);
     void InsertMapEntry(napi_env env, napi_value obj, napi_value propNames, uint32_t index,
         std::unordered_map<std::string, std::string> &uMap);
@@ -187,6 +188,8 @@ private:
         std::vector<AAFwk::WantParams> &wantParamsList);
     bool RequestFormWantsInner(const std::vector<AppExecFwk::FormInfo> &formInfos,
         std::vector<AAFwk::WantParams> &wantParamsList);
+    bool InvokeFormWantCallback(napi_env env, napi_ref callbackRef,
+        const std::vector<AppExecFwk::FormInfo> &formInfos, napi_value &callResult);
     bool ParseWantParamsArray(napi_env env, napi_value funcResult, std::vector<AAFwk::WantParams> &wantParamsList);
 
     mutable std::mutex registerOverflowProxyMutex_;
