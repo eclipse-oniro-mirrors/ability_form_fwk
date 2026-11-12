@@ -22,6 +22,9 @@ class MockRefreshControlMgr {
 public:
     static void MockIsFormInvisible(bool mockRet);
     static void MockIsHealthyControl(bool mockRet);
+    static void MockIsScreenOff(bool mockRet);
+    static void MockIsNeedToFresh(bool mockRet);
+    static void MockIsAddFormFinish(bool mockRet);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

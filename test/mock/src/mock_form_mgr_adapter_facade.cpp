@@ -54,6 +54,13 @@ ErrCode FormMgrAdapterFacade::UpdateFormCrossBundle(int64_t formId, int32_t call
     return ERR_OK;
 }
 
+int32_t FormMgrAdapterFacade::UpdateFormsWithReminderAgent(
+    const std::string &bundleName, const int32_t userId, const Want &want)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapterFacade::UpdateFormsWithReminderAgent called";
+    return ERR_OK;
+}
+
 ErrCode FormMgrAdapterFacade::BatchNotifyFormsColorModeUpdate(int32_t userId,
     const AppExecFwk::Configuration &configuration)
 {

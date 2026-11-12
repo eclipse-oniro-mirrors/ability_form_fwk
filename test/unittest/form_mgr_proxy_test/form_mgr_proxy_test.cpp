@@ -3930,4 +3930,57 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UnregisterGetVisibleFormRectProxy_00
     GTEST_LOG_(INFO) << "FormMgrProxyTest_UnregisterGetVisibleFormRectProxy_001 ends";
 }
 
+/**
+ * @tc.number: FormMgrProxyTest_UpdateFormsWithReminderAgent_001
+ * @tc.name: Verify UpdateFormsWithReminderAgent happy path.
+ * @tc.desc: test that ERR_OK reply round-trips through parcel serialization.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UpdateFormsWithReminderAgent_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsWithReminderAgent_001 starts";
+    std::string bundleName = "com.test.bundle";
+    int32_t userId = 100;
+    Want want;
+    EXPECT_CALL(*mockFormMgrService, UpdateFormsWithReminderAgent(_, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(formMgrProxy->UpdateFormsWithReminderAgent(bundleName, userId, want), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsWithReminderAgent_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_UpdateFormsWithReminderAgent_002
+ * @tc.name: Verify UpdateFormsWithReminderAgent propagates non-OK reply.
+ * @tc.desc: test that a non-OK service reply is surfaced unchanged to callers.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UpdateFormsWithReminderAgent_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsWithReminderAgent_002 starts";
+    std::string bundleName = "com.test.bundle";
+    int32_t userId = 100;
+    Want want;
+    EXPECT_CALL(*mockFormMgrService, UpdateFormsWithReminderAgent(_, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_INVALID_PARAM));
+    EXPECT_EQ(formMgrProxy->UpdateFormsWithReminderAgent(bundleName, userId, want),
+        ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsWithReminderAgent_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_UpdateFormsWithReminderAgent_003
+ * @tc.name: Verify UpdateFormsWithReminderAgent forwards FORM_NOT_EXIST_ID error.
+ * @tc.desc: test that the proxy surfaces FORM_NOT_EXIST_ID unchanged to callers.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_UpdateFormsWithReminderAgent_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsWithReminderAgent_003 starts";
+    std::string bundleName = "com.test.bundle";
+    int32_t userId = 100;
+    Want want;
+    EXPECT_CALL(*mockFormMgrService, UpdateFormsWithReminderAgent(_, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_NOT_EXIST_ID));
+    EXPECT_EQ(formMgrProxy->UpdateFormsWithReminderAgent(bundleName, userId, want),
+        ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsWithReminderAgent_003 ends";
+}
+
 }

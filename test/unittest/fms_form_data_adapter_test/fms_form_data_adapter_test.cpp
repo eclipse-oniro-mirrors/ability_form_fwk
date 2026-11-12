@@ -1258,5 +1258,206 @@ HWTEST_F(FmsFormDataAdapterTest, UpdateForm_005, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "UpdateForm_005 end";
 }
+
+// ========== UpdateFormsWithReminderAgent Tests ==========
+
+/**
+ * @tc.name: UpdateFormsWithReminderAgent_001
+ * @tc.desc: Verify UpdateFormsWithReminderAgent returns ERR_OK when no form record found.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataAdapterTest, UpdateFormsWithReminderAgent_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_001 start";
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
+        .WillOnce(Return(false));
+
+    auto result = FormDataAdapter::GetInstance().UpdateFormsWithReminderAgent(
+        "com.test.bundle", TEST_USER_ID, Want());
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_001 end";
+}
+
+/**
+ * @tc.name: UpdateFormsWithReminderAgent_002
+ * @tc.desc: Verify UpdateFormsWithReminderAgent returns ERR_OK when formRecords empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataAdapterTest, UpdateFormsWithReminderAgent_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_002 start";
+
+    std::vector<FormRecord> emptyRecords;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(emptyRecords), Return(true)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+
+    auto result = FormDataAdapter::GetInstance().UpdateFormsWithReminderAgent(
+        "com.test.bundle", TEST_USER_ID, Want());
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_002 end";
+}
+
+/**
+ * @tc.name: UpdateFormsWithReminderAgent_003
+ * @tc.desc: Verify UpdateFormsWithReminderAgent skips forms when GetFormsInfoByRecord fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataAdapterTest, UpdateFormsWithReminderAgent_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_003 start";
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    std::vector<FormRecord> records = {record};
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(records), Return(true)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByRecord(_, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+
+    auto result = FormDataAdapter::GetInstance().UpdateFormsWithReminderAgent(
+        "com.test.bundle", TEST_USER_ID, Want());
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_003 end";
+}
+
+/**
+ * @tc.name: UpdateFormsWithReminderAgent_004
+ * @tc.desc: Verify UpdateFormsWithReminderAgent skips forms with enableReminderAgentRefresh=false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataAdapterTest, UpdateFormsWithReminderAgent_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_004 start";
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    std::vector<FormRecord> records = {record};
+    FormInfo formInfo;
+    formInfo.enableReminderAgentRefresh = false;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(records), Return(true)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formInfo), Return(ERR_OK)));
+
+    auto result = FormDataAdapter::GetInstance().UpdateFormsWithReminderAgent(
+        "com.test.bundle", TEST_USER_ID, Want());
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_004 end";
+}
+
+/**
+ * @tc.name: UpdateFormsWithReminderAgent_005
+ * @tc.desc: Verify UpdateFormsWithReminderAgent delegates to BatchRequestRefresh for enabled forms.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataAdapterTest, UpdateFormsWithReminderAgent_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_005 start";
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    std::vector<FormRecord> records = {record};
+    FormInfo formInfo;
+    formInfo.enableReminderAgentRefresh = true;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(records), Return(true)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formInfo), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormRefreshMgr::obj,
+        BatchRequestRefresh(TYPE_REMINDER_AGENT, StaggerStrategyType::DEFAULT, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormDataAdapter::GetInstance().UpdateFormsWithReminderAgent(
+        "com.test.bundle", TEST_USER_ID, Want());
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_005 end";
+}
+
+/**
+ * @tc.name: UpdateFormsWithReminderAgent_006
+ * @tc.desc: Verify UpdateFormsWithReminderAgent propagates BatchRequestRefresh error.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataAdapterTest, UpdateFormsWithReminderAgent_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_006 start";
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    std::vector<FormRecord> records = {record};
+    FormInfo formInfo;
+    formInfo.enableReminderAgentRefresh = true;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(records), Return(true)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formInfo), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormRefreshMgr::obj,
+        BatchRequestRefresh(TYPE_REMINDER_AGENT, StaggerStrategyType::DEFAULT, _))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
+
+    auto result = FormDataAdapter::GetInstance().UpdateFormsWithReminderAgent(
+        "com.test.bundle", TEST_USER_ID, Want());
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_006 end";
+}
+
+/**
+ * @tc.name: UpdateFormsWithReminderAgent_007
+ * @tc.desc: Verify UpdateFormsWithReminderAgent filters mixed records (some enabled, some not).
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataAdapterTest, UpdateFormsWithReminderAgent_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_007 start";
+
+    FormRecord record1;
+    record1.formId = TEST_FORM_ID;
+    FormRecord record2;
+    record2.formId = TEST_FORM_ID + 1;
+    std::vector<FormRecord> records = {record1, record2};
+
+    FormInfo enabledInfo;
+    enabledInfo.enableReminderAgentRefresh = true;
+    FormInfo disabledInfo;
+    disabledInfo.enableReminderAgentRefresh = false;
+
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecordByBundleName(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(records), Return(true)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    // First record disabled, second enabled
+    EXPECT_CALL(*MockFormInfoMgr::obj, GetFormsInfoByRecord(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(disabledInfo), Return(ERR_OK)))
+        .WillOnce(DoAll(SetArgReferee<1>(enabledInfo), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormRefreshMgr::obj,
+        BatchRequestRefresh(TYPE_REMINDER_AGENT, StaggerStrategyType::DEFAULT, _))
+        .WillOnce(Return(ERR_OK));
+
+    auto result = FormDataAdapter::GetInstance().UpdateFormsWithReminderAgent(
+        "com.test.bundle", TEST_USER_ID, Want());
+    EXPECT_EQ(result, ERR_OK);
+
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_007 end";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
