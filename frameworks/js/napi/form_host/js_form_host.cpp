@@ -4167,7 +4167,6 @@ void JsFormRouterProxyMgr::CallPromise(napi_env env, napi_value funcResult,
     status = napi_call_function(env, funcResult, promiseCatch, ARGS_ONE, argvPromise, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR("Invoke pushCheck promise catch error.");
-        PromiseCallbackInfo::Destroy(callbackInfo);
         return;
     }
 }
@@ -4305,53 +4304,62 @@ void JsFormRouterProxyMgr::GetLiveFormStatusInner(LiveFormInterfaceParam *dataPa
         return;
     }
     dataParam->result = false;
-    napi_handle_scope scope = nullptr;
-    if (getLiveFormStatusEnv_ == nullptr) {
+    napi_env env = nullptr;
+    napi_ref callbackRef = nullptr;
+    {
+        std::lock_guard<std::mutex> LiveFormStatusLock(registerGetLiveFormStatusProxyMutex_);
+        env = getLiveFormStatusEnv_;
+        callbackRef = getLiveFormStatusCallbackRef_;
+    }
+    if (env == nullptr) {
         HILOG_ERROR("null getLiveFormStatusEnv_");
         return;
     }
-    napi_open_handle_scope(getLiveFormStatusEnv_, &scope);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
         return;
     }
 
     napi_value myCallback = nullptr;
-    {
-        std::lock_guard<std::mutex> LiveFormStatusLock(registerGetLiveFormStatusProxyMutex_);
-        napi_get_reference_value(getLiveFormStatusEnv_, getLiveFormStatusCallbackRef_, &myCallback);
+    if (callbackRef == nullptr) {
+        HILOG_ERROR("null getLiveFormStatusCallbackRef_");
+        napi_close_handle_scope(env, scope);
+        return;
     }
+    napi_get_reference_value(env, callbackRef, &myCallback);
 
     napi_valuetype callbackType;
-    napi_typeof(getLiveFormStatusEnv_, myCallback, &callbackType);
+    napi_typeof(env, myCallback, &callbackType);
     if (callbackType != napi_function) {
         HILOG_ERROR("callbackType is not napi_function.");
-        napi_close_handle_scope(getLiveFormStatusEnv_, scope);
+        napi_close_handle_scope(env, scope);
         return;
     }
 
     napi_value callResult;
-    napi_status status = napi_call_function(getLiveFormStatusEnv_, nullptr, myCallback, 0, nullptr, &callResult);
+    napi_status status = napi_call_function(env, nullptr, myCallback, 0, nullptr, &callResult);
     if (status != napi_ok) {
         HILOG_ERROR("status is not napi_ok.");
-        napi_close_handle_scope(getLiveFormStatusEnv_, scope);
+        napi_close_handle_scope(env, scope);
         return;
     }
 
     napi_valuetype returnType;
-    napi_typeof(getLiveFormStatusEnv_, callResult, &returnType);
+    napi_typeof(env, callResult, &returnType);
     if (returnType == napi_undefined) {
         HILOG_ERROR("returnType is napi_undefined.");
-        napi_close_handle_scope(getLiveFormStatusEnv_, scope);
+        napi_close_handle_scope(env, scope);
         return;
     }
 
     HILOG_INFO("parse result");
     std::unordered_map<std::string, std::string> liveFormStatusMap;
-    bool ret = ConvertNapiValueToMap(getLiveFormStatusEnv_, callResult, liveFormStatusMap);
+    bool ret = ConvertNapiValueToMap(env, callResult, liveFormStatusMap);
     dataParam->result = ret;
     dataParam->liveFormStatusMap = liveFormStatusMap;
-    napi_close_handle_scope(getLiveFormStatusEnv_, scope);
+    napi_close_handle_scope(env, scope);
 }
 
 void JsFormRouterProxyMgr::InsertMapEntry(napi_env env, napi_value obj, napi_value propNames,
@@ -4952,77 +4960,80 @@ bool JsFormRouterProxyMgr::RequestFormWantsInner(const std::vector<AppExecFwk::F
     std::vector<AAFwk::WantParams> &wantParamsList)
 {
     HILOG_INFO("call, formCount:%{public}zu", formInfos.size());
-    napi_handle_scope scope = nullptr;
-    if (formWantCallbackEnv_ == nullptr) {
+    napi_env env = nullptr;
+    napi_ref callbackRef = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(registerFormWantCallbackMutex_);
+        env = formWantCallbackEnv_;
+        callbackRef = formWantCallbackRef_;
+    }
+    if (env == nullptr) {
         HILOG_ERROR("null formWantCallbackEnv_");
         return false;
     }
-    napi_open_handle_scope(formWantCallbackEnv_, &scope);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
         HILOG_ERROR("null scope");
         return false;
     }
-    AbilityRuntime::HandleEscape handleEscape(formWantCallbackEnv_);
+    AbilityRuntime::HandleEscape handleEscape(env);
 
     napi_value myCallback = nullptr;
-    {
-        std::lock_guard<std::mutex> lock(registerFormWantCallbackMutex_);
-        if (formWantCallbackRef_ == nullptr) {
-            HILOG_ERROR("null formWantCallbackRef_");
-            napi_close_handle_scope(formWantCallbackEnv_, scope);
-            return false;
-        }
-        napi_get_reference_value(formWantCallbackEnv_, formWantCallbackRef_, &myCallback);
+    if (callbackRef == nullptr) {
+        HILOG_ERROR("null formWantCallbackRef_");
+        napi_close_handle_scope(env, scope);
+        return false;
     }
+    napi_get_reference_value(env, callbackRef, &myCallback);
     napi_valuetype valueType;
-    napi_typeof(formWantCallbackEnv_, myCallback, &valueType);
+    napi_typeof(env, myCallback, &valueType);
     if (valueType != napi_function) {
-        napi_close_handle_scope(formWantCallbackEnv_, scope);
+        napi_close_handle_scope(env, scope);
         return false;
     }
 
-    napi_value formInfoArray = CreateFormInfos(formWantCallbackEnv_, formInfos);
+    napi_value formInfoArray = CreateFormInfos(env, formInfos);
     napi_value callResult = nullptr;
-    napi_status status =
-        napi_call_function(formWantCallbackEnv_, nullptr, myCallback, ARGS_ONE, &formInfoArray, &callResult);
+    napi_status status = napi_call_function(env, nullptr, myCallback, ARGS_ONE, &formInfoArray, &callResult);
     if (status != napi_ok) {
         HILOG_ERROR("napi_call_function failed");
-        napi_close_handle_scope(formWantCallbackEnv_, scope);
+        napi_close_handle_scope(env, scope);
         return false;
     }
 
     napi_valuetype returnType;
-    napi_typeof(formWantCallbackEnv_, callResult, &returnType);
+    napi_typeof(env, callResult, &returnType);
     if (returnType == napi_undefined) {
-        napi_close_handle_scope(formWantCallbackEnv_, scope);
+        napi_close_handle_scope(env, scope);
         return false;
     }
 
     napi_value funcResult = handleEscape.Escape(callResult);
-    bool result = ParseWantParamsArray(funcResult, wantParamsList);
-    napi_close_handle_scope(formWantCallbackEnv_, scope);
+    bool result = ParseWantParamsArray(env, funcResult, wantParamsList);
+    napi_close_handle_scope(env, scope);
     return result;
 }
 
-bool JsFormRouterProxyMgr::ParseWantParamsArray(napi_value funcResult,
+bool JsFormRouterProxyMgr::ParseWantParamsArray(napi_env env, napi_value funcResult,
     std::vector<AAFwk::WantParams> &wantParamsList)
 {
     bool isPromise = false;
-    napi_is_promise(formWantCallbackEnv_, funcResult, &isPromise);
+    napi_is_promise(env, funcResult, &isPromise);
     if (isPromise) {
         HILOG_WARN("callback returned promise, not supported in batch mode");
         return false;
     }
 
     bool isArray = false;
-    napi_is_array(formWantCallbackEnv_, funcResult, &isArray);
+    napi_is_array(env, funcResult, &isArray);
     if (!isArray) {
         HILOG_ERROR("callback result is not array");
         return false;
     }
 
     uint32_t arrayLength = 0;
-    napi_status lengthStatus = napi_get_array_length(formWantCallbackEnv_, funcResult, &arrayLength);
+    napi_status lengthStatus = napi_get_array_length(env, funcResult, &arrayLength);
     if (lengthStatus != napi_ok) {
         HILOG_ERROR("get array length failed, status: %{public}d", static_cast<int>(lengthStatus));
         return false;
@@ -5035,9 +5046,9 @@ bool JsFormRouterProxyMgr::ParseWantParamsArray(napi_value funcResult,
     }
     for (uint32_t i = 0; i < arrayLength; i++) {
         napi_value element = nullptr;
-        napi_get_element(formWantCallbackEnv_, funcResult, i, &element);
+        napi_get_element(env, funcResult, i, &element);
         AAFwk::WantParams wp;
-        if (UnwrapWantParams(formWantCallbackEnv_, element, wp)) {
+        if (UnwrapWantParams(env, element, wp)) {
             wantParamsList.push_back(std::move(wp));
         } else {
             HILOG_WARN("parse wantParams at index %{public}u failed, using empty", i);

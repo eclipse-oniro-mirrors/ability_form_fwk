@@ -187,7 +187,7 @@ private:
         std::vector<AAFwk::WantParams> &wantParamsList);
     bool RequestFormWantsInner(const std::vector<AppExecFwk::FormInfo> &formInfos,
         std::vector<AAFwk::WantParams> &wantParamsList);
-    bool ParseWantParamsArray(napi_value funcResult, std::vector<AAFwk::WantParams> &wantParamsList);
+    bool ParseWantParamsArray(napi_env env, napi_value funcResult, std::vector<AAFwk::WantParams> &wantParamsList);
 
     mutable std::mutex registerOverflowProxyMutex_;
     mutable std::mutex registerChangeSceneAnimationStateProxyMutex_;

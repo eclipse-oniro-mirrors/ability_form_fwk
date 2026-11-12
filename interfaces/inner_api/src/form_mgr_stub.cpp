@@ -2674,7 +2674,7 @@ ErrCode FormMgrStub::HandleRequestOverflow(MessageParcel &data, MessageParcel &r
         HILOG_ERROR("read formId failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    OverflowInfo* overflowInfoPtr = data.ReadParcelable<OverflowInfo>();
+    std::unique_ptr<OverflowInfo> overflowInfoPtr(data.ReadParcelable<OverflowInfo>());
     if (overflowInfoPtr == nullptr) {
         HILOG_ERROR("Read oveflowInfo failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -2687,10 +2687,8 @@ ErrCode FormMgrStub::HandleRequestOverflow(MessageParcel &data, MessageParcel &r
     ErrCode result = RequestOverflow(formId, *overflowInfoPtr, isOverflow);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("Write request result failed");
-        delete overflowInfoPtr;
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    delete overflowInfoPtr;
     return ERR_OK;
 }
 
