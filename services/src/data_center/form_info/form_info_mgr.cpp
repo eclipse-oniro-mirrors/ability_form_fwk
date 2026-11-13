@@ -48,6 +48,18 @@ constexpr uint32_t GET_BUNDLE_INFO_WITH_ABILITY_EXTENSIONS =
 constexpr int32_t MAX_RELOAD_RETRY = 3;
 constexpr int64_t RETRY_DELAYS_MS[MAX_RELOAD_RETRY] = {100, 200, 400};
 constexpr size_t RELOAD_BATCH_SIZE = 50;
+
+bool HasFormExtension(const BundleInfo &bundleInfo)
+{
+    for (const auto &hapModuleInfo : bundleInfo.hapModuleInfos) {
+        for (const auto &extensionInfo : hapModuleInfo.extensionInfos) {
+            if (extensionInfo.type == ExtensionAbilityType::FORM) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 }  // namespace
 FormInfoMgr::FormInfoMgr()
 {
@@ -994,19 +1006,20 @@ FormInfoMgr::BundleClassifyResult FormInfoMgr::ClassifyBundles(bool isNeedUpdate
         const std::string &bundleName = bundleFormInfoPair.first;
         auto bundleVersionPair = bundleVersionMap.find(bundleName);
         if (bundleVersionPair == bundleVersionMap.end()) {
-            // versionMap is built by QueryExtensionAbilityInfosByType which skips disabled apps,
-            // double-check with GetBundleInfoByFlags to avoid removing disabled-but-installed apps.
+            // versionMap skips disabled apps; arbitrate three states via BMS.
             BundleInfo bundleInfo;
-            int32_t flags = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION);
+            int32_t flags = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION) |
+                static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_HAP_MODULE) |
+                static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_EXTENSION_ABILITY);
             bool bundleExists = FormBmsHelper::GetInstance().GetBundleInfoByFlags(
                 bundleName, flags, userId, bundleInfo);
-            if (bundleExists) {
+            if (bundleExists && HasFormExtension(bundleInfo)) {
                 HILOG_WARN("bundle %{public}s not in versionMap but still installed(disabled),skip Remove",
                     bundleName.c_str());
                 continue;
             }
-            HILOG_WARN("bundle %{public}s not in versionMap and not installed,removeBundles",
-                bundleName.c_str());
+            HILOG_WARN("bundle %{public}s %{public}s, removeBundles",
+                bundleName.c_str(), bundleExists ? "installed without form extension" : "not installed");
             result.removeBundles.push_back(bundleName);
             continue;
         }

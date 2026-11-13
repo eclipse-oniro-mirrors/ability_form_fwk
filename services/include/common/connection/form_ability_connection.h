@@ -25,6 +25,13 @@ namespace OHOS {
 namespace AppExecFwk {
 using Want = OHOS::AAFwk::Want;
 using WantParams = OHOS::AAFwk::WantParams;
+enum class ConnectionType {
+    DEFAULT = 0,
+    ACQUIRE = 1,
+    REFRESH = 2,
+    EVENT_NOTIFY = 3,
+};
+
 enum class ConnectState {
     DISCONNECTED,
     CONNECTING,
@@ -127,6 +134,32 @@ public:
     ConnectState GetConnectState() const;
 
     /**
+     * @brief Check whether this connection is managed by the FormExtension process pool.
+     *        Batch-type connections (Acquire/Refresh/EventNotify) set poolManaged_ to true
+     *        in their constructors; other connection types keep the safe default (false,
+     *        bypass the pool gate).
+     * @return true if pool managed.
+     */
+    bool IsPoolManaged() const;
+
+    /**
+     * @brief Set pool pending flag (true while the request is suspended in the pending queue).
+     * @param isPoolPending Indicates the pending flag.
+     */
+    void SetPoolPending(bool isPoolPending);
+
+    /**
+     * @brief Get pool pending flag.
+     * @return true if suspended in the pending queue.
+     */
+    bool IsPoolPending() const;
+
+    ConnectionType GetConnectionType() const
+    {
+        return connectionType_;
+    }
+
+    /**
      * @brief Set connection state.
      * @param state Connection state to set.
      */
@@ -198,6 +231,18 @@ protected:
      * @param remoteObject Remote object.
      */
     virtual void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) = 0;
+
+    /**
+     * @brief Notify the pool that this connection terminated (disconnect or
+     *        async connect failure) and replay the pending queue head off the
+     *        pool lock via FormMgrQueue when a slot was released (TASK-5).
+     * @param element Connection element (bundle name source).
+     */
+    void NotifyPoolTerminated(const AppExecFwk::ElementName &element);
+
+    bool poolManaged_ = false;
+    ConnectionType connectionType_ = ConnectionType::DEFAULT;
+    std::atomic<bool> isPoolPending_ = false;
 
     /**
      * @brief Build task Want parameter - subclass can override.

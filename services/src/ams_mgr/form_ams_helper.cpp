@@ -14,6 +14,8 @@
  */
 
 #include "ams_mgr/form_ams_helper.h"
+#include "common/connection/form_ability_connection.h"
+#include "form_provider/form_extension_process_pool.h"
 
 #include "ability_manager_interface.h"
 #include "app_mgr_client.h"
@@ -120,15 +122,31 @@ void FormAmsHelper::ClearAbilityManager()
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormAmsHelper::ConnectServiceAbility(
-    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect)
+    const Want &want, const sptr<FormAbilityConnection> &connect)
 {
     HILOG_DEBUG("connect service ability");
+    if (connect == nullptr) {
+        HILOG_ERROR("connect is null");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    if (!AdmitConnection(want, connect)) {
+        HILOG_WARN("connect service ability suspended in pending queue, bundle:%{public}s",
+            want.GetElement().GetBundleName().c_str());
+        return ERR_OK; // suspended in the pending queue, silent to caller
+    }
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
         HILOG_ERROR("[%{public}s]ability service not connect", __FUNCTION__);
+        RollbackPoolRegistration(want, connect);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    return IN_PROCESS_CALL(ams->ConnectAbility(want, connect, nullptr));
+    connect->SetConnectState(ConnectState::CONNECTING);
+    ErrCode ret = IN_PROCESS_CALL(ams->ConnectAbility(want, connect, nullptr));
+    if (ret != ERR_OK) {
+        // Synchronous ability manager service failure: no termination callback will arrive.
+        RollbackPoolRegistration(want, connect);
+    }
+    return ret;
 }
 
 /**
@@ -139,19 +157,31 @@ ErrCode FormAmsHelper::ConnectServiceAbility(
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormAmsHelper::ConnectServiceAbilityWithUserId(
-    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId)
+    const Want &want, const sptr<FormAbilityConnection> &connect, int32_t userId)
 {
     HILOG_DEBUG("connect service ability with userId");
     if (connect == nullptr) {
         HILOG_ERROR("connect is null");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+    if (!AdmitConnection(want, connect, userId)) {
+        HILOG_WARN("connect service ability suspended in pending queue, bundle:%{public}s",
+            want.GetElement().GetBundleName().c_str());
+        return ERR_OK; // suspended in the pending queue, silent to caller
+    }
     sptr<AAFwk::IAbilityManager> abilityManagerService = GetAbilityManager();
     if (abilityManagerService == nullptr) {
         HILOG_ERROR("[%{public}s]ability service not connect", __FUNCTION__);
+        RollbackPoolRegistration(want, connect);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    return IN_PROCESS_CALL(abilityManagerService->ConnectAbility(want, connect, nullptr, userId));
+    connect->SetConnectState(ConnectState::CONNECTING);
+    ErrCode ret = IN_PROCESS_CALL(abilityManagerService->ConnectAbility(want, connect, nullptr, userId));
+    if (ret != ERR_OK) {
+        // Synchronous ability manager service failure: no termination callback will arrive.
+        RollbackPoolRegistration(want, connect);
+    }
+    return ret;
 }
 
 /**
@@ -458,5 +488,31 @@ ErrCode FormAmsHelper::ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(const 
     return IN_PROCESS_CALL(ams->ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(
         want, callerAbilityToken, param, specifiedFullTokenId));
 }
+
+bool FormAmsHelper::IsRenderServiceTarget(const Want &want)
+{
+    // FRS connection (normal / sandbox share the same bundle name): bypass the
+    // pool. Type casting is NOT reliable: FormRenderConnection
+    // inherits FormAbilityConnection (design D5).
+    return want.GetElement().GetBundleName() == Constants::FRS_BUNDLE_NAME;
+}
+
+bool FormAmsHelper::AdmitConnection(const Want &want, const sptr<FormAbilityConnection> &connect, int32_t connectUserId)
+{
+    if (IsRenderServiceTarget(want)) {
+        return true;
+    }
+    return FormExtensionProcessPool::GetInstance().AdmitConnection(want, connect, connectUserId);
+}
+
+void FormAmsHelper::RollbackPoolRegistration(const Want &want, const sptr<FormAbilityConnection> &connect)
+{
+    if (IsRenderServiceTarget(want)) {
+        return;
+    }
+    FormExtensionProcessPool::GetInstance().OnConnectionTerminated(
+        connect->GetUserId(), want.GetElement().GetBundleName(), connect);
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

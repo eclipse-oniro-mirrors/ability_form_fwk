@@ -29,7 +29,25 @@ class FormCustConfigMgr final : public DelayedRefSingleton<FormCustConfigMgr> {
 public:
     DISALLOW_COPY_AND_MOVE(FormCustConfigMgr);
 
-    void InitLiveFormParameters();
+    void InitCustConfigParameters();
+
+    /**
+     * @brief Get the FormExtension process pool max threshold.
+     *        Read once at construction via system parameter
+     *        persist.sys.fms.form_extension.process_pool.threshold (C++ API
+     *        OHOS::system::GetIntParameter), sanitized by SanitizePoolThreshold:
+     *        negative -> default 20; greater than 50 -> clamp 50; 0 keeps 0
+     *        (pool gating disabled). Takes effect after FMS restart.
+     * @return Sanitized threshold.
+     */
+    size_t GetFormExtensionProcessPoolMax() const;
+
+    /**
+     * @brief Sanitize the raw pool threshold.
+     * @param rawThreshold Raw value from system parameter.
+     * @return negative -> 20; (50, +inf) -> 50; otherwise raw value.
+     */
+    static size_t SanitizePoolThreshold(int32_t rawThreshold);
 
     bool IsSupportSceneAnimation();
 
@@ -39,6 +57,7 @@ public:
 private:
     std::string liveFormSupportType = "";
     std::string gameCardSupportEnable = "";
+    size_t processPoolThreshold_ = 0;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

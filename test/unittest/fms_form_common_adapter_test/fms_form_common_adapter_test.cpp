@@ -4035,5 +4035,51 @@ HWTEST_F(FmsFormCommonAdapterTest, AlignCloneProviderUid_002, TestSize.Level1)
     GTEST_LOG_(INFO) << "AlignCloneProviderUid_002 end";
 }
 
+/**
+ * @tc.name: SanitizeFormLocation_ThirdPartyCenterLocationZeroed
+ * @tc.desc: Untrusted caller with FORM_CENTER family location gets sanitized to DESKTOP (BR-14/AC-3.2).
+ * @tc.type: FUNC
+ * @tc.require: 20260910614554
+ */
+HWTEST_F(FmsFormCommonAdapterTest, SanitizeFormLocation_ThirdPartyCenterLocationZeroed, TestSize.Level1)
+{
+    constexpr int32_t OTHER = static_cast<int32_t>(Constants::FormLocation::OTHER);
+    // Untrusted caller: all FORM_CENTER family values sanitized to OTHER (-1)
+    EXPECT_EQ(OTHER, FormCommonAdapter::SanitizeFormLocation(
+        static_cast<int32_t>(Constants::FormLocation::FORM_CENTER), false));
+    EXPECT_EQ(OTHER, FormCommonAdapter::SanitizeFormLocation(
+        static_cast<int32_t>(Constants::FormLocation::FORM_MANAGER), false));
+    EXPECT_EQ(OTHER, FormCommonAdapter::SanitizeFormLocation(
+        static_cast<int32_t>(Constants::FormLocation::FORM_CENTER_NEGATIVE_SCREEN), false));
+    EXPECT_EQ(OTHER, FormCommonAdapter::SanitizeFormLocation(
+        static_cast<int32_t>(Constants::FormLocation::FORM_MANAGER_NEGATIVE_SCREEN), false));
+    // Non-center locations pass through unchanged for untrusted callers
+    EXPECT_EQ(static_cast<int32_t>(Constants::FormLocation::NEGATIVE_SCREEN),
+        FormCommonAdapter::SanitizeFormLocation(
+            static_cast<int32_t>(Constants::FormLocation::NEGATIVE_SCREEN), false));
+    EXPECT_EQ(static_cast<int32_t>(Constants::FormLocation::SCREEN_LOCK),
+        FormCommonAdapter::SanitizeFormLocation(
+            static_cast<int32_t>(Constants::FormLocation::SCREEN_LOCK), false));
+}
+
+/**
+ * @tc.name: SanitizeFormLocation_SystemAppCenterLocationKept
+ * @tc.desc: Trusted caller keeps FORM_CENTER family location (exemption privilege, BR-14/AC-3.2).
+ * @tc.type: FUNC
+ * @tc.require: 20260910614554
+ */
+HWTEST_F(FmsFormCommonAdapterTest, SanitizeFormLocation_SystemAppCenterLocationKept, TestSize.Level1)
+{
+    EXPECT_EQ(static_cast<int32_t>(Constants::FormLocation::FORM_CENTER),
+        FormCommonAdapter::SanitizeFormLocation(
+            static_cast<int32_t>(Constants::FormLocation::FORM_CENTER), true));
+    EXPECT_EQ(static_cast<int32_t>(Constants::FormLocation::FORM_MANAGER),
+        FormCommonAdapter::SanitizeFormLocation(
+            static_cast<int32_t>(Constants::FormLocation::FORM_MANAGER), true));
+    EXPECT_EQ(static_cast<int32_t>(Constants::FormLocation::FORM_CENTER_NEGATIVE_SCREEN),
+        FormCommonAdapter::SanitizeFormLocation(
+            static_cast<int32_t>(Constants::FormLocation::FORM_CENTER_NEGATIVE_SCREEN), true));
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

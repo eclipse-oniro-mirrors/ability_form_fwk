@@ -33,6 +33,8 @@ FormRefreshConnection::FormRefreshConnection(const int64_t formId, const Want &w
     SetFreeInstall(record.needFreeInstall);
     SetProviderKey(record.bundleName, record.abilityName, record.providerUserId);
     SetModuleName(record.moduleName);
+    poolManaged_ = true;
+    connectionType_ = ConnectionType::REFRESH;
 }
 
 sptr<FormAbilityConnection> FormRefreshConnection::CreateRetryConnection() const
@@ -75,7 +77,7 @@ void FormRefreshConnection::OnExecuteConnectTask(const Want &want, const sptr<IR
 void FormRefreshConnection::OnAbilityDisconnectDone(
     const AppExecFwk::ElementName &element, int resultCode)
 {
-    ConnectState state = connectState_.load();
+    ConnectState state = GetConnectState();
     HILOG_INFO("formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
         GetFormId(), resultCode, static_cast<int32_t>(state));
 

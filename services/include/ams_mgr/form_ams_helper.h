@@ -31,6 +31,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+
+class FormAbilityConnection;
+
 using IAbilityConnection = OHOS::AAFwk::IAbilityConnection;
 using Want = OHOS::AAFwk::Want;
 const int FORM_DISCONNECT_DELAY_TIME = 10000; // ms
@@ -49,7 +52,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode ConnectServiceAbility(
-        const Want &want, const sptr<AAFwk::IAbilityConnection> &connect);
+        const Want &want, const sptr<FormAbilityConnection> &connect);
     /**
      * @brief Connect session with service ability.
      * @param want Special want for service type's ability.
@@ -58,7 +61,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode ConnectServiceAbilityWithUserId(
-        const Want &want, const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId);
+        const Want &want, const sptr<FormAbilityConnection> &connect, int32_t userId);
     /**
      * @brief Disconnect session with service ability.
      * @param connect Callback used to notify caller the result of connecting or disconnecting.
@@ -85,6 +88,7 @@ public:
      * @param abilityManager the ability manager ipc object.
      */
     void SetAbilityManager(const sptr<AAFwk::IAbilityManager> &abilityManager);
+
     /**
      * @brief Clear the ability manager instance when AMS died.
      */
@@ -179,6 +183,25 @@ public:
         uint64_t specifiedFullTokenId);
 private:
     /**
+     * @brief Filter non-FormExtension connections before the ability manager service call,
+     *        then delegate the pool admission check to the process pool.
+     * @return true to proceed with the ability manager service connect, false when suspended.
+     */
+    bool AdmitConnection(const Want &want, const sptr<FormAbilityConnection> &connect, int32_t connectUserId = -1);
+    /**
+     * @brief Check whether the want targets the render service (FRS), which bypasses the pool.
+     * @param want Target want.
+     * @return true when the target is the render service, false otherwise.
+     */
+    static bool IsRenderServiceTarget(const Want &want);
+    /**
+     * @brief Roll back the pool registration on synchronous ability manager service
+     *        connect failure (no termination callback arrives), releasing the reserved slot.
+     * @param want Target want.
+     * @param connect Connection whose pool registration is rolled back.
+     */
+    void RollbackPoolRegistration(const Want &want, const sptr<FormAbilityConnection> &connect);
+    /**
      * @brief acquire a form ability manager, if it not existed,
      * @return returns the ability manager ipc object, or nullptr for failed.
      */
@@ -189,7 +212,6 @@ private:
      * @param connect Callback used to notify caller the result of connecting or disconnecting.
      */
     void DisconnectAbilityTask(const sptr<AAFwk::IAbilityConnection> &connect);
-private:
     sptr<AAFwk::IAbilityManager> abilityManager_ = nullptr;
     std::mutex abilityManagerMutex_;
     sptr<IRemoteObject::DeathRecipient> abilityManagerDeath_ = nullptr;

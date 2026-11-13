@@ -677,6 +677,28 @@ bool FormRenderMgr::IsRerenderForRenderServiceDied(int64_t formId)
     return ret;
 }
 
+bool FormRenderMgr::IsFormRenderConnectionDied(int64_t formId)
+{
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        // Missing record: no render connection ever existed, no FRS recovery.
+        return false;
+    }
+    std::shared_ptr<FormRenderMgrInner> renderInner;
+    if (GetFormRenderMgrInner(formRecord.userId, renderInner)
+        && renderInner->IsConnectionDied(formId)
+        && renderInner->GetReRenderCount() > 0) {
+        return true;
+    }
+    std::shared_ptr<FormSandboxRenderMgrInner> sandboxInner;
+    if (GetFormSandboxMgrInner(formRecord.userId, sandboxInner)
+        && sandboxInner->IsConnectionDied(formId)
+        && sandboxInner->GetReRenderCount() > 0) {
+        return true;
+    }
+    return false;
+}
+
 void FormRenderMgr::InitRenderInner(bool isSandbox, int32_t userId)
 {
     HILOG_INFO("isSandbox:%{public}d userId:%{public}d", isSandbox, userId);

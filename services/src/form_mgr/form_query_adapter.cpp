@@ -237,7 +237,7 @@ int FormQueryAdapter::AcquireFormState(const Want &want, const sptr<IRemoteObjec
         __FUNCTION__, bundleName.c_str(),
         abilityName.c_str(), moduleName.c_str());
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
-    sptr<IAbilityConnection> connection =
+    sptr<FormAbilityConnection> connection =
         new (std::nothrow) FormAcquireStateConnection(bundleName, abilityName, want, provider, userId);
     if (connection == nullptr) {
         HILOG_ERROR("create FormAcquireStateConnection failed");
@@ -281,7 +281,7 @@ int FormQueryAdapter::AcquireFormData(int64_t formId, int64_t requestCode, const
         HILOG_ERROR("create acquire data record failed, requestCode may be owned by another caller");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    sptr<IAbilityConnection> connection =
+    sptr<FormAbilityConnection> connection =
         new (std::nothrow) FormAcquireDataConnection(formId, bundleName, abilityName, requestCode, userId);
     if (connection == nullptr) {
         HILOG_ERROR("create FormAcquireDataConnection failed");

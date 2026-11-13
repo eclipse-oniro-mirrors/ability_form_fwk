@@ -26,6 +26,7 @@
 #undef private
 #undef protected
 #include "ams_mgr/form_ams_helper.h"
+#include "common/connection/form_ability_connection.h"
 #include "securec.h"
 #include "ffrt.h"
 
@@ -138,7 +139,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formProviderMgr.AcquireFormStateBack(state, provider, wantArg);
     formProviderMgr.IsNeedToFresh(record, formId, isVisibleToFresh);
     formProviderMgr.IsFormCached(record);
-    sptr<AAFwk::IAbilityConnection> formRefreshConnection = nullptr;
+    sptr<FormAbilityConnection> formRefreshConnection = nullptr;
     return formProviderMgr.RebindByFreeInstall(record, want, formRefreshConnection);
 }
 }

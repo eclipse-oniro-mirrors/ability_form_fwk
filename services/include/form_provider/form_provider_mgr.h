@@ -26,6 +26,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+
+class FormAbilityConnection;
+
 using Want = OHOS::AAFwk::Want;
 using IInterface = OHOS::AAFwk::IInterface;
 using WantParams = OHOS::AAFwk::WantParams;
@@ -197,8 +200,7 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RebindByFreeInstall(const FormRecord &record, Want &want,
-        const sptr<AAFwk::IAbilityConnection> formRefreshConnection);
-
+        const sptr<FormAbilityConnection> formRefreshConnection);
     void DataProxyUpdate(const int64_t formId, const FormRecord &record, bool isFormProviderUpdate);
     void PostEnterpriseAppInstallFailedRetryTask(const int64_t formId, const Want &want, bool isVisibleToFresh);
 };

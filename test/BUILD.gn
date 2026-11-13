@@ -36,6 +36,8 @@ group("unittest") {
   deps = [
     "unittest/fms_batch_refresh_test:unittest",
     "unittest/fms_form_ability_connection_reporter_test:unittest",
+    "unittest/fms_form_ams_helper_test:unittest",
+    "unittest/fms_form_extension_process_pool_test:unittest",
     "unittest/fms_form_ashmem_test:unittest",
     "unittest/fms_form_batch_delete_connection_test:unittest",
     "unittest/fms_form_caller_mgr_test:unittest",

@@ -15,7 +15,6 @@
 
 #include "common/retry_policy/retry_policy.h"
 
-#include "common/connection/form_ability_connection.h"
 #include "fms_log_wrapper.h"
 
 namespace OHOS {

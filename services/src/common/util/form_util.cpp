@@ -24,6 +24,7 @@
 #include <regex>
 
 #include "accesstoken_kit.h"
+#include "tokenid_kit.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "bundle_constants.h"
 #include "fms_log_wrapper.h"
@@ -223,6 +224,20 @@ int FormUtil::GetCurrentAccountId()
     }
 
     return activeList.front();
+}
+
+bool FormUtil::IsSystemAppCall()
+{
+    auto callerTokenID = IPCSkeleton::GetCallingFullTokenID();
+    return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(callerTokenID);
+}
+
+bool FormUtil::IsFormCenterLocation(Constants::FormLocation location)
+{
+    return location == Constants::FormLocation::FORM_CENTER
+        || location == Constants::FormLocation::FORM_MANAGER
+        || location == Constants::FormLocation::FORM_CENTER_NEGATIVE_SCREEN
+        || location == Constants::FormLocation::FORM_MANAGER_NEGATIVE_SCREEN;
 }
 
 bool FormUtil::IsSACall()

@@ -514,8 +514,9 @@ ErrCode FormVisibilityAdapter::HandleEventNotify(const std::string &providerKey,
     std::string abilityName = providerKey.substr(position + delimiterLength,
         secondPosition - position - delimiterLength);
     std::string moduleName = providerKey.substr(secondPosition + delimiterLength);
-    sptr<IAbilityConnection> formEventNotifyConnection = new (std::nothrow) FormEventNotifyConnection(formIdsByProvider,
-        formVisibleType, bundleName, abilityName, FormCommonAdapter::GetInstance().GetCallingUserId());
+    sptr<FormAbilityConnection> formEventNotifyConnection = new (std::nothrow) FormEventNotifyConnection(
+        formIdsByProvider, formVisibleType, bundleName, abilityName,
+        FormCommonAdapter::GetInstance().GetCallingUserId());
     if (formEventNotifyConnection == nullptr) {
         HILOG_ERROR("create FormEventNotifyConnection failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;

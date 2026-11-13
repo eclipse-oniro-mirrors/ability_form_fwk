@@ -20,10 +20,20 @@
  
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+constexpr const char *FORM_EXT_PROCESS_POOL_THRESHOLD_KEY = "persist.sys.fms.form_extension.process_pool.threshold";
+constexpr const char *LIVE_FORM_SUPPORT_KEY = "persist.sys.fms.support.liveForm";
+constexpr const char *GAME_CARD_SUPPORT_KEY = "persist.sceneboard.desktop.game_card";
+constexpr const char *LIVE_FORM_NONE = "0";
+constexpr const char *GAME_CARD_DISABLED = "false";
+constexpr int32_t DEFAULT_POOL_THRESHOLD = 20;
+constexpr int32_t POOL_THRESHOLD_LIMIT = 50;
+}
+
 FormCustConfigMgr::FormCustConfigMgr()
 {
     HILOG_INFO("create");
-    InitLiveFormParameters();
+    InitCustConfigParameters();
 }
  
 FormCustConfigMgr::~FormCustConfigMgr()
@@ -31,10 +41,30 @@ FormCustConfigMgr::~FormCustConfigMgr()
     HILOG_INFO("destroy");
 }
  
-void FormCustConfigMgr::InitLiveFormParameters()
+void FormCustConfigMgr::InitCustConfigParameters()
 {
-    liveFormSupportType = OHOS::system::GetParameter(Constants::PARAM_LIVE_FORM_SUPPORT_KEY, Constants::LIVE_FORM_NONE);
-    gameCardSupportEnable = OHOS::system::GetParameter(Constants::PARAM_GAME_CARD_SUPPORT_KEY, "false");
+    liveFormSupportType = OHOS::system::GetParameter(LIVE_FORM_SUPPORT_KEY, LIVE_FORM_NONE);
+    gameCardSupportEnable = OHOS::system::GetParameter(GAME_CARD_SUPPORT_KEY, GAME_CARD_DISABLED);
+    int32_t rawThreshold = OHOS::system::GetIntParameter(FORM_EXT_PROCESS_POOL_THRESHOLD_KEY, DEFAULT_POOL_THRESHOLD);
+    processPoolThreshold_ = SanitizePoolThreshold(rawThreshold);
+    HILOG_INFO("process pool threshold: %{public}zu (raw %{public}d)", processPoolThreshold_, rawThreshold);
+}
+
+size_t FormCustConfigMgr::GetFormExtensionProcessPoolMax() const
+{
+    return processPoolThreshold_;
+}
+
+size_t FormCustConfigMgr::SanitizePoolThreshold(int32_t rawThreshold)
+{
+    // 0 keeps 0: pool gating disabled (rollback switch).
+    if (rawThreshold < 0) {
+        return DEFAULT_POOL_THRESHOLD;
+    }
+    if (rawThreshold > POOL_THRESHOLD_LIMIT) {
+        return POOL_THRESHOLD_LIMIT;
+    }
+    return rawThreshold;
 }
 
 bool FormCustConfigMgr::IsSupportSceneAnimation()

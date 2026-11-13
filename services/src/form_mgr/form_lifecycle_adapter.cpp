@@ -219,26 +219,9 @@ ErrCode FormLifecycleAdapter::AddExistFormRecord(const FormItemInfo &info, const
         FormDataAdapter::GetInstance().SetReUpdateFormMap(formId);
     }
     FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams, callerToken);
-    if (newRecord.needRefresh || newRecord.needAddForm
-        || FormCacheMgr::GetInstance().NeedAcquireProviderData(newRecord.formId)
-        || wantParams.HasParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY)) {
-        HILOG_INFO("acquire ProviderFormInfo async,formId:%{public}" PRId64, formId);
-        newRecord.isInited = false;
-        FormDataMgr::GetInstance().SetFormCacheInited(formId, false);
-        FormDataMgr::GetInstance().SetNeedAddForm(formId, false);
-
-        FormDataAdapter::GetInstance().ClearReconnectNum(formId);
-        // acquire formInfo from provider
-        ErrCode errorCode = FormDataAdapter::GetInstance().AcquireProviderFormInfoAsync(formId, info, wantParams);
-        if (errorCode != ERR_OK) {
-            HILOG_ERROR("[%{public}s]AcquireProviderFormInfoAsync failed,formId:%{public}" PRId64,
-                __FUNCTION__, formId);
-            return errorCode;
-        }
-    } else if (newRecord.isLocationChange) {
-        Want locationWant;
-        locationWant.SetParams(wantParams);
-        FormProviderMgr::GetInstance().ConnectAmsChangeLocation(formId, newRecord, locationWant);
+    ErrCode acquireResult = ProcessProviderAcquire(info, newRecord, formId, wantParams);
+    if (acquireResult != ERR_OK) {
+        return acquireResult;
     }
 
     // Add new form user uid.
@@ -251,6 +234,43 @@ ErrCode FormLifecycleAdapter::AddExistFormRecord(const FormItemInfo &info, const
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, newRecord, formInfo);
 
     return FormDataAdapter::GetInstance().UpdateTimer(formId, newRecord);
+}
+
+ErrCode FormLifecycleAdapter::ProcessProviderAcquire(const FormItemInfo &info, FormRecord &newRecord,
+    const int64_t formId, const WantParams &wantParams)
+{
+    bool needAcquireProviderData = FormCacheMgr::GetInstance().NeedAcquireProviderData(newRecord.formId);
+    bool needAcquire = newRecord.needRefresh || newRecord.needAddForm
+        || needAcquireProviderData
+        || wantParams.HasParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY);
+    // Skip provider acquire and render directly from DB cache when all four conditions hold:
+    // 1. The original decision wants provider data (refresh or add-form marker set).
+    // 2. No inverse-color param: inverse color requires fresh provider data, not cache.
+    // 3. DB cache is valid and non-REBOOT, safe to render directly.
+    // 4. FRS death recovery window: render from cache to break the kill-restart loop.
+    if (needAcquire
+        && !wantParams.HasParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY)
+        && !needAcquireProviderData
+        && FormRenderMgr::GetInstance().IsFormRenderConnectionDied(formId)) {
+        HILOG_INFO("DbDirectRender hit, skip acquire, formId:%{public}" PRId64, formId);
+    } else if (needAcquire) {
+        HILOG_INFO("[%{public}s]acquire ProviderFormInfo async,formId:%{public}" PRId64, __FUNCTION__, formId);
+        newRecord.isInited = false;
+        FormDataMgr::GetInstance().SetFormCacheInited(formId, false);
+        FormDataMgr::GetInstance().SetNeedAddForm(formId, false);
+        FormDataAdapter::GetInstance().ClearReconnectNum(formId);
+        ErrCode errorCode = FormDataAdapter::GetInstance().AcquireProviderFormInfoAsync(formId, info, wantParams);
+        if (errorCode != ERR_OK) {
+            HILOG_ERROR("[%{public}s]AcquireProviderFormInfoAsync failed,formId:%{public}" PRId64,
+                __FUNCTION__, formId);
+            return errorCode;
+        }
+    } else if (newRecord.isLocationChange) {
+        Want locationWant;
+        locationWant.SetParams(wantParams);
+        FormProviderMgr::GetInstance().ConnectAmsChangeLocation(formId, newRecord, locationWant);
+    }
+    return ERR_OK;
 }
 
 ErrCode FormLifecycleAdapter::AllotFormById(const FormItemInfo &info,
@@ -1463,7 +1483,7 @@ ErrCode FormLifecycleAdapter::HandleCastTempForm(const int64_t formId, const For
 #ifndef WATCH_API_DISABLE
     HILOG_DEBUG("cast temp form to normal form,notify supplier,package:%{public}s,class:%{public}s",
         formRecord.bundleName.c_str(), formRecord.abilityName.c_str());
-    sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId,
+    sptr<FormAbilityConnection> castTempConnection = new FormCastTempConnection(formId,
         formRecord.bundleName, formRecord.abilityName, FormCommonAdapter::GetInstance().GetCallingUserId());
 
     Want want;

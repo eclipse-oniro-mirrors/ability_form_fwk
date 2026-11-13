@@ -35,7 +35,7 @@ FormAmsHelper::~FormAmsHelper()
 {}
 
 ErrCode FormAmsHelper::ConnectServiceAbility(
-    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect)
+    const Want &want, const sptr<FormAbilityConnection> &connect)
 {
     if (g_mockConnectServiceAbilityRet) {
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;

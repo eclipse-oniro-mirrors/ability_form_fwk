@@ -406,6 +406,8 @@ public:
 
     int DumpFormRunningFormInfos(std::string &runningFormInfosResult) const;
 
+    int DumpProcessPool(std::string &result) const;
+
 private:
 };
 

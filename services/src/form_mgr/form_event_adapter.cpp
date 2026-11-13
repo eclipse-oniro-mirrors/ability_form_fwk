@@ -388,7 +388,7 @@ int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
         HILOG_ERROR("fail get method from params");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    sptr<IAbilityConnection> formBackgroundConnection = new (std::nothrow) FormBackgroundConnection(
+    sptr<FormAbilityConnection> formBackgroundConnection = new (std::nothrow) FormBackgroundConnection(
         formId, want.GetBundle(), want.GetElement().GetAbilityName(),
         jsonObject[Constants::PARAM_FORM_CALL_EVENT_METHOD_KEY].get<std::string>(), params, record.providerUserId);
     if (formBackgroundConnection == nullptr) {

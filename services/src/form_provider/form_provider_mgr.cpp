@@ -14,6 +14,7 @@
  */
 
 #include "form_provider/form_provider_mgr.h"
+#include "common/connection/form_ability_connection.h"
 
 #include <cinttypes>
 
@@ -286,8 +287,8 @@ ErrCode FormProviderMgr::ConnectForConfigUpdate(const AppExecFwk::Configuration 
 {
     HILOG_INFO("[%{public}s]bundleName:%{public}s,abilityName:%{public}s", __FUNCTION__,
         record.bundleName.c_str(), record.abilityName.c_str());
-    sptr<IAbilityConnection> abilityConnection = new (std::nothrow) ConfigurationUpdateConnection(record.formId, want,
-        record.bundleName, record.abilityName, configuration, record.providerUserId);
+    sptr<FormAbilityConnection> abilityConnection = new (std::nothrow) ConfigurationUpdateConnection(
+        record.formId, want, record.bundleName, record.abilityName, configuration, record.providerUserId);
     if (abilityConnection == nullptr) {
         HILOG_ERROR("[%{public}s]create FormRefreshConnection failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -313,8 +314,8 @@ ErrCode FormProviderMgr::ConnectForConfigUpdateWithUserId(const AppExecFwk::Conf
 {
     HILOG_INFO("bundleName:%{public}s,abilityName:%{public}s,userId:%{public}d,providerUserId:%{public}d",
         record.bundleName.c_str(), record.abilityName.c_str(), userId, record.providerUserId);
-    sptr<IAbilityConnection> abilityConnection = new (std::nothrow) ConfigurationUpdateConnection(record.formId, want,
-        record.bundleName, record.abilityName, configuration, record.providerUserId);
+    sptr<FormAbilityConnection> abilityConnection = new (std::nothrow) ConfigurationUpdateConnection(record.formId,
+        want, record.bundleName, record.abilityName, configuration, record.providerUserId);
     if (abilityConnection == nullptr) {
         HILOG_ERROR("create ConfigurationUpdateConnection failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -470,7 +471,7 @@ ErrCode FormProviderMgr::NotifyProviderFormDelete(const int64_t formId, const Fo
 
     HILOG_DEBUG("connectAbility,bundleName:%{public}s,abilityName:%{public}s",
         formRecord.bundleName.c_str(), formRecord.abilityName.c_str());
-    sptr<IAbilityConnection> formDeleteConnection = new (std::nothrow) FormDeleteConnection(formId,
+    sptr<FormAbilityConnection> formDeleteConnection = new (std::nothrow) FormDeleteConnection(formId,
         formRecord.bundleName, formRecord.abilityName, formRecord.providerUserId);
     if (formDeleteConnection == nullptr) {
         HILOG_ERROR("create FormDeleteConnection failed");
@@ -515,8 +516,8 @@ ErrCode FormProviderMgr::NotifyProviderFormsBatchDelete(const std::string &bundl
 
     HILOG_DEBUG("[%{public}s]bundleName:%{public}s,abilityName:%{public}s", __FUNCTION__,
         bundleName.c_str(), abilityName.c_str());
-    sptr<IAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds, bundleName, abilityName,
-        userId);
+    sptr<FormAbilityConnection> batchDeleteConnection = new (std::nothrow) FormBatchDeleteConnection(formIds,
+        bundleName, abilityName, userId);
     if (batchDeleteConnection == nullptr) {
         HILOG_ERROR("create FormBatchDeleteConnection failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -628,7 +629,7 @@ int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record
     }
 #endif
 
-    sptr<IAbilityConnection> formMsgEventConnection = new (std::nothrow) FormMsgEventConnection(formId, want,
+    sptr<FormAbilityConnection> formMsgEventConnection = new (std::nothrow) FormMsgEventConnection(formId, want,
         record.bundleName, record.abilityName, record.providerUserId);
     if (formMsgEventConnection == nullptr) {
         HILOG_ERROR("create FormMsgEventConnection failed");
@@ -666,7 +667,7 @@ int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record
         __FUNCTION__, formId,
         record.bundleName.c_str(), record.abilityName.c_str());
 
-    sptr<IAbilityConnection> formLocationConnection = new (std::nothrow) FormLocationConnection(formId, want,
+    sptr<FormAbilityConnection> formLocationConnection = new (std::nothrow) FormLocationConnection(formId, want,
         record.bundleName, record.abilityName, record.providerUserId);
     if (formLocationConnection == nullptr) {
         HILOG_ERROR("create FormLocationConnection failed");
@@ -761,7 +762,7 @@ bool FormProviderMgr::IsFormCached(const FormRecord &record)
 }
 
 ErrCode FormProviderMgr::RebindByFreeInstall(const FormRecord &record, Want &want,
-    const sptr<AAFwk::IAbilityConnection> formRefreshConnection)
+    const sptr<FormAbilityConnection> formRefreshConnection)
 {
     HILOG_INFO("[%{public}s]start", __FUNCTION__);
     want.AddFlags(Want::FLAG_INSTALL_ON_DEMAND | Want::FLAG_INSTALL_WITH_BACKGROUND_MODE);
@@ -786,7 +787,7 @@ ErrCode FormProviderMgr::ConnectAmsUpdateSize(const int32_t newDimension,
     const Rect &newRect, const FormRecord &record)
 {
     HILOG_INFO("[%{public}s]formId:%{public} " PRId64, __FUNCTION__, record.formId);
-    sptr<IAbilityConnection> formUpdateSizeConnection = new (std::nothrow) FormUpdateSizeConnection(
+    sptr<FormAbilityConnection> formUpdateSizeConnection = new (std::nothrow) FormUpdateSizeConnection(
         record.formId, record.bundleName, record.abilityName, newDimension, newRect, record.providerUserId);
     if (formUpdateSizeConnection == nullptr) {
         HILOG_ERROR("create FormUpdateSizeConnection failed");

@@ -21,13 +21,13 @@
 #include <unordered_map>
 
 #include "refbase.h"
-#include "common/connection/form_ability_connection.h"
 #include "common/retry_policy/retry_policy.h"
 #include "common/util/form_task_common.h"
 #include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+
 using Want = AAFwk::Want;
 
 /**

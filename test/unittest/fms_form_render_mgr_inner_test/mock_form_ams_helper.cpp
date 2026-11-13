@@ -55,7 +55,7 @@ ErrCode FormAmsHelper::DisconnectServiceAbility(const sptr<AAFwk::IAbilityConnec
 }
 
 ErrCode FormAmsHelper::ConnectServiceAbility(
-    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect)
+    const Want &want, const sptr<FormAbilityConnection> &connect)
 {
     if (true == g_mockConnectServiceAbilityRet) {
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -64,7 +64,7 @@ ErrCode FormAmsHelper::ConnectServiceAbility(
 }
 
 ErrCode FormAmsHelper::ConnectServiceAbilityWithUserId(
-    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId)
+    const Want &want, const sptr<FormAbilityConnection> &connect, int32_t userId)
 {
     if (true == g_mockConnectServiceAbilityRet) {
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
