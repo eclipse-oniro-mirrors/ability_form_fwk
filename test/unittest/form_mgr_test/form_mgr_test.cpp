@@ -3482,11 +3482,13 @@ HWTEST_F(FormMgrTest, FormMgrTest_0194, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrTest_0194 starts";
     sptr<IRemoteObject> mockFormProviderClient = new (std::nothrow) MockFormProviderClient();
     sptr<FormMgr::FormMgrDeathRecipient> formMgrDeath = new (std::nothrow) FormMgr::FormMgrDeathRecipient();
-    FormMgr::GetInstance().resetFlag_ = true;
+    sptr<FailLoadSamgr> failSamgr = new (std::nothrow) FailLoadSamgr();
+    sptr<ISystemAbilityManager> backupSamgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = failSamgr;
     FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
     formMgrDeath->OnRemoteDied(mockFormProviderClient);
     EXPECT_TRUE(FormMgr::GetInstance().GetRecoverStatus() == Constants::RECOVER_FAIL);
-    FormMgr::GetInstance().resetFlag_ = false;
+    SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = backupSamgr;
     GTEST_LOG_(INFO) << "FormMgrTest_0194 test ends";
 }
 
