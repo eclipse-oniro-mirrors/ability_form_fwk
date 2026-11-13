@@ -1059,6 +1059,8 @@ void FormMgr::OnFmsLoaded(const sptr<IRemoteObject> &remoteObject)
     if (Connect(remoteObject) == ERR_OK) {
         NotifyDeathCallbacks();
         FormMgr::SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    } else {
+        OnFmsLoadFail();
     }
 }
 
