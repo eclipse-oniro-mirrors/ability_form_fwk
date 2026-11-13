@@ -20,6 +20,7 @@
 #include <vector>
 #include <cinttypes>
 #include <memory>
+#include <mutex>
 #include <regex>
 #include <utility>
 #include "ani_task.h"
@@ -1804,12 +1805,14 @@ void AcquireFormState([[maybe_unused]] ani_env *env, ani_object wantObject, ani_
         return;
     }
 
+    auto grefOnceFlag = std::make_shared<std::once_flag>();
     EtsFormStateCallbackClient::AcquireFormStateTask task(
-        [vm, callbackRef = acquireFormStateCallback, createEnv = env](int32_t state, Want want) mutable -> void {
+        [vm, callbackRef = acquireFormStateCallback, createEnv = env,
+            grefOnceFlag](int32_t state, Want want) mutable -> void {
             ani_env *env = GetEnvFromVm(vm);
             if (env == nullptr) {
                 HILOG_ERROR("null env");
-                DeleteGlobalReference(createEnv, callbackRef);
+                std::call_once(*grefOnceFlag, [&]() { DeleteGlobalReference(createEnv, callbackRef); });
                 return;
             }
             if (callbackRef == nullptr) {
@@ -1821,15 +1824,16 @@ void AcquireFormState([[maybe_unused]] ani_env *env, ani_object wantObject, ani_
             bool result = InnerAcquireFormState(env, callbackRef, state, want);
             if (!result) {
                 HILOG_ERROR("Cannot call callback");
-                DeleteGlobalReference(env, callbackRef);
+                std::call_once(*grefOnceFlag, [&]() { DeleteGlobalReference(env, callbackRef); });
                 PrepareExceptionAndThrow(env, static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
                 return;
             }
 
-            if (!DeleteGlobalReference(env, callbackRef)) {
-                PrepareExceptionAndThrow(env, static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
-                return;
-            }
+            std::call_once(*grefOnceFlag, [&]() {
+                if (!DeleteGlobalReference(env, callbackRef)) {
+                    PrepareExceptionAndThrow(env, static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE));
+                }
+            });
         });
     auto callback = std::make_shared<EtsFormStateCallbackClient>(std::move(task));
     FormHostClient::GetInstance()->AddFormState(callback, want);
@@ -1840,7 +1844,7 @@ void AcquireFormState([[maybe_unused]] ani_env *env, ani_object wantObject, ani_
         HILOG_ERROR("Cannot get state info from system");
         FormHostClient::GetInstance()->RemoveFormState(want);
         InvokeAsyncWithBusinessError(env, aniCallback, static_cast<int32_t>(resultFromFormMgr), nullptr);
-        DeleteGlobalReference(env, acquireFormStateCallback);
+        std::call_once(*grefOnceFlag, [&]() { DeleteGlobalReference(env, acquireFormStateCallback); });
         return;
     }
 

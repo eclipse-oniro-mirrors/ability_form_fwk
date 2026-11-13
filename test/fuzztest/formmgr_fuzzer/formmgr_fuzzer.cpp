@@ -104,7 +104,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formMgr.UnRegisterDeathCallback(formDeathCallback);
     formMgr.GetDeathRecipient();
     formMgr.CheckIsDeathCallbackRegistered(formDeathCallback);
-    return formMgr.Reconnect();
+    formMgr.Reconnect();
+    return true;
 }
 }
 

@@ -177,6 +177,7 @@ HWTEST_F(FmsFormMgrDeathCallbackTest, OnRemoteDied_001, TestSize.Level0)
     FormMgr::GetInstance().RegisterDeathCallback(deathCallback);
     EXPECT_EQ(true, FormMgr::GetInstance().CheckIsDeathCallbackRegistered(deathCallback));
     FormMgr::GetInstance().GetDeathRecipient()->OnRemoteDied(formyMgrServ_->AsObject());
+    FormMgr::GetInstance().OnFmsLoaded(formyMgrServ_->AsObject());
 
     int64_t formId = formJsInfo.formId;
 

@@ -47,8 +47,8 @@ EtsFormAddCallbackClient::EtsFormAddCallbackClient(ani_env* env, ani_ref callbac
 
 EtsFormAddCallbackClient::~EtsFormAddCallbackClient()
 {
-    if (env_ == nullptr) {
-        HILOG_ERROR("null env");
+    if (env_ == nullptr || callbackRef_ == nullptr) {
+        HILOG_ERROR("null env or ref");
         return;
     }
     ani_status status = ANI_ERROR;
@@ -56,6 +56,7 @@ EtsFormAddCallbackClient::~EtsFormAddCallbackClient()
         HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
         return;
     }
+    callbackRef_ = nullptr;
 }
 
 void EtsFormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
@@ -113,8 +114,8 @@ EtsFormRemoveCallbackClient::EtsFormRemoveCallbackClient(ani_env* env, ani_ref c
 
 EtsFormRemoveCallbackClient::~EtsFormRemoveCallbackClient()
 {
-    if (env_ == nullptr) {
-        HILOG_ERROR("null env");
+    if (env_ == nullptr || callbackRef_ == nullptr) {
+        HILOG_ERROR("null env or ref");
         return;
     }
     ani_status status = ANI_ERROR;
@@ -122,6 +123,7 @@ EtsFormRemoveCallbackClient::~EtsFormRemoveCallbackClient()
         HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
         return;
     }
+    callbackRef_ = nullptr;
 }
 
 void EtsFormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleName,
@@ -250,7 +252,6 @@ bool EtsFormStateObserver::RegisterFormAddCallback(ani_vm* ani_vm,
         for (auto &iter : callbacks) {
             if (iter->IsStrictEqual(callback)) {
                 HILOG_ERROR("found equal callback");
-                env->GlobalReference_Delete(callbackRef);
                 return false;
             }
         }
@@ -289,7 +290,6 @@ bool EtsFormStateObserver::RegisterFormRemoveCallback(ani_vm* ani_vm,
         for (auto &iter : callbacks) {
             if (iter->IsStrictEqual(callback)) {
                 HILOG_ERROR("found equal callback");
-                env->GlobalReference_Delete(callbackRef);
                 return false;
             }
         }
