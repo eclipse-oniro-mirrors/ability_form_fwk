@@ -18,6 +18,7 @@
 #include <initializer_list>
 
 #include "bundle_constants.h"
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_ipc_handlers.h"
 #include "form_mgr_interface.h"
@@ -559,6 +560,10 @@ FormIpcDispatchTable &FormIpcDispatchTable::GetInstance()
 
 void FormIpcDispatchTable::SetAccessChecker(std::shared_ptr<IStubAccessChecker> checker)
 {
+    if (checker == nullptr) {
+        HILOG_ERROR("SetAccessChecker: null checker ignored, current checker kept");
+        return;
+    }
     checker_ = std::move(checker);
 }
 

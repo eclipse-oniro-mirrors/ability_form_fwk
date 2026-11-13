@@ -16,6 +16,7 @@
 #include "form_stub_access_checker.h"
 
 #include <algorithm>
+#include <string>
 #include <vector>
 
 #include "accesstoken_kit.h"
@@ -23,7 +24,6 @@
 #include "common/util/form_util.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
-#include "ipc_skeleton.h"
 #include "tokenid_kit.h"
 
 namespace OHOS {
@@ -65,7 +65,7 @@ ErrCode FormStubAccessChecker::CheckPolicyStep(CheckType step, const FormPermiss
         case CheckType::Permission:
             return CheckPermission(policy);
         case CheckType::CrossAccount:
-            return CheckCrossAccount();
+            return CheckCrossAccount(context);
         default:
             return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
@@ -95,12 +95,13 @@ ErrCode FormStubAccessChecker::CheckPermission(const FormPermissionPolicy &polic
     if (FormUtil::VerifyCallingPermission(policy.permName)) {
         return ERR_OK;
     }
+    HILOG_ERROR("VerifyCallingPermission failed, permName: %{public}s", std::string(policy.permName).c_str());
     return policy.permDenyCode;
 }
 
-ErrCode FormStubAccessChecker::CheckCrossAccount()
+ErrCode FormStubAccessChecker::CheckCrossAccount(const FormIpcContext &context)
 {
-    int callingUid = IPCSkeleton::GetCallingUid();
+    int callingUid = context.callingUid;
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     std::vector<int32_t> foregroundUsers;
     FormUtil::GetForegroundUsers(foregroundUsers);

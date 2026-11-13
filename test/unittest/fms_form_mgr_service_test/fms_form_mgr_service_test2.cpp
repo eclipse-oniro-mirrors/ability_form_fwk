@@ -1225,6 +1225,12 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetAllTemplateFormsInfo_0001, Te
     ret = formMgrService.GetAllTemplateFormsInfo(formInfos);
     EXPECT_EQ(ret, ERR_OK);
     EXPECT_EQ(1, formInfos.size());
+
+    // deny path: CheckAcrossLocalAccountsPermission rejects without the permission
+    MockIsSACall(true);
+    MockCheckAcrossLocalAccountsPermission(false);
+    ret = formMgrService.GetAllTemplateFormsInfo(formInfos);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, ret);
     GTEST_LOG_(INFO) << "FormMgrService_GetAllTemplateFormsInfo_0001 end";
 }
 
@@ -1257,6 +1263,12 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetTemplateFormsInfoByApp_0001, 
     ret = formMgrService.GetTemplateFormsInfoByApp(BUNDLE_NAME, formInfos);
     EXPECT_EQ(ret, ERR_OK);
     EXPECT_EQ(1, formInfos.size());
+
+    // deny path: CheckAcrossLocalAccountsPermission rejects without the permission
+    MockIsSACall(true);
+    MockCheckAcrossLocalAccountsPermission(false);
+    ret = formMgrService.GetTemplateFormsInfoByApp(BUNDLE_NAME, formInfos);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, ret);
     GTEST_LOG_(INFO) << "FormMgrService_GetTemplateFormsInfoByApp_0001 end";
 }
 
@@ -1288,6 +1300,12 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetTemplateFormsInfoByModule_000
     ret = formMgrService.GetTemplateFormsInfoByModule(BUNDLE_NAME, MODULE_NAME, formInfos);
     EXPECT_EQ(ret, ERR_OK);
     EXPECT_EQ(1, formInfos.size());
+
+    // deny path: CheckAcrossLocalAccountsPermission rejects without the permission
+    MockIsSACall(true);
+    MockCheckAcrossLocalAccountsPermission(false);
+    ret = formMgrService.GetTemplateFormsInfoByModule(BUNDLE_NAME, MODULE_NAME, formInfos);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, ret);
     GTEST_LOG_(INFO) << "FormMgrService_GetTemplateFormsInfoByModule_0001 end";
 }
 

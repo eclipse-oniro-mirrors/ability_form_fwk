@@ -23,6 +23,7 @@
 #include "mock_form_mgr_service.h"
 #include "mock_form_token.h"
 #include "form_mgr_errors.h"
+#include "form_ipc_dispatch_table.h"
 #include "mock_form_provider_client.h"
 
 using namespace testing::ext;
@@ -4372,4 +4373,72 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_007, TestSize.Level
     GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_007 ends";
 }
 
+// Deny-only checker stub used to exercise the OnRemoteRequest deny path.
+class DenyAllChecker : public IStubAccessChecker {
+public:
+    ErrCode Check(const FormPermissionPolicy &policy, const FormIpcContext &context) override
+    {
+        ++calls;
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+    uint32_t calls = 0;
+};
+
+/**
+ * @tc.name: FormMgrStubTest_OnRemoteRequestDeny_001
+ * @tc.desc: When the installed checker denies, the deny code is returned verbatim,
+ *           the business handler is never invoked, and the reply stays empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestDeny_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestDeny_001 starts";
+    ASSERT_TRUE(mockFormMgrService != nullptr);
+    auto &table = FormIpcDispatchTable::GetInstance();
+    auto original = table.GetAccessChecker();
+    ASSERT_NE(original, nullptr);
+    auto denyChecker = std::make_shared<DenyAllChecker>();
+    table.SetAccessChecker(denyChecker);
+
+    constexpr int64_t formId = 1;
+    const Want want = {};
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ADD_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteInt64(formId);
+    data.WriteParcelable(&want);
+    data.WriteRemoteObject(callerToken);
+    // Deny must short-circuit before the handler: AddForm is never invoked.
+    EXPECT_CALL(*mockFormMgrService, AddForm(_, _, _, _)).Times(0);
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
+    EXPECT_EQ(denyChecker->calls, 1u);
+    // Denied requests never write business data into the reply.
+    EXPECT_EQ(reply.GetDataSize(), 0u);
+
+    // Restore so later tests see the checker installed before this one.
+    table.SetAccessChecker(original);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestDeny_001 ends";
+}
+
+/**
+ * @tc.name: FormMgrStubTest_OnRemoteRequestFallback_001
+ * @tc.desc: A reserved code misses the dispatch table and falls back to the base
+ *           IPCObjectStub, which reports IPC_STUB_UNKNOW_TRANS_ERR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestFallback_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestFallback_001 starts";
+    ASSERT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_EVENT_NOTIFY);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestFallback_001 ends";
+}
 }

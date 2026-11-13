@@ -24,6 +24,7 @@
 #include "common/util/form_util.h"
 #include "common/util/form_trust_mgr.h"
 #include "form_mgr_errors.h"
+#include "string_ex.h"
 #include "tokenid_kit.h"
 
 namespace OHOS {
@@ -79,8 +80,8 @@ int FormMgrDumpHandler::Dump(int fd, const std::vector<std::u16string> &args)
     std::string result;
     Dump(args, result);
     int ret = dprintf(fd, "%s\n", result.c_str());
-    if (ret < 0) {
-        HILOG_ERROR("format dprintf error");
+    if (ret < 0 || static_cast<size_t>(ret) < result.size() + 1) {
+        HILOG_ERROR("dprintf failed or short write, ret: %{public}d, expect: %{public}zu", ret, result.size() + 1);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ERR_OK;
@@ -158,7 +159,7 @@ bool FormMgrDumpHandler::ParseOption(const std::vector<std::u16string> &args, Du
         result = "error: invalid arguments.";
         return false;
     }
-    std::string argStr(args[0].begin(), args[0].end());
+    std::string argStr = Str16ToStr8(args[0]);
     auto it = dumpKeyMap_.find(argStr);
     if (it == dumpKeyMap_.end()) {
         result = "error: unknown option.";
@@ -166,7 +167,7 @@ bool FormMgrDumpHandler::ParseOption(const std::vector<std::u16string> &args, Du
     }
     key = it->second;
     if (args.size() > 1) {
-        value = std::string(args[1].begin(), args[1].end());
+        value = Str16ToStr8(args[1]);
     }
     return true;
 }
@@ -183,17 +184,11 @@ void FormMgrDumpHandler::HiDumpStorageFormInfos([[maybe_unused]] const std::stri
 
 void FormMgrDumpHandler::HiDumpTemporaryFormInfos([[maybe_unused]] const std::string &args, std::string &result)
 {
-    if (!CheckCallerIsSystemApp()) {
-        return;
-    }
     FormMgrAdapterFacade::GetInstance().DumpTemporaryFormInfos(result);
 }
 
 void FormMgrDumpHandler::HiDumpStaticBundleFormInfos([[maybe_unused]] const std::string &args, std::string &result)
 {
-    if (!CheckCallerIsSystemApp()) {
-        return;
-    }
     FormMgrAdapterFacade::GetInstance().DumpStaticBundleFormInfos(result);
 }
 
@@ -217,25 +212,16 @@ void FormMgrDumpHandler::HiDumpFormInfoByBundleName(const std::string &args, std
 
 void FormMgrDumpHandler::HiDumpFormRunningFormInfos([[maybe_unused]] const std::string &args, std::string &result)
 {
-    if (!CheckCallerIsSystemApp()) {
-        return;
-    }
     FormMgrAdapterFacade::GetInstance().DumpFormRunningFormInfos(result);
 }
 
 void FormMgrDumpHandler::HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result)
 {
-    if (!CheckCallerIsSystemApp()) {
-        return;
-    }
     FormTrustMgr::GetInstance().GetUntrustAppNameList(result);
 }
 
 void FormMgrDumpHandler::HiDumpCrossDevice([[maybe_unused]] const std::string &args, std::string &result)
 {
-    if (!CheckCallerIsSystemApp()) {
-        return;
-    }
     FormMgrAdapterFacade::GetInstance().DumpCrossDevice(result);
 }
 

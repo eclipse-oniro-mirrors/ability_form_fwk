@@ -16,7 +16,11 @@
 #ifndef OHOS_FORM_FWK_FORM_IPC_HANDLERS_H
 #define OHOS_FORM_FWK_FORM_IPC_HANDLERS_H
 
+#include <vector>
+
 #include "form_mgr_interface.h"
+#include "form_provider_data_proxy.h"
+#include "message_parcel.h"
 
 namespace OHOS {
 namespace AppExecFwk {

@@ -82,7 +82,7 @@ private:
     ErrCode CheckSystemCaller(const FormIpcContext &context);
     ErrCode CheckSystemApp(const FormIpcContext &context);
     ErrCode CheckPermission(const FormPermissionPolicy &policy);
-    ErrCode CheckCrossAccount();
+    ErrCode CheckCrossAccount(const FormIpcContext &context);
     ErrCode CheckSaOnly();
 };
 

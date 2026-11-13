@@ -70,14 +70,32 @@ FormIpcContext MakeContext()
 
 }  // namespace
 
-class FormStubAccessCheckerTest : public ::testing::Test {};
+class FormStubAccessCheckerTest : public ::testing::Test {
+public:
+    void SetUp() override
+    {
+        ResetMocks();
+    }
+};
 
+/**
+ * @tc.name: EmptyPolicyReturnsOk
+ * @tc.desc: A policy with no effective check steps evaluates to ERR_OK instead of
+ *           failing closed, matching the checker contract for empty policies.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, EmptyPolicyReturnsOk, TestSize.Level0)
 {
     FormStubAccessChecker checker;
     EXPECT_EQ(checker.Check(MakePolicy({}), MakeContext()), ERR_OK);
 }
 
+/**
+ * @tc.name: SaBypassWithSaCallShortCircuitsLaterSteps
+ * @tc.desc: When the caller is a system service, the SaBypass step passes immediately
+ *           and later steps (here SystemApp, set up to deny) are never evaluated.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, SaBypassWithSaCallShortCircuitsLaterSteps, TestSize.Level0)
 {
     ResetMocks();
@@ -87,6 +105,12 @@ HWTEST_F(FormStubAccessCheckerTest, SaBypassWithSaCallShortCircuitsLaterSteps, T
     EXPECT_EQ(checker.Check(MakePolicy({CheckType::SaBypass, CheckType::SystemApp}), MakeContext()), ERR_OK);
 }
 
+/**
+ * @tc.name: SaBypassWithoutSaCallSkipsFirstStep
+ * @tc.desc: Without a SA identity the SaBypass slot is skipped without denying;
+ *           the next step decides, and here SystemApp passes.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, SaBypassWithoutSaCallSkipsFirstStep, TestSize.Level0)
 {
     ResetMocks();
@@ -96,6 +120,12 @@ HWTEST_F(FormStubAccessCheckerTest, SaBypassWithoutSaCallSkipsFirstStep, TestSiz
     EXPECT_EQ(checker.Check(MakePolicy({CheckType::SaBypass, CheckType::SystemApp}), MakeContext()), ERR_OK);
 }
 
+/**
+ * @tc.name: SaBypassWithoutSaCallDeniesOnLaterStep
+ * @tc.desc: A non-SA caller skips SaBypass and is denied by the later SystemApp step
+ *           with ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, SaBypassWithoutSaCallDeniesOnLaterStep, TestSize.Level0)
 {
     ResetMocks();
@@ -106,6 +136,12 @@ HWTEST_F(FormStubAccessCheckerTest, SaBypassWithoutSaCallDeniesOnLaterStep, Test
               ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
 }
 
+/**
+ * @tc.name: SaBypassAsOnlyStepReturnsOk
+ * @tc.desc: The execution loop starts after the SaBypass slot, so a policy containing
+ *           only SaBypass has no effective steps and returns ERR_OK.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, SaBypassAsOnlyStepReturnsOk, TestSize.Level0)
 {
     ResetMocks();
@@ -115,6 +151,11 @@ HWTEST_F(FormStubAccessCheckerTest, SaBypassAsOnlyStepReturnsOk, TestSize.Level0
     EXPECT_EQ(checker.Check(MakePolicy({CheckType::SaBypass}), MakeContext()), ERR_OK);
 }
 
+/**
+ * @tc.name: SaOnlyWithSaCallPasses
+ * @tc.desc: The SaOnly step requires a SA identity; a SA caller passes the check.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, SaOnlyWithSaCallPasses, TestSize.Level0)
 {
     ResetMocks();
@@ -123,6 +164,11 @@ HWTEST_F(FormStubAccessCheckerTest, SaOnlyWithSaCallPasses, TestSize.Level0)
     EXPECT_EQ(checker.Check(MakePolicy({CheckType::SaOnly}), MakeContext()), ERR_OK);
 }
 
+/**
+ * @tc.name: SaOnlyWithoutSaCallDenies
+ * @tc.desc: The SaOnly step denies non-SA callers with the generic permission deny code.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, SaOnlyWithoutSaCallDenies, TestSize.Level0)
 {
     ResetMocks();
@@ -132,6 +178,12 @@ HWTEST_F(FormStubAccessCheckerTest, SaOnlyWithoutSaCallDenies, TestSize.Level0)
         ERR_APPEXECFWK_FORM_PERMISSION_DENY);
 }
 
+/**
+ * @tc.name: SystemCallerSaCallPasses
+ * @tc.desc: SystemCaller is satisfied when either probe passes; a SA identity alone
+ *           is sufficient for the step to pass.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, SystemCallerSaCallPasses, TestSize.Level0)
 {
     ResetMocks();
@@ -140,6 +192,12 @@ HWTEST_F(FormStubAccessCheckerTest, SystemCallerSaCallPasses, TestSize.Level0)
     EXPECT_EQ(checker.Check(MakePolicy({CheckType::SystemCaller}), MakeContext()), ERR_OK);
 }
 
+/**
+ * @tc.name: SystemCallerSystemAppPasses
+ * @tc.desc: Without SA identity, a full-token system app also satisfies the
+ *           SystemCaller step.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, SystemCallerSystemAppPasses, TestSize.Level0)
 {
     ResetMocks();
@@ -149,6 +207,12 @@ HWTEST_F(FormStubAccessCheckerTest, SystemCallerSystemAppPasses, TestSize.Level0
     EXPECT_EQ(checker.Check(MakePolicy({CheckType::SystemCaller}), MakeContext()), ERR_OK);
 }
 
+/**
+ * @tc.name: SystemCallerBothFailDenySys
+ * @tc.desc: A caller that is neither a SA nor a system app is denied by SystemCaller
+ *           with ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, SystemCallerBothFailDenySys, TestSize.Level0)
 {
     ResetMocks();
@@ -159,6 +223,11 @@ HWTEST_F(FormStubAccessCheckerTest, SystemCallerBothFailDenySys, TestSize.Level0
               ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
 }
 
+/**
+ * @tc.name: SystemAppPasses
+ * @tc.desc: The SystemApp step passes when the full-token probe reports a system app.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, SystemAppPasses, TestSize.Level0)
 {
     ResetMocks();
@@ -167,6 +236,12 @@ HWTEST_F(FormStubAccessCheckerTest, SystemAppPasses, TestSize.Level0)
     EXPECT_EQ(checker.Check(MakePolicy({CheckType::SystemApp}), MakeContext()), ERR_OK);
 }
 
+/**
+ * @tc.name: SystemAppFailsDenySys
+ * @tc.desc: The SystemApp step denies non-system-app callers with
+ *           ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, SystemAppFailsDenySys, TestSize.Level0)
 {
     ResetMocks();
@@ -176,6 +251,12 @@ HWTEST_F(FormStubAccessCheckerTest, SystemAppFailsDenySys, TestSize.Level0)
               ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
 }
 
+/**
+ * @tc.name: PermissionGrantedReturnsOk
+ * @tc.desc: The Permission step returns ERR_OK when VerifyCallingPermission grants the
+ *           permission required by the policy.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, PermissionGrantedReturnsOk, TestSize.Level0)
 {
     ResetMocks();
@@ -187,6 +268,12 @@ HWTEST_F(FormStubAccessCheckerTest, PermissionGrantedReturnsOk, TestSize.Level0)
     EXPECT_EQ(checker.Check(policy, MakeContext()), ERR_OK);
 }
 
+/**
+ * @tc.name: PermissionDeniedReturnsBakedCode
+ * @tc.desc: On denial the checker returns the row's baked permDenyCode verbatim
+ *           instead of substituting a generic deny code.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, PermissionDeniedReturnsBakedCode, TestSize.Level0)
 {
     ResetMocks();
@@ -199,6 +286,12 @@ HWTEST_F(FormStubAccessCheckerTest, PermissionDeniedReturnsBakedCode, TestSize.L
     EXPECT_EQ(checker.Check(policy, MakeContext()), ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
 }
 
+/**
+ * @tc.name: CrossAccountForegroundUserPasses
+ * @tc.desc: A caller on a foreground user passes CrossAccount even without the interact
+ *           permission; the in-test permission denial proves the skip.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, CrossAccountForegroundUserPasses, TestSize.Level0)
 {
     ResetMocks();
@@ -210,6 +303,12 @@ HWTEST_F(FormStubAccessCheckerTest, CrossAccountForegroundUserPasses, TestSize.L
     EXPECT_EQ(checker.Check(MakePolicy({CheckType::CrossAccount}), MakeContext()), ERR_OK);
 }
 
+/**
+ * @tc.name: CrossAccountBackgroundUserWithInteractPermissionPasses
+ * @tc.desc: A background-user caller holding the interact permission passes the
+ *           CrossAccount step.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, CrossAccountBackgroundUserWithInteractPermissionPasses, TestSize.Level0)
 {
     ResetMocks();
@@ -220,6 +319,12 @@ HWTEST_F(FormStubAccessCheckerTest, CrossAccountBackgroundUserWithInteractPermis
     EXPECT_EQ(checker.Check(MakePolicy({CheckType::CrossAccount}), MakeContext()), ERR_OK);
 }
 
+/**
+ * @tc.name: CrossAccountBackgroundUserWithoutInteractPermissionDenies
+ * @tc.desc: A background-user caller without the interact permission is denied with
+ *           ERR_APPEXECFWK_FORM_PERMISSION_DENY.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, CrossAccountBackgroundUserWithoutInteractPermissionDenies, TestSize.Level0)
 {
     ResetMocks();
@@ -231,6 +336,12 @@ HWTEST_F(FormStubAccessCheckerTest, CrossAccountBackgroundUserWithoutInteractPer
               ERR_APPEXECFWK_FORM_PERMISSION_DENY);
 }
 
+/**
+ * @tc.name: UnknownStepDenies
+ * @tc.desc: An unrecognized CheckType value is denied with the generic permission deny
+ *           code instead of being skipped.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, UnknownStepDenies, TestSize.Level0)
 {
     ResetMocks();
@@ -241,6 +352,12 @@ HWTEST_F(FormStubAccessCheckerTest, UnknownStepDenies, TestSize.Level0)
     EXPECT_EQ(checker.Check(policy, MakeContext()), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
 }
 
+/**
+ * @tc.name: ChainStopsAtFirstDeny
+ * @tc.desc: When SystemCaller denies, the chain stops immediately; the later
+ *           Permission step's baked deny code is never produced.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, ChainStopsAtFirstDeny, TestSize.Level0)
 {
     ResetMocks();
@@ -255,6 +372,12 @@ HWTEST_F(FormStubAccessCheckerTest, ChainStopsAtFirstDeny, TestSize.Level0)
     EXPECT_EQ(checker.Check(policy, MakeContext()), ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
 }
 
+/**
+ * @tc.name: FullChainPasses
+ * @tc.desc: SaBypass, SystemCaller, Permission and CrossAccount steps compose: a
+ *           non-SA system app with granted permission passes the whole chain.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FormStubAccessCheckerTest, FullChainPasses, TestSize.Level0)
 {
     ResetMocks();

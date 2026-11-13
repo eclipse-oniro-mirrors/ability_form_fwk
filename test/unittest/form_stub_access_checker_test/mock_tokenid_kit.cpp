@@ -18,7 +18,8 @@
 #include "tokenid_kit.h"
 
 namespace {
-bool g_isSystemAppByFullTokenID = true;
+// Fail-closed default: system-app status must be explicitly mocked true.
+bool g_isSystemAppByFullTokenID = false;
 }  // namespace
 
 void MockIsSystemAppByFullTokenID(bool mockRet)

@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_IPC_CONTEXT_H
 
 #include <cstdint>
+#include <type_traits>
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -26,10 +27,13 @@ namespace AppExecFwk {
  * @brief Caller identity snapshot for one IPC message.
  */
 struct FormIpcContext {
-    int32_t callingUid;
-    uint64_t callingTokenId;
-    int32_t callingPid;
+    int32_t callingUid = 0;
+    uint64_t callingTokenId = 0;
+    int32_t callingPid = 0;
 };
+
+static_assert(std::is_trivially_copyable_v<FormIpcContext>,
+    "FormIpcContext must stay trivially copyable");
 
 }  // namespace AppExecFwk
 }  // namespace OHOS
