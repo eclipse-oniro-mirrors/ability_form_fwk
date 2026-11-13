@@ -213,7 +213,6 @@ bool JsFormStateObserver::RegisterFormAddCallback(const napi_env env,
         for (auto &iter : callbacks) {
             if (iter->IsStrictEqual(callback)) {
                 HILOG_ERROR("found equal callback");
-                napi_delete_reference(env, callbackRef);
                 return false;
             }
         }
