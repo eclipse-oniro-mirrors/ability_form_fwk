@@ -590,6 +590,22 @@ public:
                                      const sptr<IRemoteObject> &callerToken, int callingUid);
 
     /**
+     * @brief Record the provider bundle queried by the acquire-data request.
+     *        Used to verify the caller of the acquire-data result.
+     * @param requestCode The request code of this acquire form.
+     * @param bundleName The provider bundle queried for this request.
+     */
+    void AddAcquireDataProvider(int64_t requestCode, const std::string &bundleName);
+ 
+    /**
+     * @brief Check whether the acquire-data result caller is the queried provider.
+     * @param requestCode The request code of this acquire form.
+     * @param callerBundleName The bundle name of the result caller.
+     * @return Returns true if the caller is the queried provider; returns false otherwise.
+     */
+    bool CheckAcquireDataProvider(int64_t requestCode, const std::string &callerBundleName);
+
+    /**
      * @brief Remove the acquire data host record on connection failure.
      * @param requestCode The request code of this acquire form.
      */
@@ -1364,6 +1380,7 @@ private:
     std::map<std::string, FormHostRecord> formStateRecord_;
     std::map<std::string, std::vector<sptr<IRemoteObject>>> formAddObservers_;
     std::unordered_map<int64_t, FormHostRecord> formAcquireDataRecord_;
+    std::unordered_map<int64_t, std::string> formAcquireDataProvider_;
     using FormRequestPublishFormInfo = std::pair<Want, std::unique_ptr<FormProviderData>>;
     std::map<int64_t, FormRequestPublishFormInfo> formRequestPublishForms_;
     std::atomic<int64_t> udidHash_ = 0;

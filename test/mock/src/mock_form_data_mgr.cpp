@@ -297,6 +297,23 @@ bool FormDataMgr::CreateFormAcquireDataRecord(int64_t requestCode, const FormIte
     return false;
 }
 
+void FormDataMgr::AddAcquireDataProvider(int64_t requestCode, const std::string &bundleName)
+{
+    GTEST_LOG_(INFO) << "AddAcquireDataProvider called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        AppExecFwk::MockFormDataMgr::obj->AddAcquireDataProvider(requestCode, bundleName);
+    }
+}
+ 
+bool FormDataMgr::CheckAcquireDataProvider(int64_t requestCode, const std::string &callerBundleName)
+{
+    GTEST_LOG_(INFO) << "CheckAcquireDataProvider called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->CheckAcquireDataProvider(requestCode, callerBundleName);
+    }
+    return false;
+}
+
 bool FormDataMgr::GetMatchedHostClient(const sptr<IRemoteObject> &callerToken,
     FormHostRecord &formHostRecord) const
 {

@@ -95,6 +95,31 @@ int32_t FormSupplyCallback::CheckCallerOwnsForm(int64_t formId)
     return ERR_OK;
 }
 
+int32_t FormSupplyCallback::CheckCallerOwnsConnection(int32_t connectId)
+{
+    std::string ownerBundle;
+    {
+        std::lock_guard<std::mutex> lock(conMutex_);
+        auto conIterator = connections_.find(connectId);
+        if (conIterator == connections_.end()) {
+            // No registered connection means nothing to tear down; keep as no-op.
+            return ERR_OK;
+        }
+        ownerBundle = conIterator->second->GetBundleName();
+    }
+    std::string callerBundle;
+    if (FormBmsHelper::GetInstance().GetCallerBundleName(callerBundle) != ERR_OK) {
+        HILOG_ERROR("get caller bundle failed, connectId:%{public}d", connectId);
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+    if (callerBundle != ownerBundle) {
+        HILOG_ERROR("caller not connection owner, caller:%{public}s, owner:%{public}s, connectId:%{public}d",
+            callerBundle.c_str(), ownerBundle.c_str(), connectId);
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+    return ERR_OK;
+}
+
 int32_t FormSupplyCallback::ValidateAcquireRequest(const Want &want, int64_t &formId)
 {
     int errCode = want.GetIntParam(Constants::PROVIDER_FLAG, ERR_OK);
@@ -191,6 +216,11 @@ int FormSupplyCallback::OnEventHandle(const Want &want)
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     std::string supplyInfo = want.GetStringParam(Constants::FORM_SUPPLY_INFO);
     HILOG_INFO("connectId:%{public}d, supplyInfo:%{public}s", connectId, supplyInfo.c_str());
+    int32_t ownRet = CheckCallerOwnsConnection(connectId);
+    if (ownRet != ERR_OK) {
+        HILOG_ERROR("caller not connection owner, connectId:%{public}d, ret:%{public}d", connectId, ownRet);
+        return ownRet;
+    }
     FormProviderQueue::GetInstance().CancelDelayTask(
         std::make_pair(static_cast<int64_t>(Constants::DETECT_FORM_EXIT_DELAY_TASK), static_cast<int64_t>(connectId)));
     RemoveConnection(connectId);
@@ -237,6 +267,17 @@ int FormSupplyCallback::OnAcquireStateResult(FormState state,
 int FormSupplyCallback::OnAcquireDataResult(const AAFwk::WantParams &wantParams, int64_t requestCode)
 {
     HILOG_DEBUG("call");
+    // Only the provider queried for this requestCode may answer, reject before delivering to host.
+    std::string callerBundle;
+    if (FormBmsHelper::GetInstance().GetCallerBundleName(callerBundle) != ERR_OK) {
+        HILOG_ERROR("get caller bundle failed, requestCode:%{public}" PRId64, requestCode);
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+    if (!FormDataMgr::GetInstance().CheckAcquireDataProvider(requestCode, callerBundle)) {
+        HILOG_ERROR("caller is not the queried provider, caller:%{public}s, requestCode:%{public}" PRId64,
+            callerBundle.c_str(), requestCode);
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
     ErrCode errCode = FormProviderMgr::GetInstance().AcquireFormDataBack(wantParams, requestCode);
     HILOG_INFO("errCode:%{public}d", errCode);
     return errCode;
@@ -412,12 +453,22 @@ int32_t FormSupplyCallback::OnStopRenderingTaskDone(int64_t formId, const Want &
 int32_t FormSupplyCallback::OnRenderingBlock(const std::string &bundleName)
 {
     HILOG_INFO("bundleName:%{public}s", bundleName.c_str());
+    if (bundleName.empty()) {
+        HILOG_ERROR("empty bundleName");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     FormRenderMgr::GetInstance().OnRenderingBlock(bundleName);
     return ERR_OK;
 }
 
 int32_t FormSupplyCallback::OnRecycleForm(const int64_t formId, const Want &want)
 {
+    // Guard status-data injection for non-existent form, even from gated FRS caller.
+    FormRecord formRecord;
+    if (formId <= 0 || !FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("recycle form result with invalid formId:%{public}" PRId64, formId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
     return FormStatusTaskMgr::GetInstance().OnRecycleDataDone(formId, want);
 }
 

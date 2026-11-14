@@ -2129,12 +2129,29 @@ bool FormDataMgr::CreateFormAcquireDataRecord(int64_t requestCode, const FormIte
 void FormDataMgr::RemoveFormAcquireDataRecord(int64_t requestCode)
 {
     std::lock_guard<std::mutex> lock(formAcquireDataRecordMutex_);
+    formAcquireDataProvider_.erase(requestCode);
     auto iter = formAcquireDataRecord_.find(requestCode);
     if (iter == formAcquireDataRecord_.end()) {
         return;
     }
     iter->second.CleanResource();
     formAcquireDataRecord_.erase(iter);
+}
+
+void FormDataMgr::AddAcquireDataProvider(int64_t requestCode, const std::string &bundleName)
+{
+    std::lock_guard<std::mutex> lock(formAcquireDataRecordMutex_);
+    formAcquireDataProvider_[requestCode] = bundleName;
+}
+ 
+bool FormDataMgr::CheckAcquireDataProvider(int64_t requestCode, const std::string &callerBundleName)
+{
+    std::lock_guard<std::mutex> lock(formAcquireDataRecordMutex_);
+    auto iter = formAcquireDataProvider_.find(requestCode);
+    if (iter == formAcquireDataProvider_.end()) {
+        return false;
+    }
+    return iter->second == callerBundleName;
 }
 
 ErrCode FormDataMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams, int64_t requestCode)
@@ -2145,6 +2162,7 @@ ErrCode FormDataMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams, in
         HILOG_ERROR("filed to get form state host record");
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
+    formAcquireDataProvider_.erase(requestCode);
     iter->second.OnAcquireFormData(wantParams, requestCode);
     iter->second.CleanResource();
     formAcquireDataRecord_.erase(iter);

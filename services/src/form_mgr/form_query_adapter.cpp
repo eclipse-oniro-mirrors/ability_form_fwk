@@ -236,6 +236,8 @@ int FormQueryAdapter::AcquireFormState(const Want &want, const sptr<IRemoteObjec
     HILOG_DEBUG("bundleName:%{public}s, abilityName:%{public}s, moduleName:%{public}s", bundleName.c_str(),
         abilityName.c_str(), moduleName.c_str());
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
+    // Bind the request to its queried provider for result caller verification.
+    FormDataMgr::GetInstance().AddAcquireDataProvider(requestCode, bundleName);
     sptr<IAbilityConnection> connection =
         new (std::nothrow) FormAcquireStateConnection(bundleName, abilityName, want, provider, userId);
     if (connection == nullptr) {

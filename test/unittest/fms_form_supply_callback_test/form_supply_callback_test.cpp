@@ -168,7 +168,7 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0019, TestSize.Lev
 
 /**
  * @tc.name: FormAcquireConnectionTest_0020
- * @tc.desc: Test OnAcquireDataResult function.
+ * @tc.desc: Test OnAcquireDataResult returns ERR_OK when caller is the queried provider.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0020, TestSize.Level0)
@@ -177,9 +177,38 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0020, TestSize.Lev
     AAFwk::WantParams wantParams;
     int64_t requestCode = 102;
     FormSupplyCallback formSupplyCallback;
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>("com.example.provider"), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormDataMgr::obj, CheckAcquireDataProvider(requestCode, _))
+        .Times(1)
+        .WillOnce(Return(true));
     EXPECT_EQ(formSupplyCallback.OnAcquireDataResult(wantParams, requestCode), ERR_OK);
 
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0020 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0021
+ * @tc.desc: Test OnAcquireDataResult rejects when caller is not the queried provider.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0021, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0021 start");
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = 103;
+    FormSupplyCallback formSupplyCallback;
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>("com.example.attacker"), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormDataMgr::obj, CheckAcquireDataProvider(requestCode, _))
+        .Times(1)
+        .WillOnce(Return(false));
+    EXPECT_EQ(formSupplyCallback.OnAcquireDataResult(wantParams, requestCode),
+        ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+ 
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0021 end";
 }
 
 /**
@@ -214,6 +243,7 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormOnRecycleFormTest_0001, TestSize.Level0)
     int64_t formId = 102;
     Want want;
     FormSupplyCallback formSupplyCallback;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _)).WillRepeatedly(Return(true));
     EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
 
     want.SetParam(Constants::FORM_STATUS_DATA, std::to_string(formId));
@@ -245,6 +275,7 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormOnRecycleFormTest_0002, TestSize.Level0)
     int64_t formId = 102;
     Want want;
     FormSupplyCallback formSupplyCallback;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _)).WillRepeatedly(Return(true));
     want.SetParam(Constants::FORM_STATUS_DATA, std::to_string(formId));
     EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
 
