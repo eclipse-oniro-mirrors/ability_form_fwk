@@ -28,13 +28,13 @@ int32_t g_getCallerUserId = OHOS::AppExecFwk::Constants::ANY_USERID;
 std::vector<int32_t> g_foregroundUsers;
 }  // namespace
 
+namespace OHOS {
+namespace AppExecFwk {
+
 void MockVerifyCallingPermission(bool mockRet)
 {
     g_verifyCallingPermission = mockRet;
 }
-
-namespace OHOS {
-namespace AppExecFwk {
 
 void MockIsSACall(bool mockRet)
 {

@@ -4384,6 +4384,26 @@ public:
     uint32_t calls = 0;
 };
 
+class CheckerScopeGuard {
+public:
+    explicit CheckerScopeGuard(std::shared_ptr<IStubAccessChecker> replacement)
+        : original_(FormIpcDispatchTable::GetInstance().GetAccessChecker())
+    {
+        FormIpcDispatchTable::GetInstance().SetAccessChecker(replacement);
+    }
+
+    ~CheckerScopeGuard()
+    {
+        FormIpcDispatchTable::GetInstance().SetAccessChecker(original_);
+    }
+
+    CheckerScopeGuard(const CheckerScopeGuard &) = delete;
+    CheckerScopeGuard &operator=(const CheckerScopeGuard &) = delete;
+
+private:
+    std::shared_ptr<IStubAccessChecker> original_;
+};
+
 /**
  * @tc.name: FormMgrStubTest_OnRemoteRequestDeny_001
  * @tc.desc: When the installed checker denies, the deny code is returned verbatim,
@@ -4393,11 +4413,8 @@ public:
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestDeny_001, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestDeny_001 starts";
     ASSERT_TRUE(mockFormMgrService != nullptr);
-    auto &table = FormIpcDispatchTable::GetInstance();
-    auto original = table.GetAccessChecker();
-    ASSERT_NE(original, nullptr);
     auto denyChecker = std::make_shared<DenyAllChecker>();
-    table.SetAccessChecker(denyChecker);
+    CheckerScopeGuard checkerGuard(denyChecker);
 
     constexpr int64_t formId = 1;
     const Want want = {};
@@ -4417,22 +4434,188 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestDeny_001, TestSize.Leve
     EXPECT_EQ(denyChecker->calls, 1u);
     // Denied requests never write business data into the reply.
     EXPECT_EQ(reply.GetDataSize(), 0u);
-
-    // Restore so later tests see the checker installed before this one.
-    table.SetAccessChecker(original);
     GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestDeny_001 ends";
 }
 
 /**
+ * @tc.name: FormMgrStubTest_OnRemoteRequestDenyShapeReplyInt_001
+ * @tc.desc: On a CARRIER_REPLY_INT32 legacy row the deny code is written into the
+ *           reply as the leading int32 while the status channel stays ERR_OK,
+ *           replicating the pre-refactor stub contract byte for byte.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestDenyShapeReplyInt_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestDenyShapeReplyInt_001 starts";
+    ASSERT_TRUE(mockFormMgrService != nullptr);
+    auto denyChecker = std::make_shared<DenyAllChecker>();
+    CheckerScopeGuard checkerGuard(denyChecker);
+
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORM_LOCKED);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    EXPECT_CALL(*mockFormMgrService, NotifyFormLocked(_, _)).Times(0);
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t replyCode = ERR_OK;
+    EXPECT_TRUE(reply.ReadInt32(replyCode));
+    EXPECT_EQ(replyCode, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
+    EXPECT_EQ(denyChecker->calls, 1u);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestDenyShapeReplyInt_001 ends";
+}
+
+/**
+ * @tc.name: FormMgrStubTest_OnRemoteRequestDenyShapeReplyBool_001
+ * @tc.desc: On a CARRIER_REPLY_BOOL legacy row the deny surfaces as the reply's
+ *           plain false bool with an ERR_OK status, so proxy and direct stub
+ *           callers observe exactly the pre-refactor channel.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestDenyShapeReplyBool_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestDenyShapeReplyBool_001 starts";
+    ASSERT_TRUE(mockFormMgrService != nullptr);
+    auto denyChecker = std::make_shared<DenyAllChecker>();
+    CheckerScopeGuard checkerGuard(denyChecker);
+
+    constexpr uint32_t code =
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_HAS_FORM_VISIBLE_WITH_TOKENID);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    EXPECT_CALL(*mockFormMgrService, HasFormVisible(_)).Times(0);
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    bool visible = true;
+    EXPECT_TRUE(reply.ReadBool(visible));
+    EXPECT_FALSE(visible);
+    EXPECT_EQ(denyChecker->calls, 1u);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestDenyShapeReplyBool_001 ends";
+}
+
+/**
+ * @tc.name: FormMgrStubTest_DenyShapeLegacyWhitelistSnapshot_001
+ * @tc.desc: The legacy deny-shape whitelist is frozen: exactly the audited
+ *           37 CARRIER_REPLY_INT32 rows and 6 CARRIER_REPLY_BOOL rows keep the
+ *           pre-refactor deny channels; every other row must stay on the
+ *           CARRIER_STATUS default so new commands cannot silently inherit
+ *           a legacy shape.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_DenyShapeLegacyWhitelistSnapshot_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DenyShapeLegacyWhitelistSnapshot_001 starts";
+    static constexpr IFormMgr::Message kReplyInt32Whitelist[] = {
+        IFormMgr::Message::FORM_MGR_UPDATE_FORM_CROSS_BUNDLE,
+        IFormMgr::Message::FORM_MGR_CHECK_FMS_READY,
+        IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER,
+        IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID,
+        IFormMgr::Message::FORM_MGR_NOTIFY_FORM_LOCKED,
+        IFormMgr::Message::FORM_MGR_REGISTER_OVERFLOW_PROXY,
+        IFormMgr::Message::FORM_MGR_UNREGISTER_OVERFLOW_PROXY,
+        IFormMgr::Message::FORM_MGR_REGISTER_CHANGE_SCENEANIMATION_STATE_PROXY,
+        IFormMgr::Message::FORM_MGR_UNREGISTER_CHANGE_SCENEANIMATION_STATE_PROXY,
+        IFormMgr::Message::FORM_MGR_CHANGE_SCENE_ANIMATION_STATE,
+        IFormMgr::Message::FORM_MGR_REGISTER_GET_FORM_RECT,
+        IFormMgr::Message::FORM_MGR_UNREGISTER_GET_FORM_RECT,
+        IFormMgr::Message::FORM_MGR_NOTIFY_UPDATE_FORM_SIZE,
+        IFormMgr::Message::FORM_MGR_REGISTER_GET_LIVE_FORM_STATUS,
+        IFormMgr::Message::FORM_MGR_UNREGISTER_GET_LIVE_FORM_STATUS,
+        IFormMgr::Message::FORM_MGR_SEND_NON_TRANSPARENT_RATIO,
+        IFormMgr::Message::FORM_MGR_REGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE,
+        IFormMgr::Message::FORM_MGR_UNREGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE,
+        IFormMgr::Message::FORM_MGR_UPDATE_TEMPLATE_FORM_DETAIL_INFO,
+        IFormMgr::Message::FORM_MGR_REGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL,
+        IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL,
+        IFormMgr::Message::FORM_MGR_GET_FORMIDS_BY_FORM_LOCATION,
+        IFormMgr::Message::FORM_MGR_REGISTER_FORM_WANT_CALLBACK,
+        IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK,
+        IFormMgr::Message::FORM_MGR_REGISTER_UPDATE_FORMS_CONFIG_CALLBACK,
+        IFormMgr::Message::FORM_MGR_UNREGISTER_UPDATE_FORMS_CONFIG_CALLBACK,
+        IFormMgr::Message::FORM_MGR_UPDATE_FORMS_CONFIG,
+        IFormMgr::Message::FORM_MGR_REGISTER_DELETE_FORMS_CALLBACK,
+        IFormMgr::Message::FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK,
+        IFormMgr::Message::FORM_MGR_DELETE_FORMS,
+        IFormMgr::Message::FORM_MGR_REGISTER_FORM_HOST_SERVICE,
+        IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_HOST_SERVICE,
+        IFormMgr::Message::FORM_MGR_GET_AVAILABLE_FORM_HOST_SERVICES,
+        IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_DEVICE,
+        IFormMgr::Message::FORM_MGR_REGISTER_GET_VISIBLE_FORM_RECT_PROXY,
+        IFormMgr::Message::FORM_MGR_UNREGISTER_GET_VISIBLE_FORM_RECT_PROXY,
+        IFormMgr::Message::FORM_MGR_GET_VISIBLE_FORM_RECT,
+    };
+    static constexpr IFormMgr::Message kReplyBoolWhitelist[] = {
+        IFormMgr::Message::FORM_MGR_HAS_FORM_VISIBLE_WITH_TOKENID,
+        IFormMgr::Message::FORM_MGR_IS_REQUEST_PUBLISH_FORM_SUPPORTED,
+        IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN,
+        IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_PEOTECTED,
+        IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_DEBUG_SIGNATURE,
+        IFormMgr::Message::FORM_MGR_IS_FORM_DUE_CONTROL,
+    };
+    constexpr size_t kInt32Count = sizeof(kReplyInt32Whitelist) / sizeof(kReplyInt32Whitelist[0]);
+    constexpr size_t kBoolCount = sizeof(kReplyBoolWhitelist) / sizeof(kReplyBoolWhitelist[0]);
+    auto inList = [](IFormMgr::Message code, bool int32List) {
+        const auto *list = int32List ? kReplyInt32Whitelist : kReplyBoolWhitelist;
+        const size_t n = int32List ? kInt32Count : kBoolCount;
+        for (size_t i = 0; i < n; ++i) {
+            if (list[i] == code) {
+                return true;
+            }
+        }
+        return false;
+    };
+    auto &table = FormIpcDispatchTable::GetInstance();
+    const HandlerEntry *entries = table.GetEntries();
+    ASSERT_NE(entries, nullptr);
+    const size_t count = table.GetEntryCount();
+    uint32_t replyInt32 = 0;
+    uint32_t replyBool = 0;
+    for (size_t i = 0; i < count; ++i) {
+        const auto shape = entries[i].policy.denyShape;
+        const bool inInt32 = inList(entries[i].code, true);
+        const bool inBool = inList(entries[i].code, false);
+        if (shape == DenyShape::CARRIER_REPLY_INT32) {
+            ++replyInt32;
+            EXPECT_TRUE(inInt32) << "unexpected REPLY_INT32 row: "
+                                 << static_cast<uint32_t>(entries[i].code);
+        } else if (shape == DenyShape::CARRIER_REPLY_BOOL) {
+            ++replyBool;
+            EXPECT_TRUE(inBool) << "unexpected REPLY_BOOL row: "
+                                << static_cast<uint32_t>(entries[i].code);
+        } else {
+            EXPECT_EQ(shape, DenyShape::CARRIER_STATUS);
+            EXPECT_FALSE(inInt32 || inBool) << "whitelist row lost its legacy shape: "
+                                            << static_cast<uint32_t>(entries[i].code);
+        }
+    }
+    EXPECT_EQ(replyInt32, static_cast<uint32_t>(kInt32Count));
+    EXPECT_EQ(replyBool, static_cast<uint32_t>(kBoolCount));
+    GTEST_LOG_(INFO) << "FormMgrStubTest_DenyShapeLegacyWhitelistSnapshot_001 ends";
+}
+
+/**
  * @tc.name: FormMgrStubTest_OnRemoteRequestFallback_001
- * @tc.desc: A reserved code misses the dispatch table and falls back to the base
- *           IPCObjectStub, which reports IPC_STUB_UNKNOW_TRANS_ERR.
+ * @tc.desc: A code not served by the dispatch table falls back to the base
+ *           IPCObjectStub, which reports IPC_STUB_UNKNOW_TRANS_ERR. The probe
+ *           code is discovered at runtime, so future table extension cannot
+ *           break this case.
  * @tc.type: FUNC
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestFallback_001, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestFallback_001 starts";
     ASSERT_TRUE(mockFormMgrService != nullptr);
-    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_EVENT_NOTIFY);
+    // Discover any code the table does not serve; the concrete value is an
+    // implementation detail, so later table extension cannot break this case.
+    auto &table = FormIpcDispatchTable::GetInstance();
+    constexpr uint32_t probeLimit = 1U << 20;
+    uint32_t code = 0;
+    for (uint32_t probe = 1; probe < probeLimit; ++probe) {
+        if (table.Find(probe) == nullptr) {
+            code = probe;
+            break;
+        }
+    }
+    ASSERT_NE(code, 0u) << "No unregistered code below probe limit";
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};

@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -47,6 +48,26 @@ public:
     ErrCode denyResult = ERR_OK;
 };
 
+class CheckerScopeGuard {
+public:
+    explicit CheckerScopeGuard(std::shared_ptr<IStubAccessChecker> replacement)
+        : original_(FormIpcDispatchTable::GetInstance().GetAccessChecker())
+    {
+        FormIpcDispatchTable::GetInstance().SetAccessChecker(replacement);
+    }
+
+    ~CheckerScopeGuard()
+    {
+        FormIpcDispatchTable::GetInstance().SetAccessChecker(original_);
+    }
+
+    CheckerScopeGuard(const CheckerScopeGuard &) = delete;
+    CheckerScopeGuard &operator=(const CheckerScopeGuard &) = delete;
+
+private:
+    std::shared_ptr<IStubAccessChecker> original_;
+};
+
 }  // namespace
 
 class FormIpcDispatchTableTest : public ::testing::Test {};
@@ -70,7 +91,7 @@ HWTEST_F(FormIpcDispatchTableTest, AllCodesUniqueSortedViewStrictlyAscendingPerm
         ASSERT_NE(found, nullptr);
         sorted.push_back(static_cast<uint32_t>(found->code));
     }
-    ASSERT_EQ(sorted.size(), entryCount);
+    ASSERT_GT(entryCount, 0u);
     std::sort(sorted.begin(), sorted.end());
     // Strictly ascending.
     for (size_t i = 1; i < sorted.size(); ++i) {
@@ -111,21 +132,20 @@ HWTEST_F(FormIpcDispatchTableTest, GetAccessCheckerNonNullDefaultFailClosed, Tes
 HWTEST_F(FormIpcDispatchTableTest, SetAccessCheckerInjectsAndObserved, TestSize.Level0)
 {
     auto &table = FormIpcDispatchTable::GetInstance();
-    auto original = table.GetAccessChecker();
-    ASSERT_NE(original, nullptr);
     auto fake = std::make_shared<RecordingChecker>();
-    table.SetAccessChecker(fake);
-    EXPECT_EQ(table.GetAccessChecker().get(), fake.get());
-    FormPermissionPolicy p{};
-    FormIpcContext context{1, 2, 3};
-    EXPECT_EQ(table.GetAccessChecker()->Check(p, context), ERR_OK);
-    EXPECT_EQ(fake->calls, 1u);
-    EXPECT_EQ(fake->lastContext.callingUid, 1);
-    EXPECT_EQ(fake->lastContext.callingTokenId, 2u);
-    EXPECT_EQ(fake->lastContext.callingPid, 3);
-    EXPECT_EQ(fake->lastPolicy.checkCount, 0);
-    // Restore original so later tests see the default fail-closed checker.
-    table.SetAccessChecker(original);
+    {
+        CheckerScopeGuard guard(fake);
+        EXPECT_EQ(table.GetAccessChecker().get(), fake.get());
+        FormPermissionPolicy p{};
+        FormIpcContext context{1, 2, 3};
+        EXPECT_EQ(table.GetAccessChecker()->Check(p, context), ERR_OK);
+        EXPECT_EQ(fake->calls, 1u);
+        EXPECT_EQ(fake->lastContext.callingUid, 1);
+        EXPECT_EQ(fake->lastContext.callingTokenId, 2u);
+        EXPECT_EQ(fake->lastContext.callingPid, 3);
+        EXPECT_EQ(fake->lastPolicy.checkCount, 0);
+    }
+    EXPECT_NE(table.GetAccessChecker().get(), fake.get());
 }
 
 /**

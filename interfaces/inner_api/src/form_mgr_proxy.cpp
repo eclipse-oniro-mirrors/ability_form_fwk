@@ -1960,7 +1960,6 @@ int32_t FormMgrProxy::OpenLiveFormPage(const Want &want, const std::string &form
     return result;
 }
 
-
 ErrCode FormMgrProxy::StartUIAbilityByFms(const Want &want)
 {
     HILOG_INFO("start");

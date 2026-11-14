@@ -39,6 +39,20 @@ enum class CheckType : uint8_t {
 };
 
 /**
+ * @brief Carrier of the deny result when the pre-check rejects an IPC request.
+ *
+ * Deny shape is part of each command's client-visible IPC contract and cannot be
+ * derived from the reply protocol automatically (two commands may share the same
+ * reply format yet differ in the deny channel). It exists solely to keep legacy
+ * client compatibility; new commands must stay on the default CARRIER_STATUS.
+ */
+enum class DenyShape : uint8_t {
+    CARRIER_STATUS,      // Deny code rides the binder status channel (SendRequest return value).
+    CARRIER_REPLY_INT32, // Legacy: deny code is the reply's leading int32; status stays ERR_OK.
+    CARRIER_REPLY_BOOL,  // Legacy: deny surfaces as the reply's plain false bool; status stays ERR_OK.
+};
+
+/**
  * @brief Access policy of one IPC message: an ordered check list.
  * Checks run in order; the first failing check returns its deny code.
  * An empty list means no check (pass-through, B-1/B-2 rows).
@@ -52,6 +66,8 @@ struct FormPermissionPolicy {
     std::string_view permName;
     // Final deny code for the Permission step: explicit override, else GetDefaultDenyCode(permName).
     ErrCode permDenyCode = 0;
+    // Carrier of the deny result for legacy client compatibility; see DenyShape.
+    DenyShape denyShape = DenyShape::CARRIER_STATUS;
 };
 
 /**

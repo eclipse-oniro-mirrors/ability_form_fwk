@@ -1718,6 +1718,9 @@ bool FormMgrService::IsFormBundleDebugSignature(const std::string &bundleName)
 bool FormMgrService::IsFormBundleExempt(int64_t formId)
 {
     HILOG_DEBUG("call");
+    if (!CheckCallerIsSystemApp()) {
+        return true;
+    }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormBundleExempt",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     bool result = FormExemptLockMgr::GetInstance().IsExemptLock(formId);

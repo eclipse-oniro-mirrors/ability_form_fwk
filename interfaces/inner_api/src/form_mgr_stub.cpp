@@ -15,6 +15,7 @@
 
 #include "form_mgr_stub.h"
 
+#include "appexecfwk_errors.h"
 #include "fms_log_wrapper.h"
 #include "form_ipc_dispatch_table.h"
 #include "form_mgr_errors.h"
@@ -31,6 +32,38 @@ FormMgrStub::FormMgrStub()
 FormMgrStub::~FormMgrStub()
 {}
 
+
+/**
+ * @brief Serialize a deny result following the command's legacy deny carrier.
+ *
+ * Deny shape is part of the client-visible IPC contract frozen in the dispatch
+ * table. CARRIER_STATUS is the default (and mandatory) shape for new commands;
+ * the two legacy carriers only replicate how pre-refactor stub handlers reported
+ * permission denials inside the reply parcel with an ERR_OK status.
+ *
+ * @param shape Deny carrier declared in the dispatch-table policy.
+ * @param denyCode Deny code produced by the access checker.
+ * @param reply Output parcel of the current request.
+ * @return Returns the status channel code: ERR_OK for legacy carriers, denyCode otherwise.
+ */
+static ErrCode WriteDenyByShape(DenyShape shape, ErrCode denyCode, MessageParcel &reply)
+{
+    switch (shape) {
+        case DenyShape::CARRIER_REPLY_INT32:
+            if (!reply.WriteInt32(denyCode)) {
+                return ERR_APPEXECFWK_PARCEL_ERROR;
+            }
+            return ERR_OK;
+        case DenyShape::CARRIER_REPLY_BOOL:
+            if (!reply.WriteBool(false)) {
+                return ERR_APPEXECFWK_PARCEL_ERROR;
+            }
+            return ERR_OK;
+        case DenyShape::CARRIER_STATUS:
+        default:
+            return denyCode;
+    }
+}
 /**
  * @brief handle remote request.
  * @param code ipc code.
@@ -69,7 +102,7 @@ int FormMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParc
     if (denyCode != ERR_OK) {
         HILOG_ERROR("IPC deny: code=%{public}u, uid=%{public}d, deny=%{public}d",
                     code, context.callingUid, denyCode);
-        return denyCode;
+        return WriteDenyByShape(entry->policy.denyShape, denyCode, reply);
     }
 
     return entry->handler(*this, data, reply);

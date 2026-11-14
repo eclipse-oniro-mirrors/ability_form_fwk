@@ -25,8 +25,7 @@
 #include "form_permission_policy.h"
 #include "form_stub_access_checker.h"
 
-// Mock control functions defined in mock_form_util.cpp and mock_tokenid_kit.cpp.
-void MockVerifyCallingPermission(bool mockRet);
+// Mock control functions defined in mock_tokenid_kit.cpp.
 void MockIsSystemAppByFullTokenID(bool mockRet);
 
 using namespace testing::ext;
@@ -37,6 +36,7 @@ namespace AppExecFwk {
 void MockIsSACall(bool mockRet);
 void MockGetCallerUserId(int32_t userId);
 void MockGetForegroundUsers(std::vector<int32_t> foregroundUsers);
+void MockVerifyCallingPermission(bool mockRet);
 
 namespace {
 

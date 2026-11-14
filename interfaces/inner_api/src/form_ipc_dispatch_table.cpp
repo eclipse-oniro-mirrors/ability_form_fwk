@@ -40,9 +40,11 @@ constexpr FormPermissionPolicy MakePolicyFromSteps(const CheckType *steps, size_
 
 // Row policy factory: the final deny code is assigned here (override, else GetDefaultDenyCode by permName).
 constexpr FormPermissionPolicy MakePolicy(std::initializer_list<CheckType> steps = {},
-                                          std::string_view permName = {}, ErrCode permDenyCode = 0)
+                                          std::string_view permName = {}, ErrCode permDenyCode = 0,
+                                          DenyShape denyShape = DenyShape::CARRIER_STATUS)
 {
     FormPermissionPolicy policy = MakePolicyFromSteps(steps.begin(), steps.size());
+    policy.denyShape = denyShape;
     policy.permName = permName;
     bool hasPermissionStep = false;
     for (uint8_t i = 0; i < policy.checkCount; ++i) {
@@ -54,6 +56,17 @@ constexpr FormPermissionPolicy MakePolicy(std::initializer_list<CheckType> steps
         policy.permDenyCode = hasPermissionStep ? GetDefaultDenyCode(permName) : 0;
     }
     return policy;
+}
+
+constexpr FormPermissionPolicy MakePolicy(std::initializer_list<CheckType> steps, DenyShape denyShape)
+{
+    return MakePolicy(steps, {}, 0, denyShape);
+}
+
+constexpr FormPermissionPolicy MakePolicy(std::initializer_list<CheckType> steps, std::string_view permName,
+    DenyShape denyShape)
+{
+    return MakePolicy(steps, permName, 0, denyShape);
 }
 
 // Compile-time validators that check table invariants.
@@ -106,6 +119,17 @@ constexpr bool CheckPermDenyApplicability(const HandlerEntry *entries, size_t en
             hasPermissionCheck = hasPermissionCheck || (policy.checks[i] == CheckType::Permission);
         }
         if (hasPermissionCheck != (policy.permDenyCode != 0)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+constexpr bool CheckLegacyDenyShapeHasChecks(const HandlerEntry *entries, size_t entryCount)
+{
+    for (size_t row = 0; row < entryCount; ++row) {
+        const FormPermissionPolicy &policy = entries[row].policy;
+        if (policy.denyShape != DenyShape::CARRIER_STATUS && policy.checkCount == 0) {
             return false;
         }
     }
@@ -186,7 +210,7 @@ constexpr HandlerEntry kEntries[] = {
         MakePolicy()},
     {IFormMgr::Message::FORM_MGR_IS_REQUEST_PUBLISH_FORM_SUPPORTED,
         FormIpcHandlers::HandleIsRequestPublishFormSupported,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_BOOL)},
     {IFormMgr::Message::FORM_MGR_SHARE_FORM, FormIpcHandlers::HandleShareForm,
         MakePolicy({CheckType::SaBypass, CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
                    Constants::PERMISSION_REQUIRE_FORM)},
@@ -201,7 +225,7 @@ constexpr HandlerEntry kEntries[] = {
         MakePolicy({CheckType::SaBypass, CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
                    Constants::PERMISSION_REQUIRE_FORM)},
     {IFormMgr::Message::FORM_MGR_CHECK_FMS_READY, FormIpcHandlers::HandleCheckFMSReady,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_BACKGROUND_EVENT, FormIpcHandlers::HandleBackgroundEvent,
         MakePolicy({CheckType::SaBypass, CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
                    Constants::PERMISSION_REQUIRE_FORM)},
@@ -234,11 +258,11 @@ constexpr HandlerEntry kEntries[] = {
     {IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER,
         FormIpcHandlers::HandleGetFormInstancesByFilter,
         MakePolicy({CheckType::SaBypass, CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
-                   Constants::PERMISSION_OBSERVE_FORM_RUNNING)},
+                   Constants::PERMISSION_OBSERVE_FORM_RUNNING, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID,
         FormIpcHandlers::HandleGetFormInstanceById,
         MakePolicy({CheckType::SaBypass, CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
-                   Constants::PERMISSION_OBSERVE_FORM_RUNNING)},
+                   Constants::PERMISSION_OBSERVE_FORM_RUNNING, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_REGISTER_ADD_OBSERVER,
         FormIpcHandlers::HandleRegisterAddObserver,
         MakePolicy({CheckType::SaBypass, CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
@@ -288,7 +312,7 @@ constexpr HandlerEntry kEntries[] = {
                    Constants::PERMISSION_REQUIRE_FORM)},
     {IFormMgr::Message::FORM_MGR_HAS_FORM_VISIBLE_WITH_TOKENID,
         FormIpcHandlers::HandleHasFormVisible,
-        MakePolicy({CheckType::SaOnly})},
+        MakePolicy({CheckType::SaOnly}, DenyShape::CARRIER_REPLY_BOOL)},
     {IFormMgr::Message::FORM_MGR_UPDATE_FORM_LOCATION, FormIpcHandlers::HandleUpdateFormLocation,
         MakePolicy({CheckType::SaBypass, CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
                    Constants::PERMISSION_REQUIRE_FORM)},
@@ -319,7 +343,7 @@ constexpr HandlerEntry kEntries[] = {
         MakePolicy()},
     {IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN,
         FormIpcHandlers::HandleIsFormBundleForbidden,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_BOOL)},
     {IFormMgr::Message::FORM_MGR_UPDATE_FORM_SIZE, FormIpcHandlers::HandleUpdateFormSize,
         MakePolicy({CheckType::SaBypass, CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
                    Constants::PERMISSION_REQUIRE_FORM)},
@@ -328,12 +352,12 @@ constexpr HandlerEntry kEntries[] = {
                    Constants::PERMISSION_REQUIRE_FORM)},
     {IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_PEOTECTED,
         FormIpcHandlers::HandleIsFormProtected,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_BOOL)},
     {IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_EXEMPT, FormIpcHandlers::HandleIsFormExempt,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy()},  // legacy fail-open stays in the service layer
     {IFormMgr::Message::FORM_MGR_NOTIFY_FORM_LOCKED, FormIpcHandlers::HandleNotifyFormLocked,
         MakePolicy({CheckType::SaBypass, CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
-                   Constants::PERMISSION_REQUIRE_FORM)},
+                   Constants::PERMISSION_REQUIRE_FORM, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_START_ABILITY_BY_FMS, FormIpcHandlers::HandleStartAbilityByFms,
         MakePolicy()},
     {IFormMgr::Message::FORM_MGR_START_UI_ABILITY_BY_FMS,
@@ -356,52 +380,52 @@ constexpr HandlerEntry kEntries[] = {
         MakePolicy()},
     {IFormMgr::Message::FORM_MGR_REGISTER_OVERFLOW_PROXY,
         FormIpcHandlers::HandleRegisterOverflowProxy,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_UNREGISTER_OVERFLOW_PROXY,
         FormIpcHandlers::HandleUnregisterOverflowProxy,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_REQUEST_OVERFLOW, FormIpcHandlers::HandleRequestOverflow,
         MakePolicy()},
     {IFormMgr::Message::FORM_MGR_REGISTER_CHANGE_SCENEANIMATION_STATE_PROXY,
         FormIpcHandlers::HandleRegisterChangeSceneAnimationStateProxy,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_UNREGISTER_CHANGE_SCENEANIMATION_STATE_PROXY,
         FormIpcHandlers::HandleUnregisterChangeSceneAnimationStateProxy,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_CHANGE_SCENE_ANIMATION_STATE,
         FormIpcHandlers::HandleChangeSceneAnimationState,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_REGISTER_GET_FORM_RECT,
         FormIpcHandlers::HandleRegisterGetFormRectProxy,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_UNREGISTER_GET_FORM_RECT,
         FormIpcHandlers::HandleUnregisterGetFormRectProxy,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_GET_FORM_RECT,
         FormIpcHandlers::HandleGetFormRect, MakePolicy()},
     {IFormMgr::Message::FORM_MGR_NOTIFY_UPDATE_FORM_SIZE,
         FormIpcHandlers::HandleNotifyUpdateFormSize,
         MakePolicy({CheckType::SaBypass, CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
-                   Constants::PERMISSION_REQUIRE_FORM)},
+                   Constants::PERMISSION_REQUIRE_FORM, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_REGISTER_GET_LIVE_FORM_STATUS,
         FormIpcHandlers::HandleRegisterGetLiveFormStatusProxy,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_UNREGISTER_GET_LIVE_FORM_STATUS,
         FormIpcHandlers::HandleUnregisterGetLiveFormStatusProxy,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_DEBUG_SIGNATURE,
         FormIpcHandlers::HandleIsFormDebugSignature,
         MakePolicy({CheckType::SaBypass, CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
-                   Constants::PERMISSION_REQUIRE_FORM)},
+                   Constants::PERMISSION_REQUIRE_FORM, DenyShape::CARRIER_REPLY_BOOL)},
     {IFormMgr::Message::FORM_MGR_RELOAD_FORMS, FormIpcHandlers::HandleReloadForms, MakePolicy()},
     {IFormMgr::Message::FORM_MGR_RELOAD_ALL_FORMS, FormIpcHandlers::HandleReloadAllForms,
         MakePolicy()},
     {IFormMgr::Message::FORM_MGR_IS_FORM_DUE_CONTROL, FormIpcHandlers::HandleIsFormDueControl,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_BOOL)},
     {IFormMgr::Message::FORM_MGR_SEND_NON_TRANSPARENT_RATIO,
         FormIpcHandlers::HandleSendNonTransparencyRatio,
         MakePolicy({CheckType::SaBypass, CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
-                   Constants::PERMISSION_REQUIRE_FORM)},
+                   Constants::PERMISSION_REQUIRE_FORM, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_GET_ALL_TEMPLATE_FORMS_INFO,
         FormIpcHandlers::HandleGetAllTemplateFormsInfo,
         MakePolicy({CheckType::SystemCaller, CheckType::CrossAccount, CheckType::Permission},
@@ -417,69 +441,80 @@ constexpr HandlerEntry kEntries[] = {
     {IFormMgr::Message::FORM_MGR_REGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL,
         FormIpcHandlers::HandleRegisterPublishFormCrossBundleControl,
         MakePolicy({CheckType::SystemCaller, CheckType::Permission},
-                   Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL)},
+                   Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_CROSS_BUNDLE_CONTROL,
         FormIpcHandlers::HandleUnregisterPublishFormCrossBundleControl,
         MakePolicy({CheckType::SystemCaller, CheckType::Permission},
-                   Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL)},
+                   Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_REGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE,
         FormIpcHandlers::HandleRegisterTemplateFormDetailInfoChange,
         MakePolicy({CheckType::SystemCaller, CheckType::CrossAccount, CheckType::Permission},
-                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)},
+                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_UNREGISTER_TEMPLATE_FORM_DETAIL_INFO_CHANGE,
         FormIpcHandlers::HandleUnregisterTemplateFormDetailInfoChange,
         MakePolicy({CheckType::SystemCaller, CheckType::CrossAccount, CheckType::Permission},
-                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)},
+                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_UPDATE_TEMPLATE_FORM_DETAIL_INFO,
         FormIpcHandlers::HandleUpdateTemplateFormDetailInfo,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_GET_FORMIDS_BY_FORM_LOCATION,
         FormIpcHandlers::HandleGetFormIdsByFormLocation,
-        MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)},
+        MakePolicy({CheckType::SystemCaller, CheckType::Permission},
+                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_USER,
         FormIpcHandlers::HandleRequestPublishFormCrossUser,
         MakePolicy({CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
                    Constants::PERMISSION_AGENT_REQUIRE_FORM)},
     {IFormMgr::Message::FORM_MGR_REGISTER_FORM_WANT_CALLBACK,
         FormIpcHandlers::HandleRegisterFormWantCallback,
-        MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)},
+        MakePolicy({CheckType::SystemCaller, CheckType::Permission},
+                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_WANT_CALLBACK,
         FormIpcHandlers::HandleUnregisterFormWantCallback,
-        MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)},
+        MakePolicy({CheckType::SystemCaller, CheckType::Permission},
+                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_REGISTER_UPDATE_FORMS_CONFIG_CALLBACK,
         FormIpcHandlers::HandleRegisterUpdateFormsConfigCallback,
-        MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)},
+        MakePolicy({CheckType::SystemCaller, CheckType::Permission},
+                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_UNREGISTER_UPDATE_FORMS_CONFIG_CALLBACK,
         FormIpcHandlers::HandleUnregisterUpdateFormsConfigCallback,
-        MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)},
+        MakePolicy({CheckType::SystemCaller, CheckType::Permission},
+                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_UPDATE_FORMS_CONFIG, FormIpcHandlers::HandleUpdateFormsConfig,
-        MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_FORM_CUSTOM_CONFIG)},
+        MakePolicy({CheckType::SystemCaller, CheckType::Permission},
+                   Constants::PERMISSION_FORM_CUSTOM_CONFIG, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_REGISTER_DELETE_FORMS_CALLBACK,
         FormIpcHandlers::HandleRegisterDeleteFormsCallback,
-        MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)},
+        MakePolicy({CheckType::SystemCaller, CheckType::Permission},
+                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_UNREGISTER_DELETE_FORMS_CALLBACK,
         FormIpcHandlers::HandleUnregisterDeleteFormsCallback,
-        MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)},
+        MakePolicy({CheckType::SystemCaller, CheckType::Permission},
+                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_DELETE_FORMS, FormIpcHandlers::HandleDeleteForms,
-        MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_FORM_CUSTOM_CONFIG)},
+        MakePolicy({CheckType::SystemCaller, CheckType::Permission},
+                   Constants::PERMISSION_FORM_CUSTOM_CONFIG, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_UPDATE_FORM_CROSS_BUNDLE,
         FormIpcHandlers::HandleUpdateFormCrossBundle,
         MakePolicy({CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
-                   Constants::PERMISSION_UPDATE_FORM_CROSS_BUNDLE)},
+                   Constants::PERMISSION_UPDATE_FORM_CROSS_BUNDLE, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_REGISTER_FORM_HOST_SERVICE,
         FormIpcHandlers::HandleRegisterFormHostService,
-        MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)},
+        MakePolicy({CheckType::SystemCaller, CheckType::Permission},
+                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_HOST_SERVICE,
         FormIpcHandlers::HandleUnregisterFormHostService,
-        MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)},
+        MakePolicy({CheckType::SystemCaller, CheckType::Permission},
+                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_GET_AVAILABLE_FORM_HOST_SERVICES,
         FormIpcHandlers::HandleGetAvailableFormHostServices,
         MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_AGENT_REQUIRE_FORM,
-                   ERR_APPEXECFWK_FORM_PERMISSION_DENY_AGENT_REQUIRE_FORM)},
+                   ERR_APPEXECFWK_FORM_PERMISSION_DENY_AGENT_REQUIRE_FORM, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_DEVICE,
         FormIpcHandlers::HandleRequestPublishFormCrossDevice,
         MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_AGENT_REQUIRE_FORM,
-                   ERR_APPEXECFWK_FORM_PERMISSION_DENY_AGENT_REQUIRE_FORM)},
+                   ERR_APPEXECFWK_FORM_PERMISSION_DENY_AGENT_REQUIRE_FORM, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_INSIGHT_INTENT_EVENT, FormIpcHandlers::HandleInsightIntentEvent,
         MakePolicy({CheckType::SaBypass, CheckType::SystemCaller, CheckType::Permission, CheckType::CrossAccount},
                    Constants::PERMISSION_REQUIRE_FORM)},
@@ -488,13 +523,15 @@ constexpr HandlerEntry kEntries[] = {
         MakePolicy()},
     {IFormMgr::Message::FORM_MGR_REGISTER_GET_VISIBLE_FORM_RECT_PROXY,
         FormIpcHandlers::HandleRegisterGetVisibleFormRectProxy,
-        MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)},
+        MakePolicy({CheckType::SystemCaller, CheckType::Permission},
+                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_UNREGISTER_GET_VISIBLE_FORM_RECT_PROXY,
         FormIpcHandlers::HandleUnregisterGetVisibleFormRectProxy,
-        MakePolicy({CheckType::SystemCaller, CheckType::Permission}, Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)},
+        MakePolicy({CheckType::SystemCaller, CheckType::Permission},
+                   Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_GET_VISIBLE_FORM_RECT,
         FormIpcHandlers::HandleGetVisibleFormRect,
-        MakePolicy({CheckType::SystemCaller})},
+        MakePolicy({CheckType::SystemCaller}, DenyShape::CARRIER_REPLY_INT32)},
     {IFormMgr::Message::FORM_MGR_OPEN_FORM_MANAGE_PAGE,
         FormIpcHandlers::HandleOpenFormManagePage,
         MakePolicy()},
@@ -519,6 +556,7 @@ static_assert(CheckStrictlyAscending(kEntries, ENTRY_COUNT), "IPC codes must be 
 static_assert(CheckSaBypassOnlyAtFirstPosition(kEntries, ENTRY_COUNT), "SA caller exemption must be checks[0]");
 static_assert(CheckPermissionMatchesPermName(kEntries, ENTRY_COUNT), "Permission step and permName mismatch");
 static_assert(CheckPermDenyApplicability(kEntries, ENTRY_COUNT), "permDenyCode applicability broken");
+static_assert(CheckLegacyDenyShapeHasChecks(kEntries, ENTRY_COUNT), "legacy denyShape on EMPTY policy row");
 
 FormIpcDispatchTable::FormIpcDispatchTable()
     : checker_(std::make_shared<FailClosedChecker>())

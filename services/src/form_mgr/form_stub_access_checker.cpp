@@ -95,7 +95,7 @@ ErrCode FormStubAccessChecker::CheckPermission(const FormPermissionPolicy &polic
     if (FormUtil::VerifyCallingPermission(policy.permName)) {
         return ERR_OK;
     }
-    HILOG_ERROR("VerifyCallingPermission failed, permName: %{public}s", std::string(policy.permName).c_str());
+    HILOG_ERROR("VerifyCallingPermission failed, permName: %{public}s", policy.permName.data());
     return policy.permDenyCode;
 }
 
