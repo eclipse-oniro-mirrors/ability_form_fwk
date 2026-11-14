@@ -14,7 +14,7 @@
  */
 
 #include "form_provider/form_supply_callback.h"
-// 
+
 #include <cinttypes>
 
 #include "ipc_skeleton.h"
