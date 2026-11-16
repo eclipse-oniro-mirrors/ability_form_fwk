@@ -996,23 +996,35 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetAllTemplateFormsInfo_0001, Te
 {
     GTEST_LOG_(INFO) << "FormMgrService_GetAllTemplateFormsInfo_0001 start";
     FormMgrService formMgrService;
+    // FormInfoMgr is a process-wide singleton: isolate its map from prior test cases,
+    // and clear the output vector between calls because production appends to it.
+    FormInfoMgr::GetInstance().bundleFormInfoMap_.clear();
     std::vector<FormInfo> formInfos;
 
+    // no SA call and no GET_BUNDLE_INFO_PRIVILEGED permission: denied
     MockIsSACall(false);
-    // get empty template form info
+    MockVerifyCallingPermission(false);
     auto ret = formMgrService.GetAllTemplateFormsInfo(formInfos);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
     EXPECT_EQ(0, formInfos.size());
 
+    // permission granted, empty map: no template form info
     MockIsSACall(true);
-    MockCheckAcrossLocalAccountsPermission(true);
-    // get no template form info cause add normal form
-    FormInfoMgr::GetInstance().bundleFormInfoMap_ = CreateBundleFormInfoMapWithTemplateForm();
+    formInfos.clear();
     ret = formMgrService.GetAllTemplateFormsInfo(formInfos);
     EXPECT_EQ(ret, ERR_OK);
     EXPECT_EQ(0, formInfos.size());
 
-    // get one template form info
+    // only a normal form exists: still no template form info
+    FormInfoMgr::GetInstance().bundleFormInfoMap_ = CreateBundleFormInfoMapWithTemplateForm();
+    formInfos.clear();
+    ret = formMgrService.GetAllTemplateFormsInfo(formInfos);
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(0, formInfos.size());
+
+    // one template form exists: exactly one entry
     FormInfoMgr::GetInstance().bundleFormInfoMap_ = CreateBundleFormInfoMapWithTemplateForm(true);
+    formInfos.clear();
     ret = formMgrService.GetAllTemplateFormsInfo(formInfos);
     EXPECT_EQ(ret, ERR_OK);
     EXPECT_EQ(1, formInfos.size());
@@ -1029,23 +1041,33 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetTemplateFormsInfoByApp_0001, 
 {
     GTEST_LOG_(INFO) << "FormMgrService_GetTemplateFormsInfoByApp_0001 start";
     FormMgrService formMgrService;
+    // FormInfoMgr is a process-wide singleton: isolate its map from prior test cases,
+    // and clear the output vector between calls because production appends to it.
+    FormInfoMgr::GetInstance().bundleFormInfoMap_.clear();
     std::vector<FormInfo> formInfos;
 
-    MockIsSACall(false);
-    // get empty template form info
-    auto ret = formMgrService.GetTemplateFormsInfoByApp(BUNDLE_NAME, formInfos);
+    // empty bundle name is rejected before any lookup
+    auto ret = formMgrService.GetTemplateFormsInfoByApp("", formInfos);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     EXPECT_EQ(0, formInfos.size());
 
+    // bundle missing from the map
     MockIsSACall(true);
-    MockCheckAcrossLocalAccountsPermission(true);
-    // get no template form info cause add normal form
+    formInfos.clear();
+    ret = formMgrService.GetTemplateFormsInfoByApp(BUNDLE_NAME, formInfos);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    EXPECT_EQ(0, formInfos.size());
+
+    // only a normal form exists: no template form info
     FormInfoMgr::GetInstance().bundleFormInfoMap_ = CreateBundleFormInfoMapWithTemplateForm();
+    formInfos.clear();
     ret = formMgrService.GetTemplateFormsInfoByApp(BUNDLE_NAME, formInfos);
     EXPECT_EQ(ret, ERR_OK);
     EXPECT_EQ(0, formInfos.size());
 
-    // get one template form info
+    // one template form exists: exactly one entry
     FormInfoMgr::GetInstance().bundleFormInfoMap_ = CreateBundleFormInfoMapWithTemplateForm(true);
+    formInfos.clear();
     ret = formMgrService.GetTemplateFormsInfoByApp(BUNDLE_NAME, formInfos);
     EXPECT_EQ(ret, ERR_OK);
     EXPECT_EQ(1, formInfos.size());
@@ -1062,22 +1084,33 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetTemplateFormsInfoByModule_000
 {
     GTEST_LOG_(INFO) << "FormMgrService_GetTemplateFormsInfoByModule_0001 start";
     FormMgrService formMgrService;
+    // FormInfoMgr is a process-wide singleton: isolate its map from prior test cases,
+    // and clear the output vector between calls because production appends to it.
+    FormInfoMgr::GetInstance().bundleFormInfoMap_.clear();
     std::vector<FormInfo> formInfos;
-    MockIsSACall(false);
-    // get empty template form info
-    auto ret = formMgrService.GetTemplateFormsInfoByModule(BUNDLE_NAME, MODULE_NAME, formInfos);
+
+    // empty bundle name is rejected before any lookup
+    auto ret = formMgrService.GetTemplateFormsInfoByModule("", MODULE_NAME, formInfos);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     EXPECT_EQ(0, formInfos.size());
 
+    // bundle missing from the map
     MockIsSACall(true);
-    MockCheckAcrossLocalAccountsPermission(true);
-    // get no template form info cause add normal form
+    formInfos.clear();
+    ret = formMgrService.GetTemplateFormsInfoByModule(BUNDLE_NAME, MODULE_NAME, formInfos);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    EXPECT_EQ(0, formInfos.size());
+
+    // only a normal form exists: no template form info
     FormInfoMgr::GetInstance().bundleFormInfoMap_ = CreateBundleFormInfoMapWithTemplateForm();
+    formInfos.clear();
     ret = formMgrService.GetTemplateFormsInfoByModule(BUNDLE_NAME, MODULE_NAME, formInfos);
     EXPECT_EQ(ret, ERR_OK);
     EXPECT_EQ(0, formInfos.size());
 
-    // get one template form info
+    // one template form exists: exactly one entry
     FormInfoMgr::GetInstance().bundleFormInfoMap_ = CreateBundleFormInfoMapWithTemplateForm(true);
+    formInfos.clear();
     ret = formMgrService.GetTemplateFormsInfoByModule(BUNDLE_NAME, MODULE_NAME, formInfos);
     EXPECT_EQ(ret, ERR_OK);
     EXPECT_EQ(1, formInfos.size());

@@ -513,17 +513,16 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0031, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0031 start";
     FormMgrService formMgrService;
-    char dumpPath[] = "/tmp/fms_dump_XXXXXX";
-    int fd = mkstemp(dumpPath);
-    ASSERT_NE(-1, fd) << "mkstemp failed";
+    // Anonymous pipe provides the fd without depending on any device path.
+    int fds[2];
+    ASSERT_EQ(0, pipe(fds)) << "pipe failed";
     std::vector<std::u16string> args;
-    EXPECT_EQ(ERR_OK, formMgrService.Dump(fd, args));
+    EXPECT_EQ(ERR_OK, formMgrService.Dump(fds[1], args));
+    close(fds[1]); // send EOF so read() returns 0 after draining
     // Read back content and verify permission-denied text
     char buf[128] = {0};
-    lseek(fd, 0, SEEK_SET);
-    ssize_t readLen = read(fd, buf, sizeof(buf) - 1);
-    close(fd);
-    unlink(dumpPath);
+    ssize_t readLen = read(fds[0], buf, sizeof(buf) - 1);
+    close(fds[0]);
     ASSERT_GT(readLen, 0) << "read returned empty";
     std::string content(buf);
     EXPECT_NE(std::string::npos, content.find("permission denied"))

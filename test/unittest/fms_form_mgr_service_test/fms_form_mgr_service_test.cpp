@@ -311,23 +311,21 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0012, TestSize.Level1)
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(false);
 
-    char tmpPath[] = "/tmp/fms_dump_XXXXXX";
-    int fd = mkstemp(tmpPath);
-    ASSERT_GE(fd, 0) << "mkstemp failed";
-    ASSERT_EQ(unlink(tmpPath), 0);
+    // Anonymous pipe provides the fd without depending on any device path.
+    int fds[2];
+    ASSERT_EQ(0, pipe(fds)) << "pipe failed";
 
     formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
-    EXPECT_EQ(formMgrService.Dump(fd, args), ERR_OK);
+    EXPECT_EQ(formMgrService.Dump(fds[1], args), ERR_OK);
+    close(fds[1]); // send EOF so read() returns 0 after draining
 
     // Read back and verify the permission-denied text was written.
-    ASSERT_GE(lseek(fd, 0, SEEK_SET), 0);
     char buf[256] = {};
-    ssize_t n = read(fd, buf, sizeof(buf) - 1);
+    ssize_t n = read(fds[0], buf, sizeof(buf) - 1);
+    close(fds[0]);
     ASSERT_GT(n, 0);
     std::string content(buf, static_cast<size_t>(n));
     EXPECT_NE(content.find("permission denied"), std::string::npos);
-
-    close(fd);
     GTEST_LOG_(INFO) << "FormMgrService_0012 end";
 }
 
@@ -1094,8 +1092,8 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0064, TestSize.Level1)
 /**
  * @tc.number: FormMgrService_0065
  * @tc.name: test RequestPublishForm function.
- * @tc.desc: Verify that the RequestPublishForm interface is called normally
- * and the return value is ERR_OK.
+ * @tc.desc: Verify that RequestPublishForm propagates the adapter facade error and
+ *           denies agent publish calls without the required permission.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0065, TestSize.Level1)
 {
@@ -1114,6 +1112,8 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0065, TestSize.Level1)
 
     want.SetParam(Constants::IS_FORM_AGENT, true);
     MockIsSACall(false);
+    // system app without the agent permission reaches the VerifyCallingPermission check
+    MockIsSystemAppByFullTokenID(true);
     MockVerifyCallingPermission(false);
     ret = formMgrService.RequestPublishForm(want, withFormBindingData, formBindingData, formId);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
