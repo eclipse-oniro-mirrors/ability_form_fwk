@@ -452,7 +452,8 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_003, TestSize.Level0)
  * SubFunction: AddForm Function
  * FunctionPoints: FormMgr AddForm interface
  * EnvConditions: Mobile that can run ohos test framework
- * CaseDescription: Invalid case when callertoken is nullptr.
+ * CaseDescription: Call service AddForm directly with null callerToken - service layer null-token
+ *                  guard at FormLifecycleAdapter::AddForm returns ERR_APPEXECFWK_FORM_INVALID_PARAM.
  */
 HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_004, TestSize.Level0)
 {
@@ -471,7 +472,16 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_004, TestSize.Level0)
     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
 
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().AddForm(formId, want, nullptr, formJsInfo));
+    // ReportAddFormEvent calls GetCallerBundleName (1 BMS lookup before the null-token guard).
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        return ERR_OK;
+    };
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _))
+        .Times(testing::AnyNumber()).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    MockGetCallingUid(DEFAULT_CALLING_UID);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formyMgrServ_->AddForm(formId, want, nullptr, formJsInfo));
 
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_004 end";
 }
@@ -482,7 +492,9 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_004, TestSize.Level0)
  * SubFunction: AddForm Function
  * FunctionPoints: FormMgr AddForm interface
  * EnvConditions: Mobile that can run ohos test framework
- * CaseDescription: BundleName,AbilityName,moduleName in Want is null separately.
+ * CaseDescription: Call service AddForm directly with empty bundleName / abilityName / moduleName
+ *                  (3 sub-calls). The empty-field guard in FormCommonAdapter::GetBundleInfo
+ *                  returns ERR_APPEXECFWK_FORM_INVALID_PARAM.
  */
 HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_005, TestSize.Level0)
 {
@@ -499,15 +511,28 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_005, TestSize.Level0)
     want.SetElementName(DEVICE_ID, "", FORM_PROVIDER_ABILITY_NAME);
     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().AddForm(formId, want, nullptr, formJsInfo));
+
+    // Each sub-call fires ReportAddFormEvent -> GetCallerBundleName (1 BMS lookup per sub-call,
+    // 3 total) before reaching GetBundleInfo's empty-field validation.
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        return ERR_OK;
+    };
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _))
+        .Times(testing::AnyNumber()).WillRepeatedly(Invoke(bmsTaskGetBundleNameForUid));
+    MockGetCallingUid(DEFAULT_CALLING_UID);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formyMgrServ_->AddForm(formId, want, token_, formJsInfo));
 
     want.SetElementName(DEVICE_ID, FORM_PROVIDER_BUNDLE_NAME, "");
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().AddForm(formId, want, nullptr, formJsInfo));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formyMgrServ_->AddForm(formId, want, token_, formJsInfo));
 
     want.SetElementName(DEVICE_ID, FORM_PROVIDER_BUNDLE_NAME, FORM_PROVIDER_ABILITY_NAME);
     std::string tmp = "";
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, tmp);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().AddForm(formId, want, nullptr, formJsInfo));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formyMgrServ_->AddForm(formId, want, token_, formJsInfo));
 
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_005 end";
 }

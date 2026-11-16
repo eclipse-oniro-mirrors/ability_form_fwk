@@ -47,6 +47,8 @@ void MockUpdateFormCrossBundle(int mockRet);
 void MockFormMgrAdapterFacadeGetVisibleFormRect(int mockRet);
 void MockFormMgrAdapterFacadeRegisterGetVisibleFormRectProxy(int mockRet);
 void MockFormMgrAdapterFacadeUnregisterGetVisibleFormRectProxy(int mockRet);
+void MockFormMgrAdapterFacadeStartHostPage(int mockRet);
+void MockFormMgrAdapterFacadeIsForegroundApp(bool mockRet);
 }  // namespace AppExecFwk
 }  // namespace OHOS
 

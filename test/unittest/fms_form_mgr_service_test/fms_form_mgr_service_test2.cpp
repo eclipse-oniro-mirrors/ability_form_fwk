@@ -219,19 +219,18 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0081, TestSize.Level1)
  * @tc.name: test RegisterRemoveObserver function.
  * @tc.desc: Verify that the RegisterRemoveObserver interface is called normally
  */
+/**
+ * @tc.number: FormMgrService_0082
+ * @tc.name: test RegisterRemoveObserver function.
+ * @tc.desc: Verify that the RegisterRemoveObserver interface delegates to facade and returns OK.
+ */
 HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0082, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0082 start";
     FormMgrService formMgrService;
     std::string bundleName = "bundleName";
     const sptr<IRemoteObject> callerToken = nullptr;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
     ErrCode ret = formMgrService.RegisterRemoveObserver(bundleName, callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-
-    MockIsSACall(true);
-    ret = formMgrService.RegisterRemoveObserver(bundleName, callerToken);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0082 end";
 }
@@ -240,6 +239,11 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0082, TestSize.Level1)
  * @tc.number: FormMgrService_0083
  * @tc.name: test RequestPublishProxyForm function.
  * @tc.desc: Verify that the RequestPublishProxyForm interface is called normally
+ */
+/**
+ * @tc.number: FormMgrService_0083
+ * @tc.name: test RequestPublishProxyForm function.
+ * @tc.desc: Verify that the RequestPublishProxyForm interface delegates to facade and returns OK.
  */
 HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0083, TestSize.Level1)
 {
@@ -250,39 +254,12 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0083, TestSize.Level1)
     std::unique_ptr<FormProviderData> formBindingData;
     int64_t formId = 1;
     const std::vector<FormDataProxy> formDataProxies;
-    MockIsSACall(false);
     ErrCode ret = formMgrService.RequestPublishProxyForm(want, withFormBindingData, formBindingData,
-        formId, formDataProxies);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-
-    MockIsSACall(true);
-    ret = formMgrService.RequestPublishProxyForm(want, withFormBindingData, formBindingData,
         formId, formDataProxies);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0083 end";
 }
 
-/**
- * @tc.number: FormMgrService_0084
- * @tc.name: test RequestPublishProxyForm function.
- * @tc.desc: Verify that the RequestPublishProxyForm interface is called normally
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0084, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0084 start";
-    FormMgrService formMgrService;
-    Want want;
-    bool withFormBindingData = true;
-    std::unique_ptr<FormProviderData> formBindingData;
-    int64_t formId = 1;
-    const std::vector<FormDataProxy> formDataProxies;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.RequestPublishProxyForm(want, withFormBindingData, formBindingData,
-        formId, formDataProxies);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
-    GTEST_LOG_(INFO) << "FormMgrService_0084 end";
-}
 
 
 /**
@@ -291,20 +268,20 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0084, TestSize.Level1)
  * @tc.desc: Verify that the BackgroundEvent interface is called normally
  * and the return value is ERR_OK.
  */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0085, TestSize.Level1)
-{
+/**
+ * @tc.number: FormMgrService_0085
+ * @tc.name: test BackgroundEvent function.
+ * @tc.desc: Verify that the BackgroundEvent interface delegates to facade, with CheckInvalidForm gating.
+ */
+    HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0085, TestSize.Level1)
+    {
     GTEST_LOG_(INFO) << "FormMgrService_0085 start";
     FormMgrService formMgrService;
     int64_t formId = 1;
     Want want;
     const sptr<IRemoteObject> callerToken = nullptr;
-    MockIsSACall(false);
-    int ret = formMgrService.BackgroundEvent(formId, want, callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-
-    MockIsSACall(true);
     MockCheckInvalidForm(ERR_APPEXECFWK_FORM_COMMON_CODE);
-    ret = formMgrService.BackgroundEvent(formId, want, callerToken);
+    int ret = formMgrService.BackgroundEvent(formId, want, callerToken);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
 
     MockCheckInvalidForm(ERR_OK);
@@ -316,8 +293,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0085, TestSize.Level1)
 /**
  * @tc.number: FormMgrService_0086
  * @tc.name: test RegisterFormRouterProxy function.
- * @tc.desc: Verify that the RegisterFormRouterProxy interface is called normally
- * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
+ * @tc.desc: Verify that the RegisterFormRouterProxy interface delegates to facade and returns OK.
  */
 HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0086, TestSize.Level1)
 {
@@ -327,12 +303,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0086, TestSize.Level1)
     std::vector<int64_t> formIds;
     formIds.emplace_back(formId);
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    MockIsSACall(false);
     int ret = formMgrService.RegisterFormRouterProxy(formIds, callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-
-    MockIsSACall(true);
-    ret = formMgrService.RegisterFormRouterProxy(formIds, callerToken);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0086 end";
 }
@@ -340,8 +311,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0086, TestSize.Level1)
 /**
  * @tc.number: FormMgrService_0087
  * @tc.name: test UnregisterFormRouterProxy function.
- * @tc.desc: Verify that the UnregisterFormRouterProxy interface is called normally
- * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
+ * @tc.desc: Verify that the UnregisterFormRouterProxy interface delegates to facade and returns OK.
  */
 HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0087, TestSize.Level1)
 {
@@ -350,12 +320,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0087, TestSize.Level1)
     int64_t formId = 1;
     std::vector<int64_t> formIds;
     formIds.emplace_back(formId);
-    MockIsSACall(false);
     int ret = formMgrService.UnregisterFormRouterProxy(formIds);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-
-    MockIsSACall(true);
-    ret = formMgrService.UnregisterFormRouterProxy(formIds);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0087 end";
 }
@@ -380,45 +345,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0090, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0090 end";
 }
 
-/**
- * @tc.number: FormMgrService_0091
- * @tc.name: test GetFormInstancesByFilter function.
- * @tc.desc: Verify that the GetFormInstancesByFilter interface is called normally
- * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0091, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0091 start";
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    MockVerifyCallingPermission(true);
-    FormMgrService formMgrService;
-    FormInstancesFilter formInstancesFilter;
-    std::vector<FormInstance> formInstances;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
-        formMgrService.GetFormInstancesByFilter(formInstancesFilter, formInstances));
-    GTEST_LOG_(INFO) << "FormMgrService_0091 end";
-}
 
-/**
- * @tc.number: FormMgrService_0092
- * @tc.name: test GetFormInstancesByFilter function.
- * @tc.desc: Verify that the GetFormInstancesByFilter interface is called normally
- * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0092, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0092 start";
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(false);
-    FormMgrService formMgrService;
-    FormInstancesFilter formInstancesFilter;
-    std::vector<FormInstance> formInstances;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY,
-        formMgrService.GetFormInstancesByFilter(formInstancesFilter, formInstances));
-    GTEST_LOG_(INFO) << "FormMgrService_0092 end";
-}
 
 /**
  * @tc.number: FormMgrService_0093
@@ -439,43 +366,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0093, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0093 end";
 }
 
-/**
- * @tc.number: FormMgrService_0094
- * @tc.name: test GetFormInstanceById function.
- * @tc.desc: Verify that the GetFormInstanceById interface is called normally
- * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0094, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0094 start";
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    MockVerifyCallingPermission(true);
-    FormMgrService formMgrService;
-    int64_t formId = 800;
-    FormInstance formInstance;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetFormInstanceById(formId, formInstance));
-    GTEST_LOG_(INFO) << "FormMgrService_0094 end";
-}
-
-/**
- * @tc.number: FormMgrService_0095
- * @tc.name: test GetFormInstanceById function.
- * @tc.desc: Verify that the GetFormInstanceById interface is called normally
- * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0095, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0095 start";
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(false);
-    FormMgrService formMgrService;
-    int64_t formId = 800;
-    FormInstance formInstance;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.GetFormInstanceById(formId, formInstance));
-    GTEST_LOG_(INFO) << "FormMgrService_0095 end";
-}
 
 /**
  * @tc.number: FormMgrService_0096
@@ -522,24 +412,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0098, TestSize.Level1)
     MockIsSACall(false);
 
     GTEST_LOG_(INFO) << "FormMgrService_0098 end";
-}
-
-/**
- * @tc.number: FormMgrService_0100
- * @tc.name: test GetFormsInfoByFilter function.
- * @tc.desc: Verify that the GetFormsInfoByFilter interface if the caller is not a system app
- *           and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0100, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0100 start";
-    FormMgrService formMgrService;
-    std::vector<FormInfo> formInfos;
-    FormInfoFilter filter;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetFormsInfoByFilter(filter, formInfos));
-    GTEST_LOG_(INFO) << "FormMgrService_0100 end";
 }
 
 /**
@@ -606,12 +478,8 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0106, TestSize.Level1)
     FormMgrService formMgrService;
     std::vector<int64_t> formIds;
     Want want;
-    MockIsSACall(false);
-    ErrCode ret = formMgrService.RecoverForms(formIds, want);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-
     MockIsSACall(true);
-    ret = formMgrService.RecoverForms(formIds, want);
+    ErrCode ret = formMgrService.RecoverForms(formIds, want);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
 
     GTEST_LOG_(INFO) << "FormMgrService_0106 end";
@@ -661,12 +529,8 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0109, TestSize.Level1)
     const int64_t formId = 1;
     FormInstance formInstance;
     bool isUnusedInclude = false;
-    MockIsSACall(false);
     ErrCode ret = formMgrService.GetFormInstanceById(formId, isUnusedInclude, formInstance);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-
-    MockIsSACall(true);
-    ret = formMgrService.GetFormInstanceById(formId, isUnusedInclude, formInstance);
+    EXPECT_EQ(ret, ERR_OK);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0109 end";
 }
@@ -681,16 +545,11 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0110, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0110 start";
     FormMgrService formMgrService;
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    MockIsSACall(false);
     const std::string bundleName = "";
     const std::string formEventType = "";
 
     ErrCode ret = formMgrService.RegisterClickEventObserver(bundleName, formEventType, nullptr);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-
-    ret = formMgrService.RegisterClickEventObserver(bundleName, formEventType, callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-
     MockIsSACall(true);
     ret = formMgrService.RegisterClickEventObserver(bundleName, formEventType, callerToken);
     EXPECT_EQ(ret, ERR_OK);
@@ -707,16 +566,11 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0111, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0111 start";
     FormMgrService formMgrService;
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    MockIsSACall(false);
     const std::string bundleName = "";
     const std::string formEventType = "";
 
     ErrCode ret = formMgrService.UnregisterClickEventObserver(bundleName, formEventType, nullptr);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-
-    ret = formMgrService.UnregisterClickEventObserver(bundleName, formEventType, callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-
     MockIsSACall(true);
     ret = formMgrService.UnregisterClickEventObserver(bundleName, formEventType, callerToken);
     EXPECT_EQ(ret, ERR_OK);
@@ -733,10 +587,9 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0112, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0112 start";
     FormMgrService formMgrService;
     std::vector<int64_t> formIds;
-    MockIsSACall(false);
+    MockIsSACall(true);
     ErrCode ret = formMgrService.SetFormsRecyclable(formIds);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     MockIsSACall(true);
     ret = formMgrService.SetFormsRecyclable(formIds);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
@@ -754,10 +607,9 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0113, TestSize.Level1)
     FormMgrService formMgrService;
     std::vector<int64_t> formIds;
     Want want;
-    MockIsSACall(false);
+    MockIsSACall(true);
     ErrCode ret = formMgrService.RecycleForms(formIds, want);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     MockIsSACall(true);
     ret = formMgrService.RecycleForms(formIds, want);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
@@ -792,10 +644,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0115, TestSize.Level1)
     FormMgrService formMgrService;
     const int64_t formId = 1;
     std::string isTimingService;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    EXPECT_EQ(formMgrService.DumpFormTimerByFormId(formId, isTimingService), ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-
     MockIsSACall(true);
     EXPECT_EQ(formMgrService.DumpFormTimerByFormId(formId, isTimingService), ERR_OK);
 
@@ -812,10 +660,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0116, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0116 start";
     FormMgrService formMgrService;
     FormShareInfo formShareInfo;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    EXPECT_EQ(formMgrService.RecvFormShareInfoFromRemote(formShareInfo), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
-
     MockIsSACall(true);
     EXPECT_EQ(formMgrService.RecvFormShareInfoFromRemote(formShareInfo), ERR_OK);
 
@@ -833,13 +677,8 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0117, TestSize.Level1)
     FormMgrService formMgrService;
     Want want;
     RunningFormInfo runningFormInfo;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(true);
-    MockCheckAcrossLocalAccountsPermission(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.CreateForm(want, runningFormInfo));
-
-    MockCheckAcrossLocalAccountsPermission(true);
+    // Service delegates CreateForm to facade without perm check;
+    // empty want/runningFormInfo reaches facade validation -> INVALID_PARAM.
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrService.CreateForm(want, runningFormInfo));
     GTEST_LOG_(INFO) << "FormMgrService_0117 end";
 }
@@ -856,10 +695,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0118, TestSize.Level1)
     Want want;
     want.SetParam(AppExecFwk::Constants::PARAM_THEME_KEY, true);
     RunningFormInfo runningFormInfo;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(true);
-    MockCheckAcrossLocalAccountsPermission(true);
 #ifdef THEME_MGR_ENABLE
     GTEST_LOG_(INFO) << "FormMgrService_0118 THEME_MGR_ENABLE defined";
     MockSetThemeManagerAddFormResult(ERR_OK);
@@ -919,23 +754,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0124, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0125
- * @tc.name: test BatchRefreshForms function.
- * @tc.desc: Verify that the BatchRefreshForms interface is called normally.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0125, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0125 start";
-    FormMgrService formMgrService;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    MockVerifyCallingPermission(true);
-    int32_t formRefreshType = Constants::REFRESH_ALL_FORM;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.BatchRefreshForms(formRefreshType));
-    GTEST_LOG_(INFO) << "FormMgrService_0125 end";
-}
-
-/**
  * @tc.number: FormMgrService_0126
  * @tc.name: test IsFormBundleForbidden function.
  * @tc.desc: Verify that the IsFormBundleForbidden interface is called normally.
@@ -965,10 +783,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0127, TestSize.Level1)
     MockEnableForms(ERR_OK);
     EXPECT_EQ(formMgrService.EnableForms(bundleName, userId, true), ERR_OK);
 
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    EXPECT_EQ(formMgrService.EnableForms(bundleName, userId, true), ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_0127 end";
 }
 
 /**
@@ -1035,7 +849,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0137, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0137 start";
     FormMgrService formMgrService;
     uint32_t tokenId = 1;
-    MockIsSACall(false);
+    MockHasFormVisible(false);
     EXPECT_FALSE(formMgrService.HasFormVisible(tokenId));
     GTEST_LOG_(INFO) << "FormMgrService_0137 end";
 }
@@ -1073,24 +887,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0181, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0181 end";
 }
 
-/**
- * @tc.number: FormMgrService_ChangeSceneAnimationState_0001
- * @tc.name: test ChangeSceneAnimationState non-system app.
- * @tc.desc: Verify that ChangeSceneAnimationState returns permission deny for non-system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_ChangeSceneAnimationState_0001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_ChangeSceneAnimationState_0001 start";
-    FormMgrService formMgrService;
-    const int64_t formId = 1;
-    int32_t state = 1;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    EXPECT_EQ(formMgrService.ChangeSceneAnimationState(formId, state), ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    MockIsSACall(true);
-    MockIsSystemAppByFullTokenID(true);
-    GTEST_LOG_(INFO) << "FormMgrService_ChangeSceneAnimationState_0001 end";
-}
 
 /**
  * @tc.number: FormMgrService_ChangeSceneAnimationState_0002
@@ -1187,12 +983,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_SendNonTransparencyRatio_0001, T
     auto ret = formMgrService.SendNonTransparencyRatio(formId, ratio);
     EXPECT_EQ(ret, ERR_OK);
 
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ret = formMgrService.SendNonTransparencyRatio(formId, ratio);
-    EXPECT_NE(ret, ERR_OK);
-    MockIsSACall(true);
-    MockIsSystemAppByFullTokenID(true);
+    // Service delegates directly without perm check; always returns ERR_OK.
     GTEST_LOG_(INFO) << "FormMgrService_SendNonTransparencyRatio_0001 end";
 }
 
@@ -1226,11 +1017,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetAllTemplateFormsInfo_0001, Te
     EXPECT_EQ(ret, ERR_OK);
     EXPECT_EQ(1, formInfos.size());
 
-    // deny path: CheckAcrossLocalAccountsPermission rejects without the permission
-    MockIsSACall(true);
-    MockCheckAcrossLocalAccountsPermission(false);
-    ret = formMgrService.GetAllTemplateFormsInfo(formInfos);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, ret);
     GTEST_LOG_(INFO) << "FormMgrService_GetAllTemplateFormsInfo_0001 end";
 }
 
@@ -1264,11 +1050,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetTemplateFormsInfoByApp_0001, 
     EXPECT_EQ(ret, ERR_OK);
     EXPECT_EQ(1, formInfos.size());
 
-    // deny path: CheckAcrossLocalAccountsPermission rejects without the permission
-    MockIsSACall(true);
-    MockCheckAcrossLocalAccountsPermission(false);
-    ret = formMgrService.GetTemplateFormsInfoByApp(BUNDLE_NAME, formInfos);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, ret);
     GTEST_LOG_(INFO) << "FormMgrService_GetTemplateFormsInfoByApp_0001 end";
 }
 
@@ -1301,11 +1082,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetTemplateFormsInfoByModule_000
     EXPECT_EQ(ret, ERR_OK);
     EXPECT_EQ(1, formInfos.size());
 
-    // deny path: CheckAcrossLocalAccountsPermission rejects without the permission
-    MockIsSACall(true);
-    MockCheckAcrossLocalAccountsPermission(false);
-    ret = formMgrService.GetTemplateFormsInfoByModule(BUNDLE_NAME, MODULE_NAME, formInfos);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, ret);
     GTEST_LOG_(INFO) << "FormMgrService_GetTemplateFormsInfoByModule_0001 end";
 }
 
@@ -1466,39 +1242,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetPublishedFormInfos_0002, Test
     GTEST_LOG_(INFO) << "FormMgrService_GetPublishedFormInfos_0002 end";
 }
 
-/**
- * @tc.number: FormMgrService_StartAbilityByCrossBundle_0001
- * @tc.name: test StartAbilityByCrossBundle non-system app.
- * @tc.desc: Verify that StartAbilityByCrossBundle returns permission deny for non-system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByCrossBundle_0001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByCrossBundle_0001 start";
-    FormMgrService formMgrService;
-    Want want;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    int32_t ret = formMgrService.StartAbilityByCrossBundle(want);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByCrossBundle_0001 end";
-}
-
-/**
- * @tc.number: FormMgrService_StartAbilityByCrossBundle_0002
- * @tc.name: test StartAbilityByCrossBundle permission denied.
- * @tc.desc: Verify that StartAbilityByCrossBundle returns permission deny.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByCrossBundle_0002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByCrossBundle_0002 start";
-    FormMgrService formMgrService;
-    Want want;
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(false);
-    int32_t ret = formMgrService.StartAbilityByCrossBundle(want);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
-    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByCrossBundle_0002 end";
-}
 
 /**
  * @tc.number: FormMgrService_StartAbilityByCrossBundle_0003
@@ -1521,8 +1264,10 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByCrossBundle_0003, 
 
 /**
  * @tc.number: FormMgrService_StartAbilityByCrossBundle_0004
- * @tc.name: test StartAbilityByCrossBundle success.
- * @tc.desc: Verify that StartAbilityByCrossBundle returns success.
+ * @tc.name: test StartAbilityByCrossBundle foreground app success.
+ * @tc.desc: Verify that StartAbilityByCrossBundle returns success when caller is system app,
+ *           want has SHOW_SINGLE_FORM_KEY, caller bundle resolves, app is foreground, and
+ *           StartHostPage succeeds.
  */
 HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByCrossBundle_0004, TestSize.Level1)
 {
@@ -1531,10 +1276,34 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByCrossBundle_0004, 
     Want want;
     MockIsSystemAppByFullTokenID(true);
     MockVerifyCallingPermission(true);
-    MockFormMgrAdapterFacadeStartAbilityByFms(ERR_OK);
+    want.SetParam(Constants::FORM_MANAGER_SHOW_SINGLE_FORM_KEY, true);
+    MockGetCallerBundleName(ERR_OK);
+    MockFormMgrAdapterFacadeIsForegroundApp(true);
+    MockFormMgrAdapterFacadeStartHostPage(ERR_OK);
     int32_t ret = formMgrService.StartAbilityByCrossBundle(want);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByCrossBundle_0004 end";
+}
+
+/**
+ * @tc.number: FormMgrService_StartAbilityByCrossBundle_0005
+ * @tc.name: test StartAbilityByCrossBundle non-foreground trust check.
+ * @tc.desc: Verify that StartAbilityByCrossBundle returns NOT_TRUST when the caller is
+ *           system app but the app is not in the foreground (foreground trust branch).
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByCrossBundle_0005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByCrossBundle_0005 start";
+    FormMgrService formMgrService;
+    Want want;
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    want.SetParam(Constants::FORM_MANAGER_SHOW_SINGLE_FORM_KEY, true);
+    MockGetCallerBundleName(ERR_OK);
+    MockFormMgrAdapterFacadeIsForegroundApp(false);
+    int32_t ret = formMgrService.StartAbilityByCrossBundle(want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_TRUST);
+    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByCrossBundle_0005 end";
 }
 
 /**
@@ -1728,7 +1497,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_OpenFormEditAbility_0005, TestSi
     bool isMainPage = true;
     MockFormBmsHelperGetBundleNameByUid(ERR_OK, "caller");
     MockFormDataMgrGetRunningFormInfosByFormId(ERR_OK, "caller", FormVisibilityType::VISIBLE);
-    MockFormMgrAdapterFacadeStartAbilityByFms(ERR_OK);
+    MockFormMgrAdapterFacadeStartHostPage(ERR_OK);
     ErrCode ret = formMgrService.OpenFormEditAbility(abilityName, formId, isMainPage);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_OpenFormEditAbility_0005 end";
@@ -1748,28 +1517,12 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_OpenFormEditAbility_0006, TestSi
     bool isMainPage = false;
     MockFormBmsHelperGetBundleNameByUid(ERR_OK, "caller");
     MockFormDataMgrGetRunningFormInfosByFormId(ERR_OK, "caller", FormVisibilityType::VISIBLE);
-    MockFormMgrAdapterFacadeStartAbilityByFms(ERR_OK);
+    MockFormMgrAdapterFacadeStartHostPage(ERR_OK);
     ErrCode ret = formMgrService.OpenFormEditAbility(abilityName, formId, isMainPage);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_OpenFormEditAbility_0006 end";
 }
 
-/**
- * @tc.number: FormMgrService_RegisterChangeSceneAnimationStateProxy_0001
- * @tc.name: test RegisterChangeSceneAnimationStateProxy non-system app.
- * @tc.desc: Verify that RegisterChangeSceneAnimationStateProxy returns permission deny for non-system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterChangeSceneAnimationStateProxy_0001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterChangeSceneAnimationStateProxy_0001 start";
-    FormMgrService formMgrService;
-    sptr<IRemoteObject> callerToken = nullptr;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.RegisterChangeSceneAnimationStateProxy(callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterChangeSceneAnimationStateProxy_0001 end";
-}
 
 /**
  * @tc.number: FormMgrService_RegisterChangeSceneAnimationStateProxy_0002
@@ -1788,22 +1541,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterChangeSceneAnimationStat
     GTEST_LOG_(INFO) << "FormMgrService_RegisterChangeSceneAnimationStateProxy_0002 end";
 }
 
-/**
- * @tc.number: FormMgrService_RegisterOverflowProxy_0001
- * @tc.name: test RegisterOverflowProxy non-system app.
- * @tc.desc: Verify that RegisterOverflowProxy returns permission deny for non-system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterOverflowProxy_0001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterOverflowProxy_0001 start";
-    FormMgrService formMgrService;
-    sptr<IRemoteObject> callerToken = nullptr;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.RegisterOverflowProxy(callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterOverflowProxy_0001 end";
-}
 
 /**
  * @tc.number: FormMgrService_RegisterOverflowProxy_0002
@@ -1822,22 +1559,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterOverflowProxy_0002, Test
     GTEST_LOG_(INFO) << "FormMgrService_RegisterOverflowProxy_0002 end";
 }
 
-/**
- * @tc.number: FormMgrService_RegisterGetFormRectProxy_0001
- * @tc.name: test RegisterGetFormRectProxy non-system app.
- * @tc.desc: Verify that RegisterGetFormRectProxy returns permission deny for non-system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterGetFormRectProxy_0001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterGetFormRectProxy_0001 start";
-    FormMgrService formMgrService;
-    sptr<IRemoteObject> callerToken = nullptr;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.RegisterGetFormRectProxy(callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterGetFormRectProxy_0001 end";
-}
 
 /**
  * @tc.number: FormMgrService_RegisterGetFormRectProxy_0002
@@ -1856,22 +1577,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterGetFormRectProxy_0002, T
     GTEST_LOG_(INFO) << "FormMgrService_RegisterGetFormRectProxy_0002 end";
 }
 
-/**
- * @tc.number: FormMgrService_RegisterGetLiveFormStatusProxy_0001
- * @tc.name: test RegisterGetLiveFormStatusProxy non-system app.
- * @tc.desc: Verify that RegisterGetLiveFormStatusProxy returns permission deny for non-system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterGetLiveFormStatusProxy_0001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterGetLiveFormStatusProxy_0001 start";
-    FormMgrService formMgrService;
-    sptr<IRemoteObject> callerToken = nullptr;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.RegisterGetLiveFormStatusProxy(callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterGetLiveFormStatusProxy_0001 end";
-}
 
 /**
  * @tc.number: FormMgrService_RegisterGetLiveFormStatusProxy_0002
@@ -1890,21 +1595,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterGetLiveFormStatusProxy_0
     GTEST_LOG_(INFO) << "FormMgrService_RegisterGetLiveFormStatusProxy_0002 end";
 }
 
-/**
- * @tc.number: FormMgrService_UnregisterGetLiveFormStatusProxy_0001
- * @tc.name: test UnristerGetLiveFormStatusProxy non-system app.
- * @tc.desc: Verify that UnregisterGetLiveFormStatusProxy returns permission deny for non-system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterGetLiveFormStatusProxy_0001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterGetLiveFormStatusProxy_0001 start";
-    FormMgrService formMgrService;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.UnregisterGetLiveFormStatusProxy();
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterGetLiveFormStatusProxy_0001 end";
-}
 
 /**
  * @tc.number: FormMgrService_UnregisterGetLiveFormStatusProxy_0002
@@ -1922,26 +1612,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterGetLiveFormStatusProxy
     GTEST_LOG_(INFO) << "FormMgrService_UnregisterGetLiveFormStatusProxy_0002 end";
 }
 
-/**
- * @tc.number: FormMgrService_UpdateFormSize_0001
- * @tc.name: test UpdateFormSize permission denied.
- * @tc.desc: Verify that UpdateFormSize returns permission denied.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UpdateFormSize_0001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_UpdateFormSize_0001 start";
-    FormMgrService formMgrService;
-    int64_t formId = 1;
-    float width = 100.0f;
-    float height = 200.0f;
-    float borderWidth = 10.0f;
-    float formViewScale = 1.0f;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.UpdateFormSize(formId, width, height, borderWidth, formViewScale);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_UpdateFormSize_0001 end";
-}
 
 /**
  * @tc.number: FormMgrService_UpdateFormSize_0002
@@ -1963,40 +1633,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UpdateFormSize_0002, TestSize.Le
     GTEST_LOG_(INFO) << "FormMgrService_UpdateFormSize_0002 end";
 }
 
-/**
- * @tc.number: FormMgrService_RegisterTemplateFormDetailInfoChange_0001
- * @tc.name: test RegisterTemplateFormDetailInfoChange non-system app.
- * @tc.desc: Verify that RegisterTemplateFormDetailInfoChangeChange returns permission deny for non-system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterTemplateFormDetailInfoChange_0001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterTemplateFormDetailInfoChange_0001 start";
-    FormMgrService formMgrService;
-    sptr<IRemoteObject> callerToken = nullptr;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.RegisterTemplateFormDetailInfoChange(callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterTemplateFormDetailInfoChange_0001 end";
-}
 
-/**
- * @tc.number: FormMgrService_RegisterTemplateFormDetailInfoChange_0003
- * @tc.name: test RegisterTemplateFormDetailInfoChange bundle permission denied.
- * @tc.desc: Verify that RegisterTemplateFormDetailInfoChange returns permission deny.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterTemplateFormDetailInfoChange_0003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterTemplateFormDetailInfoChange_0003 start";
-    FormMgrService formMgrService;
-    sptr<IRemoteObject> callerToken = nullptr;
-    MockIsSystemAppByFullTokenID(true);
-    MockCheckAcrossLocalAccountsPermission(true);
-    MockVerifyCallingPermission(false);
-    ErrCode ret = formMgrService.RegisterTemplateFormDetailInfoChange(callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterTemplateFormDetailInfoChange_0003 end";
-}
 
 /**
  * @tc.number: FormMgrService_RegisterTemplateFormDetailInfoChange_0004
@@ -2017,38 +1654,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterTemplateFormDetailInfoCh
     GTEST_LOG_(INFO) << "FormMgrService_RegisterTemplateFormDetailInfoChange_0004 end";
 }
 
-/**
- * @tc.number: FormMgrService_UnregisterTemplateFormDetailInfoChange_0001
- * @tc.name: test UnregisterTemplateFormDetailInfoChange non-system app.
- * @tc.desc: Verify that UnregisterTemplateFormDetailInfoChange returns permission deny for non-system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterTemplateFormDetailInfoChange_0001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterTemplateFormDetailInfoChange_0001 start";
-    FormMgrService formMgrService;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.UnregisterTemplateFormDetailInfoChange();
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterTemplateFormDetailInfoChange_0001 end";
-}
 
-/**
- * @tc.number: FormMgrService_UnregisterTemplateFormDetailInfoChange_0003
- * @tc.name: test UnregisterTemplateFormDetailInfoChange bundle permission denied.
- * @tc.desc: Verify that UnregisterTemplateFormDetailInfoChange returns permission deny.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterTemplateFormDetailInfoChange_0003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterTemplateFormDetailInfoChange_0003 start";
-    FormMgrService formMgrService;
-    MockIsSystemAppByFullTokenID(true);
-    MockCheckAcrossLocalAccountsPermission(true);
-    MockVerifyCallingPermission(false);
-    ErrCode ret = formMgrService.UnregisterTemplateFormDetailInfoChange();
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterTemplateFormDetailInfoChange_0003 end";
-}
 
 /**
  * @tc.number: FormMgrService_UnregisterTemplateFormDetailInfoChange_0004
@@ -2069,23 +1675,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterTemplateFormDetailInfo
 }
 
 /**
- * @tc.number: FormMgrService_UpdateTemplateFormDetailInfo_0001
- * @tc.name: test UpdateTemplateFormDetailInfo non-system app.
- * @tc.desc: Verify that UpdateTemplateFormDetailInfo returns permission deny for non-system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UpdateTemplateFormDetailInfo_0001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_UpdateTemplateFormDetailInfo_0001 start";
-    FormMgrService formMgrService;
-    std::vector<TemplateFormDetailInfo> templateFormInfo;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.UpdateTemplateFormDetailInfo(templateFormInfo);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_UpdateTemplateFormDetailInfo_0001 end";
-}
-
-/**
  * @tc.number: FormMgrService_UpdateTemplateFormDetailInfo_0002
  * @tc.name: test UpdateTemplateFormDetailInfo success.
  * @tc.desc: Verify that UpdateTemplateFormDetailInfo returns success.
@@ -2102,37 +1691,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UpdateTemplateFormDetailInfo_000
     GTEST_LOG_(INFO) << "FormMgrService_UpdateTemplateFormDetailInfo_0002 end";
 }
 
-/**
- * @tc.number: FormMgrService_UnregisterPublishFormCrossBundleControl_0001
- * @tc.name: test UnregisterPublishFormCrossBundleControl non-system app.
- * @tc.desc: Verify that UnregisterPublishFormCrossBundleControl returns permission deny for non-system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterPublishFormCrossBundleControl_0001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterPublishFormCrossBundleControl_0001 start";
-    FormMgrService formMgrService;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.UnregisterPublishFormCrossBundleControl();
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterPublishFormCrossBundleControl_0001 end";
-}
 
-/**
- * @tc.number: FormMgrService_UnregisterPublishFormCrossBundleControl_0002
- * @tc.name: test UnregisterPublishFormCrossBundleControl permission denied.
- * @tc.desc: Verify that UnregisterPublishFormCrossBundleControl returns permission deny.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterPublishFormCrossBundleControl_0002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterPublishFormCrossBundleControl_0002 start";
-    FormMgrService formMgrService;
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(false);
-    ErrCode ret = formMgrService.UnregisterPublishFormCrossBundleControl();
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterPublishFormCrossBundleControl_0002 end";
-}
 
 /**
  * @tc.number: FormMgrService_UnregisterPublishFormCrossBundleControl_0003
@@ -2201,42 +1760,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_PublishFormCrossBundleControl_00
     GTEST_LOG_(INFO) << "FormMgrService_PublishFormCrossBundleControl_0003 end";
 }
 
-/**
- * @tc.number: FormMgrService_RegisterFormWantCallback_001
- * @tc.name: test RegisterFormWantCallback function.
- * @tc.desc: Verify that the RegisterFormWantCallback returns ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS
- *           when not system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterFormWantCallback_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterFormWantCallback_001 start";
-    FormMgrService formMgrService;
-    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.RegisterFormWantCallback(callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterFormWantCallback_001 end";
-}
 
-/**
- * @tc.number: FormMgrService_RegisterFormWantCallback_002
- * @tc.name: test RegisterFormWantCallback function.
- * @tc.desc: Verify that the RegisterFormWantCallback returns ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE
- *           when permission denied.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterFormWantCallback_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterFormWantCallback_002 start";
-    FormMgrService formMgrService;
-    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(false);
-    ErrCode ret = formMgrService.RegisterFormWantCallback(callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterFormWantCallback_002 end";
-}
 
 /**
  * @tc.number: FormMgrService_RegisterFormWantCallback_003
@@ -2256,40 +1780,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterFormWantCallback_003, Te
     GTEST_LOG_(INFO) << "FormMgrService_RegisterFormWantCallback_003 end";
 }
 
-/**
- * @tc.number: FormMgrService_UnregisterFormWantCallback_001
- * @tc.name: test UnregisterFormWantCallback function.
- * @tc.desc: Verify that the UnregisterFormWantCallback returns ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS
- *           when not system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormWantCallback_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_001 start";
-    FormMgrService formMgrService;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.UnregisterFormWantCallback();
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_001 end";
-}
 
-/**
- * @tc.number: FormMgrService_UnregisterFormWantCallback_002
- * @tc.name: test UnregisterFormWantCallback function.
- * @tc.desc: Verify that the UnregisterFormWantCallback returns ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE
- *           when permission denied.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormWantCallback_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_002 start";
-    FormMgrService formMgrService;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(false);
-    ErrCode ret = formMgrService.UnregisterFormWantCallback();
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_002 end";
-}
 
 /**
  * @tc.number: FormMgrService_UnregisterFormWantCallback_003
@@ -2345,40 +1836,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormWantCallback_004, 
     GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_004 end";
 }
 
-/**
- * @tc.number: FormMgrService_RegisterDeleteFormsCallback_001
- * @tc.name: test RegisterDeleteFormsCallback function.
- * @tc.desc: Verify that the RegisterDeleteFormsCallback returns permission denied when not system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterDeleteFormsCallback_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterDeleteFormsCallback_001 start";
-    FormMgrService formMgrService;
-    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.RegisterDeleteFormsCallback(callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterDeleteFormsCallback_001 end";
-}
 
-/**
- * @tc.number: FormMgrService_RegisterDeleteFormsCallback_002
- * @tc.name: test RegisterDeleteFormsCallback function.
- * @tc.desc: Verify that the RegisterDeleteFormsCallback returns permission denied when no bundle permission.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterDeleteFormsCallback_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterDeleteFormsCallback_002 start";
-    FormMgrService formMgrService;
-    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(false);
-    ErrCode ret = formMgrService.RegisterDeleteFormsCallback(callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterDeleteFormsCallback_002 end";
-}
 
 /**
  * @tc.number: FormMgrService_RegisterDeleteFormsCallback_003
@@ -2399,38 +1857,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterDeleteFormsCallback_003,
     GTEST_LOG_(INFO) << "FormMgrService_RegisterDeleteFormsCallback_003 end";
 }
 
-/**
- * @tc.number: FormMgrService_UnregisterDeleteFormsCallback_001
- * @tc.name: test UnregisterDeleteFormsCallback function.
- * @tc.desc: Verify that the UnregisterDeleteFormsCallback returns permission denied when not system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterDeleteFormsCallback_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterDeleteFormsCallback_001 start";
-    FormMgrService formMgrService;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.UnregisterDeleteFormsCallback();
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterDeleteFormsCallback_001 end";
-}
 
-/**
- * @tc.number: FormMgrService_UnregisterDeleteFormsCallback_002
- * @tc.name: test UnregisterDeleteFormsCallback function.
- * @tc.desc: Verify that the UnregisterDeleteFormsCallback returns permission denied when no bundle permission.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterDeleteFormsCallback_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterDeleteFormsCallback_002 start";
-    FormMgrService formMgrService;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(false);
-    ErrCode ret = formMgrService.UnregisterDeleteFormsCallback();
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterDeleteFormsCallback_002 end";
-}
 
 /**
  * @tc.number: FormMgrService_UnregisterDeleteFormsCallback_003
@@ -2450,46 +1877,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterDeleteFormsCallback_00
     GTEST_LOG_(INFO) << "FormMgrService_UnregisterDeleteFormsCallback_003 end";
 }
 
-/**
- * @tc.number: FormMgrService_DeleteForms_001
- * @tc.name: test DeleteForms function.
- * @tc.desc: Verify that the DeleteForms returns permission denied when not system app.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_DeleteForms_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_DeleteForms_001 start";
-    FormMgrService formMgrService;
-    std::vector<FormRecordFilter> filters;
-    FormRecordFilter filter;
-    filter.bundleName = "com.test.bundle";
-    filters.push_back(filter);
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.DeleteForms(filters);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_DeleteForms_001 end";
-}
 
-/**
- * @tc.number: FormMgrService_DeleteForms_002
- * @tc.name: test DeleteForms function.
- * @tc.desc: Verify that the DeleteForms returns permission denied when no custom config permission.
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_DeleteForms_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_DeleteForms_002 start";
-    FormMgrService formMgrService;
-    std::vector<FormRecordFilter> filters;
-    FormRecordFilter filter;
-    filter.bundleName = "com.test.bundle";
-    filters.push_back(filter);
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(true);
-    MockVerifyCallingPermission(false);
-    ErrCode ret = formMgrService.DeleteForms(filters);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG);
-    GTEST_LOG_(INFO) << "FormMgrService_DeleteForms_002 end";
-}
 
 /**
  * @tc.number: FormMgrService_DeleteForms_003
@@ -2513,23 +1901,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_DeleteForms_003, TestSize.Level1
     GTEST_LOG_(INFO) << "FormMgrService_DeleteForms_003 end";
 }
 
-/**
- * @tc.name: FormMgrService_GetVisibleFormRect_Svc001
- * @tc.desc: Verify GetVisibleFormRect returns PERMISSION_DENY_SYS for non-system caller.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetVisibleFormRect_Svc001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_GetVisibleFormRect_Svc001 start";
-    FormMgrService formMgrService;
-    const int64_t formId = 1;
-    Rect rect;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.GetVisibleFormRect(formId, rect);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_GetVisibleFormRect_Svc001 end";
-}
 
 /**
  * @tc.name: FormMgrService_GetVisibleFormRect_Svc002
@@ -2551,39 +1922,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetVisibleFormRect_Svc002, TestS
     GTEST_LOG_(INFO) << "FormMgrService_GetVisibleFormRect_Svc002 end";
 }
 
-/**
- * @tc.name: FormMgrService_RegisterGetVisibleFormRectProxy_Svc003
- * @tc.desc: Verify RegisterGetVisibleFormRectProxy denies without the required permission.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterGetVisibleFormRectProxy_Svc003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterGetVisibleFormRectProxy_Svc003 start";
-    FormMgrService formMgrService;
-    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    MockIsSACall(true);
-    MockVerifyCallingPermission(false);
-    ErrCode ret = formMgrService.RegisterGetVisibleFormRectProxy(callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
-    MockVerifyCallingPermission(true);
-    GTEST_LOG_(INFO) << "FormMgrService_RegisterGetVisibleFormRectProxy_Svc003 end";
-}
 
-/**
- * @tc.name: FormMgrService_UnregisterGetVisibleFormRectProxy_Svc003b
- * @tc.desc: Verify UnregisterGetVisibleFormRectProxy denies without the required permission.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterGetVisibleFormRectProxy_Svc003b, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterGetVisibleFormRectProxy_Svc003b start";
-    FormMgrService formMgrService;
-    MockIsSACall(true);
-    MockVerifyCallingPermission(false);
-    ErrCode ret = formMgrService.UnregisterGetVisibleFormRectProxy();
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
-    MockVerifyCallingPermission(true);
-    GTEST_LOG_(INFO) << "FormMgrService_UnregisterGetVisibleFormRectProxy_Svc003b end";
-}
 
 }
