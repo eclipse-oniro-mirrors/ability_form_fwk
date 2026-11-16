@@ -139,6 +139,12 @@ public:
 
     bool IsEmpty();
 
+    /**
+     * @brief Check whether the renderer group map is empty.
+     * @return Returns true if the renderer group map is empty, false otherwise.
+     */
+    bool IsRenderGroupEmpty();
+
     bool HasRenderFormTask();
 
     void UpdateConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config,

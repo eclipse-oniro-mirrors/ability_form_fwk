@@ -538,6 +538,12 @@ bool FormRenderRecord::IsEmpty()
     return rendererEmpty && formRequestsEmpty;
 }
 
+bool FormRenderRecord::IsRenderGroupEmpty()
+{
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    return formRendererGroupMap_.empty();
+}
+
 std::string FormRenderRecord::GetUid() const
 {
     return uid_;
