@@ -1272,8 +1272,7 @@ public:
     }
 
     /**
-     * @brief Open the form manage page. Split router entry: the foreground-app
-     *        authorization is bound to this method at the service entry.
+     * @brief Open the form manage page by form manager service.
      * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
      */
@@ -1283,8 +1282,7 @@ public:
     }
 
     /**
-     * @brief Open the form edit page. Split router entry: requires a foreground
-     *        FORM_EDIT extension of the caller at the service entry.
+     * @brief Open the form edit page by form manager service.
      * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
      */
@@ -1294,10 +1292,9 @@ public:
     }
 
     /**
-     * @brief Open the live form page. Split router entry: formId is an explicit
-     *        IPC argument validated as caller-owned at the service entry.
+     * @brief Open the live form page by form manager service.
      * @param want includes ability name, parameters and related info sending to an ability.
-     * @param formId Indicates the unique id of the live form owned by the caller.
+     * @param formId Indicates the unique id of the live form.
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int32_t OpenLiveFormPage(const Want &want, const std::string &formId)

@@ -110,7 +110,7 @@ HWTEST_F(FormIpcDispatchTableTest, AllCodesUniqueSortedViewStrictlyAscendingPerm
 /**
  * @tc.name: GetAccessCheckerNonNullDefaultFailClosed
  * @tc.desc: The table installs a non-null default checker before SetAccessChecker runs;
- *           an empty policy is denied with ERR_APPEXECFWK_FORM_PERMISSION_DENY.
+ *           an empty policy passes like the real checker, a policy with checks stays denied.
  * @tc.type: FUNC
  */
 HWTEST_F(FormIpcDispatchTableTest, GetAccessCheckerNonNullDefaultFailClosed, TestSize.Level0)
@@ -120,7 +120,11 @@ HWTEST_F(FormIpcDispatchTableTest, GetAccessCheckerNonNullDefaultFailClosed, Tes
     ASSERT_NE(defaultChecker, nullptr);
     FormPermissionPolicy emptyPolicy{};
     FormIpcContext context{1000, 0xdeadbeefcafe0000ULL, 42};
-    EXPECT_EQ(defaultChecker->Check(emptyPolicy, context), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+    EXPECT_EQ(defaultChecker->Check(emptyPolicy, context), ERR_OK);
+    FormPermissionPolicy checkedPolicy{};
+    checkedPolicy.checks[0] = CheckType::SystemCaller;
+    checkedPolicy.checkCount = 1;
+    EXPECT_EQ(defaultChecker->Check(checkedPolicy, context), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
 }
 
 /**

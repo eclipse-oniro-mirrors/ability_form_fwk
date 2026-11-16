@@ -40,18 +40,23 @@ public:
 
 /**
  * @class FailClosedChecker
- * @brief Default checker that denies every request until the real checker is installed.
+ * @brief Default checker used until the real checker is installed: rows carrying checks
+ *        stay fail-closed denied, while empty pass-through rows return ERR_OK like the real checker.
  */
 class FailClosedChecker : public IStubAccessChecker {
 public:
     /**
-     * @brief Always deny, keeping IPC fail-closed before service startup installs the checker.
-     * @param policy Unused.
+     * @brief Deny rows carrying checks, keeping IPC fail-closed before service startup
+     *        installs the checker; empty pass-through rows return ERR_OK like the real checker.
+     * @param policy Policy carrying the check count.
      * @param context Unused.
-     * @return ERR_APPEXECFWK_FORM_PERMISSION_DENY.
+     * @return Returns ERR_OK for empty policies, ERR_APPEXECFWK_FORM_PERMISSION_DENY otherwise.
      */
     ErrCode Check(const FormPermissionPolicy &policy, const FormIpcContext &context) override
     {
+        if (policy.checkCount == 0) {
+            return ERR_OK;
+        }
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
 };

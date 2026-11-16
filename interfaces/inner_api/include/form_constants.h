@@ -262,6 +262,8 @@ namespace Constants {
     constexpr int32_t MAX_FORM_DATA_SIZE = 1024;
     // max length for publish form result message
     constexpr int32_t MAX_PUBLISH_FORM_MESSAGE_LENGTH = 1024;
+    // max length of the decimal string of an int64 form id (INT64_MAX has 19 digits)
+    constexpr int32_t MAX_FORM_ID_STRING_LENGTH = 19;
     constexpr int32_t MAX_FORM_NAME_LENGTH = 128;
     constexpr int32_t MAX_BUNDLE_NAME_LENGTH = 128;
     constexpr int32_t MAX_ABILITY_NAME_LENGTH = 128;

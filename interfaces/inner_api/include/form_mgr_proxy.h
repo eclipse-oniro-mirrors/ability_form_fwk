@@ -432,7 +432,7 @@ public:
     /**
      * @brief Open the live form page by form manager service.
      * @param want includes ability name, parameters and related info sending to an ability.
-     * @param formId Indicates the unique id of the live form owned by the caller.
+     * @param formId Indicates the unique id of the live form.
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t OpenLiveFormPage(const Want &want, const std::string &formId) override;
