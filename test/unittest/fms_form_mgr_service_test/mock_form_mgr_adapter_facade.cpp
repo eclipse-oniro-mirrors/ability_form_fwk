@@ -80,6 +80,7 @@ namespace {
     int g_unregisterPublishFormCrossBundleControl = OHOS::ERR_OK;
     bool g_publishFormCrossBundleControl = true;
     int g_updateFormCrossBundle = OHOS::ERR_OK;
+    int g_updateFormsWithReminderAgent = OHOS::ERR_OK;
     bool g_hasFormVisible = true;
     int g_enableForms = OHOS::ERR_OK;
     int g_registerFormWantCallback = OHOS::ERR_OK;
@@ -279,6 +280,11 @@ void MockDeleteForms(int mockRet)
 void MockUpdateFormCrossBundle(int mockRet)
 {
     g_updateFormCrossBundle = mockRet;
+}
+
+void MockUpdateFormsWithReminderAgent(int mockRet)
+{
+    g_updateFormsWithReminderAgent = mockRet;
 }
 
 void MockFormMgrAdapterFacadeGetVisibleFormRect(int mockRet)
@@ -657,6 +663,13 @@ ErrCode FormMgrAdapterFacade::UpdateFormCrossBundle(const int64_t formId, const 
     const FormProviderData &formProviderData)
 {
     return g_updateFormCrossBundle;
+}
+
+int32_t FormMgrAdapterFacade::UpdateFormsWithReminderAgent(
+    const std::string &bundleName, const int32_t userId, const Want &want)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent called " << g_updateFormsWithReminderAgent;
+    return g_updateFormsWithReminderAgent;
 }
 
 ErrCode FormMgrAdapterFacade::GetVisibleFormRect(const int64_t formId, const int32_t callingUid, Rect &rect)

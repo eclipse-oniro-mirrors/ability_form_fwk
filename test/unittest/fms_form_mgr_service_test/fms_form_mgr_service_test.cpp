@@ -1666,5 +1666,128 @@ HWTEST_F(FmsFormMgrServiceTest, UpdateFormCrossBundle_008, TestSize.Level1)
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_UPDATE_FORM_CROSS_BUNDLE);
     GTEST_LOG_(INFO) << "UpdateFormCrossBundle_008 end";
 }
+
+// ========== UpdateFormsWithReminderAgent Tests ==========
+
+/**
+ * @tc.number: UpdateFormsWithReminderAgent_001
+ * @tc.name: test UpdateFormsWithReminderAgent rejects non-system-app caller.
+ * @tc.desc: Verify FORM_PERMISSION_DENY_SYS is returned for a non-system-app caller.
+ */
+HWTEST_F(FmsFormMgrServiceTest, UpdateFormsWithReminderAgent_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_001 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    MockVerifyCallingPermission(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    MockUpdateFormsWithReminderAgent(ERR_OK);
+
+    ErrCode ret = formMgrService.UpdateFormsWithReminderAgent("com.test.bundle", 100, Want());
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_001 end";
+}
+
+/**
+ * @tc.number: UpdateFormsWithReminderAgent_002
+ * @tc.name: test UpdateFormsWithReminderAgent rejects empty bundleName.
+ * @tc.desc: Verify FORM_INVALID_PARAM is returned when bundleName is empty.
+ */
+HWTEST_F(FmsFormMgrServiceTest, UpdateFormsWithReminderAgent_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_002 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    MockUpdateFormsWithReminderAgent(ERR_OK);
+
+    ErrCode ret = formMgrService.UpdateFormsWithReminderAgent("", 100, Want());
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_002 end";
+}
+
+/**
+ * @tc.number: UpdateFormsWithReminderAgent_003
+ * @tc.name: test UpdateFormsWithReminderAgent rejects negative userId.
+ * @tc.desc: Verify FORM_INVALID_PARAM is returned when userId is negative.
+ */
+HWTEST_F(FmsFormMgrServiceTest, UpdateFormsWithReminderAgent_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_003 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    MockUpdateFormsWithReminderAgent(ERR_OK);
+
+    ErrCode ret = formMgrService.UpdateFormsWithReminderAgent("com.test.bundle", -1, Want());
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_003 end";
+}
+
+/**
+ * @tc.number: UpdateFormsWithReminderAgent_004
+ * @tc.name: test UpdateFormsWithReminderAgent success path with permission granted.
+ * @tc.desc: Verify ERR_OK is returned when system-app caller has permission and params are valid.
+ */
+HWTEST_F(FmsFormMgrServiceTest, UpdateFormsWithReminderAgent_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_004 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    MockUpdateFormsWithReminderAgent(ERR_OK);
+
+    ErrCode ret = formMgrService.UpdateFormsWithReminderAgent("com.test.bundle", 100, Want());
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_004 end";
+}
+
+/**
+ * @tc.number: UpdateFormsWithReminderAgent_005
+ * @tc.name: test UpdateFormsWithReminderAgent propagates AdapterFacade errors.
+ * @tc.desc: Verify that the Service-layer propagates whatever code AdapterFacade returns.
+ */
+HWTEST_F(FmsFormMgrServiceTest, UpdateFormsWithReminderAgent_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_005 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    MockUpdateFormsWithReminderAgent(ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    ErrCode ret = formMgrService.UpdateFormsWithReminderAgent("com.test.bundle", 100, Want());
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_005 end";
+}
+
+/**
+ * @tc.number: UpdateFormsWithReminderAgent_006
+ * @tc.name: test UpdateFormsWithReminderAgent rejects caller without across-local-accounts permission.
+ * @tc.desc: Verify FORM_PERMISSION_DENY is returned when cross-account permission is denied.
+ */
+HWTEST_F(FmsFormMgrServiceTest, UpdateFormsWithReminderAgent_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_006 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockCheckAcrossLocalAccountsPermission(false);
+    MockUpdateFormsWithReminderAgent(ERR_OK);
+
+    ErrCode ret = formMgrService.UpdateFormsWithReminderAgent("com.test.bundle", 100, Want());
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_006 end";
+}
+
 // Please add to file fms_form_mgr_service_test2.cpp
 }

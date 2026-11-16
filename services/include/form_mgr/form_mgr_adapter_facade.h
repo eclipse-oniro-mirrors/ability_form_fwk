@@ -130,6 +130,8 @@ public:
     ErrCode UpdateFormCrossBundle(const int64_t formId, const int32_t callingUid,
         const FormProviderData &formProviderData);
 
+    int32_t UpdateFormsWithReminderAgent(const std::string &bundleName, const int32_t userId, const Want &want);
+
     int RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want);
 
     void UpdateFormSize(const int64_t &formId, float width, float height,
