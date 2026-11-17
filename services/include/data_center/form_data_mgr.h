@@ -579,23 +579,17 @@ public:
     void DeleteInvalidPublishForms(int32_t userId, std::string bundleName, std::set<int64_t> &validFormIds);
 
     /**
-     * @brief Create form acquire data host record.
+     * @brief Create form acquire data host record and bind the queried provider atomically.
      * @param requestCode The request code of this acquire form.
      * @param info The form item info.
      * @param callerToken  Caller ability token.
      * @param callingUid The UID of the proxy.
-     * @return Returns true if this function is successfully called; returns false otherwise.
+     * @param providerBundleName The provider bundle queried by this request.
+     * @return Returns true if record and binding are written; returns false otherwise.
      */
     bool CreateFormAcquireDataRecord(int64_t requestCode, const FormItemInfo &info,
-                                     const sptr<IRemoteObject> &callerToken, int callingUid);
-
-    /**
-     * @brief Record the provider bundle queried by the acquire-data request.
-     *        Used to verify the caller of the acquire-data result.
-     * @param requestCode The request code of this acquire form.
-     * @param bundleName The provider bundle queried for this request.
-     */
-    void AddAcquireDataProvider(int64_t requestCode, const std::string &bundleName);
+                                     const sptr<IRemoteObject> &callerToken, int callingUid,
+                                     const std::string &providerBundleName);
  
     /**
      * @brief Check whether the acquire-data result caller is the queried provider.

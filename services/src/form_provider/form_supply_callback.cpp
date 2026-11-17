@@ -102,8 +102,8 @@ int32_t FormSupplyCallback::CheckCallerOwnsConnection(int32_t connectId)
         std::lock_guard<std::mutex> lock(conMutex_);
         auto conIterator = connections_.find(connectId);
         if (conIterator == connections_.end()) {
-            // No registered connection means nothing to tear down; keep as no-op.
-            return ERR_OK;
+            // Unknown and non-owner connectIds share the same error code to avoid enumeration.
+            return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
         }
         ownerBundle = conIterator->second->GetBundleName();
     }
