@@ -134,6 +134,19 @@ public:
     }
 
     /**
+     * @brief Refresh all forms of the specified bundle/user triggered by reminder agent.
+     * @param bundleName The bundle name of form provider to refresh.
+     * @param userId The user id of forms to refresh.
+     * @param want The want carrying reminder agent context to provider.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t UpdateFormsWithReminderAgent(
+        const std::string &bundleName, const int32_t userId, const Want &want)
+    {
+        return ERR_OK;
+    }
+
+    /**
      * @brief Set next refresh time.
      * @param formId The Id of the form to update.
      * @param nextTime Next refresh time.
@@ -1441,6 +1454,7 @@ public:
         FORM_MGR_REGISTER_GET_VISIBLE_FORM_RECT_PROXY,
         FORM_MGR_UNREGISTER_GET_VISIBLE_FORM_RECT_PROXY,
         FORM_MGR_GET_VISIBLE_FORM_RECT,
+        FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT,
         FORM_MGR_OPEN_FORM_MANAGE_PAGE,
         FORM_MGR_OPEN_FORM_EDIT_PAGE,
         FORM_MGR_OPEN_LIVE_FORM_PAGE,

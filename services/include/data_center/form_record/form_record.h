@@ -82,6 +82,7 @@ public:
     bool transparencyEnabled = false;
     bool isTimerRefresh = false;
     bool isHostRefresh = false;
+    bool isReminderAgentRefresh = false;
     bool isDataProxy = false;
     bool isDataProxyIgnoreFormVisible = false;
     bool isSystemApp = false;

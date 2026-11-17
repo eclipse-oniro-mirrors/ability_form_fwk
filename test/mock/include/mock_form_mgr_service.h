@@ -32,6 +32,8 @@ public:
     MOCK_METHOD2(UpdateForm, int(const int64_t formId, const FormProviderData &formProviderData));
     MOCK_METHOD2(UpdateForm, int(const int64_t formId, const FormProviderInfo &formProviderInfo));
     MOCK_METHOD2(UpdateFormCrossBundle, int(const int64_t formId, const FormProviderData &formBindingData));
+    MOCK_METHOD3(UpdateFormsWithReminderAgent, int32_t(const std::string &bundleName,
+        const int32_t userId, const Want &want));
     MOCK_METHOD2(SetNextRefreshTime, int(const int64_t formId, const int64_t nextTime));
     MOCK_METHOD3(RequestPublishFormCrossUser, ErrCode(Want &want, int32_t userId, int64_t &formId));
     MOCK_METHOD4(RequestPublishForm, ErrCode(Want &want, bool withFormBindingData,

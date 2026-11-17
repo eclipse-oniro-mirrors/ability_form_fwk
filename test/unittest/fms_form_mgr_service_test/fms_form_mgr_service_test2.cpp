@@ -1556,7 +1556,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_OpenFormEditAbility_0006, TestSi
     GTEST_LOG_(INFO) << "FormMgrService_OpenFormEditAbility_0006 end";
 }
 
-
 /**
  * @tc.number: FormMgrService_RegisterChangeSceneAnimationStateProxy_0002
  * @tc.name: test RegisterChangeSceneAnimationStateProxy success.

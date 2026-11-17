@@ -65,6 +65,21 @@ public:
     }
 };
 
+class FormMgrStubReminderAgentTestTarget : public MockFormMgrService {
+public:
+    int32_t updateFormsWithReminderAgentCount = 0;
+    int32_t lastUserId = -1;
+    std::string lastBundleName;
+    int32_t UpdateFormsWithReminderAgent(const std::string &bundleName,
+        const int32_t userId, const Want &want) override
+    {
+        updateFormsWithReminderAgentCount++;
+        lastBundleName = bundleName;
+        lastUserId = userId;
+        return ERR_OK;
+    }
+};
+
 class FormMgrStubTest : public testing::Test {
 public:
     void SetUp() override
@@ -4173,6 +4188,48 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DeleteForms_007, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_DeleteForms_007 ends";
 }
 
+// Deny-only checker stub used to exercise the OnRemoteRequest deny path.
+class DenyAllChecker : public IStubAccessChecker {
+public:
+    ErrCode Check(const FormPermissionPolicy &policy, const FormIpcContext &context) override
+    {
+        ++calls;
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+    uint32_t calls = 0;
+};
+
+// Permissive checker used to exercise the OnRemoteRequest allow path under a non-empty policy.
+class AllowAllChecker : public IStubAccessChecker {
+public:
+    ErrCode Check(const FormPermissionPolicy &policy, const FormIpcContext &context) override
+    {
+        ++calls;
+        return ERR_OK;
+    }
+    uint32_t calls = 0;
+};
+
+class CheckerScopeGuard {
+public:
+    explicit CheckerScopeGuard(std::shared_ptr<IStubAccessChecker> replacement)
+        : original_(FormIpcDispatchTable::GetInstance().GetAccessChecker())
+    {
+        FormIpcDispatchTable::GetInstance().SetAccessChecker(replacement);
+    }
+
+    ~CheckerScopeGuard()
+    {
+        FormIpcDispatchTable::GetInstance().SetAccessChecker(original_);
+    }
+
+    CheckerScopeGuard(const CheckerScopeGuard &) = delete;
+    CheckerScopeGuard &operator=(const CheckerScopeGuard &) = delete;
+
+private:
+    std::shared_ptr<IStubAccessChecker> original_;
+};
+
 /**
  * @tc.number: FormMgrStubTest_HandleUpdateFormCrossBundle_001
  * @tc.name: Verify OnRemoteRequest dispatches FORM_MGR_UPDATE_FORM_CROSS_BUNDLE with valid FormProviderData.
@@ -4182,6 +4239,8 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormCrossBundle_001, TestS
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_001 starts";
     auto stub = new (std::nothrow) FormMgrStubCrossBundleTestTarget();
     ASSERT_TRUE(stub != nullptr);
+    auto allowChecker = std::make_shared<AllowAllChecker>();
+    CheckerScopeGuard checkerGuard(allowChecker);
     constexpr int64_t formId = 1001L;
     FormProviderData formBindingData = FormProviderData(std::string("{\"city\":\"shenzhen\"}"));
     constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_CROSS_BUNDLE);
@@ -4197,6 +4256,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormCrossBundle_001, TestS
     EXPECT_EQ(result, ERR_OK);
     EXPECT_EQ(stub->updateFormCrossBundleCount, 1);
     EXPECT_EQ(reply.ReadInt32(), ERR_OK);
+    EXPECT_EQ(allowChecker->calls, 1u);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_001 ends";
 }
 
@@ -4209,6 +4269,8 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormCrossBundle_002, TestS
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_002 starts";
     auto stub = new (std::nothrow) FormMgrStubCrossBundleTestTarget();
     ASSERT_TRUE(stub != nullptr);
+    auto allowChecker = std::make_shared<AllowAllChecker>();
+    CheckerScopeGuard checkerGuard(allowChecker);
     constexpr int64_t formId = 1002L;
     constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_CROSS_BUNDLE);
     MessageParcel data;
@@ -4221,6 +4283,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormCrossBundle_002, TestS
     auto result = stub->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
     EXPECT_EQ(stub->updateFormCrossBundleCount, 0);
+    EXPECT_EQ(allowChecker->calls, 1u);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormCrossBundle_002 ends";
 }
 
@@ -4357,6 +4420,8 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_006, TestSize.Level
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_007, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_007 starts";
     ASSERT_TRUE(mockFormMgrService != nullptr);
+    auto allowChecker = std::make_shared<AllowAllChecker>();
+    CheckerScopeGuard checkerGuard(allowChecker);
     MessageOption option{MessageOption::TF_SYNC};
     MessageParcel data;
     MessageParcel reply;
@@ -4370,39 +4435,9 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_007, TestSize.Level
         IFormMgr::Message::FORM_MGR_GET_VISIBLE_FORM_RECT);
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(allowChecker->calls, 1u);
     GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_007 ends";
 }
-
-// Deny-only checker stub used to exercise the OnRemoteRequest deny path.
-class DenyAllChecker : public IStubAccessChecker {
-public:
-    ErrCode Check(const FormPermissionPolicy &policy, const FormIpcContext &context) override
-    {
-        ++calls;
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
-    uint32_t calls = 0;
-};
-
-class CheckerScopeGuard {
-public:
-    explicit CheckerScopeGuard(std::shared_ptr<IStubAccessChecker> replacement)
-        : original_(FormIpcDispatchTable::GetInstance().GetAccessChecker())
-    {
-        FormIpcDispatchTable::GetInstance().SetAccessChecker(replacement);
-    }
-
-    ~CheckerScopeGuard()
-    {
-        FormIpcDispatchTable::GetInstance().SetAccessChecker(original_);
-    }
-
-    CheckerScopeGuard(const CheckerScopeGuard &) = delete;
-    CheckerScopeGuard &operator=(const CheckerScopeGuard &) = delete;
-
-private:
-    std::shared_ptr<IStubAccessChecker> original_;
-};
 
 /**
  * @tc.name: FormMgrStubTest_OnRemoteRequestDeny_001
@@ -4624,4 +4659,166 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestFallback_001, TestSize.
     EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
     GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestFallback_001 ends";
 }
+
+/**
+ * @tc.number: FormMgrStubTest_HandleUpdateFormsWithReminderAgent_001
+ * @tc.name: Verify OnRemoteRequest dispatches FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT with valid params.
+ * @tc.desc: test that bundleName/userId/Want are deserialized and reply echoes result.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormsWithReminderAgent_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormsWithReminderAgent_001 starts";
+    auto stub = new (std::nothrow) FormMgrStubReminderAgentTestTarget();
+    ASSERT_TRUE(stub != nullptr);
+    auto allowChecker = std::make_shared<AllowAllChecker>();
+    CheckerScopeGuard checkerGuard(allowChecker);
+    std::string bundleName = "com.test.bundle";
+    int32_t userId = 100;
+    Want want;
+    constexpr uint32_t code = static_cast<uint32_t>(
+        IFormMgr::Message::FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+
+    data.WriteInterfaceToken(FormMgrStubReminderAgentTestTarget::GetDescriptor());
+    data.WriteString(bundleName);
+    data.WriteInt32(userId);
+    data.WriteParcelable(&want);
+
+    auto result = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(stub->updateFormsWithReminderAgentCount, 1);
+    EXPECT_EQ(stub->lastBundleName, bundleName);
+    EXPECT_EQ(stub->lastUserId, userId);
+    EXPECT_EQ(reply.ReadInt32(), ERR_OK);
+    EXPECT_EQ(allowChecker->calls, 1u);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormsWithReminderAgent_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_HandleUpdateFormsWithReminderAgent_002
+ * @tc.name: Verify OnRemoteRequest returns PARCEL_ERROR for empty bundleName.
+ * @tc.desc: test that empty bundleName is rejected before dispatching to service.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormsWithReminderAgent_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormsWithReminderAgent_002 starts";
+    auto stub = new (std::nothrow) FormMgrStubReminderAgentTestTarget();
+    ASSERT_TRUE(stub != nullptr);
+    auto allowChecker = std::make_shared<AllowAllChecker>();
+    CheckerScopeGuard checkerGuard(allowChecker);
+    std::string emptyBundleName;
+    int32_t userId = 100;
+    Want want;
+    constexpr uint32_t code = static_cast<uint32_t>(
+        IFormMgr::Message::FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+
+    data.WriteInterfaceToken(FormMgrStubReminderAgentTestTarget::GetDescriptor());
+    data.WriteString(emptyBundleName);
+    data.WriteInt32(userId);
+    data.WriteParcelable(&want);
+
+    auto result = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    EXPECT_EQ(stub->updateFormsWithReminderAgentCount, 0);
+    EXPECT_EQ(allowChecker->calls, 1u);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormsWithReminderAgent_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_HandleUpdateFormsWithReminderAgent_003
+ * @tc.name: Verify OnRemoteRequest returns PARCEL_ERROR when Want is missing.
+ * @tc.desc: test that missing Want parcelable returns PARCEL_ERROR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormsWithReminderAgent_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormsWithReminderAgent_003 starts";
+    auto stub = new (std::nothrow) FormMgrStubReminderAgentTestTarget();
+    ASSERT_TRUE(stub != nullptr);
+    auto allowChecker = std::make_shared<AllowAllChecker>();
+    CheckerScopeGuard checkerGuard(allowChecker);
+    std::string bundleName = "com.test.bundle";
+    int32_t userId = 100;
+    constexpr uint32_t code = static_cast<uint32_t>(
+        IFormMgr::Message::FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+
+    data.WriteInterfaceToken(FormMgrStubReminderAgentTestTarget::GetDescriptor());
+    data.WriteString(bundleName);
+    data.WriteInt32(userId);
+    // Intentionally omit WriteParcelable(&want)
+
+    auto result = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    EXPECT_EQ(stub->updateFormsWithReminderAgentCount, 0);
+    EXPECT_EQ(allowChecker->calls, 1u);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormsWithReminderAgent_003 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_HandleUpdateFormsWithReminderAgent_004
+ * @tc.name: Verify OnRemoteRequest returns PARCEL_ERROR for negative userId.
+ * @tc.desc: test that negative userId is rejected before Want is read and the service is not invoked.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormsWithReminderAgent_004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormsWithReminderAgent_004 starts";
+    auto stub = new (std::nothrow) FormMgrStubReminderAgentTestTarget();
+    ASSERT_TRUE(stub != nullptr);
+    auto allowChecker = std::make_shared<AllowAllChecker>();
+    CheckerScopeGuard checkerGuard(allowChecker);
+    std::string bundleName = "com.test.bundle";
+    int32_t userId = -1;
+    constexpr uint32_t code = static_cast<uint32_t>(
+        IFormMgr::Message::FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+
+    data.WriteInterfaceToken(FormMgrStubReminderAgentTestTarget::GetDescriptor());
+    data.WriteString(bundleName);
+    data.WriteInt32(userId);
+    // Intentionally omit WriteParcelable(&want): the negative-userId check must fire first.
+
+    auto result = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    EXPECT_EQ(stub->updateFormsWithReminderAgentCount, 0);
+    EXPECT_EQ(allowChecker->calls, 1u);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormsWithReminderAgent_004 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_OnRemoteRequestDenyReminderAgent_001
+ * @tc.name: Verify a denied checker blocks FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT.
+ * @tc.desc: test that the reminder-agent row enforces a non-empty permission policy: a deny
+ *           short-circuits with the default CARRIER_STATUS shape and never reaches the service.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestDenyReminderAgent_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestDenyReminderAgent_001 starts";
+    auto stub = new (std::nothrow) FormMgrStubReminderAgentTestTarget();
+    ASSERT_TRUE(stub != nullptr);
+    auto denyChecker = std::make_shared<DenyAllChecker>();
+    CheckerScopeGuard checkerGuard(denyChecker);
+
+    constexpr uint32_t code = static_cast<uint32_t>(
+        IFormMgr::Message::FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+    data.WriteInterfaceToken(FormMgrStubReminderAgentTestTarget::GetDescriptor());
+    data.WriteString("com.test.bundle");
+    data.WriteInt32(100);
+    Want want;
+    data.WriteParcelable(&want);
+
+    auto result = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
+    EXPECT_EQ(stub->updateFormsWithReminderAgentCount, 0);
+    EXPECT_EQ(denyChecker->calls, 1u);
+    EXPECT_EQ(reply.GetDataSize(), 0u);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestDenyReminderAgent_001 ends";
+}
+
 }

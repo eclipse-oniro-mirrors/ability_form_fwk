@@ -106,6 +106,16 @@ public:
     virtual int UpdateFormCrossBundle(const int64_t formId, const FormProviderData &formProviderData) override;
 
     /**
+     * @brief Refresh all forms of the specified bundle/user triggered by reminder agent.
+     * @param bundleName The bundle name of form provider to refresh.
+     * @param userId The user id of forms to refresh.
+     * @param want The want carrying reminder agent context to provider.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t UpdateFormsWithReminderAgent(
+        const std::string &bundleName, const int32_t userId, const Want &want) override;
+
+    /**
      * @brief Set next refresh time.
      * @param formId The Id of the form to update.
      * @param nextTime Next refresh time.

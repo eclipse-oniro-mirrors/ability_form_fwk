@@ -44,6 +44,7 @@ void MockUnregisterDeleteFormsCallback(int mockRet);
 void MockDeleteForms(int mockRet);
 void MockUpdateFormCrossBundle(int mockRet);
 void MockUpdateFormCrossBundle(int mockRet);
+void MockUpdateFormsWithReminderAgent(int mockRet);
 void MockFormMgrAdapterFacadeGetVisibleFormRect(int mockRet);
 void MockFormMgrAdapterFacadeRegisterGetVisibleFormRectProxy(int mockRet);
 void MockFormMgrAdapterFacadeUnregisterGetVisibleFormRectProxy(int mockRet);

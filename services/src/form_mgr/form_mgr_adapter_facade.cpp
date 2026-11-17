@@ -201,6 +201,13 @@ ErrCode FormMgrAdapterFacade::UpdateFormCrossBundle(const int64_t formId, const 
     return FormDataAdapter::GetInstance().UpdateFormCrossBundle(formId, callingUid, formProviderData);
 }
 
+int32_t FormMgrAdapterFacade::UpdateFormsWithReminderAgent(
+    const std::string &bundleName, const int32_t userId, const Want &want)
+{
+    HILOG_INFO("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+    return FormDataAdapter::GetInstance().UpdateFormsWithReminderAgent(bundleName, userId, want);
+}
+
 int FormMgrAdapterFacade::RequestForm(const int64_t formId,
     const sptr<IRemoteObject> &callerToken, const Want &want)
 {

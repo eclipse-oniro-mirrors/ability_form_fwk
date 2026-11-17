@@ -189,6 +189,41 @@ ErrCode FormDataAdapter::UpdateFormCrossBundle(const int64_t formId, const int32
     return FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_DATA);
 }
 
+int32_t FormDataAdapter::UpdateFormsWithReminderAgent(
+    const std::string &bundleName, const int32_t userId, const Want &want)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    std::vector<FormRecord> formRecords;
+    if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formRecords, userId)) {
+        HILOG_INFO("FormInfo not find, bundleName:%{public}s, userId:%{public}d",
+            bundleName.c_str(), userId);
+        return ERR_OK;
+    }
+    HILOG_INFO("reminder agent refresh, bundleName:%{public}s, userId:%{public}d, formCount:%{public}zu",
+        bundleName.c_str(), userId, formRecords.size());
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    std::vector<RefreshData> batch;
+    for (auto &formRecord : formRecords) {
+        FormInfo formInfo;
+        if (FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo) != ERR_OK ||
+            !formInfo.enableReminderAgentRefresh) {
+            continue;
+        }
+        RefreshData data;
+        data.formId = formRecord.formId;
+        data.record = formRecord;
+        data.callingUid = callingUid;
+        data.want = want;
+        batch.push_back(data);
+    }
+    if (batch.empty()) {
+        HILOG_INFO("no enabled form to refresh");
+        return ERR_OK;
+    }
+    return FormRefreshMgr::GetInstance().BatchRequestRefresh(
+        TYPE_REMINDER_AGENT, StaggerStrategyType::DEFAULT, batch);
+}
+
 int FormDataAdapter::RequestForm(const int64_t formId,
     const sptr<IRemoteObject> &callerToken, const Want &want)
 {

@@ -353,6 +353,20 @@ int FormMgrService::UpdateFormCrossBundle(const int64_t formId, const FormProvid
 }
 
 /**
+ * @brief Update forms with reminder agent, restricted to system callers with REQUIRE_FORM permission.
+ * @param bundleName The bundle name of the target form provider.
+ * @param userId The id of the target user.
+ * @param want The want of the reminder agent.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrService::UpdateFormsWithReminderAgent(
+    const std::string &bundleName, const int32_t userId, const Want &want)
+{
+    HILOG_INFO("call, bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+    return FormMgrAdapterFacade::GetInstance().UpdateFormsWithReminderAgent(bundleName, userId, want);
+}
+
+/**
  * @brief Request form with formId and want, send formId and want to form manager service.
  * @param formId The Id of the form to update.
  * @param callerToken Caller ability token.

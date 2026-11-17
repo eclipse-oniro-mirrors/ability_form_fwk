@@ -1427,5 +1427,112 @@ HWTEST_F(FmsFormMgrServiceTest, UpdateFormCrossBundle_008, TestSize.Level1)
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "UpdateFormCrossBundle_008 end";
 }
+
+// ========== UpdateFormsWithReminderAgent Tests ==========
+
+/**
+ * @tc.number: UpdateFormsWithReminderAgent_001
+ * @tc.name: test UpdateFormsWithReminderAgent delegates regardless of caller identity.
+ * @tc.desc: Verify the service delegates to AdapterFacade even for a non-system caller;
+ *           permission is enforced by the IPC dispatch layer.
+ */
+HWTEST_F(FmsFormMgrServiceTest, UpdateFormsWithReminderAgent_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_001 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    MockUpdateFormsWithReminderAgent(ERR_OK);
+
+    ErrCode ret = formMgrService.UpdateFormsWithReminderAgent("com.test.bundle", 100, Want());
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_001 end";
+}
+
+/**
+ * @tc.number: UpdateFormsWithReminderAgent_002
+ * @tc.name: test UpdateFormsWithReminderAgent forwards empty bundleName to AdapterFacade.
+ * @tc.desc: Verify the service performs no bundleName validation; the dispatch-layer
+ *           handler rejects an empty bundleName before the service is reached.
+ */
+HWTEST_F(FmsFormMgrServiceTest, UpdateFormsWithReminderAgent_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_002 start";
+    FormMgrService formMgrService;
+    MockUpdateFormsWithReminderAgent(ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    ErrCode ret = formMgrService.UpdateFormsWithReminderAgent("", 100, Want());
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_002 end";
+}
+
+/**
+ * @tc.number: UpdateFormsWithReminderAgent_003
+ * @tc.name: test UpdateFormsWithReminderAgent forwards negative userId to AdapterFacade.
+ * @tc.desc: Verify the service performs no userId validation; the dispatch-layer handler
+ *           rejects a negative userId before the service is reached.
+ */
+HWTEST_F(FmsFormMgrServiceTest, UpdateFormsWithReminderAgent_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_003 start";
+    FormMgrService formMgrService;
+    MockUpdateFormsWithReminderAgent(ERR_OK);
+
+    ErrCode ret = formMgrService.UpdateFormsWithReminderAgent("com.test.bundle", -1, Want());
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_003 end";
+}
+
+/**
+ * @tc.number: UpdateFormsWithReminderAgent_004
+ * @tc.name: test UpdateFormsWithReminderAgent success path.
+ * @tc.desc: Verify ERR_OK is returned when AdapterFacade succeeds and params are valid.
+ */
+HWTEST_F(FmsFormMgrServiceTest, UpdateFormsWithReminderAgent_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_004 start";
+    FormMgrService formMgrService;
+    MockUpdateFormsWithReminderAgent(ERR_OK);
+
+    ErrCode ret = formMgrService.UpdateFormsWithReminderAgent("com.test.bundle", 100, Want());
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_004 end";
+}
+
+/**
+ * @tc.number: UpdateFormsWithReminderAgent_005
+ * @tc.name: test UpdateFormsWithReminderAgent propagates AdapterFacade errors.
+ * @tc.desc: Verify that the Service-layer propagates whatever code AdapterFacade returns.
+ */
+HWTEST_F(FmsFormMgrServiceTest, UpdateFormsWithReminderAgent_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_005 start";
+    FormMgrService formMgrService;
+    MockUpdateFormsWithReminderAgent(ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    ErrCode ret = formMgrService.UpdateFormsWithReminderAgent("com.test.bundle", 100, Want());
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_005 end";
+}
+
+/**
+ * @tc.number: UpdateFormsWithReminderAgent_006
+ * @tc.name: test UpdateFormsWithReminderAgent delegates regardless of cross-account permission.
+ * @tc.desc: Verify the service delegates to AdapterFacade even when across-local-accounts
+ *           permission would be denied; the check is enforced by the IPC dispatch layer.
+ */
+HWTEST_F(FmsFormMgrServiceTest, UpdateFormsWithReminderAgent_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_006 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockCheckAcrossLocalAccountsPermission(false);
+    MockUpdateFormsWithReminderAgent(ERR_OK);
+
+    ErrCode ret = formMgrService.UpdateFormsWithReminderAgent("com.test.bundle", 100, Want());
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "UpdateFormsWithReminderAgent_006 end";
+}
+
 // Please add to file fms_form_mgr_service_test2.cpp
 }

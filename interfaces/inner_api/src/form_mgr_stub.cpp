@@ -32,7 +32,6 @@ FormMgrStub::FormMgrStub()
 FormMgrStub::~FormMgrStub()
 {}
 
-
 /**
  * @brief Serialize a deny result following the command's legacy deny carrier.
  *

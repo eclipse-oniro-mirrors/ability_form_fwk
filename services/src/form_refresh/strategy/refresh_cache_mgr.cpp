@@ -120,8 +120,9 @@ void RefreshCacheMgr::ConsumeInvisibleFlag(const std::vector<FormRecord> &visibl
     bool isActiveUser = FormUtil::IsActiveUser(userId);
     for (const auto &record : visibleFormRecords) {
         const int64_t formId = record.formId;
-        HILOG_INFO("formId:%{public}" PRId64", userId:%{public}d, isTimerRefresh:%{public}d, isHostRefresh:%{public}d",
-            formId, userId, record.isTimerRefresh, record.isHostRefresh);
+        HILOG_INFO("formId:%{public}" PRId64", userId:%{public}d, isTimerRefresh:%{public}d, isHostRefresh:%{public}d,"
+            " isReminderAgentRefresh:%{public}d",
+            formId, userId, record.isTimerRefresh, record.isHostRefresh, record.isReminderAgentRefresh);
         Want want;
         if (record.isTimerRefresh) {
             want.SetParam(Constants::KEY_IS_TIMER, true);
@@ -131,7 +132,7 @@ void RefreshCacheMgr::ConsumeInvisibleFlag(const std::vector<FormRecord> &visibl
         if (isActiveUser) {
             want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
         }
-        if (record.isHostRefresh) {
+        if (record.isHostRefresh || record.isReminderAgentRefresh) {
             auto it = record.refreshWantMap.find(formId);
             if (it != record.refreshWantMap.end()) {
                 FormWant::MergeWantParams(want, it->second.GetWant());

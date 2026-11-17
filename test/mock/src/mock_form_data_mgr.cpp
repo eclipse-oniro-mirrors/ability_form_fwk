@@ -70,6 +70,22 @@ void FormDataMgr::SetNeedRefresh(const int64_t formId, const bool needRefresh)
     }
 }
 
+void FormDataMgr::MergeRefreshWant(const int64_t formId, const Want &want)
+{
+    GTEST_LOG_(INFO) << "MergeRefreshWant called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        AppExecFwk::MockFormDataMgr::obj->MergeRefreshWant(formId, want);
+    }
+}
+
+void FormDataMgr::SetReminderAgentRefresh(const int64_t formId, const bool reminderAgentRefresh)
+{
+    GTEST_LOG_(INFO) << "SetReminderAgentRefresh called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        AppExecFwk::MockFormDataMgr::obj->SetReminderAgentRefresh(formId, reminderAgentRefresh);
+    }
+}
+
 bool FormDataMgr::SetRecordNeedFreeInstall(int64_t formId, bool isNeedFreeInstall)
 {
     GTEST_LOG_(INFO) << "SetRecordNeedFreeInstall called";
