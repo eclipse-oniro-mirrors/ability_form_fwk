@@ -93,15 +93,15 @@ void EtsLiveFormExtensionImpl::BindMethod(ani_env *env)
     ani_method method = nullptr;
     ani_object object = nullptr;
     if ((status = env->FindClass(LIVE_FORM_EXTENSION_CLASS_NAME, &cls)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return;
     }
     if ((status = env->Class_FindMethod(cls, "<ctor>", "l:", &method)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return;
     }
     if ((status = env->Object_New(cls, method, &object)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return;
     }
     std::array functions = {
@@ -111,7 +111,7 @@ void EtsLiveFormExtensionImpl::BindMethod(ani_env *env)
             reinterpret_cast<void *>(EtsLiveFormExtensionImpl::SetFontScale) },
         };
     if ((status = env->Class_BindNativeMethods(cls, functions.data(), functions.size())) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return;
     }
 }
@@ -126,7 +126,7 @@ EtsLiveFormExtensionImpl* EtsLiveFormExtensionImpl::GetEtsEtsLiveForm(ani_env *e
     ani_status status = ANI_ERROR;
     ani_long etsContextLong = 0;
     if ((status = env->Object_GetFieldByName_Long(obj, "context", &etsContextLong)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return nullptr;
     }
     etsLiveForm = reinterpret_cast<EtsLiveFormExtensionImpl *>(etsContextLong);

@@ -49,7 +49,7 @@ AccountCommonEventManager::~AccountCommonEventManager()
 
 void AccountCommonEventManager::RegisterAccountCallback()
 {
-    HILOG_DEBUG("Register account callback begin, post to queue");
+    HILOG_DEBUG("Register account callback begin,post to queue");
     auto task = []() {
         auto &instance = AccountCommonEventManager::GetInstance();
         instance.retryCount_.store(0);
@@ -89,10 +89,10 @@ void AccountCommonEventManager::RegisterAccountCallbackInternal()
         return;
     }
 
-    HILOG_ERROR("Register AccountCommonEventObserver failed, retryCount:%{public}d", retryCount_.load());
+    HILOG_ERROR("Register AccountCommonEventObserver failed,retryCount:%{public}d", retryCount_.load());
     retryCount_.fetch_add(1);
     if (retryCount_.load() >= RETRY_SUBSCRIBER_MAX) {
-        HILOG_ERROR("Register AccountCommonEventObserver failed %{public}d times, give up", RETRY_SUBSCRIBER_MAX);
+        HILOG_ERROR("Register AccountCommonEventObserver failed %{public}d times,give up", RETRY_SUBSCRIBER_MAX);
         observer_ = nullptr;
         return;
     }
@@ -101,7 +101,7 @@ void AccountCommonEventManager::RegisterAccountCallbackInternal()
 
 void AccountCommonEventManager::UnregisterAccountCallback()
 {
-    HILOG_DEBUG("Unregister account callback begin, post to queue");
+    HILOG_DEBUG("Unregister account callback begin,post to queue");
     auto task = []() {
         AccountCommonEventManager::GetInstance().UnregisterAccountCallbackInternal();
     };

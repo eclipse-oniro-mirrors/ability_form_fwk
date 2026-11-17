@@ -24,7 +24,7 @@ SystemAppChecker::~SystemAppChecker() {}
 int SystemAppChecker::CheckValid(const CheckValidFactor &factor)
 {
     if (!factor.record.isSystemApp) {
-        HILOG_ERROR("is not system app, formId:%{public}" PRId64, factor.record.formId);
+        HILOG_ERROR("is not system app,formId:%{public}" PRId64, factor.record.formId);
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
     return ERR_OK;

@@ -66,7 +66,7 @@ bool FormBundleLockMgr::IsBundleLock(const std::string &bundleName, const int32_
     if (formId != 0) {
         bool lockStatus = false;
         if (FormDataMgr::GetInstance().GetFormLock(formId, lockStatus) != ERR_OK) {
-            HILOG_ERROR("GetFormLock failed, use default lock status");
+            HILOG_ERROR("GetFormLock failed,use default lock status");
         }
         return lockStatus;
     }
@@ -126,7 +126,7 @@ bool FormBundleLockMgr::IsBundleProtect(const std::string &bundleName, const int
     }
 
     if (!isLockServiceInitialized_.load()) {
-        HILOG_WARN("The app lock service has not been initialized; returning bundle lock Info, bundleName:%{public}s.",
+        HILOG_WARN("The app lock service has not been initialized;returning bundle lock Info,bundleName:%{public}s",
             bundleName.c_str());
         return IsBundleLock(bundleName, userId, formId);
     }
@@ -157,7 +157,7 @@ void FormBundleLockMgr::SetBundleProtectStatus(const std::string &bundleName, bo
 void FormBundleLockMgr::InitLockService()
 {
     if (!isLockServiceInitialized_.load()) {
-        HILOG_INFO("App lock service initialization.");
+        HILOG_INFO("App lock service initialization");
         isLockServiceInitialized_.store(true);
     }
 }

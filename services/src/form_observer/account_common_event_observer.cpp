@@ -38,13 +38,13 @@ void AccountCommonEventObserver::OnReceiveEvent(const EventFwk::CommonEventData 
     std::string action = want.GetAction();
     // Filter non-account events
     if (action != ACCOUNT_LOGIN_ACTION && action != ACCOUNT_LOGOUT_ACTION) {
-        HILOG_WARN("Ignore non-account event: %{public}s", action.c_str());
+        HILOG_WARN("Ignore non-account event:%{public}s", action.c_str());
         return;
     }
     // Extract userId from event Want params (key: userId, set by AccountEventProvider::EventPublishAsUser)
     int32_t userId = want.GetParams().GetIntParam(KEY_USER_ID, INVALID_USER_ID);
     if (userId < 0) {
-        HILOG_WARN("Invalid userId:%{public}d, skip refresh", userId);
+        HILOG_WARN("Invalid userId:%{public}d,skip refresh", userId);
         return;
     }
     HILOG_INFO("Account event action:%{public}s userId:%{public}d", action.c_str(), userId);

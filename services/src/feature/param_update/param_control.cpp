@@ -93,13 +93,13 @@ ParamControl::~ParamControl() {}
 void ParamControl::DealDueParam(const std::string &jsonStr)
 {
     if (jsonStr.empty()) {
-        HILOG_WARN("due control param empty.");
+        HILOG_WARN("due control param empty");
         return;
     }
 
     nlohmann::json jsonObject = SafeJsonParse(jsonStr);
     if (jsonObject.is_discarded()) {
-        HILOG_ERROR("fail parse jsonStr: %{public}s.", jsonStr.c_str());
+        HILOG_ERROR("fail parse jsonStr:%{public}s", jsonStr.c_str());
         return;
     }
     if (!jsonObject.is_object()) {
@@ -143,7 +143,7 @@ int32_t ParamControl::GetDueUpdateDuration(const FormRecord &formRecord)
             continue;
         }
 
-        HILOG_INFO("updateDuration:%{public}d, formId:%{public}" PRId64, item.updateDuration, formRecord.formId);
+        HILOG_INFO("updateDuration:%{public}d,formId:%{public}" PRId64, item.updateDuration, formRecord.formId);
         return item.updateDuration;
     }
     // no matching the application control found.
@@ -158,7 +158,7 @@ bool ParamControl::IsFormDisable(const FormRecord &formRecord)
             continue;
         }
         if (IsFormInfoMatch(formRecord, item)) {
-            HILOG_INFO("due form disable, %{public}" PRId64, formRecord.formId);
+            HILOG_INFO("due form disable,%{public}" PRId64, formRecord.formId);
             return true;
         }
     }
@@ -173,7 +173,7 @@ bool ParamControl::IsFormRemove(const FormRecord &formRecord)
             continue;
         }
         if (IsFormInfoMatch(formRecord, item)) {
-            HILOG_INFO("due form remove, %{public}" PRId64, formRecord.formId);
+            HILOG_INFO("due form remove,%{public}" PRId64, formRecord.formId);
             return true;
         }
     }
@@ -251,7 +251,7 @@ void ParamControl::ParseJsonToObj(const nlohmann::json &jsonObject)
         }
     }
 
-    HILOG_INFO("nextUpdateDurationCtrl_ size:%{public}zu, nextDisableCtrl_ size:%{public}zu",
+    HILOG_INFO("nextUpdateDurationCtrl_ size:%{public}zu,nextDisableCtrl_ size:%{public}zu",
         nextUpdateDurationCtrl_.size(), nextDisableCtrl_.size());
 }
 
@@ -269,13 +269,13 @@ bool ParamControl::IsParamValid(ParamCtrl &paramCtrl, bool isDisableCtrl)
 
     if (!isDisableCtrl && !(paramCtrl.updateDuration >= 0 &&
         paramCtrl.updateDuration <= Constants::MAX_CONFIG_DURATION)) {
-        HILOG_WARN("due param updateDuration invalid: %{public}d", paramCtrl.updateDuration);
+        HILOG_WARN("due param updateDuration invalid:%{public}d", paramCtrl.updateDuration);
         paramCtrl.updateDuration = 0;
         return true;
     }
 
     if (isDisableCtrl && paramCtrl.policy != DUE_POLICY_DISABLE && paramCtrl.policy != DUE_POLICY_REMOVE) {
-        HILOG_ERROR("due param policy invalid: %{public}s", paramCtrl.policy.c_str());
+        HILOG_ERROR("due param policy invalid:%{public}s", paramCtrl.policy.c_str());
         return false;
     }
     return true;
@@ -355,7 +355,7 @@ std::vector<ParamCtrl> ParamControl::GetCompareDisableCtrls(const bool isApply)
 void ParamControl::ExecUpdateDurationCtrl(const bool isApply, const std::vector<ParamCtrl> &paramCtrls,
     const bool isAppUpgrade)
 {
-    HILOG_INFO("call, isApply:%{public}d, isAppUpgrade:%{public}d", isApply, isAppUpgrade);
+    HILOG_INFO("call,isApply:%{public}d,isAppUpgrade:%{public}d", isApply, isAppUpgrade);
     for (const auto &item : paramCtrls) {
         std::vector<FormRecord> formRecords;
         if (!FormDataMgr::GetInstance().GetFormRecord(item.bundleName, item.moduleName, formRecords)) {
@@ -387,7 +387,7 @@ void ParamControl::ExecUpdateDurationCtrl(const bool isApply, const std::vector<
 void ParamControl::ExecDisableCtrl(const bool isApply, const std::vector<ParamCtrl> &paramCtrls,
     const bool isAppUpgrade)
 {
-    HILOG_INFO("call, isApply:%{public}d, isAppUpgrade:%{public}d", isApply, isAppUpgrade);
+    HILOG_INFO("call,isApply:%{public}d,isAppUpgrade:%{public}d", isApply, isAppUpgrade);
     std::vector<ParamCtrl> compareCtrls = GetCompareDisableCtrls(isApply);
     std::vector<FormRecord> disableFormRecords;
     std::vector<FormRecord> removeFormRecords;
@@ -409,14 +409,14 @@ void ParamControl::ExecDisableCtrl(const bool isApply, const std::vector<ParamCt
 
             if (item.policy == DUE_POLICY_DISABLE &&
                 (isAppUpgrade || !IsSamePolicy(formRecord, item, compareCtrls))) {
-                HILOG_INFO("exec disable ctrl, formId:%{public}" PRId64, formRecord.formId);
+                HILOG_INFO("exec disable ctrl,formId:%{public}" PRId64, formRecord.formId);
                 disableFormRecords.push_back(formRecord);
                 continue;
             }
 
             if (item.policy == DUE_POLICY_REMOVE &&
                 (isAppUpgrade || !IsSamePolicy(formRecord, item, compareCtrls))) {
-                HILOG_INFO("exec remove ctrl, formId:%{public}" PRId64, formRecord.formId);
+                HILOG_INFO("exec remove ctrl,formId:%{public}" PRId64, formRecord.formId);
                 removeFormRecords.push_back(formRecord);
                 continue;
             }
@@ -452,7 +452,7 @@ bool ParamControl::ShouldProcessForm(const FormRecord &formRecord, const ParamCt
     }
 
     if (isApply && item.updateDuration == 0) {
-        HILOG_INFO("disable interval refresh, formId:%{public}" PRId64, formRecord.formId);
+        HILOG_INFO("disable interval refresh,formId:%{public}" PRId64, formRecord.formId);
         FormTimerMgr::GetInstance().DeleteIntervalTimer(formRecord.formId);
         return false;
     }

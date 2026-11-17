@@ -42,7 +42,7 @@ int FormAppUpgradeRefreshImpl::DoRefresh(RefreshData &data)
         FormProviderData formProviderData;
         formProviderData.EnableDbCache(true);
         FormMgrAdapterFacade::GetInstance().UpdateForm(data.formId, data.record.uid, formProviderData);
-        HILOG_INFO("Upgrade APP data agent card update, formId: %{public}" PRId64, data.formId);
+        HILOG_INFO("Upgrade APP data agent card update,formId:%{public}" PRId64, data.formId);
     }
     return BaseFormRefresh::DoRefresh(data);
 }

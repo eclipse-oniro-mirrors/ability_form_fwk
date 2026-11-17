@@ -197,7 +197,7 @@ int32_t FormShareMgr::CheckFormPackage(const FormShareInfo &info, const std::str
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperator =
         std::make_shared<FormFreeInstallOperator>(formShareInfoKey, serialQueue_);
     auto eventId = FormEventHandler::GetEventId();
-    HILOG_DEBUG("free install operator send event, eventId:%{public}" PRId64 ", key:%{public}s",
+    HILOG_DEBUG("free install operator send event,eventId:%{public}" PRId64 ", key:%{public}s",
         eventId, formShareInfoKey.c_str());
     eventHandler_->ProcessEvent(
         MSG::FORM_PACKAGE_FREE_INSTALL_DELAY_MSG, eventId, FORM_PACKAGE_FREE_INSTALL_TIMER);
@@ -231,13 +231,13 @@ bool FormShareMgr::CheckFormShareInfo(const FormShareInfo &info)
         return false;
     }
     if (info.providerShareData.Size() > FORM_SHARE_INFO_MAX_SIZE) {
-        HILOG_ERROR("providerShareData too many keys: %{public}d", info.providerShareData.Size());
+        HILOG_ERROR("providerShareData too many keys:%{public}d", info.providerShareData.Size());
         return false;
     }
     const auto &params = info.providerShareData.GetParams();
     for (const auto &item : params) {
         if (AAFwk::IRemoteObjectWrap::Query(item.second.GetRefPtr()) != nullptr) {
-            HILOG_ERROR("providerShareData contains IRemoteObject, key: %{public}s", item.first.c_str());
+            HILOG_ERROR("providerShareData contains IRemoteObject,key:%{public}s", item.first.c_str());
             return false;
         }
     }
@@ -306,7 +306,7 @@ bool FormShareMgr::IsExistFormPackage(const std::string &bundleName, const std::
 
     for (const auto &moduleInfo : bundleInfo.moduleNames) {
         if (moduleInfo.compare(moduleName) == 0) {
-            HILOG_DEBUG("module name is exist, moduleName:%{public}s", moduleInfo.c_str());
+            HILOG_DEBUG("module name is exist,moduleName:%{public}s", moduleInfo.c_str());
             return true;
         }
     }
@@ -408,7 +408,7 @@ void FormShareMgr::HandleFormShareInfoTimeout(int64_t eventId)
         formShareInfoKey = it->second;
         eventMap_.erase(eventId);
     }
-    HILOG_DEBUG("form share info timeout, key:%{public}s", formShareInfoKey.c_str());
+    HILOG_DEBUG("form share info timeout,key:%{public}s", formShareInfoKey.c_str());
 
     RemoveFormShareInfo(formShareInfoKey);
 }
@@ -469,7 +469,7 @@ void FormShareMgr::AddProviderData(const Want &want, WantParams &wantParams)
 
     if (isFreeInstall) {
         FormBmsHelper::GetInstance().NotifyModuleNotRemovable(bundleName, moduleName);
-        HILOG_INFO("notify module not removable, bundleName:%{public}s, moduleName:%{public}s",
+        HILOG_INFO("notify module not removable,bundleName:%{public}s,moduleName:%{public}s",
             bundleName.c_str(), moduleName.c_str());
     }
 
@@ -546,7 +546,7 @@ void FormShareMgr::HandleProviderShareData(int64_t formId, const std::string &re
 
 void FormShareMgr::SendResponse(int64_t requestCode, int32_t result)
 {
-    HILOG_DEBUG("FormMgrService SendResponse call, requestCode:%{public}" PRId64 " result:%{public}d",
+    HILOG_DEBUG("FormMgrService SendResponse call,requestCode:%{public}" PRId64 " result:%{public}d",
         requestCode, result);
     sptr<IFormHost> remoteFormHost;
     {
@@ -604,7 +604,7 @@ void FormShareMgr::Initialize(const std::shared_ptr<FormEventHandler> &handler,
     const std::shared_ptr<FormSerialQueue> &serialQueue)
 {
     if (handler == nullptr || serialQueue == nullptr) {
-        HILOG_ERROR("FormShareMgr::Initialize null handler or serialQueue, skip");
+        HILOG_ERROR("FormShareMgr::Initialize null handler or serialQueue,skip");
         return;
     }
     std::call_once(initOnce_, [this, handler, serialQueue]() {

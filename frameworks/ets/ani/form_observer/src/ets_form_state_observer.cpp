@@ -53,7 +53,7 @@ EtsFormAddCallbackClient::~EtsFormAddCallbackClient()
     }
     ani_status status = ANI_ERROR;
     if ((status = env_->GlobalReference_Delete(callbackRef_)) != ANI_OK) {
-        HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
+        HILOG_ERROR("GlobalReference_Delete status:%{public}d", status);
         return;
     }
     callbackRef_ = nullptr;
@@ -120,7 +120,7 @@ EtsFormRemoveCallbackClient::~EtsFormRemoveCallbackClient()
     }
     ani_status status = ANI_ERROR;
     if ((status = env_->GlobalReference_Delete(callbackRef_)) != ANI_OK) {
-        HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
+        HILOG_ERROR("GlobalReference_Delete status:%{public}d", status);
         return;
     }
     callbackRef_ = nullptr;
@@ -210,7 +210,7 @@ ani_env* EtsFormStateObserver::GetAniEnv(ani_vm* ani_vm)
     ani_env* env = nullptr;
     ani_status status = ANI_ERROR;
     if ((status = ani_vm->GetEnv(ANI_VERSION_1, &env)) != ANI_OK) {
-        HILOG_ERROR("GetEnv failed status: %{public}d", status);
+        HILOG_ERROR("GetEnv failed status:%{public}d", status);
         return nullptr;
     }
     return env;
@@ -228,7 +228,7 @@ bool EtsFormStateObserver::RegisterFormAddCallback(ani_vm* ani_vm,
     ani_status status = ANI_ERROR;
     ani_ref callbackRef;
     if ((status = env->GlobalReference_Create(callback, &callbackRef)) != ANI_OK) {
-        HILOG_ERROR("GlobalReference_Create status : %{public}d", status);
+        HILOG_ERROR("GlobalReference_Create status :%{public}d", status);
         return false;
     }
     std::shared_ptr<EtsFormAddCallbackClient> callbackClient = std::make_shared<EtsFormAddCallbackClient>(env,
@@ -272,7 +272,7 @@ bool EtsFormStateObserver::RegisterFormRemoveCallback(ani_vm* ani_vm,
     ani_status status = ANI_ERROR;
     ani_ref callbackRef;
     if ((status = env->GlobalReference_Create(callback, &callbackRef)) != ANI_OK) {
-        HILOG_ERROR("GlobalReference_Create status : %{public}d", status);
+        HILOG_ERROR("GlobalReference_Create status :%{public}d", status);
         return false;
     }
     std::shared_ptr<EtsFormRemoveCallbackClient> callbackClient =
@@ -446,7 +446,7 @@ int EtsFormStateObserver::RegisterFormInstanceCallback(ani_vm* ani_vm, ani_objec
         }
         ani_status status = ANI_ERROR;
         if ((status = env->GlobalReference_Create(etsObserverObject, &ref)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Create status : %{public}d", status);
+            HILOG_ERROR("GlobalReference_Create status :%{public}d", status);
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
         etsReference->aniRef = ref;
@@ -459,7 +459,7 @@ int EtsFormStateObserver::RegisterFormInstanceCallback(ani_vm* ani_vm, ani_objec
         }
         ani_status status = ANI_ERROR;
         if ((status = env->GlobalReference_Create(etsObserverObject, &ref)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Create status : %{public}d", status);
+            HILOG_ERROR("GlobalReference_Create status :%{public}d", status);
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
         etsReference->aniRef = ref;
@@ -600,7 +600,7 @@ void EtsFormStateObserver::ProcessVisibilityNotificationInternal(ani_env *env, c
 {
     const std::string specialFlag = "#" + std::to_string(isVisibility);
     if (bundleName.find(specialFlag) == std::string::npos) {
-        HILOG_DEBUG("bundleName does not contain %s flag: %s", isVisibility ? "visible" : "invisible",
+        HILOG_DEBUG("bundleName does not contain %s flag:%s", isVisibility ? "visible" : "invisible",
             bundleName.c_str());
         return;
     }
@@ -615,7 +615,7 @@ void EtsFormStateObserver::ProcessVisibilityNotificationInternal(ani_env *env, c
         }
     }
     if (callback == nullptr) {
-        HILOG_DEBUG("No %s callback registered for bundle: %s", isVisibility ? "visible" : "invisible",
+        HILOG_DEBUG("No %s callback registered for bundle:%s", isVisibility ? "visible" : "invisible",
             bundleNameNew.c_str());
         return;
     }
@@ -790,7 +790,7 @@ EtsFormEventCallbackList::~EtsFormEventCallbackList()
     ani_status status = ANI_ERROR;
     for (auto &iter : callbacks_) {
         if ((status = env_->GlobalReference_Delete(iter)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Delete status: %{public}d", status);
+            HILOG_ERROR("GlobalReference_Delete status:%{public}d", status);
             continue;
         }
     }
@@ -824,7 +824,7 @@ void EtsFormEventCallbackList::PushCallback(ani_object call)
         ani_status status = ANI_ERROR;
         ani_ref callbackRef;
         if ((status = env_->GlobalReference_Create(call, &callbackRef)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Create status: %{public}d", status);
+            HILOG_ERROR("GlobalReference_Create status:%{public}d", status);
             return;
         }
         if (callbackRef != nullptr) {
@@ -848,7 +848,7 @@ void EtsFormEventCallbackList::RemoveCallback(ani_object call)
     if (iter != callbacks_.end()) {
         ani_status status = env_->GlobalReference_Delete(*iter);
         if (status != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Delete failed: %{public}d, force erase", status);
+            HILOG_ERROR("GlobalReference_Delete failed:%{public}d,force erase", status);
         }
         callbacks_.erase(iter);
     }
@@ -865,7 +865,7 @@ std::shared_ptr<EtsFormEventCallbackList> EtsFormEventCallbackList::CopyCallback
         ani_ref callbackRef = nullptr;
         ani_status status = env_->GlobalReference_Create(callback, &callbackRef);
         if (status != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Create status: %{public}d", status);
+            HILOG_ERROR("GlobalReference_Create status:%{public}d", status);
             return nullptr;
         }
         snapshot->callbacks_.emplace_back(callbackRef);

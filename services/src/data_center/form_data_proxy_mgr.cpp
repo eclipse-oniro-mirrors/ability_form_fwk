@@ -40,7 +40,7 @@ FormDataProxyMgr::~FormDataProxyMgr()
 ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies,
     const AAFwk::Want &want, const int32_t userId)
 {
-    HILOG_INFO("subscribe form data. formId:%{public} " PRId64 ", proxy data size:%{public}zu",
+    HILOG_INFO("subscribe form data.formId:%{public} " PRId64 ", proxy data size:%{public}zu",
         formId, formDataProxies.size());
     if (formDataProxies.empty()) {
         HILOG_INFO("empty formDataProxies");
@@ -54,7 +54,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
     }
 
     if (!formRecord.isDataProxy) {
-        HILOG_WARN("not data proxy form, formId:%{public}" PRId64 ".", formId);
+        HILOG_WARN("not data proxy form,formId:%{public}" PRId64 ".", formId);
         return ERR_OK;
     }
 
@@ -70,7 +70,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
     formDataProxyRecord->SetWant(want);
     auto ret = formDataProxyRecord->SubscribeFormData(formDataProxies);
     if (ret != ERR_OK) {
-        HILOG_ERROR("SubscribeFormData failed, ret:%{public}d", ret);
+        HILOG_ERROR("SubscribeFormData failed,ret:%{public}d", ret);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED,
             formId, formRecord.bundleName, formRecord.formName,
             static_cast<int32_t>(AddFormFailedErrorType::SUBSCRIBE_DATA_SHARE_FAILED), ret);
@@ -82,7 +82,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         formDataProxyRecordMap_[formId] = formDataProxyRecord;
     }
     if (!FormDataMgr::GetInstance().GetFormVisible(formId)) {
-        HILOG_INFO("form is invisible, disable subscribe. formId:%{public}" PRId64, formId);
+        HILOG_INFO("form is invisible,disable subscribe.formId:%{public}" PRId64, formId);
         DisableSubscribeFormData({ formId });
     }
     return ERR_OK;
@@ -99,7 +99,7 @@ ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
 
 void FormDataProxyMgr::UpdateSubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies)
 {
-    HILOG_INFO("update subscribe form data. formId:%{public}" PRId64, formId);
+    HILOG_INFO("update subscribe form data.formId:%{public}" PRId64, formId);
     std::shared_ptr<FormDataProxyRecord> recordPtr = GetFormDataProxyRecord(formId);
     if (recordPtr != nullptr) {
         recordPtr->UpdateSubscribeFormData(formDataProxies);
@@ -117,7 +117,7 @@ bool FormDataProxyMgr::ConsumeFormDataProxies(int64_t formId, std::vector<FormDa
     std::lock_guard<std::mutex> lock(formDataProxiesMutex_);
     auto search = formDataProxiesMap_.find(formId);
     if (search == formDataProxiesMap_.end()) {
-        HILOG_DEBUG("no form data proxies, formId:%{public}" PRId64, formId);
+        HILOG_DEBUG("no form data proxies,formId:%{public}" PRId64, formId);
         return false;
     }
     formDataProxies = search->second;
@@ -164,7 +164,7 @@ void FormDataProxyMgr::GetFormSubscribeInfo(
 
 void FormDataProxyMgr::UnsubscribeFormDataById(int64_t formId)
 {
-    HILOG_DEBUG("unsubscribe form data. formId:%{public}s", std::to_string(formId).c_str());
+    HILOG_DEBUG("unsubscribe form data.formId:%{public}s", std::to_string(formId).c_str());
     std::shared_ptr<FormDataProxyRecord> recordPtr = GetFormDataProxyRecord(formId);
     if (recordPtr != nullptr) {
         recordPtr->UnsubscribeFormData();
@@ -187,7 +187,7 @@ void FormDataProxyMgr::RetrySubscribeProxy(int64_t formId, const std::vector<For
     uint32_t tokenId, const AAFwk::Want &want, int32_t leftRetryTimes)
 {
     if (leftRetryTimes <= 0) {
-        HILOG_WARN("retried max times, formId:%{public}" PRId64, formId);
+        HILOG_WARN("retried max times,formId:%{public}" PRId64, formId);
         return;
     }
 
@@ -203,13 +203,13 @@ void FormDataProxyMgr::RetrySubscribeProxy(int64_t formId, const std::vector<For
         formDataProxyRecord->SetWant(want);
         auto ret = formDataProxyRecord->SubscribeFormData(formDataProxies);
         if (ret == ERR_OK) {
-            HILOG_INFO("subscribe data proxy success, formId:%{public}" PRId64, formId);
+            HILOG_INFO("subscribe data proxy success,formId:%{public}" PRId64, formId);
             {
                 std::lock_guard<std::mutex> lock(FormDataProxyMgr::GetInstance().formDataProxyRecordMutex_);
                 FormDataProxyMgr::GetInstance().formDataProxyRecordMap_[formId] = formDataProxyRecord;
             }
             if (!FormDataMgr::GetInstance().GetFormVisible(formId)) {
-                HILOG_INFO("form is invisible, disable subscribe. formId:%{public}" PRId64, formId);
+                HILOG_INFO("form is invisible,disable subscribe.formId:%{public}" PRId64, formId);
                 FormDataProxyMgr::GetInstance().DisableSubscribeFormData({ formId });
             }
             return;
@@ -217,11 +217,11 @@ void FormDataProxyMgr::RetrySubscribeProxy(int64_t formId, const std::vector<For
 
         auto newLeftTimes = leftRetryTimes;
         --newLeftTimes;
-        HILOG_WARN("retry failed, %{public}d attempts remaining, formId:%{public}" PRId64, newLeftTimes, formId);
+        HILOG_WARN("retry failed,%{public}d attempts remaining,formId:%{public}" PRId64, newLeftTimes, formId);
         FormDataProxyMgr::GetInstance().RetrySubscribeProxy(formId, formDataProxies, tokenId, want, newLeftTimes);
     };
 
-    HILOG_INFO("post subs proxy task, formId:%{public}" PRId64, formId);
+    HILOG_INFO("post subs proxy task,formId:%{public}" PRId64, formId);
     FormMgrQueue::GetInstance().ScheduleDelayTask(
         std::make_pair(static_cast<int64_t>(TaskType::SUBSCRIBE_PROXY_RETRY_TASK), formId),
         SUBSCRIBE_PROXY_RETRY_DELAY_TIME_MS, delaySubsProxyTask);

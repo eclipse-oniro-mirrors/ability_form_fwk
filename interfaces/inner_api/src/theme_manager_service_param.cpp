@@ -73,7 +73,7 @@ ThemeManagerThemeFormInfoByParcel *ThemeManagerThemeFormInfoByParcel::Unmarshall
     if (!parcel.ReadInt32(themeFormDimensionValue) ||
         themeFormDimensionValue < 0 ||
         themeFormDimensionValue > static_cast<int32_t>(ThemeFormDimension::DIMENSION_6_4)) {
-        HILOG_ERROR("read themeFormDimension failed, value: %{public}d", themeFormDimensionValue);
+        HILOG_ERROR("read themeFormDimension failed,value:%{public}d", themeFormDimensionValue);
         delete obj;
         return nullptr;
     }
@@ -81,7 +81,7 @@ ThemeManagerThemeFormInfoByParcel *ThemeManagerThemeFormInfoByParcel::Unmarshall
     if (!parcel.ReadInt32(themeFormLocationValue) ||
         themeFormLocationValue < 0 ||
         themeFormLocationValue > static_cast<int32_t>(ThemeFormLocation::LOCATION_NEGATIVE_SCREEN)) {
-        HILOG_ERROR("read themeFormLocation failed, value: %{public}d", themeFormLocationValue);
+        HILOG_ERROR("read themeFormLocation failed,value:%{public}d", themeFormLocationValue);
         delete obj;
         return nullptr;
     }

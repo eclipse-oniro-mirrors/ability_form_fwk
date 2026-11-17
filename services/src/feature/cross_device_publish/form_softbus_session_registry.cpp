@@ -23,21 +23,21 @@ namespace AppExecFwk {
 namespace {
 void TrampOnServiceBind(int32_t socket, ServiceSocketInfo info)
 {
-    HILOG_INFO("TrampOnServiceBind: fd=%{public}d peerSvcId=%{public}" PRId64, socket, info.peerServiceId);
+    HILOG_INFO("TrampOnServiceBind:fd=%{public}d peerSvcId=%{public}" PRId64, socket, info.peerServiceId);
     auto s = FormSoftbusSessionRegistry::Instance().Find(socket);
     if (s) {
         s->OnServiceBind(socket, info);
     } else {
-        HILOG_WARN("TrampOnServiceBind: session not found for fd=%{public}d", socket);
+        HILOG_WARN("TrampOnServiceBind:session not found for fd=%{public}d", socket);
     }
 }
 bool TrampOnServiceNegotiate(int32_t socket, ServiceSocketInfo info)
 {
-    HILOG_INFO("TrampOnServiceNegotiate: fd=%{public}d peerSvcId=%{public}" PRId64, socket, info.peerServiceId);
+    HILOG_INFO("TrampOnServiceNegotiate:fd=%{public}d peerSvcId=%{public}" PRId64, socket, info.peerServiceId);
     auto s = FormSoftbusSessionRegistry::Instance().Find(socket);
     // Prevent orphan connections.
     if (!s) {
-        HILOG_WARN("TrampOnServiceNegotiate: session not found for fd=%{public}d, reject", socket);
+        HILOG_WARN("TrampOnServiceNegotiate:session not found for fd=%{public}d,reject", socket);
         return false;
     }
     return s->OnServiceNegotiate(socket, info);
@@ -66,7 +66,7 @@ void TrampOnError(int32_t socket, int32_t errCode)
 // Stub: SoftBus never calls OnBind for ServiceSocket, but IsValidSocketListener requires non-NULL.
 void TrampOnBind(int32_t socket, PeerSocketInfo info)
 {
-    HILOG_WARN("OnBind called on ServiceSocket (unexpected), fd=%{public}d", socket);
+    HILOG_WARN("OnBind called on ServiceSocket (unexpected),fd=%{public}d", socket);
 }
 } // namespace
 

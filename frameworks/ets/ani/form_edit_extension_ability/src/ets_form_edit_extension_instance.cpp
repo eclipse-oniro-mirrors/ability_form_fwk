@@ -37,12 +37,12 @@ FormEditExtension *CreateETSFormEditExtension(const std::unique_ptr<Runtime> &ru
     std::call_once(g_initFlag, []() {
         auto handle = dlopen(ETS_ANI_LIBNAME, RTLD_LAZY);
         if (handle == nullptr) {
-            HILOG_ERROR("dlopen failed %{public}s, %{public}s", ETS_ANI_LIBNAME, dlerror());
+            HILOG_ERROR("dlopen failed %{public}s,%{public}s", ETS_ANI_LIBNAME, dlerror());
             return;
         }
         auto symbol = dlsym(handle, ETS_ANI_CREATE_FUNC);
         if (symbol == nullptr) {
-            HILOG_ERROR("dlsym failed %{public}s, %{public}s", ETS_ANI_CREATE_FUNC, dlerror());
+            HILOG_ERROR("dlsym failed %{public}s,%{public}s", ETS_ANI_CREATE_FUNC, dlerror());
             dlclose(handle);
             return;
         }

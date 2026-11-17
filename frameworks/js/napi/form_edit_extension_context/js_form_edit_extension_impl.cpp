@@ -162,14 +162,14 @@ void JsFormEditExtensionImpl::ProcessOnSessionCreate(napi_env env, napi_value co
     }
     if (colorMode < static_cast<int32_t>(OHOS::Global::Resource::ColorMode::DARK) ||
         colorMode > static_cast<int32_t>(OHOS::Global::Resource::ColorMode::LIGHT)) {
-        HILOG_WARN("FormEdit invalid colorMode: %{public}d", colorMode);
+        HILOG_WARN("FormEdit invalid colorMode:%{public}d", colorMode);
         return;
     }
     if (context_ == nullptr) {
         HILOG_ERROR("context_ is null");
         return;
     }
-    HILOG_INFO("FormEdit colorMode: %{public}d", colorMode);
+    HILOG_INFO("FormEdit colorMode:%{public}d", colorMode);
     context_->SetAbilityColorMode(colorMode);
 }
 

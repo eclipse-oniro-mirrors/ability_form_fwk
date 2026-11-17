@@ -69,24 +69,24 @@ ErrCode BundleFormInfo::MergeStaticFormInfosLocked(std::vector<FormInfo> &formIn
         bool findUser = false;
         for (auto item = formInfoStorages_.begin(); item != formInfoStorages_.end(); ++item) {
             // Update all user's formInfos
-            HILOG_DEBUG("Update formInfos, user:%{public}d", item->userId);
+            HILOG_DEBUG("Update formInfos,user:%{public}d", item->userId);
             item->formInfos = finalFormInfos;
             findUser = findUser || (item->userId == userId);
         }
         if (!findUser) {
-            HILOG_DEBUG("Add new userId, user:%{public}d", userId);
+            HILOG_DEBUG("Add new userId,user:%{public}d", userId);
             formInfoStorages_.emplace_back(userId, finalFormInfos);
         }
         return ERR_OK;
     }
 
     bool IsBundleDistributed = FormDistributedMgr::GetInstance().IsBundleDistributed(bundleName_, userId);
-    HILOG_INFO("The new package of %{public}s does not contain a card, IsBundleDistributed:%{public}d.",
+    HILOG_INFO("The new package of %{public}s does not contain a card,IsBundleDistributed:%{public}d",
         bundleName_.c_str(), IsBundleDistributed);
     if (IsBundleDistributed) {
         ClearDistributedFormInfos(userId);
     } else {
-        HILOG_INFO("clear normal app formInfos, bundleName: %{public}s", bundleName_.c_str());
+        HILOG_INFO("clear normal app formInfos,bundleName:%{public}s", bundleName_.c_str());
         formInfoStorages_.clear();
     }
     return ERR_OK;
@@ -216,7 +216,7 @@ ErrCode BundleFormInfo::RemoveAllDynamicFormsInfo(int32_t userId)
         break;
     }
     if (numRemoved > 0) {
-        HILOG_ERROR("%{public}d dynamic forms info removed.", numRemoved);
+        HILOG_ERROR("%{public}d dynamic forms info removed", numRemoved);
         return UpdateFormInfoStorageLocked();
     }
     return ERR_OK;
@@ -315,7 +315,7 @@ ErrCode BundleFormInfo::UpdateFormInfoStorageLocked()
 void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
     std::vector<FormInfo> &outFormInfos, const std::vector<FormDBInfo> &formDBInfos)
 {
-    HILOG_INFO("formInfo num: %{public}zu,formDBInfo num: %{public}zu",
+    HILOG_INFO("formInfo num:%{public}zu,formDBInfo num:%{public}zu",
         inFormInfos.size(), formDBInfos.size());
     std::set<std::string> formDBNames;
     GetAllUsedFormName(formDBInfos, inFormInfos, formDBNames);
@@ -364,7 +364,7 @@ void BundleFormInfo::GetAllUsedFormName(const std::vector<FormDBInfo> &formDBInf
             }
         }
     }
-    HILOG_INFO("used form num: %{public}zu", formDBNames.size());
+    HILOG_INFO("used form num:%{public}zu", formDBNames.size());
 }
 
 void BundleFormInfo::ClearDistributedFormInfos(int32_t userId)
@@ -380,7 +380,7 @@ void BundleFormInfo::ClearDistributedFormInfos(int32_t userId)
         // install a part of distributed app package, do not clear for now
         return;
     }
-    HILOG_INFO("clear distributed app formInfos, bundleName: %{public}s", bundleName_.c_str());
+    HILOG_INFO("clear distributed app formInfos,bundleName:%{public}s", bundleName_.c_str());
     formInfoStorages_.clear();
 }
 
@@ -421,14 +421,14 @@ bool BundleFormInfo::ApplyConfigToStorages(const FormCustomConfig &config)
 
 void BundleFormInfo::UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs)
 {
-    HILOG_DEBUG("call, bundleName:%{public}s", bundleName_.c_str());
+    HILOG_DEBUG("call,bundleName:%{public}s", bundleName_.c_str());
     int32_t matchedCount = 0;
     for (const auto &config : configs) {
         if (ApplyConfigToStorages(config)) {
             ++matchedCount;
         }
     }
-    HILOG_INFO("bundleName:%{public}s, config size:%{public}zu, matched config num:%{public}d",
+    HILOG_INFO("bundleName:%{public}s,config size:%{public}zu,matched config num:%{public}d",
         bundleName_.c_str(), configs.size(), matchedCount);
 }
 }  // namespace AppExecFwk

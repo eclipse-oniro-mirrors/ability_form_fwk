@@ -41,13 +41,13 @@ int FormDataRefreshImpl::DoRefresh(RefreshData &data)
     FormType formType = data.record.uiSyntax;
     if (formType == FormType::JS) {
         ret = FormProviderMgr::GetInstance().UpdateForm(data.formId, data.record, data.providerData);
-        HILOG_INFO("update js form, ret:%{public}d, formId:%{public}" PRId64, ret, data.formId);
+        HILOG_INFO("update js form,ret:%{public}d,formId:%{public}" PRId64, ret, data.formId);
         return ret;
     }
 
     ret = RefreshExecMgr::UpdateByProviderData(data.formId, data.providerData, false);
     if (ret != ERR_OK) {
-        HILOG_ERROR("update provider data failed, ret:%{public}d, formId:%{public}" PRId64, ret, data.formId);
+        HILOG_ERROR("update provider data failed,ret:%{public}d,formId:%{public}" PRId64, ret, data.formId);
         return ret;
     }
 

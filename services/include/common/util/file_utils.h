@@ -37,7 +37,7 @@ public:
         canonicalPath[PATH_MAX - 1] = '\0';
         std::ifstream file(canonicalPath);
         if (!file.good()) {
-            HILOG_WARN("file not exists: %{public}s", fileName.c_str());
+            HILOG_WARN("file not exists:%{public}s", fileName.c_str());
             return false;
         }
         return true;

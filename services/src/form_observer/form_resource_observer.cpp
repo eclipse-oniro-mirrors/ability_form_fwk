@@ -49,7 +49,7 @@ FormFwkResourceObserver::~FormFwkResourceObserver()
 
 void FormFwkResourceObserver::OnConfigurationUpdated(const AppExecFwk::Configuration& configuration)
 {
-    HILOG_INFO("userId: %{public}d, language: %{public}s colorMode: %{public}s", userId_,
+    HILOG_INFO("userId:%{public}d,language:%{public}s colorMode:%{public}s", userId_,
         configuration.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE).c_str(),
         configuration.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE).c_str());
     // Language changes are global; only the default-user observer handles them to avoid duplicate dispatch.
@@ -82,7 +82,7 @@ void FormFwkResourceObserver::HandleColorModeUpdate(const AppExecFwk::Configurat
     if (colorMode == colorMode_) {
         return;
     }
-    HILOG_INFO("colorMode update %{public}s to %{public}s, userId:%{public}d",
+    HILOG_INFO("colorMode update %{public}s to %{public}s,userId:%{public}d",
         colorMode_.c_str(), colorMode.c_str(), userId_);
     colorMode_ = colorMode;
     FormObserverTaskMgr::GetInstance().PostBatchColorModeUpdateForms(userId_, configuration);

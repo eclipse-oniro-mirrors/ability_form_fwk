@@ -79,7 +79,7 @@ void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::strin
         HILOG_ERROR("Get running process info failed");
         return;
     }
-    HILOG_INFO("BundleName:%{public}s, infosSize:%{public}zu",
+    HILOG_INFO("BundleName:%{public}s,infosSize:%{public}zu",
         bundleName.c_str(), infos.size());
     AddFormAbilityConnectProcessInfo(bundleName, infos);
     ReportConnectionInfosToRss(bundleName, true);
@@ -94,7 +94,7 @@ void FormAbilityConnectionReporter::ReportFormAbilityDisconnection(const std::st
     std::lock_guard<std::mutex> lock(formConnectionInfoMapMutex_);
     auto iter = formConnectionInfoMap_.find(bundleName);
     if (iter == formConnectionInfoMap_.end()) {
-        HILOG_ERROR("Disconnect ability connection:%{public}s, but without created connection notified!",
+        HILOG_ERROR("Disconnect ability connection:%{public}s,but without created connection notified",
             bundleName.c_str());
         return;
     }
@@ -175,7 +175,7 @@ void FormAbilityConnectionReporter::AddFormAbilityConnectProcessInfo(const std::
         if ((*iter).processName_ != targetProceName) {
             continue;
         }
-        HILOG_INFO("Get running process:%{public}s, pid:%{public}" PRId32, targetProceName.c_str(),
+        HILOG_INFO("Get running process:%{public}s,pid:%{public}" PRId32, targetProceName.c_str(),
             (*iter).pid_);
         FormConnectionInfo connectionInfo;
         connectionInfo.pid_ = (*iter).pid_;
@@ -190,7 +190,7 @@ void FormAbilityConnectionReporter::ReportConnectionInfosToRss(const std::string
 {
     auto iter = formConnectionInfoMap_.find(bundleName);
     if (iter == formConnectionInfoMap_.end()) {
-        HILOG_WARN("Report connection info failed, empty info, bundle name:%{public}s",
+        HILOG_WARN("Report connection info failed,empty info,bundle name:%{public}s",
             bundleName.c_str());
         return;
     }

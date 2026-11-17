@@ -361,7 +361,7 @@ void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     std::lock_guard<std::mutex> lock(callbackMutex_);
-    HILOG_ERROR("Receive error form FMS, errorCode:%{public}d, errorMsg:%{public}s, etsFormIds_ size:%{public}zu",
+    HILOG_ERROR("Receive error form FMS,errorCode:%{public}d,errorMsg:%{public}s,etsFormIds_ size:%{public}zu",
         errorCode,
         errorMsg.c_str(),
         etsFormIds_.size());
@@ -542,7 +542,7 @@ void FormHostClient::OnLockForm(const std::vector<int64_t> &formIds, const bool 
 void FormHostClient::OnDueControlForm(
     const std::vector<int64_t> &formIds, const bool isDisablePolicy, const bool isControl)
 {
-    HILOG_INFO("call, size:%{public}zu", formIds.size());
+    HILOG_INFO("call,size:%{public}zu", formIds.size());
     for (auto &formId : formIds) {
         if (formId < 0) {
             HILOG_ERROR("the passed form id can't be negative");
@@ -566,7 +566,7 @@ void FormHostClient::OnDueControlForm(
 
 void FormHostClient::OnCheckForm(const std::vector<int64_t> &formIds)
 {
-    HILOG_INFO("call, size:%{public}zu", formIds.size());
+    HILOG_INFO("call,size:%{public}zu", formIds.size());
     for (int64_t formId : formIds) {
         if (formId < 0) {
             HILOG_ERROR("the form id can't be negative");

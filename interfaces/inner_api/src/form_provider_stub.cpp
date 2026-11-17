@@ -38,7 +38,7 @@ FormProviderStub::~FormProviderStub()
  */
 int FormProviderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOG_INFO("code:%{public}u, flags:%{public}d", code, option.GetFlags());
+    HILOG_INFO("code:%{public}u,flags:%{public}d", code, option.GetFlags());
     std::u16string descriptor = FormProviderStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
@@ -268,7 +268,7 @@ int FormProviderStub::HandleNotifyFormCastTempForm(MessageParcel &data, MessageP
 int FormProviderStub::HandleNotifyConfigurationUpdate(MessageParcel &data, MessageParcel &reply)
 {
     std::unique_ptr<AppExecFwk::Configuration> configuration(data.ReadParcelable<AppExecFwk::Configuration>());
-    HILOG_INFO("Call.");
+    HILOG_INFO("Call");
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
         HILOG_ERROR("ReadParcelable<Want> failed");
@@ -404,7 +404,7 @@ int32_t FormProviderStub::HandleNotifyFormLocationUpdate(MessageParcel &data, Me
 
 int32_t FormProviderStub::HandleNotifySizeChanged(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("Call.");
+    HILOG_INFO("Call");
     int64_t formId = data.ReadInt64();
     int32_t newDimension = data.ReadInt32();
     std::unique_ptr<Rect> newRect(data.ReadParcelable<Rect>());

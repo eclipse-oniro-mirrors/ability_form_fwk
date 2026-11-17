@@ -50,7 +50,7 @@ void FormDbCache::Start()
         HILOG_ERROR("LoadFormData failed");
         return;
     }
-    HILOG_INFO("load form data, size: %{public}zu", innerFormInfos.size());
+    HILOG_INFO("load form data,size:%{public}zu", innerFormInfos.size());
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     for (unsigned int i = 0; i < innerFormInfos.size(); i++) {
         FormDBInfo formDBInfo = innerFormInfos.at(i).GetFormDBInfo();
@@ -69,11 +69,11 @@ ErrCode FormDbCache::SaveFormInfo(const FormDBInfo &formDBInfo)
     FormDBInfo tmpInfo;
     if (FindAndSaveFormDBInfoCache(formDBInfo, tmpInfo)) {
         if (tmpInfo.Compare(formDBInfo) == false) {
-            HILOG_WARN("need update, formId[%{public}" PRId64 "]", formDBInfo.formId);
+            HILOG_WARN("need update,formId[%{public}" PRId64 "]", formDBInfo.formId);
             InnerFormInfo innerFormInfo(formDBInfo);
             return FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormData(innerFormInfo);
         } else {
-            HILOG_WARN("already exist, formId[%{public}" PRId64 "].", formDBInfo.formId);
+            HILOG_WARN("already exist,formId[%{public}" PRId64 "].", formDBInfo.formId);
             return ERR_OK;
         }
     } else {
@@ -93,12 +93,12 @@ ErrCode FormDbCache::SaveFormInfoNolock(const FormDBInfo &formDBInfo)
     auto iter = find(formDBInfos_.begin(), formDBInfos_.end(), formDBInfo);
     if (iter != formDBInfos_.end()) {
         if (iter->Compare(formDBInfo) == false) {
-            HILOG_WARN("need update, formId[%{public}" PRId64 "].", formDBInfo.formId);
+            HILOG_WARN("need update,formId[%{public}" PRId64 "].", formDBInfo.formId);
             *iter = formDBInfo;
             InnerFormInfo innerFormInfo(formDBInfo);
             return FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormData(innerFormInfo);
         } else {
-            HILOG_WARN("already exist, formId[%{public}" PRId64 "].", formDBInfo.formId);
+            HILOG_WARN("already exist,formId[%{public}" PRId64 "].", formDBInfo.formId);
             return ERR_OK;
         }
     } else {
@@ -115,7 +115,7 @@ ErrCode FormDbCache::SaveFormInfoNolock(const FormDBInfo &formDBInfo)
  */
 ErrCode FormDbCache::DeleteFormInfo(int64_t formId)
 {
-    HILOG_INFO("form: %{public}" PRId64, formId);
+    HILOG_INFO("form:%{public}" PRId64, formId);
     DeleteFormDBInfoCache(formId);
     return FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(std::to_string(formId));
 }
@@ -127,7 +127,7 @@ ErrCode FormDbCache::DeleteFormInfo(int64_t formId)
 void FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, const int32_t userId,
     std::vector<FormDBInfo> &removedDBForms, const int32_t appIndex)
 {
-    HILOG_INFO("bundleName: %{public}s, appIndex: %{public}d", bundleName.c_str(), appIndex);
+    HILOG_INFO("bundleName:%{public}s,appIndex:%{public}d", bundleName.c_str(), appIndex);
     GetFormDBInfoCacheByBundleName(bundleName, userId, removedDBForms);
     if (appIndex != Constants::MAIN_APP_INDEX) {
         removedDBForms.erase(std::remove_if(removedDBForms.begin(), removedDBForms.end(),
@@ -140,7 +140,7 @@ void FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, cons
             DeleteFormDBInfoCache(iter->formId);
             iter++;
         } else {
-            HILOG_WARN("delete storage form data failed, formId:%{public}" PRId64, iter->formId);
+            HILOG_WARN("delete storage form data failed,formId:%{public}" PRId64, iter->formId);
             iter = removedDBForms.erase(iter);
         }
     }
@@ -242,7 +242,7 @@ bool FormDbCache::HasDBRecord(const int64_t formId) const
 ErrCode FormDbCache::UpdateDBRecord(const int64_t formId, const FormRecord &record) const
 {
     if (record.formTempFlag) {
-        HILOG_ERROR("refusing to save temp form to db: %{public}" PRId64, formId);
+        HILOG_ERROR("refusing to save temp form to db:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -307,14 +307,14 @@ int FormDbCache::GetMatchCount(const std::string &bundleName, const std::string 
  */
 void FormDbCache::DeleteDBFormsByUserId(const int32_t userId)
 {
-    HILOG_INFO("userId: %{public}d", userId);
+    HILOG_INFO("userId:%{public}d", userId);
     std::vector<FormDBInfo> removedDBForms;
     GetFormDBInfoCacheByUserId(userId, removedDBForms);
     for (auto &info : removedDBForms) {
         if (FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(std::to_string(info.formId)) == ERR_OK) {
             DeleteFormDBInfoCache(info.formId);
         } else {
-            HILOG_ERROR("fail delete form, formId[%{public}" PRId64 "]", info.formId);
+            HILOG_ERROR("fail delete form,formId[%{public}" PRId64 "]", info.formId);
         }
     }
 }
@@ -420,7 +420,7 @@ void FormDbCache::BatchDeleteNoHostDBForms(int32_t callingUid, std::map<FormIdKe
 ErrCode FormDbCache::DeleteInvalidDBForms(int32_t userId, int32_t callingUid, std::set<int64_t> &matchedFormIds,
                                           std::map<int64_t, bool> &removedFormsMap)
 {
-    HILOG_INFO("userId:%{public}d, callingUid:%{public}d", userId, callingUid);
+    HILOG_INFO("userId:%{public}d,callingUid:%{public}d", userId, callingUid);
     std::map<int64_t, bool> foundFormsMap {};
     std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap {};
 
@@ -455,7 +455,7 @@ void FormDbCache::DeleteThemeForms(std::map<int64_t, bool> &removedFormsMap)
     for (const auto &element : removedFormsMap) {
         FormDBInfo dbInfo;
         ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(element.first, dbInfo);
-        HILOG_INFO("getDbRet:%{public}d, isThemeForm:%{public}d", getDbRet, dbInfo.isThemeForm);
+        HILOG_INFO("getDbRet:%{public}d,isThemeForm:%{public}d", getDbRet, dbInfo.isThemeForm);
         if (getDbRet == ERR_OK && dbInfo.isThemeForm) {
             removeList.emplace_back(element.first);
         }
@@ -470,7 +470,7 @@ bool FormDbCache::IsHostOwner(int64_t formId, int32_t hostUid)
 {
     FormDBInfo dbInfo;
     if (GetDBRecord(formId, dbInfo) != ERR_OK) {
-        HILOG_ERROR("get db record failed. formId:%{public}s", std::to_string(formId).c_str());
+        HILOG_ERROR("get db record failed.formId:%{public}s", std::to_string(formId).c_str());
         return false;
     }
 

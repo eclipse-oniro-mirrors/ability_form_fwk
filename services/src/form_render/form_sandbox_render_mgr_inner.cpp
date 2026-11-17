@@ -68,11 +68,11 @@ ErrCode FormSandboxRenderMgrInner::RenderForm(
             ErrCode ret = InstallSandboxFRS(appIndex);
             IPCSkeleton::SetCallingIdentity(identity);
             if (ret != ERR_OK) {
-                HILOG_ERROR("InstallSandboxFRS fail, ret:%{public}d", ret);
+                HILOG_ERROR("InstallSandboxFRS fail,ret:%{public}d", ret);
                 return ret;
             }
             if (appIndex != Constants::DEFAULT_SANDBOX_FRS_APP_INDEX) {
-                HILOG_ERROR("sandbox FRS already install, please check, appIndex:%{public}d", appIndex);
+                HILOG_ERROR("sandbox FRS already install,please check,appIndex:%{public}d", appIndex);
                 return ERR_APPEXECFWK_FORM_INVALID_PARAM;
             }
         }

@@ -33,7 +33,7 @@ class FormServicePublishCallback : public DistributedHardware::ServicePublishCal
 public:
     void OnServicePublishResult(int64_t serviceId, int32_t reason) override
     {
-        HILOG_INFO("OnServicePublishResult: serviceId=%{public}" PRId64 ", reason=%{public}d", serviceId, reason);
+        HILOG_INFO("OnServicePublishResult:serviceId=%{public}" PRId64 ", reason=%{public}d", serviceId, reason);
     }
 };
 } // namespace
@@ -64,7 +64,7 @@ ErrCode FormServiceProxy::Register(const FormHostServiceInfo &info, int64_t &ser
         auto it = localEntries_.find(serviceKey);
         if (it != localEntries_.end()) {
             serviceId = it->second.serviceId;
-            HILOG_INFO("already registered: serviceId=%{public}" PRId64 " owner=%{public}s userId=%{public}d",
+            HILOG_INFO("already registered:serviceId=%{public}" PRId64 " owner=%{public}s userId=%{public}d",
                 serviceId, ownerPkgName.c_str(), userId);
             return ERR_OK;
         }
@@ -87,7 +87,7 @@ ErrCode FormServiceProxy::Register(const FormHostServiceInfo &info, int64_t &ser
         serviceIdToKey_[serviceId] = serviceKey;
     }
 
-    HILOG_INFO("registered: serviceId=%{public}" PRId64 " owner=%{public}s userId=%{public}d",
+    HILOG_INFO("registered:serviceId=%{public}" PRId64 " owner=%{public}s userId=%{public}d",
         serviceId, ownerPkgName.c_str(), userId);
     return ERR_OK;
 }
@@ -98,7 +98,7 @@ DistributedHardware::DmRegisterServiceInfo FormServiceProxy::BuildRegisterInfo(
     DistributedHardware::DmRegisterServiceInfo regInfo;
     regInfo.userId = userId;
     if (!FormUtil::ConvertStringToInt64(info.displayId, regInfo.displayId)) {
-        HILOG_WARN("Invalid displayId format: %{public}s", info.displayId.c_str());
+        HILOG_WARN("Invalid displayId format:%{public}s", info.displayId.c_str());
         regInfo.displayId = FORM_CD_DEFAULT_DISPLAY_ID;
     }
     regInfo.serviceOwnerTokenId = IPCSkeleton::GetCallingTokenID();
@@ -113,7 +113,7 @@ DistributedHardware::DmRegisterServiceInfo FormServiceProxy::BuildRegisterInfo(
     regInfo.description = info.serviceDisplayName;
     regInfo.serviceCode = info.serviceName;
 
-    HILOG_DEBUG("RegisterServiceInfo: owner=%{public}s, serviceName=%{public}s, userId=%{public}d",
+    HILOG_DEBUG("RegisterServiceInfo:owner=%{public}s,serviceName=%{public}s,userId=%{public}d",
         regInfo.serviceOwnerPkgName.c_str(), regInfo.serviceName.c_str(), regInfo.userId);
     return regInfo;
 }
@@ -124,10 +124,10 @@ ErrCode FormServiceProxy::RegisterWithDm(
     serviceId = -1;
     int32_t dmRet = dmAdapter_->RegisterServiceInfo(regInfo, serviceId);
     if (dmRet != 0) {
-        HILOG_ERROR("RegisterServiceInfo failed, ret=%{public}d", dmRet);
+        HILOG_ERROR("RegisterServiceInfo failed,ret=%{public}d", dmRet);
         return ERR_APPEXECFWK_FORM_SERVICE_PUBLISH_FAILED;
     }
-    HILOG_INFO("RegisterServiceInfo succeeded, serviceId=%{public}" PRId64, serviceId);
+    HILOG_INFO("RegisterServiceInfo succeeded,serviceId=%{public}" PRId64, serviceId);
 
     DistributedHardware::DmPublishServiceParam publishParam;
     publishParam.discoverMode = DistributedHardware::DMSrvDiscoveryMode::SERVICE_PUBLISH_MODE_PASSIVE;
@@ -137,7 +137,7 @@ ErrCode FormServiceProxy::RegisterWithDm(
     auto callback = std::make_shared<FormServicePublishCallback>();
     dmRet = dmAdapter_->StartPublishService(FORM_SERVICE_OWNER_PKG, serviceId, publishParam, callback);
     if (dmRet != 0) {
-        HILOG_ERROR("StartPublishService failed, serviceId=%{public}" PRId64 ", ret=%{public}d",
+        HILOG_ERROR("StartPublishService failed,serviceId=%{public}" PRId64 ", ret=%{public}d",
             serviceId, dmRet);
         dmAdapter_->UnRegisterServiceInfo(serviceId);
         return ERR_APPEXECFWK_FORM_SERVICE_PUBLISH_FAILED;
@@ -146,7 +146,7 @@ ErrCode FormServiceProxy::RegisterWithDm(
     if (hooks_.onStartListen) {
         ErrCode listenRet = hooks_.onStartListen(serviceId);
         if (listenRet != ERR_OK) {
-            HILOG_ERROR("StartListen failed, serviceId=%{public}" PRId64 ", rolling back DM registration",
+            HILOG_ERROR("StartListen failed,serviceId=%{public}" PRId64 ", rolling back DM registration",
                 serviceId);
             dmAdapter_->StopPublishService(FORM_SERVICE_OWNER_PKG, serviceId);
             dmAdapter_->UnRegisterServiceInfo(serviceId);
@@ -170,12 +170,12 @@ ErrCode FormServiceProxy::Unregister(int64_t serviceId)
         std::lock_guard<std::mutex> lock(mutex_);
         auto it = localEntries_.find(serviceKey);
         if (it == localEntries_.end()) {
-            HILOG_ERROR("service not found in local index: owner=%{public}s userId=%{public}d",
+            HILOG_ERROR("service not found in local index:owner=%{public}s userId=%{public}d",
                 ownerPkgName.c_str(), userId);
             return ERR_APPEXECFWK_FORM_SERVICE_NOT_EXIST;
         }
         if (it->second.serviceId != serviceId) {
-            HILOG_ERROR("serviceId mismatch: caller owns serviceId=%{public}" PRId64
+            HILOG_ERROR("serviceId mismatch:caller owns serviceId=%{public}" PRId64
                 " but requested serviceId=%{public}" PRId64,
                 it->second.serviceId, serviceId);
             return ERR_APPEXECFWK_FORM_SERVICE_NOT_SELF;
@@ -188,12 +188,12 @@ ErrCode FormServiceProxy::Unregister(int64_t serviceId)
 
     int32_t dmRet = dmAdapter_->StopPublishService(FORM_SERVICE_OWNER_PKG, serviceId);
     if (dmRet != 0) {
-        HILOG_WARN("StopPublishService failed, serviceId=%{public}" PRId64 ", ret=%{public}d", serviceId, dmRet);
+        HILOG_WARN("StopPublishService failed,serviceId=%{public}" PRId64 ", ret=%{public}d", serviceId, dmRet);
     }
 
     dmRet = dmAdapter_->UnRegisterServiceInfo(serviceId);
     if (dmRet != 0) {
-        HILOG_WARN("UnRegisterServiceInfo failed, serviceId=%{public}" PRId64 ", ret=%{public}d", serviceId, dmRet);
+        HILOG_WARN("UnRegisterServiceInfo failed,serviceId=%{public}" PRId64 ", ret=%{public}d", serviceId, dmRet);
     }
 
     {
@@ -202,7 +202,7 @@ ErrCode FormServiceProxy::Unregister(int64_t serviceId)
         serviceIdToKey_.erase(serviceId);
     }
 
-    HILOG_INFO("unregistered: serviceId=%{public}" PRId64 " owner=%{public}s userId=%{public}d",
+    HILOG_INFO("unregistered:serviceId=%{public}" PRId64 " owner=%{public}s userId=%{public}d",
         serviceId, ownerPkgName.c_str(), userId);
     return ERR_OK;
 }
@@ -248,12 +248,12 @@ ErrCode FormServiceProxy::ValidateInput(const FormHostServiceInfo &info)
 {
     if (info.serviceName.empty() ||
         info.serviceName.size() > static_cast<size_t>(FORM_SERVICE_MAX_SERVICE_NAME)) {
-        HILOG_ERROR("serviceName invalid, size:%{public}d", static_cast<int32_t>(info.serviceName.size()));
+        HILOG_ERROR("serviceName invalid,size:%{public}d", static_cast<int32_t>(info.serviceName.size()));
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     if (info.serviceDisplayName.size() < static_cast<size_t>(FORM_SERVICE_MIN_DISPLAYNAME) ||
         info.serviceDisplayName.size() > static_cast<size_t>(FORM_SERVICE_MAX_DISPLAYNAME)) {
-        HILOG_ERROR("serviceDisplayName invalid, size:%{public}d",
+        HILOG_ERROR("serviceDisplayName invalid,size:%{public}d",
             static_cast<int32_t>(info.serviceDisplayName.size()));
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }

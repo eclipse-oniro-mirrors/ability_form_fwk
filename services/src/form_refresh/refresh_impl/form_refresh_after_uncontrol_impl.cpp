@@ -65,7 +65,7 @@ int FormRefreshAfterUncontrolImpl::RefreshFormRequest(RefreshData &data)
     refreshRecord.isTimerRefresh = isTimerRefresh;
     ret = RefreshExecMgr::AskForProviderData(data.formId, refreshRecord, data.want);
     if (ret != ERR_OK) {
-        HILOG_ERROR("ask for provider data failed, ret:%{public}d, formId:%{public}" PRId64, ret, data.formId);
+        HILOG_ERROR("ask for provider data failed,ret:%{public}d,formId:%{public}" PRId64, ret, data.formId);
         return ret;
     }
 
@@ -87,7 +87,7 @@ bool FormRefreshAfterUncontrolImpl::DetectControlPoint(
 
     if (refreshType == Constants::REFRESHTYPE_VISIABLE) {
         FormDataMgr::GetInstance().GetRefreshType(data.formId, refreshType);
-        HILOG_INFO("refreshType:%{public}d, formId:%{public}" PRId64, refreshType, data.formId);
+        HILOG_INFO("refreshType:%{public}d,formId:%{public}" PRId64, refreshType, data.formId);
         if (FormConstantsUtil::IsConditionRefreshType(refreshType)) {
             isCountTimerRefresh = false;
         }

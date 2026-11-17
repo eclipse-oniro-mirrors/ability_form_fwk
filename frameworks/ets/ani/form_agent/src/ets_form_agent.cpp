@@ -122,7 +122,7 @@ void UpdateFormCrossBundle(ani_env *env, ani_string aniFormId, ani_string dataOb
     auto formProviderData = AppExecFwk::FormProviderData(FormAniUtil::AniStringToStdString(env, dataObjStr));
     int32_t ret = FormMgr::GetInstance().UpdateFormCrossBundle(formId, formProviderData);
     if (ret != ERR_OK) {
-        HILOG_ERROR("UpdateFormCrossBundle failed, error code: %{public}d", static_cast<int32_t>(ret));
+        HILOG_ERROR("UpdateFormCrossBundle failed,error code:%{public}d", static_cast<int32_t>(ret));
     }
     FormAniUtil::InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
 }
@@ -140,7 +140,7 @@ void EtsFormAgentInit(ani_env* env)
     ani_namespace ns;
     status = env->FindNamespace(ETS_FORM_AGENT_NAME, &ns);
     if (status != ANI_OK) {
-        HILOG_ERROR("FindNamespace application failed status: %{public}d", status);
+        HILOG_ERROR("FindNamespace application failed status:%{public}d", status);
         return;
     }
     std::array methods = {
@@ -153,7 +153,7 @@ void EtsFormAgentInit(ani_env* env)
     };
     status = env->Namespace_BindNativeFunctions(ns, methods.data(), methods.size());
     if (status != ANI_OK) {
-        HILOG_ERROR("Namespace_BindNativeFunctions failed status: %{public}d", status);
+        HILOG_ERROR("Namespace_BindNativeFunctions failed status:%{public}d", status);
     }
 }
 
@@ -169,7 +169,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     ani_status status = ANI_ERROR;
     status = vm->GetEnv(ANI_VERSION_1, &env);
     if (status != ANI_OK) {
-        HILOG_ERROR("GetEnv failed, status: %{public}d", status);
+        HILOG_ERROR("GetEnv failed,status:%{public}d", status);
         return ANI_NOT_FOUND;
     }
     EtsFormAgentInit(env);

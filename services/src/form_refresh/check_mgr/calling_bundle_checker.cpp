@@ -28,12 +28,12 @@ int CallingBundleChecker::CheckValid(const CheckValidFactor &factor)
     std::string bundleName;
     auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
     if (ret != ERR_OK) {
-        HILOG_ERROR("get bundleName failed, formId:%{public}" PRId64, factor.record.formId);
+        HILOG_ERROR("get bundleName failed,formId:%{public}" PRId64, factor.record.formId);
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
 
     if (bundleName != factor.record.bundleName) {
-        HILOG_ERROR("not match caller bundleName:%{public}s, formId:%{public}" PRId64,
+        HILOG_ERROR("not match caller bundleName:%{public}s,formId:%{public}" PRId64,
             bundleName.c_str(), factor.record.formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }

@@ -49,7 +49,7 @@ sptr<OHOS::AppExecFwk::IAppMgr> FormAppMgrHelper::GetAppMgr()
 
 bool FormAppMgrHelper::IsAbilityForeground(const std::string &bundleName, ExtensionAbilityType extensionAbilityType)
 {
-    HILOG_INFO("bundleName:%{public}s, extensionAbilityType:%{public}d", bundleName.c_str(), extensionAbilityType);
+    HILOG_INFO("bundleName:%{public}s,extensionAbilityType:%{public}d", bundleName.c_str(), extensionAbilityType);
     if (bundleName.empty()) {
         HILOG_ERROR("Empty bundle name");
         return false;
@@ -72,7 +72,7 @@ bool FormAppMgrHelper::IsAbilityForeground(const std::string &bundleName, Extens
             return true;
         }
     }
-    HILOG_WARN("ability not foreground, foreground apps size:%{public}zu", list.size());
+    HILOG_WARN("ability not foreground,foreground apps size:%{public}zu", list.size());
     return false;
 }
 

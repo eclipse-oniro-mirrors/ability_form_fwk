@@ -28,7 +28,7 @@ FormProxyDeathRecipient::FormProxyDeathRecipient(int32_t uid, CleanupCallback ca
 
 void FormProxyDeathRecipient::OnRemoteDied([[maybe_unused]] const wptr<IRemoteObject> &remote)
 {
-    HILOG_WARN("Proxy died for uid=%{public}d, auto cleaning", uid_);
+    HILOG_WARN("Proxy died for uid=%{public}d,auto cleaning", uid_);
     if (callback_) {
         callback_(uid_);
     }
@@ -39,7 +39,7 @@ FormProxyRegistry::FormProxyRegistry(const std::string &tag) : tag_(tag) {}
 ErrCode FormProxyRegistry::Register(int32_t callingUid, const sptr<IRemoteObject> &proxy)
 {
     if (proxy == nullptr) {
-        HILOG_ERROR("%{public}s: proxy is null", tag_.c_str());
+        HILOG_ERROR("%{public}s:proxy is null", tag_.c_str());
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -47,14 +47,14 @@ ErrCode FormProxyRegistry::Register(int32_t callingUid, const sptr<IRemoteObject
     auto it = proxies_.find(callingUid);
     if (it != proxies_.end()) {
         RemoveDeathRecipient(callingUid, it->second);
-        HILOG_WARN("%{public}s: overwriting existing proxy for uid=%{public}d", tag_.c_str(), callingUid);
+        HILOG_WARN("%{public}s:overwriting existing proxy for uid=%{public}d", tag_.c_str(), callingUid);
     }
 
     if (!AddDeathRecipient(callingUid, proxy)) {
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     proxies_[callingUid] = proxy;
-    HILOG_INFO("%{public}s: registered for uid=%{public}d, total=%{public}zu",
+    HILOG_INFO("%{public}s:registered for uid=%{public}d,total=%{public}zu",
         tag_.c_str(), callingUid, proxies_.size());
     return ERR_OK;
 }
@@ -64,12 +64,12 @@ ErrCode FormProxyRegistry::Unregister(int32_t callingUid)
     std::unique_lock<std::shared_mutex> lock(mutex_);
     auto it = proxies_.find(callingUid);
     if (it == proxies_.end()) {
-        HILOG_WARN("%{public}s: no proxy registered for uid=%{public}d", tag_.c_str(), callingUid);
+        HILOG_WARN("%{public}s:no proxy registered for uid=%{public}d", tag_.c_str(), callingUid);
         return ERR_OK;
     }
     RemoveDeathRecipient(callingUid, it->second);
     proxies_.erase(it);
-    HILOG_INFO("%{public}s: unregistered for uid=%{public}d, remaining=%{public}zu",
+    HILOG_INFO("%{public}s:unregistered for uid=%{public}d,remaining=%{public}zu",
         tag_.c_str(), callingUid, proxies_.size());
     return ERR_OK;
 }
@@ -79,7 +79,7 @@ ErrCode FormProxyRegistry::Get(int32_t key, sptr<IRemoteObject> &proxy)
     std::shared_lock<std::shared_mutex> lock(mutex_);
     auto it = proxies_.find(key);
     if (it == proxies_.end()) {
-        HILOG_ERROR("%{public}s: no proxy for key=%{public}d", tag_.c_str(), key);
+        HILOG_ERROR("%{public}s:no proxy for key=%{public}d", tag_.c_str(), key);
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
     proxy = it->second;
@@ -93,7 +93,7 @@ ErrCode FormProxyRegistry::GetAll(std::vector<sptr<IRemoteObject>> &proxies)
         proxies.push_back(pair.second);
     }
     if (proxies.empty()) {
-        HILOG_ERROR("%{public}s: no proxies registered", tag_.c_str());
+        HILOG_ERROR("%{public}s:no proxies registered", tag_.c_str());
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
     return ERR_OK;
@@ -106,7 +106,7 @@ ErrCode FormProxyRegistry::GetAllWithKeys(std::vector<std::pair<int32_t, sptr<IR
         entries.push_back({pair.first, pair.second});
     }
     if (entries.empty()) {
-        HILOG_ERROR("%{public}s: no proxies registered", tag_.c_str());
+        HILOG_ERROR("%{public}s:no proxies registered", tag_.c_str());
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
     return ERR_OK;
@@ -122,7 +122,7 @@ ErrCode FormProxyRegistry::GetByUserId(int32_t userId, std::vector<sptr<IRemoteO
         }
     }
     if (proxies.empty()) {
-        HILOG_ERROR("%{public}s: no proxies for userId=%{public}d", tag_.c_str(), userId);
+        HILOG_ERROR("%{public}s:no proxies for userId=%{public}d", tag_.c_str(), userId);
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
     return ERR_OK;
@@ -135,7 +135,7 @@ void FormProxyRegistry::Clear()
         RemoveDeathRecipient(pair.first, pair.second);
     }
     proxies_.clear();
-    HILOG_INFO("%{public}s: cleared all proxies", tag_.c_str());
+    HILOG_INFO("%{public}s:cleared all proxies", tag_.c_str());
 }
 
 size_t FormProxyRegistry::Size() const
@@ -154,16 +154,16 @@ bool FormProxyRegistry::AddDeathRecipient(int32_t uid, const sptr<IRemoteObject>
         std::unique_lock<std::shared_mutex> lock(self->mutex_);
         self->deathRecipients_.erase(diedUid);
         self->proxies_.erase(diedUid);
-        HILOG_INFO("%{public}s: auto cleaned died proxy for uid=%{public}d", self->tag_.c_str(), diedUid);
+        HILOG_INFO("%{public}s:auto cleaned died proxy for uid=%{public}d", self->tag_.c_str(), diedUid);
     };
 
     auto recipient = sptr<FormProxyDeathRecipient>::MakeSptr(uid, std::move(callback));
     if (recipient == nullptr) {
-        HILOG_ERROR("%{public}s: failed to create DeathRecipient for uid=%{public}d", tag_.c_str(), uid);
+        HILOG_ERROR("%{public}s:failed to create DeathRecipient for uid=%{public}d", tag_.c_str(), uid);
         return false;
     }
     if (proxy == nullptr) {
-        HILOG_ERROR("%{public}s: proxy is null for uid=%{public}d", tag_.c_str(), uid);
+        HILOG_ERROR("%{public}s:proxy is null for uid=%{public}d", tag_.c_str(), uid);
         return false;
     }
     proxy->AddDeathRecipient(recipient);

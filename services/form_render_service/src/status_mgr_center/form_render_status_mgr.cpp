@@ -40,7 +40,7 @@ int32_t FormRenderStatusMgr::PostFormEvent(
 {
     // get status machine info
     if (!FormRenderStatus::GetInstance().HasFormStatus(formId)) {
-        HILOG_INFO("create new status.");
+        HILOG_INFO("create new status");
         FormRenderStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::INIT);
     }
     FormFsmStatus status = FormRenderStatus::GetInstance().GetFormStatus(formId);

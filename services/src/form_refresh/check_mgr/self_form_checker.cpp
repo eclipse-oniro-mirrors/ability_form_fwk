@@ -28,12 +28,12 @@ int SelfFormChecker::CheckValid(const CheckValidFactor &factor)
     FormHostRecord formHostRecord;
     bool isHostExist = FormDataMgr::GetInstance().GetMatchedHostClient(factor.callerToken, formHostRecord);
     if (!isHostExist) {
-        HILOG_ERROR("can't find host client, formId:%{public}" PRId64, factor.formId);
+        HILOG_ERROR("can't find host client,formId:%{public}" PRId64, factor.formId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     if (!formHostRecord.Contains(factor.formId)) {
-        HILOG_ERROR("form not self-owned, formId:%{public}" PRId64, factor.formId);
+        HILOG_ERROR("form not self-owned,formId:%{public}" PRId64, factor.formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 

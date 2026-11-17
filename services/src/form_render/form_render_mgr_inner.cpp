@@ -77,7 +77,7 @@ ErrCode FormRenderMgrInner::RenderForm(
         want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, hostToken);
     }
     if (!isActiveUser_.load()) {
-        HILOG_WARN("isActiveUser is false, return");
+        HILOG_WARN("isActiveUser is false,return");
         return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
     }
     FillBundleInfo(want, formRecord.bundleName, formRecord.userId);
@@ -100,7 +100,7 @@ ErrCode FormRenderMgrInner::RenderForm(
     }
     ErrCode errorCode = ConnectRenderService(formRenderConnection, formRecord.privacyLevel);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbility failed, errorCode:%{public}d", errorCode);
+        HILOG_ERROR("ConnectServiceAbility failed,errorCode:%{public}d", errorCode);
         FormRenderMgr::GetInstance().HandleConnectFailed(formRecord.formId, errorCode);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED,
             formRecord.formId,
@@ -161,12 +161,12 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
         sptr<IRemoteObject> remoteObject;
         auto formRenderMgrInner = weak.lock();
         if (!formRenderMgrInner) {
-            HILOG_ERROR("formRenderMgrInner is null.");
+            HILOG_ERROR("formRenderMgrInner is null");
             return;
         }
         auto ret = formRenderMgrInner->GetRenderObject(remoteObject);
         if (ret != ERR_OK) {
-            HILOG_ERROR("get remote object fail.");
+            HILOG_ERROR("get remote object fail");
             return;
         }
         FormRecord newRecord(formRecord);
@@ -210,7 +210,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
         FormDataMgr::GetInstance().SetFormCacheInited(formRecord.formId, true);
     }
 
-    HILOG_DEBUG("enableForm:%{public}d, protectForm:%{public}d", formRecord.enableForm, formRecord.protectForm);
+    HILOG_DEBUG("enableForm:%{public}d,protectForm:%{public}d", formRecord.enableForm, formRecord.protectForm);
     if (!formRecord.enableForm) {
         FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
         FormDataMgr::GetInstance().SetUpdateDuringDisableForm(formRecord.formId, true);
@@ -255,7 +255,7 @@ void FormRenderMgrInner::FillBundleInfo(Want &want, const std::string &bundleNam
     BundleInfo bundleInfo;
     if (!FormBmsHelper::GetInstance().GetBundleInfoDefault(
         bundleName, userId, bundleInfo)) {
-        HILOG_ERROR("get bundle info failed. %{public}s", bundleName.c_str());
+        HILOG_ERROR("get bundle info failed.%{public}s", bundleName.c_str());
         return;
     }
 
@@ -371,7 +371,7 @@ ErrCode FormRenderMgrInner::StopRenderingFormCallback(int64_t formId, const Want
         for (auto iter = etsHosts_.begin(); iter != etsHosts_.end();) {
             iter->second.erase(formId);
             if (iter->second.empty()) {
-                HILOG_INFO("All forms of the host have been removed, remove the host");
+                HILOG_INFO("All forms of the host have been removed,remove the host");
                 iter = etsHosts_.erase(iter);
             } else {
                 ++iter;
@@ -480,7 +480,7 @@ void FormRenderMgrInner::RerenderAllForms()
         std::lock_guard<std::mutex> lock(resourceMutex_);
         atomicRerenderCount_ = renderFormConnections_.size();
         if (etsHosts_.empty() || renderFormConnections_.empty()) {
-            HILOG_INFO("All hosts died or all connections erased, no need to rerender");
+            HILOG_INFO("All hosts died or all connections erased,no need to rerender");
             return;
         }
         HILOG_INFO("The forms need to rerender count:%{public}zu", renderFormConnections_.size());
@@ -503,7 +503,7 @@ void FormRenderMgrInner::RerenderAllForms()
 
 void FormRenderMgrInner::CleanFormHost(const sptr<IRemoteObject> &host)
 {
-    HILOG_INFO("Host is died or been removed, notify FormRenderService and remove host");
+    HILOG_INFO("Host is died or been removed,notify FormRenderService and remove host");
     RemoveHostToken(host);
     std::unique_lock<std::shared_mutex> guard(renderRemoteObjMutex_);
     if (renderRemoteObj_ == nullptr) {
@@ -532,7 +532,7 @@ void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remo
 {
     std::shared_lock<std::shared_mutex> guard(renderRemoteObjMutex_);
     if (renderRemoteObj_) {
-        HILOG_INFO("renderDeathRecipient is exist, no need to add again");
+        HILOG_INFO("renderDeathRecipient is exist,no need to add again");
         return;
     }
     guard.unlock();
@@ -566,7 +566,7 @@ bool FormRenderMgrInner::RegisterRenderDeathRecipient(const sptr<IRemoteObject> 
                 HILOG_ERROR("null renderMgrInner");
                 return;
             }
-            HILOG_WARN("FRS is Death, userId:%{public}d, isActiveUser:%{public}d",
+            HILOG_WARN("FRS is Death,userId:%{public}d,isActiveUser:%{public}d",
                 renderMgrInner->userId_.load(), renderMgrInner->isActiveUser_.load());
             if (renderMgrInner->isActiveUser_.load()) {
                 renderMgrInner->RerenderAllForms();
@@ -631,7 +631,7 @@ void FormRenderMgrInner::RerenderAllFormsImmediate()
         std::lock_guard<std::mutex> lock(resourceMutex_);
         isActiveUser_.store(true);
         if (etsHosts_.empty()) {
-            HILOG_WARN("All hosts died, no need to rerender.");
+            HILOG_WARN("All hosts died,no need to rerender");
             return;
         }
     }
@@ -647,7 +647,7 @@ void FormRenderMgrInner::DisconnectAllRenderConnections()
         isActiveUser_.store(false);
     }
     size_t size = connectionsToDisconnect.size();
-    HILOG_INFO("renderFormConnections size: %{public}zu.", size);
+    HILOG_INFO("renderFormConnections size:%{public}zu", size);
     for (auto &iter : connectionsToDisconnect) {
         DisconnectRenderService(iter.second, size--);
     }
@@ -656,7 +656,7 @@ void FormRenderMgrInner::DisconnectAllRenderConnections()
 void FormRenderMgrInner::DisconnectRenderService(const sptr<FormRenderConnection> connection, size_t size) const
 {
     if (size == LAST_CONNECTION) {
-        HILOG_INFO("This is the last connection, disconnect render service delay");
+        HILOG_INFO("This is the last connection,disconnect render service delay");
         FormAmsHelper::GetInstance().DisconnectServiceAbilityDelay(connection, FORM_DISCONNECT_FRS_DELAY_TIME);
     } else {
         HILOG_DEBUG("Disconnect render service ability");
@@ -685,12 +685,12 @@ inline void FormRenderMgrInner::AddHostToken(const sptr<IRemoteObject> &host, in
     std::lock_guard<std::mutex> lock(resourceMutex_);
     auto iter = etsHosts_.find(host);
     if (iter == etsHosts_.end()) {
-        HILOG_DEBUG("Add host, current etsHosts.size:%{public}zu", etsHosts_.size());
+        HILOG_DEBUG("Add host,current etsHosts.size:%{public}zu", etsHosts_.size());
         std::unordered_set<int64_t> formIdSet;
         formIdSet.emplace(formId);
         etsHosts_.emplace(host, formIdSet);
     } else {
-        HILOG_DEBUG("Add formId to host, current etsHosts.size:%{public}zu", etsHosts_.size());
+        HILOG_DEBUG("Add formId to host,current etsHosts.size:%{public}zu", etsHosts_.size());
         iter->second.emplace(formId);
     }
 }
@@ -757,7 +757,7 @@ void FormRenderMgrInner::NotifyHostRenderServiceIsDead() const
     std::unordered_map<sptr<IRemoteObject>, std::unordered_set<int64_t>, RemoteObjHash> hostsForNotify;
     {
         std::lock_guard<std::mutex> lock(resourceMutex_);
-        HILOG_INFO("Notify hosts the render is dead, hosts.size:%{public}zu", etsHosts_.size());
+        HILOG_INFO("Notify hosts the render is dead,hosts.size:%{public}zu", etsHosts_.size());
         auto tmpMap(etsHosts_);
         hostsForNotify.swap(tmpMap);
     }
@@ -910,7 +910,7 @@ bool FormRenderMgrInner::GetRenderFormConnectId(const int64_t formId, int32_t &c
         connectId = connection->GetConnectId();
         return true;
     }
-    HILOG_ERROR("Not find renderFormConnection. formId: %{public}" PRId64, formId);
+    HILOG_ERROR("Not find renderFormConnection.formId:%{public}" PRId64, formId);
     return false;
 }
 

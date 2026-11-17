@@ -62,7 +62,7 @@ uint64_t GetProviderSpecifiedFullTokenId(const std::string &bundleName, const in
     }
     const auto hapTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(userId, bundleName, 0);
     if (hapTokenId == 0) {
-        HILOG_ERROR("GetHapTokenID failed, userId:%{public}d, bundleName:%{public}s",
+        HILOG_ERROR("GetHapTokenID failed,userId:%{public}d,bundleName:%{public}s",
             userId, bundleName.c_str());
         return 0;
     }
@@ -81,7 +81,7 @@ std::string GetProviderMainElement(const FormRecord &record)
     const int32_t flags = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_HAP_MODULE);
     if (!FormBmsHelper::GetInstance().GetBundleInfoByFlags(
         record.bundleName, flags, record.providerUserId, bundleInfo)) {
-        HILOG_ERROR("GetBundleInfoByFlags failed, bundleName:%{public}s", record.bundleName.c_str());
+        HILOG_ERROR("GetBundleInfoByFlags failed,bundleName:%{public}s", record.bundleName.c_str());
         return "";
     }
     for (const auto &hapModuleInfo : bundleInfo.hapModuleInfos) {
@@ -89,7 +89,7 @@ std::string GetProviderMainElement(const FormRecord &record)
             return hapModuleInfo.mainElementName;
         }
     }
-    HILOG_ERROR("module not found, bundleName:%{public}s, moduleName:%{public}s",
+    HILOG_ERROR("module not found,bundleName:%{public}s,moduleName:%{public}s",
         record.bundleName.c_str(), record.moduleName.c_str());
     return "";
 }
@@ -117,7 +117,7 @@ int PrepareInsightIntentParam(Want &want, const FormRecord &record, InsightInten
     if (element.GetAbilityName().empty()) {
         const std::string mainElement = GetProviderMainElement(record);
         if (mainElement.empty()) {
-            HILOG_ERROR("empty mainElement, bundleName:%{public}s, moduleName:%{public}s",
+            HILOG_ERROR("empty mainElement,bundleName:%{public}s,moduleName:%{public}s",
                 record.bundleName.c_str(), record.moduleName.c_str());
             return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
         }
@@ -153,12 +153,12 @@ int FormEventAdapter::MessageEvent(const int64_t formId, const Want &want,
 {
     HILOG_DEBUG("call");
     if (formId <= 0 || callerToken == nullptr) {
-        HILOG_ERROR("invalid formId or null callerToken formId: %{public}" PRId64, formId);
+        HILOG_ERROR("invalid formId or null callerToken formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     if (!want.HasParameter(Constants::PARAM_MESSAGE_KEY)) {
-        HILOG_ERROR("messageInfo not exist formId: %{public}" PRId64, formId);
+        HILOG_ERROR("messageInfo not exist formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -166,19 +166,19 @@ int FormEventAdapter::MessageEvent(const int64_t formId, const Want &want,
     FormRecord record;
     bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!bGetRecord) {
-        HILOG_ERROR("not exist such form: %{public}" PRId64, matchedFormId);
+        HILOG_ERROR("not exist such form:%{public}" PRId64, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
     FormHostRecord formHostRecord;
     bool isHostExist = FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, formHostRecord);
     if (!isHostExist) {
-        HILOG_ERROR("cannot find target client formId: %{public}" PRId64, formId);
+        HILOG_ERROR("cannot find target client formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     if (!formHostRecord.Contains(matchedFormId)) {
-        HILOG_ERROR("form not self-owned formId: %{public}" PRId64, formId);
+        HILOG_ERROR("form not self-owned formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
@@ -186,7 +186,7 @@ int FormEventAdapter::MessageEvent(const int64_t formId, const Want &want,
     if (errCode != ERR_OK) {
         return errCode;
     }
-    HILOG_INFO("find target client formId: %{public}" PRId64, formId);
+    HILOG_INFO("find target client formId:%{public}" PRId64, formId);
 
     int32_t callerUserId = FormCommonAdapter::GetInstance().GetCallingUserId();
     NotifyFormClickEvent(formId, FORM_CLICK_MESSAGE, callerUserId);
@@ -209,7 +209,7 @@ int FormEventAdapter::CheckRouterUriUnique(const std::string &uri, const int32_t
     bool findDefaultApp = false;
     if (!FormBmsHelper::GetInstance().ImplicitQueryInfos(uriWant, userId, true,
         abilityInfos, extensionInfos, findDefaultApp)) {
-        HILOG_ERROR("router uri query failed, uri:%{private}s", uri.c_str());
+        HILOG_ERROR("router uri query failed,uri:%{private}s", uri.c_str());
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
     std::set<std::string> matchedBundles;
@@ -220,7 +220,7 @@ int FormEventAdapter::CheckRouterUriUnique(const std::string &uri, const int32_t
         matchedBundles.insert(extensionInfo.bundleName);
     }
     if (matchedBundles.size() != 1) {
-        HILOG_ERROR("router uri not unique, matched bundle size:%{public}zu, uri:%{private}s",
+        HILOG_ERROR("router uri not unique,matched bundle size:%{public}zu,uri:%{private}s",
             matchedBundles.size(), uri.c_str());
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
@@ -250,7 +250,7 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
     FormRecord record;
     bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!bGetRecord) {
-        HILOG_ERROR("not exist such form: %{public}" PRId64, matchedFormId);
+        HILOG_ERROR("not exist such form:%{public}" PRId64, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
@@ -293,14 +293,14 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
         }
     }
 
-    HILOG_DEBUG("RouterEvent send to ams, abilityName: %{public}s, uri: %{public}s",
+    HILOG_DEBUG("RouterEvent send to ams,abilityName:%{public}s,uri:%{public}s",
         want.GetElement().GetAbilityName().c_str(), want.GetUriString().c_str());
 
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
         int32_t uriCheckResult = CheckRouterUriUnique(want.GetUriString(), callerUserId);
         if (uriCheckResult != ERR_OK) {
-            HILOG_INFO("CheckRouterUriUnique is failed, uriCheckResult:%{public}d", uriCheckResult);
+            HILOG_INFO("CheckRouterUriUnique is failed,uriCheckResult:%{public}d", uriCheckResult);
             return uriCheckResult;
         }
         return StartAbilityForRouter(formId, want, callerToken, callerUserId, appInfo.accessTokenId);
@@ -326,7 +326,7 @@ void FormEventAdapter::DiscardRouterEventUri(const FormRecord &record, Want &wan
     bool enableRouteSecondPage = want.GetBoolParam(Constants::PARAM_ENABLE_ROUTE_SECOND_PAGE, false);
     if (!(enableRouteSecondPage && record.isSystemApp) && !want.GetUriString().empty()
         && !want.GetElement().GetAbilityName().empty()) {
-        HILOG_WARN("abilityName and uri both exist, abilityName first and discard uri");
+        HILOG_WARN("abilityName and uri both exist,abilityName first and discard uri");
         want.SetUri("");
     }
 }
@@ -337,7 +337,7 @@ int32_t FormEventAdapter::StartAbilityForRouter(const int64_t formId, Want &want
     int32_t result = FormAmsHelper::GetInstance().StartAbilityOnlyUIAbility(want, callerToken,
         accessTokenId, callerUserId);
     if (result != ERR_OK && result != START_ABILITY_WAITING) {
-        HILOG_ERROR("fail StartAbility, result:%{public}d", result);
+        HILOG_ERROR("fail StartAbility,result:%{public}d", result);
         return result;
     }
     NotifyFormClickEvent(formId, FORM_CLICK_ROUTER, callerUserId);
@@ -380,7 +380,7 @@ int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
     std::string params = want.GetStringParam(Constants::FORM_CALL_EVENT_PARAMS);
     nlohmann::json jsonObject = SafeJsonParse(params, false);
     if (jsonObject.is_discarded()) {
-        HILOG_ERROR("fail parse jsonDataString, length:%{public}zu", params.size());
+        HILOG_ERROR("fail parse jsonDataString,length:%{public}zu", params.size());
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     if (!jsonObject.contains(Constants::PARAM_FORM_CALL_EVENT_METHOD_KEY) ||
@@ -399,11 +399,11 @@ int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
     want.SetParam(Constants::PARAM_FORM_ID, formId);
     want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
     bool isManuallyClick = want.GetBoolParam(Constants::PARAM_FORM_MANUAL_CLICK_KEY, false);
-    HILOG_INFO("StartAbilityByCall, MANUAL_CLICK:%{public}d", isManuallyClick);
+    HILOG_INFO("StartAbilityByCall,MANUAL_CLICK:%{public}d", isManuallyClick);
     int32_t result = FormAmsHelper::GetInstance().StartAbilityByCall(want,
         formBackgroundConnection, callerToken, record.providerUserId, true, isManuallyClick);
     if (result != ERR_OK) {
-        HILOG_ERROR("fail StartAbilityByCall, result:%{public}d", result);
+        HILOG_ERROR("fail StartAbilityByCall,result:%{public}d", result);
         return result;
     }
     NotifyFormClickEvent(formId, FORM_CLICK_CALL, FormCommonAdapter::GetInstance().GetCallingUserId());
@@ -425,14 +425,14 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     if (!record.isSystemApp) {
-        HILOG_ERROR("insightIntent rejected, provider is not system app, "
+        HILOG_ERROR("insightIntent rejected,provider is not system app,"
             "bundleName:%{public}s", record.bundleName.c_str());
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     const uint64_t specifiedFullTokenId =
         GetProviderSpecifiedFullTokenId(record.bundleName, record.providerUserId);
     if (specifiedFullTokenId == 0) {
-        HILOG_ERROR("get provider specifiedFullTokenId failed, bundleName:%{public}s",
+        HILOG_ERROR("get provider specifiedFullTokenId failed,bundleName:%{public}s",
             record.bundleName.c_str());
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
@@ -452,7 +452,7 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
     result = FormAmsHelper::GetInstance().ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(
         want, callerToken, executeParam, specifiedFullTokenId);
     if (result != ERR_OK) {
-        HILOG_ERROR("fail ExecuteUIAbilityForegroundIntentWithSpecifyTokenId, result:%{public}d", result);
+        HILOG_ERROR("fail ExecuteUIAbilityForegroundIntentWithSpecifyTokenId,result:%{public}d", result);
         return result;
     }
     NotifyFormClickEvent(formId, FORM_CLICK_INSIGHT_INTENT, FormCommonAdapter::GetInstance().GetCallingUserId());
@@ -494,7 +494,7 @@ bool FormEventAdapter::OpenByOpenType(const int32_t openType, const FormRecord &
         want.SetParam(Want::PARAM_RESV_CALLER_BUNDLE_NAME, bundleName);
         int32_t result = FormAmsHelper::GetInstance().OpenLink(want, callerToken);
         if (result != ERR_OK && result != START_ABILITY_WAITING) {
-            HILOG_ERROR("failed OpenLink, result:%{public}d", result);
+            HILOG_ERROR("failed OpenLink,result:%{public}d", result);
             openResult = result;
             return true;
         }
@@ -507,7 +507,7 @@ bool FormEventAdapter::OpenByOpenType(const int32_t openType, const FormRecord &
         StartOptions startOptions;
         int32_t result = FormAmsHelper::GetInstance().OpenAtomicService(want, startOptions, callerToken);
         if (result != ERR_OK && result != START_ABILITY_WAITING) {
-            HILOG_ERROR("failed OpenAtomicService, result:%{public}d", result);
+            HILOG_ERROR("failed OpenAtomicService,result:%{public}d", result);
             openResult = result;
             return true;
         }

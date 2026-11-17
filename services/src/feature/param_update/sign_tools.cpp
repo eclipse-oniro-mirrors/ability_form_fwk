@@ -125,7 +125,7 @@ std::string SignTools::GetfileStream(const std::string &filepath)
     canonicalPath[PATH_MAX - 1] = '\0';
     std::ifstream file(canonicalPath, std::ios::in | std::ios::binary);
     if (!file.good()) {
-        HILOG_ERROR("Failed to open the file!");
+        HILOG_ERROR("Failed to open the file");
         return fileString;
     }
     std::stringstream infile;
@@ -183,7 +183,7 @@ void SignTools::CalcBase64(uint8_t *input, uint32_t inputLen, std::string &encod
     encodedStr.resize(expectedLength);
     int actualLength = EVP_EncodeBlock(reinterpret_cast<uint8_t *>(&encodedStr[0]), input, inputLen);
     encodedStr.resize(actualLength);
-    HILOG_INFO("expectedLength = %{public}zu, actualLength = %{public}d", expectedLength, actualLength);
+    HILOG_INFO("expectedLength = %{public}zu,actualLength = %{public}d", expectedLength, actualLength);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

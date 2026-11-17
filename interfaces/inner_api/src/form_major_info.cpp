@@ -53,34 +53,34 @@ FormMajorInfo *FormMajorInfo::Unmarshalling(Parcel &parcel)
     FormMajorInfo *majorInfo = new (std::nothrow) FormMajorInfo();
 
     if (majorInfo == nullptr) {
-        HILOG_ERROR("new FormMajorInfo failed.");
+        HILOG_ERROR("new FormMajorInfo failed");
         return nullptr;
     }
 
     bool readFlag = false;
     do {
         if (!parcel.ReadString(majorInfo->bundleName)) {
-            HILOG_ERROR("marshall bundleName failed.");
+            HILOG_ERROR("marshall bundleName failed");
             break;
         }
 
         if (!parcel.ReadString(majorInfo->moduleName)) {
-            HILOG_ERROR("marshall moduleName failed.");
+            HILOG_ERROR("marshall moduleName failed");
             break;
         }
 
         if (!parcel.ReadString(majorInfo->abilityName)) {
-            HILOG_ERROR("marshall abilityName failed.");
+            HILOG_ERROR("marshall abilityName failed");
             break;
         }
 
         if (!parcel.ReadString(majorInfo->formName)) {
-            HILOG_ERROR("marshall formName failed.");
+            HILOG_ERROR("marshall formName failed");
             break;
         }
 
         if (!parcel.ReadInt32(majorInfo->dimension)) {
-            HILOG_ERROR("marshall dimension failed.");
+            HILOG_ERROR("marshall dimension failed");
             break;
         }
 
