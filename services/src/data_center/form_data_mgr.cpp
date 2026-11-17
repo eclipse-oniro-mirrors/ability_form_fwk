@@ -2140,7 +2140,7 @@ bool FormDataMgr::CreateFormAcquireDataRecord(int64_t requestCode, const FormIte
         formAcquireDataProvider_.insert_or_assign(requestCode, providerBundleName);
         return true;
     }
- 
+
     FormHostRecord hostRecord;
     bool isCreated = CreateHostRecord(info, callerToken, callingUid, hostRecord);
     if (isCreated) {
@@ -2148,14 +2148,13 @@ bool FormDataMgr::CreateFormAcquireDataRecord(int64_t requestCode, const FormIte
         formAcquireDataProvider_.emplace(requestCode, providerBundleName);
         return true;
     }
- 
+
     return false;
 }
 
 void FormDataMgr::RemoveFormAcquireDataRecord(int64_t requestCode)
 {
     std::lock_guard<std::mutex> lock(formAcquireDataRecordMutex_);
-    formAcquireDataProvider_.erase(requestCode);
     auto iter = formAcquireDataRecord_.find(requestCode);
     if (iter == formAcquireDataRecord_.end()) {
         return;
@@ -2183,7 +2182,6 @@ ErrCode FormDataMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams, in
         HILOG_ERROR("filed to get form state host record");
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
-    formAcquireDataProvider_.erase(requestCode);
     iter->second.OnAcquireFormData(wantParams, requestCode);
     iter->second.CleanResource();
     formAcquireDataRecord_.erase(iter);

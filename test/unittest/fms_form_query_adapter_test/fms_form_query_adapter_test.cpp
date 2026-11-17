@@ -1285,7 +1285,7 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormState_006, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "AcquireFormState_006 end";
 }
- 
+
 /**
  * @tc.name: AcquireFormData_006
  * @tc.desc: Verify AcquireFormData binds the requestCode to the queried provider bundle.

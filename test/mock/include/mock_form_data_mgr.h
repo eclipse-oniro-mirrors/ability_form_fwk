@@ -165,8 +165,6 @@ public:
     MOCK_METHOD5(CreateFormAcquireDataRecord, bool(int64_t requestCode, const FormItemInfo &info,
         const sptr<IRemoteObject> &callerToken, int32_t callingUid, const std::string &providerBundleName));
     MOCK_METHOD2(CheckAcquireDataProvider, bool(int64_t requestCode, const std::string &callerBundleName));
-    MOCK_METHOD2(AddAcquireDataProvider, void(int64_t requestCode, const std::string &bundleName));
-    MOCK_METHOD2(CheckAcquireDataProvider, bool(int64_t requestCode, const std::string &callerBundleName));
     MOCK_CONST_METHOD2(GetMatchedHostClient, bool(const sptr<IRemoteObject> &callerToken,
         FormHostRecord &formHostRecord));
     MOCK_METHOD5(UpdateHostFormFlag, ErrCode(const std::vector<int64_t> &formIds,
