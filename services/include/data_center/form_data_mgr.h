@@ -607,7 +607,7 @@ public:
     bool CheckAcquireDataProvider(int64_t requestCode, const std::string &callerBundleName);
 
     /**
-     * @brief Remove the acquire data host record on connection failure.
+     * @brief Remove the acquire data host record and provider binding on connection failure.
      * @param requestCode The request code of this acquire form.
      */
     void RemoveFormAcquireDataRecord(int64_t requestCode);

@@ -193,8 +193,9 @@ private:
     /**
      * @brief Check whether the caller owns the connection of the connectId.
      * @param connectId The ability connection id.
-     * @return Returns ERR_OK if caller owns the connection or the connection is not registered,
-     *         error code otherwise.
+     * @return Returns ERR_OK if caller owns the connection; returns
+     *         ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF if the connection is not registered or
+     *         owned by another bundle (same code for both cases to avoid enumeration).
      */
     int32_t CheckCallerOwnsConnection(int32_t connectId);
 
