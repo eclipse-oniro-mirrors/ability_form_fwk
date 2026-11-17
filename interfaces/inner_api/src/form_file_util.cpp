@@ -28,7 +28,7 @@ void FormFileUtil::GetDirFiles(const std::string &path, std::vector<std::string>
 {
     DIR *dir = opendir(path.c_str());
     if (dir == nullptr) {
-        HILOG_ERROR("failed to open file: %{public}s, error: %{public}d", path.c_str(), errno);
+        HILOG_ERROR("failed to open file:%{public}s,error:%{public}d", path.c_str(), errno);
         return;
     }
  
@@ -65,14 +65,14 @@ uint64_t FormFileUtil::GetFilesSize(const std::vector<std::string> &files, std::
         if (ret == 0) {
             uint64_t fileSize = static_cast<uint64_t>(statbuf.st_size);
             if (totalSize > std::numeric_limits<uint64_t>::max() - fileSize) {
-                HILOG_ERROR("Integer overflow detected, return partial size %{public}llu, file %{public}s not counted",
+                HILOG_ERROR("Integer overflow detected,return partial size %{public}llu,file %{public}s not counted",
                     static_cast<unsigned long long>(totalSize), file.c_str());
                 return totalSize;
             }
             filesSize.emplace_back(fileSize);
             totalSize += fileSize;
         } else {
-            HILOG_WARN("failed to stat file, errno: %{public}d", err);
+            HILOG_WARN("failed to stat file,errno:%{public}d", err);
         }
     }
     return totalSize;

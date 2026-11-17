@@ -65,7 +65,7 @@ void ParamManager::InitParam()
         HILOG_ERROR("path version error:%{public}s", pathVersion.c_str());
         return;
     }
-    HILOG_INFO("presetVersion: %{public}s  pathVersion:%{public}s", presetVersion.c_str(), pathVersion.c_str());
+    HILOG_INFO("presetVersion:%{public}s  pathVersion:%{public}s", presetVersion.c_str(), pathVersion.c_str());
     std::string path = Constants::FORM_MGR_CONFIG_DIR;
     if (presetVersionNum > pathVersionNum) {
         pathVersionNum = presetVersionNum;
@@ -78,7 +78,7 @@ void ParamManager::InitParam()
         HILOG_ERROR("current version error:%{public}s", currentVersion.c_str());
         return;
     }
-    HILOG_INFO("currentVersion: %{public}s", currentVersion.c_str());
+    HILOG_INFO("currentVersion:%{public}s", currentVersion.c_str());
     if (currentVersionNum < pathVersionNum) {
         ReloadParam(pathVersion, path);
     }
@@ -147,7 +147,7 @@ void ParamManager::SaveVersionStr(const std::string &versionStr)
     ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME,
         FORM_MGR_CONFIG_VERSION, versionStr);
     if (result != ERR_OK) {
-        HILOG_ERROR("update formMgrConfig version to rdbstore failed, code is %{public}d", result);
+        HILOG_ERROR("update formMgrConfig version to rdbstore failed,code is %{public}d", result);
     }
 }
 
@@ -156,7 +156,7 @@ void ParamManager::SaveParamStr(const std::string &paramStr)
     ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME,
         FORM_MGR_CONFIG_DATA, paramStr);
     if (result != ERR_OK) {
-        HILOG_ERROR("update formMgrConfig param to rdbstore failed, code is %{public}d", result);
+        HILOG_ERROR("update formMgrConfig param to rdbstore failed,code is %{public}d", result);
     }
 }
 

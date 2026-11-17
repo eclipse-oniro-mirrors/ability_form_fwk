@@ -29,7 +29,7 @@ bool ReadStringField(Parcel &parcel, const char *fieldName, std::string &out, si
     }
     out = Str16ToStr8(u16);
     if (maxLength > 0 && (out.empty() || out.size() > maxLength)) {
-        HILOG_ERROR("invalid %{public}s, length:%{public}zu", fieldName, out.size());
+        HILOG_ERROR("invalid %{public}s,length:%{public}zu", fieldName, out.size());
         return false;
     }
     return true;

@@ -30,7 +30,7 @@ const std::u16string DMS_PROXY_INTERFACE_TOKEN = u"ohos.distributedschedule.acce
 }
 void FormDistributedClient::GetDmsServiceProxy()
 {
-    HILOG_DEBUG("SHAREFORM:: func call");
+    HILOG_DEBUG("SHAREFORM::func call");
     std::lock_guard<std::mutex> lock(dmsProxyMutex_);
     if (dmsProxy_ != nullptr) {
         HILOG_DEBUG("dms proxy already get");
@@ -48,7 +48,7 @@ void FormDistributedClient::GetDmsServiceProxy()
 int32_t FormDistributedClient::ShareForm(
     const std::string &remoteDeviceId, const FormShareInfo &formShareInfo)
 {
-    HILOG_DEBUG("SHAREFORM:: func call");
+    HILOG_DEBUG("SHAREFORM::func call");
     if (remoteDeviceId.empty()) {
         HILOG_ERROR("input deviceId failed");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -85,12 +85,12 @@ int32_t FormDistributedClient::ShareForm(
 
     int32_t error = proxy->SendRequest(START_REMOTE_SHARE_FORM, data, reply, option);
     if (error != NO_ERROR) {
-        HILOG_ERROR("request failed, error:%{public}d", error);
+        HILOG_ERROR("request failed,error:%{public}d", error);
         return error;
     }
     int32_t result = 0;
     if (!reply.ReadInt32(result)) {
-        HILOG_ERROR("invalid DMS reply, read result failed");
+        HILOG_ERROR("invalid DMS reply,read result failed");
         return ERR_APPEXECFWK_FORM_DISTRIBUTED_SCHEDULE_FAILED;
     }
     HILOG_DEBUG("get result from server data = %{public}d", result);

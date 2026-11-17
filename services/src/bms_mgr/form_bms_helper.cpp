@@ -151,7 +151,7 @@ void FormBmsHelper::SetBundleManager(const sptr<IBundleMgr> &bundleManager)
  */
 void FormBmsHelper::NotifyModuleRemovable(const std::string &bundleName, const std::string &moduleName)
 {
-    HILOG_DEBUG("notify module removable, bundleName:%{public}s, moduleName:%{public}s",
+    HILOG_DEBUG("notify module removable,bundleName:%{public}s,moduleName:%{public}s",
         bundleName.c_str(), moduleName.c_str());
     if (bundleName.empty() || moduleName.empty()) {
         return;
@@ -176,7 +176,7 @@ void FormBmsHelper::NotifyModuleRemovable(const std::string &bundleName, const s
  */
 void FormBmsHelper::NotifyModuleNotRemovable(const std::string &bundleName, const std::string &moduleName)
 {
-    HILOG_INFO("bundleName:%{public}s, moduleName:%{public}s",
+    HILOG_INFO("bundleName:%{public}s,moduleName:%{public}s",
         bundleName.c_str(), moduleName.c_str());
     if (bundleName.empty() || moduleName.empty()) {
         return;
@@ -371,7 +371,7 @@ int32_t FormBmsHelper::GetCallerBundleNameAndAppIndex(std::string &callerBundleN
     auto callingUid = IPCSkeleton::GetCallingUid();
     // Resolves the caller's own index from its uid, so it holds even if that instance is disabled.
     if (IN_PROCESS_CALL(iBundleMgr->GetNameAndIndexForUid(callingUid, callerBundleName, appIndex)) != ERR_OK) {
-        HILOG_ERROR("fail get caller bundleName and appIndex, uid:%{public}d", callingUid);
+        HILOG_ERROR("fail get caller bundleName and appIndex,uid:%{public}d", callingUid);
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
     return ERR_OK;
@@ -637,7 +637,7 @@ bool FormBmsHelper::GetBundleInfos(int32_t flag, std::vector<BundleInfo> &bundle
 ErrCode FormBmsHelper::GetEnabledCloneIndex(int32_t userId, const std::string &bundleName,
     int32_t &appIndex)
 {
-    HILOG_DEBUG("userId: %{public}d, bundleName: %{public}s", userId, bundleName.c_str());
+    HILOG_DEBUG("userId:%{public}d,bundleName:%{public}s", userId, bundleName.c_str());
     appIndex = Constants::MAIN_APP_INDEX;
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
@@ -651,7 +651,7 @@ ErrCode FormBmsHelper::GetEnabledCloneIndex(int32_t userId, const std::string &b
         static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_DEFAULT), userId, bundleInfos));
     // BMS returns ERR_OK only with at least one enabled instance; empty means failure.
     if (ret != ERR_OK || bundleInfos.empty()) {
-        HILOG_ERROR("GetMainAndCloneBundleInfo failed, bundleName:%{public}s, ret:%{public}d",
+        HILOG_ERROR("GetMainAndCloneBundleInfo failed,bundleName:%{public}s,ret:%{public}d",
             bundleName.c_str(), ret);
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }

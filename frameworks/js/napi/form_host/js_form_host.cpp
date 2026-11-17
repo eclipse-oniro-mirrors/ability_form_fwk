@@ -303,7 +303,7 @@ bool DelFormUninstallCallback(napi_value callback)
             iter++;
         }
     }
-    HILOG_INFO("%{public}d form uninstall callback canceled.", count);
+    HILOG_INFO("%{public}d form uninstall callback canceled", count);
     return true;
 }
 
@@ -595,7 +595,7 @@ private:
         }
         uint32_t nativeArrayLen = 0;
         if (napi_get_array_length(env, array, &nativeArrayLen) != napi_ok) {
-            HILOG_ERROR("napi_get_array_length failed, input may not be an array");
+            HILOG_ERROR("napi_get_array_length failed,input may not be an array");
             return false;
         }
         if (nativeArrayLen > MAX_FORM_IDS_COUNT) {
@@ -1510,9 +1510,9 @@ private:
         std::string type;
         if (!ConvertFromJsValue(env, argv[PARAM0], type) ||
             (FORM_LISTENER_TYPE.find(type) == FORM_LISTENER_TYPE.end())) {
-            HILOG_ERROR("Invalid type provided: %{public}s."
+            HILOG_ERROR("Invalid type provided:%{public}s."
                         "Expected formUninstall or formOverflow or changeSceneAnimationState or getFormRect or "
-                        "getLiveFormStatus.",
+                        "getLiveFormStatus",
                 type.c_str());
             NapiFormUtil::ThrowParamTypeError(env, "type",
                 "formUninstall or formOverflow or changeSceneAnimationState or getFormRect or getLiveFormStatus");
@@ -2017,7 +2017,7 @@ private:
             napi_handle_scope scope = nullptr;
             napi_open_handle_scope(env, &scope);
             if (scope == nullptr) {
-                HILOG_ERROR("scope is null.");
+                HILOG_ERROR("scope is null");
                 asyncTask->Reject(env, NapiFormUtil::CreateErrorByExternalErrorCode(
                     env, ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
                 return;
@@ -2524,7 +2524,7 @@ private:
         napi_value propertyValue;
         napi_status status = napi_get_named_property(env, object, propertyName, &propertyValue);
         if (status != napi_ok) {
-            HILOG_ERROR("Failed to get property: %{public}s", propertyName);
+            HILOG_ERROR("Failed to get property:%{public}s", propertyName);
             return false;
         }
         if (!ConvertFromJsValue(env, propertyValue, outValue)) {
@@ -3063,7 +3063,7 @@ private:
             napi_value arrayValue = nullptr;
             if (napi_create_array_with_length(env, formIds->size(), &arrayValue) != napi_ok ||
                 arrayValue == nullptr) {
-                HILOG_ERROR("napi_create_array_with_length failed, size=%{public}zu", formIds->size());
+                HILOG_ERROR("napi_create_array_with_length failed,size=%{public}zu", formIds->size());
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ERR_APPEXECFWK_FORM_COMMON_CODE));
                 return;
             }
@@ -3175,7 +3175,7 @@ FormRouterProxyCallbackClient::~FormRouterProxyCallbackClient()
     if (env_ != nullptr && callbackRef_ != nullptr) {
         napi_status status = napi_delete_reference(env_, callbackRef_);
         if (status != napi_ok) {
-            HILOG_ERROR("napi_delete_reference failed: %{public}d", status);
+            HILOG_ERROR("napi_delete_reference failed:%{public}d", status);
         }
     }
 }
@@ -3331,7 +3331,7 @@ ErrCode JsFormRouterProxyMgr::RequestOverflow(const int64_t formId, const AppExe
         JsFormRouterProxyMgr::GetInstance()->RequestOverflowInner(dataParam);
     };
     mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::RequestOverflow");
-    HILOG_INFO("call RequestOverflow end, result:%{public}d, errCode:%{public}d", dataParam->result,
+    HILOG_INFO("call RequestOverflow end,result:%{public}d,errCode:%{public}d", dataParam->result,
         dataParam->errCode);
     bool result = dataParam->result;
     return result ? ERR_OK : dataParam->errCode;
@@ -3408,7 +3408,7 @@ napi_value JsFormRouterProxyMgr::CreateRequestOverflowObj(napi_env env,
     napi_value requestObj = nullptr;
     napi_status status = napi_create_object(env, &requestObj);
     if (status != napi_ok || requestObj == nullptr) {
-        HILOG_ERROR("napi_create_object failed, status: %{public}d", static_cast<int>(status));
+        HILOG_ERROR("napi_create_object failed,status:%{public}d", static_cast<int>(status));
         return nullptr;
     }
 
@@ -3524,7 +3524,7 @@ ErrCode JsFormRouterProxyMgr::ChangeSceneAnimationState(const int64_t formId, in
         JsFormRouterProxyMgr::GetInstance()->ChangeSceneAnimationStateInner(dataParam);
     };
     mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::ChangeSceneAnimationState");
-    HILOG_INFO("call ChangeSceneAnimationState end, result:%{public}d", dataParam->result);
+    HILOG_INFO("call ChangeSceneAnimationState end,result:%{public}d", dataParam->result);
     bool result = dataParam->result;
     return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
@@ -3764,7 +3764,7 @@ bool JsFormRouterProxyMgr::UnregisterGetVisibleFormRectListener()
 
 ErrCode JsFormRouterProxyMgr::GetVisibleFormRect(const int64_t formId, AppExecFwk::Rect &rect)
 {
-    HILOG_INFO("call, formId:%{public}" PRId64, formId);
+    HILOG_INFO("call,formId:%{public}" PRId64, formId);
     std::shared_ptr<FormRectParam> dataParam = std::make_shared<FormRectParam>();
     dataParam->formId = std::to_string(formId);
 
@@ -3794,13 +3794,13 @@ static void VisibleFormRectCallBackReturn(const Rect &item, FormRectParam *p,
     }
     // First terminal settlement wins: ignore subsequent callbacks.
     if (p->result) {
-        HILOG_INFO("getVisibleFormRect already settled; dropping duplicate answer");
+        HILOG_INFO("getVisibleFormRect already settled;dropping duplicate answer");
         return;
     }
     p->result = true;
     p->rect = item;
     p->errCode = errCode;
-    HILOG_INFO("getVisibleFormRect end, errCode:%{public}d", errCode);
+    HILOG_INFO("getVisibleFormRect end,errCode:%{public}d", errCode);
 }
 
 void JsFormRouterProxyMgr::GetVisibleFormRectInner(std::shared_ptr<FormRectParam> dataParam)
@@ -3903,18 +3903,18 @@ void JsFormRouterProxyMgr::CallVisibleFormRectPromise(napi_env env, napi_value f
     bool isCallable = false;
     napi_is_callable(env, promiseThen, &isCallable);
     if (!isCallable) {
-        HILOG_ERROR("property then is not callable.");
+        HILOG_ERROR("property then is not callable");
         return;
     }
     napi_is_callable(env, promiseCatch, &isCallable);
     if (!isCallable) {
-        HILOG_ERROR("property catch is not callable.");
+        HILOG_ERROR("property catch is not callable");
         return;
     }
 
     auto *callbackInfo = PromiseCallbackInfoT<FormRectParam>::Create(env, nullptr, params);
     if (callbackInfo == nullptr) {
-        HILOG_ERROR("Failed to new promise callbackInfo.");
+        HILOG_ERROR("Failed to new promise callbackInfo");
         return;
     }
 
@@ -3934,7 +3934,7 @@ void JsFormRouterProxyMgr::CallVisibleFormRectPromise(napi_env env, napi_value f
     napi_value argvResolve[1] = { resolveCallback };
     status = napi_call_function(env, funcResult, promiseThen, ARGS_ONE, argvResolve, nullptr);
     if (status != napi_ok) {
-        HILOG_ERROR("Invoke getVisibleFormRect promise then error.");
+        HILOG_ERROR("Invoke getVisibleFormRect promise then error");
         PromiseCallbackInfoT<FormRectParam>::Destroy(callbackInfo);
         return;
     }
@@ -3942,7 +3942,7 @@ void JsFormRouterProxyMgr::CallVisibleFormRectPromise(napi_env env, napi_value f
     napi_value argvReject[1] = { rejectCallback };
     status = napi_call_function(env, funcResult, promiseCatch, ARGS_ONE, argvReject, nullptr);
     if (status != napi_ok) {
-        HILOG_ERROR("Invoke getVisibleFormRect promise catch error.");
+        HILOG_ERROR("Invoke getVisibleFormRect promise catch error");
         // then() already bound the resolve callback to callbackInfo; destroying here would
         // leave the promise holding a dangling ref (UAF on a later resolve). Accept the leak.
         return;
@@ -3955,7 +3955,7 @@ napi_value JsFormRouterProxyMgr::VisibleFormRectResolveCallback(napi_env env, na
 {
     HILOG_INFO("enter");
     if (info == nullptr) {
-        HILOG_ERROR("VisibleFormRectResolveCallback, invalid input info");
+        HILOG_ERROR("VisibleFormRectResolveCallback,invalid input info");
         return nullptr;
     }
     size_t argc = 1;
@@ -3963,12 +3963,12 @@ napi_value JsFormRouterProxyMgr::VisibleFormRectResolveCallback(napi_env env, na
     void *data = nullptr;
     napi_get_cb_info(env, info, &argc, &argv[PARAM0], nullptr, &data);
     if (data == nullptr) {
-        HILOG_ERROR("VisibleFormRectResolveCallback, invalid data");
+        HILOG_ERROR("VisibleFormRectResolveCallback,invalid data");
         return nullptr;
     }
     auto *callbackInfo = static_cast<PromiseCallbackInfoT<FormRectParam> *>(data);
     if (callbackInfo == nullptr) {
-        HILOG_ERROR("VisibleFormRectResolveCallback, invalid callbackInfo");
+        HILOG_ERROR("VisibleFormRectResolveCallback,invalid callbackInfo");
         return nullptr;
     }
     std::unique_ptr<AppExecFwk::Rect> item = std::make_unique<AppExecFwk::Rect>();
@@ -3988,7 +3988,7 @@ napi_value JsFormRouterProxyMgr::VisibleFormRectRejectCallback(napi_env env, nap
 {
     HILOG_INFO("enter");
     if (info == nullptr) {
-        HILOG_ERROR("VisibleFormRectRejectCallback, invalid input info");
+        HILOG_ERROR("VisibleFormRectRejectCallback,invalid input info");
         return nullptr;
     }
     size_t argc = 1;
@@ -3996,12 +3996,12 @@ napi_value JsFormRouterProxyMgr::VisibleFormRectRejectCallback(napi_env env, nap
     void *data = nullptr;
     napi_get_cb_info(env, info, &argc, &argv[PARAM0], nullptr, &data);
     if (data == nullptr) {
-        HILOG_ERROR("VisibleFormRectRejectCallback, invalid data");
+        HILOG_ERROR("VisibleFormRectRejectCallback,invalid data");
         return nullptr;
     }
     auto *callbackInfo = static_cast<PromiseCallbackInfoT<FormRectParam> *>(data);
     if (callbackInfo == nullptr) {
-        HILOG_ERROR("VisibleFormRectRejectCallback, invalid callbackInfo");
+        HILOG_ERROR("VisibleFormRectRejectCallback,invalid callbackInfo");
         return nullptr;
     }
     // Rejection = miss. No answer propagated.
@@ -4026,7 +4026,7 @@ ErrCode JsFormRouterProxyMgr::GetFormRect(const int64_t formId, AppExecFwk::Rect
         JsFormRouterProxyMgr::GetInstance()->GetFormRectInner(dataParam);
     };
     mainHandler->PostSyncTask(executeGetFormRectFunc, "JsFormRouterProxyMgr::GetFormRect");
-    HILOG_INFO("call GetFormRect end, result:%{public}d", dataParam->result);
+    HILOG_INFO("call GetFormRect end,result:%{public}d", dataParam->result);
     bool result = dataParam->result;
     rect = dataParam->formRect;
     return result ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -4040,7 +4040,7 @@ void CallBackReturn(const Rect &item, std::shared_ptr<LiveFormInterfaceParam> li
     }
     liveFormInterfaceParam->result = ret;
     liveFormInterfaceParam->formRect = item;
-    HILOG_INFO("getFormRect end.");
+    HILOG_INFO("getFormRect end");
 }
 
 // Returns true when this callback synchronously supplies a valid Rect (chain stops); promise is a miss.
@@ -4131,19 +4131,19 @@ void JsFormRouterProxyMgr::CallPromise(napi_env env, napi_value funcResult,
     bool isCallable = false;
     napi_is_callable(env, promiseThen, &isCallable);
     if (!isCallable) {
-        HILOG_ERROR("property then is not callable.");
+        HILOG_ERROR("property then is not callable");
         return;
     }
     napi_is_callable(env, promiseCatch, &isCallable);
     if (!isCallable) {
-        HILOG_ERROR("property catch is not callable.");
+        HILOG_ERROR("property catch is not callable");
         return;
     }
 
     napi_value promiseCallback = nullptr;
     auto *callbackInfo = PromiseCallbackInfo::Create(params);
     if (callbackInfo == nullptr) {
-        HILOG_ERROR("Failed to new promise callbackInfo.");
+        HILOG_ERROR("Failed to new promise callbackInfo");
         return;
     }
     napi_status createStatus = napi_create_function(env, "promiseCallback", strlen("promiseCallback"),
@@ -4159,14 +4159,14 @@ void JsFormRouterProxyMgr::CallPromise(napi_env env, napi_value funcResult,
 
     status = napi_call_function(env, funcResult, promiseThen, ARGS_ONE, argvPromise, nullptr);
     if (status != napi_ok) {
-        HILOG_ERROR("Invoke pushCheck promise then error.");
+        HILOG_ERROR("Invoke pushCheck promise then error");
         PromiseCallbackInfo::Destroy(callbackInfo);
         return;
     }
 
     status = napi_call_function(env, funcResult, promiseCatch, ARGS_ONE, argvPromise, nullptr);
     if (status != napi_ok) {
-        HILOG_ERROR("Invoke pushCheck promise catch error.");
+        HILOG_ERROR("Invoke pushCheck promise catch error");
         return;
     }
 }
@@ -4175,7 +4175,7 @@ napi_value JsFormRouterProxyMgr::PromiseCallback(napi_env env, napi_callback_inf
 {
     HILOG_INFO("enter");
     if (info == nullptr) {
-        HILOG_ERROR("PromiseCallback, invalid input info");
+        HILOG_ERROR("PromiseCallback,invalid input info");
         return nullptr;
     }
 
@@ -4187,13 +4187,13 @@ napi_value JsFormRouterProxyMgr::PromiseCallback(napi_env env, napi_callback_inf
     std::unique_ptr<AppExecFwk::Rect> item = std::make_unique<AppExecFwk::Rect>();
     bool ret = ConvertFunctionResult(env, argv[PARAM0], *item);
     if (data == nullptr) {
-        HILOG_ERROR("PromiseCallback, invalid data");
+        HILOG_ERROR("PromiseCallback,invalid data");
         return nullptr;
     }
 
     auto *callbackInfo = static_cast<PromiseCallbackInfo *>(data);
     if (callbackInfo == nullptr) {
-        HILOG_ERROR("PromiseCallback, invalid callbackInfo");
+        HILOG_ERROR("PromiseCallback,invalid callbackInfo");
         return nullptr;
     }
     CallBackReturn(*item, callbackInfo->GetJsCallBackParam(), ret);
@@ -4206,7 +4206,7 @@ napi_value JsFormRouterProxyMgr::PromiseCallback(napi_env env, napi_callback_inf
 bool JsFormRouterProxyMgr::ConvertFunctionResult(napi_env env, napi_value funcResult, Rect &item)
 {
     if (funcResult == nullptr) {
-        HILOG_ERROR("The funcResult is error.");
+        HILOG_ERROR("The funcResult is error");
         return false;
     }
 
@@ -4316,14 +4316,14 @@ bool JsFormRouterProxyMgr::InvokeGetLiveFormStatusCallback(napi_env env, napi_re
 
     napi_status status = napi_call_function(env, nullptr, myCallback, 0, nullptr, &callResult);
     if (status != napi_ok) {
-        HILOG_ERROR("status is not napi_ok.");
+        HILOG_ERROR("status is not napi_ok");
         return false;
     }
 
     napi_valuetype returnType;
     napi_typeof(env, callResult, &returnType);
     if (returnType == napi_undefined) {
-        HILOG_ERROR("returnType is napi_undefined.");
+        HILOG_ERROR("returnType is napi_undefined");
         return false;
     }
     return true;
@@ -4409,7 +4409,7 @@ bool JsFormRouterProxyMgr::ConvertNapiValueToMap(
     napi_env env, napi_value value, std::unordered_map<std::string, std::string> &uMap)
 {
     if (value == nullptr) {
-        HILOG_ERROR("The value is error.");
+        HILOG_ERROR("The value is error");
         return false;
     }
 
@@ -4440,7 +4440,7 @@ bool JsFormRouterProxyMgr::ConvertNapiValueToMap(
         HILOG_ERROR("get array length error");
         return false;
     }
-    HILOG_INFO("length: %{public}d", length);
+    HILOG_INFO("length:%{public}d", length);
     for (uint32_t i = 0; i < length; ++i) {
         InsertMapEntry(env, value, propNames, i, uMap);
     }
@@ -4508,7 +4508,7 @@ ErrCode JsFormRouterProxyMgr::TemplateFormDetailInfoChange(
         result = JsFormRouterProxyMgr::GetInstance()->TemplateFormDetailInfoChangeInner(templateFormInfo);
     };
     mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::TemplateFormDetailInfoChange");
-    HILOG_DEBUG("change successfully, result: %{public}d", result);
+    HILOG_DEBUG("change successfully,result:%{public}d", result);
     return result ? ERR_OK : ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
 }
 
@@ -4674,13 +4674,13 @@ bool JsFormRouterProxyMgr::GetValidCallback(napi_env env, napi_ref callbackRef, 
 {
     napi_status status = napi_get_reference_value(env, callbackRef, &callback);
     if (status != napi_ok || callback == nullptr) {
-        HILOG_ERROR("napi_get_reference_value failed, status: %{public}d", static_cast<int>(status));
+        HILOG_ERROR("napi_get_reference_value failed,status:%{public}d", static_cast<int>(status));
         return false;
     }
     napi_valuetype type = napi_undefined;
     status = napi_typeof(env, callback, &type);
     if (status != napi_ok || type != napi_function) {
-        HILOG_ERROR("callback is not function, napi_typeof status: %{public}d", static_cast<int>(status));
+        HILOG_ERROR("callback is not function,napi_typeof status:%{public}d", static_cast<int>(status));
         return false;
     }
     return true;
@@ -4690,7 +4690,7 @@ bool JsFormRouterProxyMgr::CreateStringArray(const std::vector<std::string> &str
 {
     napi_status status = napi_create_array(deleteFormsCallbackEnv_, &array);
     if (status != napi_ok) {
-        HILOG_ERROR("napi_create_array failed, status: %{public}d", static_cast<int>(status));
+        HILOG_ERROR("napi_create_array failed,status:%{public}d", static_cast<int>(status));
         return false;
     }
     for (size_t i = 0; i < strings.size(); ++i) {
@@ -4702,7 +4702,7 @@ bool JsFormRouterProxyMgr::CreateStringArray(const std::vector<std::string> &str
         }
         status = napi_set_element(deleteFormsCallbackEnv_, array, static_cast<uint32_t>(i), jsValue);
         if (status != napi_ok) {
-            HILOG_ERROR("napi_set_element failed, index: %{public}zu, status: %{public}d", i, static_cast<int>(status));
+            HILOG_ERROR("napi_set_element failed,index:%{public}zu,status:%{public}d", i, static_cast<int>(status));
             return false;
         }
     }
@@ -4712,7 +4712,7 @@ bool JsFormRouterProxyMgr::CreateStringArray(const std::vector<std::string> &str
 bool JsFormRouterProxyMgr::UpdateFormsConfigCallbackInner(
     const std::vector<AppExecFwk::FormCustomConfig> &configs)
 {
-    HILOG_DEBUG("call, config size: %{public}zu", configs.size());
+    HILOG_DEBUG("call,config size:%{public}zu", configs.size());
 
     std::lock_guard<std::mutex> lock(registerUpdateFormsConfigMutex_);
     if (updateFormsConfigEnv_ == nullptr || updateFormsConfigCallbackRef_ == nullptr) {
@@ -4735,7 +4735,7 @@ bool JsFormRouterProxyMgr::UpdateFormsConfigCallbackInner(
     napi_value configArray = nullptr;
     napi_status status = napi_create_array(updateFormsConfigEnv_, &configArray);
     if (status != napi_ok) {
-        HILOG_ERROR("create array failed, status:%{public}d", static_cast<int>(status));
+        HILOG_ERROR("create array failed,status:%{public}d", static_cast<int>(status));
         napi_close_handle_scope(updateFormsConfigEnv_, scope);
         return false;
     }
@@ -4749,7 +4749,7 @@ bool JsFormRouterProxyMgr::UpdateFormsConfigCallbackInner(
     napi_get_undefined(updateFormsConfigEnv_, &undefined);
     status = napi_call_function(updateFormsConfigEnv_, undefined, callback, ARGS_ONE, &configArray, nullptr);
     if (status != napi_ok) {
-        HILOG_ERROR("napi_call_function failed, status: %{public}d", static_cast<int>(status));
+        HILOG_ERROR("napi_call_function failed,status:%{public}d", static_cast<int>(status));
         napi_close_handle_scope(updateFormsConfigEnv_, scope);
         return false;
     }
@@ -4761,7 +4761,7 @@ bool JsFormRouterProxyMgr::UpdateFormsConfigCallbackInner(
 bool JsFormRouterProxyMgr::GetFormCustomConfigArray(
     const std::vector<AppExecFwk::FormCustomConfig> &configs, napi_value &configArray)
 {
-    HILOG_DEBUG("call, config size: %{public}zu", configs.size());
+    HILOG_DEBUG("call,config size:%{public}zu", configs.size());
     auto setStringProperty = [this](napi_value obj, const char *key, const std::string &value) {
         napi_value jsValue = nullptr;
         napi_create_string_utf8(updateFormsConfigEnv_, value.c_str(), NAPI_AUTO_LENGTH, &jsValue);
@@ -4777,7 +4777,7 @@ bool JsFormRouterProxyMgr::GetFormCustomConfigArray(
         napi_value jsConfig = nullptr;
         napi_status status = napi_create_object(updateFormsConfigEnv_, &jsConfig);
         if (status != napi_ok || jsConfig == nullptr) {
-            HILOG_ERROR("napi_create_object failed, status: %{public}d", static_cast<int>(status));
+            HILOG_ERROR("napi_create_object failed,status:%{public}d", static_cast<int>(status));
             return false;
         }
         setStringProperty(jsConfig, "bundleName", config.bundleName);
@@ -4789,7 +4789,7 @@ bool JsFormRouterProxyMgr::GetFormCustomConfigArray(
         setBoolProperty(jsConfig, "isRepeatAdditionSupported", config.isRepeatAdditionSupported);
         status = napi_set_element(updateFormsConfigEnv_, configArray, static_cast<uint32_t>(i), jsConfig);
         if (status != napi_ok) {
-            HILOG_ERROR("napi_set_element failed, index: %{public}zu, status: %{public}d", i, static_cast<int>(status));
+            HILOG_ERROR("napi_set_element failed,index:%{public}zu,status:%{public}d", i, static_cast<int>(status));
             return false;
         }
     }
@@ -4869,7 +4869,7 @@ bool JsFormRouterProxyMgr::AcquireDeleteFormsCallback(napi_env &env, napi_ref &r
     // one can never invalidate this per-call handle.
     napi_status status = napi_create_reference(env, callback, REF_COUNT, &ref);
     if (status != napi_ok || ref == nullptr) {
-        HILOG_ERROR("napi_create_reference failed, status: %{public}d", static_cast<int>(status));
+        HILOG_ERROR("napi_create_reference failed,status:%{public}d", static_cast<int>(status));
         return false;
     }
     return true;
@@ -4877,7 +4877,7 @@ bool JsFormRouterProxyMgr::AcquireDeleteFormsCallback(napi_env &env, napi_ref &r
 
 bool JsFormRouterProxyMgr::DeleteFormsCallbackInner(const std::vector<std::string> &formIds)
 {
-    HILOG_DEBUG("call, formIds size: %{public}zu", formIds.size());
+    HILOG_DEBUG("call,formIds size:%{public}zu", formIds.size());
     napi_env env = nullptr;
     napi_ref ref = nullptr;
     if (!AcquireDeleteFormsCallback(env, ref)) {
@@ -4909,7 +4909,7 @@ bool JsFormRouterProxyMgr::DeleteFormsCallbackInner(const std::vector<std::strin
     napi_status status = napi_call_function(env, undefined, callback, ARGS_ONE, &formIdArray, nullptr);
     CloseScopeAndDeleteRef(env, scope, ref);
     if (status != napi_ok) {
-        HILOG_ERROR("napi_call_function failed, status: %{public}d", static_cast<int>(status));
+        HILOG_ERROR("napi_call_function failed,status:%{public}d", static_cast<int>(status));
         return false;
     }
     return true;
@@ -4941,7 +4941,7 @@ void JsFormRouterProxyMgr::UnregisterFormWantCallbackListener()
 ErrCode JsFormRouterProxyMgr::RequestFormWants(const std::vector<AppExecFwk::FormInfo> &formInfos,
     std::vector<AAFwk::WantParams> &wantParamsList)
 {
-    HILOG_INFO("call, formCount:%{public}zu", formInfos.size());
+    HILOG_INFO("call,formCount:%{public}zu", formInfos.size());
     auto resultList = std::make_shared<std::vector<AAFwk::WantParams>>();
     bool success = false;
 
@@ -4955,7 +4955,7 @@ ErrCode JsFormRouterProxyMgr::RequestFormWants(const std::vector<AppExecFwk::For
         success = JsFormRouterProxyMgr::GetInstance()->RequestFormWantsInner(formInfos, *resultList);
     };
     mainHandler->PostSyncTask(executeFunc, "JsFormRouterProxyMgr::RequestFormWants");
-    HILOG_INFO("call RequestFormWants end, success:%{public}d", success);
+    HILOG_INFO("call RequestFormWants end,success:%{public}d", success);
     if (success) {
         wantParamsList = std::move(*resultList);
         return ERR_OK;
@@ -4999,7 +4999,7 @@ bool JsFormRouterProxyMgr::InvokeFormWantCallback(napi_env env, napi_ref callbac
 bool JsFormRouterProxyMgr::RequestFormWantsInner(const std::vector<AppExecFwk::FormInfo> &formInfos,
     std::vector<AAFwk::WantParams> &wantParamsList)
 {
-    HILOG_INFO("call, formCount:%{public}zu", formInfos.size());
+    HILOG_INFO("call,formCount:%{public}zu", formInfos.size());
     napi_env env = nullptr;
     napi_ref callbackRef = nullptr;
     {
@@ -5037,7 +5037,7 @@ bool JsFormRouterProxyMgr::ParseWantParamsArray(napi_env env, napi_value funcRes
     bool isPromise = false;
     napi_is_promise(env, funcResult, &isPromise);
     if (isPromise) {
-        HILOG_WARN("callback returned promise, not supported in batch mode");
+        HILOG_WARN("callback returned promise,not supported in batch mode");
         return false;
     }
 
@@ -5051,7 +5051,7 @@ bool JsFormRouterProxyMgr::ParseWantParamsArray(napi_env env, napi_value funcRes
     uint32_t arrayLength = 0;
     napi_status lengthStatus = napi_get_array_length(env, funcResult, &arrayLength);
     if (lengthStatus != napi_ok) {
-        HILOG_ERROR("get array length failed, status: %{public}d", static_cast<int>(lengthStatus));
+        HILOG_ERROR("get array length failed,status:%{public}d", static_cast<int>(lengthStatus));
         return false;
     }
     // The length is app-controlled (JS callback result), so cap it with the existing form-id bound.
@@ -5067,7 +5067,7 @@ bool JsFormRouterProxyMgr::ParseWantParamsArray(napi_env env, napi_value funcRes
         if (UnwrapWantParams(env, element, wp)) {
             wantParamsList.push_back(std::move(wp));
         } else {
-            HILOG_WARN("parse wantParams at index %{public}u failed, using empty", i);
+            HILOG_WARN("parse wantParams at index %{public}u failed,using empty", i);
             wantParamsList.emplace_back();
         }
     }

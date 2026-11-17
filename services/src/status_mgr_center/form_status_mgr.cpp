@@ -55,19 +55,19 @@ void FormStatusMgr::ExecFormTaskTimeout(
     const int64_t formId, FormEventTimeout timeoutMs, FormFsmEvent event, FormFsmStatus status)
 {
     if (timeoutMs == FormEventTimeout::TIMEOUT_NO_NEED) {
-        HILOG_DEBUG("no need exec timeout task, formId:%{public}" PRId64, formId);
+        HILOG_DEBUG("no need exec timeout task,formId:%{public}" PRId64, formId);
         return;
     }
 
     SetFormEventId(formId);
     std::string eventId = GetFormEventId(formId);
     if (eventId.empty()) {
-        HILOG_ERROR("get eventId failed, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("get eventId failed,formId:%{public}" PRId64, formId);
         return;
     }
 
     auto timeoutTask = [formId, event, status, eventId]() {
-        HILOG_ERROR("excute timeout, event:%{public}s, status:%{public}s, formId:%{public}" PRId64,
+        HILOG_ERROR("excute timeout,event:%{public}s,status:%{public}s,formId:%{public}" PRId64,
             FormStatusPrint::FormEventToString(event).c_str(),
             FormStatusPrint::FormStatusToString(status).c_str(),
             formId);
@@ -82,19 +82,19 @@ bool FormStatusMgr::ExecStatusMachineTask(const int64_t formId, const FormFsmEve
 {
     // get status machine info
     if (!FormStatus::GetInstance().HasFormStatus(formId)) {
-        HILOG_INFO("create new status.");
+        HILOG_INFO("create new status");
         FormStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::INIT);
     }
     FormFsmStatus status = FormStatus::GetInstance().GetFormStatus(formId);
 
     FormStatusMachineInfo info;
     if (!FormStatusTable::GetInstance().GetFormStatusInfo(status, event, info)) {
-        HILOG_ERROR("get form status info failed, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("get form status info failed,formId:%{public}" PRId64, formId);
         (void)FormStatusMgr::GetInstance().ReportStatusInfoError(formId, status, event);
         return false;
     }
 
-    HILOG_INFO("state transition, formId:%{public}" PRId64
+    HILOG_INFO("state transition,formId:%{public}" PRId64
         ", status is %{public}s, event is %{public}s, nextStatus is %{public}s, processType is %{public}d.",
         formId,
         FormStatusPrint::FormStatusToString(status).c_str(),
@@ -162,7 +162,7 @@ void FormStatusMgr::AddTaskToQueueUnique(const int64_t formId, const FormFsmEven
 
     FormEventTaskInfo taskInfo{formId, event, func};
     if (!(formEventQueue->PushFormEvent(taskInfo))) {
-        HILOG_ERROR("push form event error, formId :%{public}" PRId64 ". ", formId);
+        HILOG_ERROR("push form event error,formId :%{public}" PRId64 ". ", formId);
         return;
     }
 
@@ -170,7 +170,7 @@ void FormStatusMgr::AddTaskToQueueUnique(const int64_t formId, const FormFsmEven
     while (!formEventQueue->IsEventQueueEmpty()) {
         FormEventTaskInfo eventTaskInfo{};
         if (!formEventQueue->PopFormEvent(eventTaskInfo)) {
-            HILOG_INFO("formEventQueue is empty.");
+            HILOG_INFO("formEventQueue is empty");
             break;
         }
         if (eventTaskInfo.getFormEvent() == FormFsmEvent::RENDER_FORM ||
@@ -184,7 +184,7 @@ void FormStatusMgr::AddTaskToQueueUnique(const int64_t formId, const FormFsmEven
         temptaskInfoQueue.pop();
         formEventQueue->PushFormEvent(eventTaskInfo);
     }
-    HILOG_INFO("formEventQueue event size %{public}d.", static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
+    HILOG_INFO("formEventQueue event size %{public}d", static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
 
     FormDataMgr::GetInstance().UpdateFormRecordSetIsExistRecycleTask(formId, false);
 }
@@ -194,7 +194,7 @@ void FormStatusMgr::AddTaskToQueuePush(const int64_t formId, const FormFsmEvent 
     std::shared_ptr<FormEventQueue> formEventQueue = GetFormEventQueue(formId);
     FormEventTaskInfo taskInfo{formId, event, func};
     if (!formEventQueue->PushFormEvent(taskInfo)) {
-        HILOG_ERROR("PushFormEvent failed, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("PushFormEvent failed,formId:%{public}" PRId64, formId);
         return;
     }
 
@@ -217,25 +217,25 @@ void FormStatusMgr::AddTaskToQueueDelete(const int64_t formId, const FormFsmEven
     while (!formEventQueue->IsEventQueueEmpty()) {
         FormEventTaskInfo eventTaskInfo{};
         if (!formEventQueue->PopFormEvent(eventTaskInfo)) {
-            HILOG_INFO("formEventQueue is empty.");
+            HILOG_INFO("formEventQueue is empty");
             break;
         }
     }
     formEventQueue->PushFormEvent(taskInfo);
-    HILOG_INFO("formEventQueue event size %{public}d.", static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
+    HILOG_INFO("formEventQueue event size %{public}d", static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
 }
 
 void FormStatusMgr::ProcessTaskFromQueue(const int64_t formId)
 {
     if (!HasFormEventQueue(formId)) {
-        HILOG_DEBUG("formEventQueue is empty, not process.");
+        HILOG_DEBUG("formEventQueue is empty,not process");
         return;
     }
     std::shared_ptr<FormEventQueue> formEventQueue = GetFormEventQueue(formId);
 
     FormEventTaskInfo eventTaskInfo{};
     if (!formEventQueue->PopFormEvent(eventTaskInfo)) {
-        HILOG_DEBUG("formEventQueue is empty, not process.");
+        HILOG_DEBUG("formEventQueue is empty,not process");
         return;
     }
 
@@ -262,18 +262,18 @@ void FormStatusMgr::ProcessTaskFromRetry(const int64_t formId)
     int32_t retryCount = FORM_EVENT_RETRY_MAX;
     bool ret = FormEventRetryMgr::GetInstance().GetRetryCount(formId, retryCount);
     if (ret && retryCount == FORM_EVENT_RETRY_MAX) {
-        HILOG_INFO("retry reached count.");
+        HILOG_INFO("retry reached count");
         FormEventRetryMgr::GetInstance().DeleteRetryCount(formId);
         ProcessTaskFromQueue(formId);
         return;
     }
-    HILOG_INFO("set retry count 1.");
+    HILOG_INFO("set retry count 1");
     FormEventRetryMgr::GetInstance().SetRetryCount(formId, 1);
 
     FormEventTaskInfo formEventInfo;
     ret = FormEventRetryMgr::GetInstance().GetLastFormEvent(formId, formEventInfo);
     if (!ret) {
-        HILOG_ERROR("GetLastFormEvent failed.");
+        HILOG_ERROR("GetLastFormEvent failed");
         return;
     }
 
@@ -294,7 +294,7 @@ const std::shared_ptr<FormEventQueue> FormStatusMgr::GetFormEventQueue(const int
     if (formEventQueueMap_.find(formId) == formEventQueueMap_.end()) {
         std::shared_ptr<FormEventQueue> formEventQueue = std::make_shared<FormEventQueue>(formId);
         formEventQueueMap_.emplace(formId, formEventQueue);
-        HILOG_INFO("formEventQueueMap_ insert, formId:%{public}" PRId64 ". ", formId);
+        HILOG_INFO("formEventQueueMap_ insert,formId:%{public}" PRId64 ". ", formId);
     }
 
     return formEventQueueMap_[formId];
@@ -314,7 +314,7 @@ std::string FormStatusMgr::GetFormEventId(const int64_t formId)
 {
     std::shared_lock<std::shared_mutex> lock(formEventIdMapMutex_);
     if (formEventIdMap_.find(formId) == formEventIdMap_.end()) {
-        HILOG_ERROR("eventId is not existed, formId:%{public}" PRId64 ".", formId);
+        HILOG_ERROR("eventId is not existed,formId:%{public}" PRId64 ".", formId);
         return "";
     }
 

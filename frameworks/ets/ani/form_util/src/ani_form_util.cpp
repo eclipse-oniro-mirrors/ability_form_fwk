@@ -41,7 +41,7 @@ bool GetPropertyDoubleByName(ani_env *env, ani_object object, const char *name, 
 
     ani_status status = ANI_ERROR;
     if ((status = env->Object_GetPropertyByName_Double(object, name, &value)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return false;
     }
     return true;
@@ -76,24 +76,24 @@ bool ParseRecordStringInner(ani_env *env, ani_ref next, ani_object aniMockList, 
     }
     status = env->Object_GetFieldByName_Ref(static_cast<ani_object>(next), DELEGATOR_RECORD_VALUE, &aniKey);
     if (ANI_OK != status) {
-        HILOG_ERROR("Failed to get value status: %{public}d", status);
+        HILOG_ERROR("Failed to get value status:%{public}d", status);
         return false;
     }
     ani_class recordCls = nullptr;
     status = env->FindClass(DELEGATOR_RECORD_CLASS_NAME, &recordCls);
     if (status != ANI_OK) {
-        HILOG_ERROR("FindClass failed status: %{public}d", status);
+        HILOG_ERROR("FindClass failed status:%{public}d", status);
         return false;
     }
     ani_method recordGetMethod = nullptr;
     status = env->Class_FindMethod(recordCls, DELEGATOR_RECORD_GET, DELEGATOR_RECORD_GET_NAME, &recordGetMethod);
     if (status != ANI_OK) {
-        HILOG_ERROR("Class_FindMethod failed status: %{public}d", status);
+        HILOG_ERROR("Class_FindMethod failed status:%{public}d", status);
         return false;
     }
     status = env->Object_CallMethod_Ref(aniMockList, recordGetMethod, &aniValue, static_cast<ani_string>(aniKey));
     if (status != ANI_OK) {
-        HILOG_ERROR("Object_CallMethod_Void failed status: %{public}d", status);
+        HILOG_ERROR("Object_CallMethod_Void failed status:%{public}d", status);
         return false;
     }
     return true;
@@ -147,7 +147,7 @@ bool ParseRecordString(ani_env *env, ani_object aniMockList, std::unordered_map<
     ani_status status = ANI_ERROR;
     status = env->Object_CallMethodByName_Ref(aniMockList, DELEGATOR_RECORD_KEY, nullptr, &iter);
     if (ANI_OK != status) {
-        HILOG_ERROR("Failed to get keys iterator status: %{public}d", status);
+        HILOG_ERROR("Failed to get keys iterator status:%{public}d", status);
         return false;
     }
     ani_ref next = nullptr;
@@ -157,7 +157,7 @@ bool ParseRecordString(ani_env *env, ani_object aniMockList, std::unordered_map<
         static_cast<ani_object>(iter), DELEGATOR_RECORD_NEXT, nullptr, &next)) {
         status = env->Object_GetFieldByName_Boolean(static_cast<ani_object>(next), DELEGATOR_RECORD_DONE, &done);
         if (ANI_OK != status) {
-            HILOG_ERROR("Failed to check iterator done status: %{public}d", status);
+            HILOG_ERROR("Failed to check iterator done status:%{public}d", status);
             return false;
         }
         if (done) {

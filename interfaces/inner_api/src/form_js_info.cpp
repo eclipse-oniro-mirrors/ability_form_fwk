@@ -86,7 +86,7 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     if (!ReadInt32Field(parcel, "formDataLength", formDataLength)) {
         return false;
     }
-    HILOG_INFO("data length is %{public}d , formId:%{public}" PRId64, formDataLength, formId);
+    HILOG_INFO("data length is %{public}d ,formId:%{public}" PRId64, formDataLength, formId);
     if (formDataLength > BIG_DATA) {
         if (!ReadAshmemFormData(parcel, formDataLength, formData)) {
             return false;
@@ -229,37 +229,37 @@ bool FormJsInfo::WriteFormData(Parcel &parcel) const
 bool FormJsInfo::WriteAshmemFormData(Parcel &parcel, int32_t size, const char *dataPtr) const
 {
     if (dataPtr == nullptr || size <= 0 || size > MAX_FORM_DATA_BUFFER_SIZE) {
-        HILOG_ERROR("invalid param, dataPtr is null or size is %{public}d", size);
+        HILOG_ERROR("invalid param,dataPtr is null or size is %{public}d", size);
         return false;
     }
     std::string name = "FormJsInfoFormData";
     int fd = AshmemCreate(name.c_str(), size);
     if (fd < 0) {
-        HILOG_ERROR("AshmemCreate failed, size:%{public}d", size);
+        HILOG_ERROR("AshmemCreate failed,size:%{public}d", size);
         return false;
     }
     fdsan_exchange_owner_tag(fd, 0, Constants::FORM_DOMAIN_ID);
     int result = AshmemSetProt(fd, PROT_READ | PROT_WRITE);
     if (result < 0) {
-        HILOG_ERROR("AshmemSetProt failed, result:%{public}d", result);
+        HILOG_ERROR("AshmemSetProt failed,result:%{public}d", result);
         fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return false;
     }
     void *ptr = ::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (ptr == MAP_FAILED) {
-        HILOG_ERROR("mmap failed, errno:%{public}d", errno);
+        HILOG_ERROR("mmap failed,errno:%{public}d", errno);
         fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return false;
     }
     if (memcpy_s(ptr, size, dataPtr, size) != EOK) {
         ::munmap(ptr, size);
-        HILOG_ERROR("memcpy_s failed, errno:%{public}d, size:%{public}d", errno, size);
+        HILOG_ERROR("memcpy_s failed,errno:%{public}d,size:%{public}d", errno, size);
         fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return false;
     }
     ::munmap(ptr, size);
     if (AshmemSetProt(fd, PROT_READ) < 0) {
-        HILOG_WARN("AshmemSetProt PROT_READ failed, errno:%{public}d", errno);
+        HILOG_WARN("AshmemSetProt PROT_READ failed,errno:%{public}d", errno);
     }
     if (!WriteFdToParcel(parcel, fd)) {
         HILOG_ERROR("WriteFdToParcel failed");
@@ -267,7 +267,7 @@ bool FormJsInfo::WriteAshmemFormData(Parcel &parcel, int32_t size, const char *d
         return false;
     }
     fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
-    HILOG_INFO("WriteAshmemFormData success, size:%{public}d", size);
+    HILOG_INFO("WriteAshmemFormData success,size:%{public}d", size);
     return true;
 }
 
@@ -279,7 +279,7 @@ bool FormJsInfo::WriteFdToParcel(Parcel &parcel, int fd) const
     }
     int dupFd = dup(fd);
     if (dupFd < 0) {
-        HILOG_ERROR("dup failed, fd:%{public}d", fd);
+        HILOG_ERROR("dup failed,fd:%{public}d", fd);
         return false;
     }
     sptr<IPCFileDescriptor> descriptor = new IPCFileDescriptor(dupFd);
@@ -300,7 +300,7 @@ int FormJsInfo::ReadFdFromParcel(Parcel &parcel)
     }
     int fd = descriptor->GetFd();
     if (fd < 0) {
-        HILOG_ERROR("get fd failed, fd:%{public}d", fd);
+        HILOG_ERROR("get fd failed,fd:%{public}d", fd);
         return -1;
     }
     return dup(fd);
@@ -329,13 +329,13 @@ bool FormJsInfo::ReadAshmemFormData(Parcel &parcel, int32_t formDataLength, std:
         return false;
     }
     if (!CheckAshmemSize(fd, formDataLength)) {
-        HILOG_ERROR("CheckAshmemSize failed, formDataLength:%{public}d", formDataLength);
+        HILOG_ERROR("CheckAshmemSize failed,formDataLength:%{public}d", formDataLength);
         fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return false;
     }
     void *ptr = ::mmap(nullptr, formDataLength, PROT_READ, MAP_SHARED, fd, 0);
     if (ptr == MAP_FAILED) {
-        HILOG_ERROR("mmap failed, errno:%{public}d", errno);
+        HILOG_ERROR("mmap failed,errno:%{public}d", errno);
         fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return false;
     }
@@ -524,7 +524,7 @@ void FormJsInfo::ReadPkgNameMap(Parcel &parcel)
     size_t keySize = keys.size();
     size_t valueSize = values.size();
     if (keySize != valueSize) {
-        HILOG_ERROR("ReadFromParcel failed, invalid size");
+        HILOG_ERROR("ReadFromParcel failed,invalid size");
         return;
     }
     for (size_t index = 0; index < keySize; index++) {

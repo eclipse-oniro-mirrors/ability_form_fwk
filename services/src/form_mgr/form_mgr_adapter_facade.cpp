@@ -143,7 +143,7 @@ int FormMgrAdapterFacade::ReleaseRenderer(int64_t formId, const std::string &com
 
 int32_t FormMgrAdapterFacade::EnableForms(const std::string &bundleName, const int32_t userId, const bool enable)
 {
-    HILOG_INFO("bundleName:%{public}s, userId:%{public}d, enable:%{public}d", bundleName.c_str(), userId, enable);
+    HILOG_INFO("bundleName:%{public}s,userId:%{public}d,enable:%{public}d", bundleName.c_str(), userId, enable);
     return FormLifecycleAdapter::GetInstance().EnableForms(bundleName, userId, enable);
 }
 
@@ -171,7 +171,7 @@ ErrCode FormMgrAdapterFacade::BatchNotifyFormsConfigurationUpdate(const AppExecF
 ErrCode FormMgrAdapterFacade::BatchNotifyFormsColorModeUpdate(int32_t userId,
     const AppExecFwk::Configuration& configuration)
 {
-    HILOG_INFO("called, userId:%{public}d", userId);
+    HILOG_INFO("called,userId:%{public}d", userId);
     return FormLifecycleAdapter::GetInstance().BatchNotifyFormsColorModeUpdate(userId, configuration);
 }
 
@@ -204,7 +204,7 @@ ErrCode FormMgrAdapterFacade::UpdateFormCrossBundle(const int64_t formId, const 
 int32_t FormMgrAdapterFacade::UpdateFormsWithReminderAgent(
     const std::string &bundleName, const int32_t userId, const Want &want)
 {
-    HILOG_INFO("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+    HILOG_INFO("bundleName:%{public}s,userId:%{public}d", bundleName.c_str(), userId);
     return FormDataAdapter::GetInstance().UpdateFormsWithReminderAgent(bundleName, userId, want);
 }
 

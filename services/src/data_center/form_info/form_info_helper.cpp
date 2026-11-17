@@ -91,9 +91,9 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleNames(const std::vector<std::s
     std::vector<BundleInfo> bundleInfos;
     ErrCode ret = FormBmsHelper::GetInstance().BatchGetBundleInfo(
         bundleNames, static_cast<int32_t>(GET_BUNDLE_INFO_WITH_ALL_EXTENSIONS), bundleInfos, userId);
-    HILOG_INFO("bundleInfos size:%{public}zu, bundleNames size:%{public}zu", bundleInfos.size(), bundleNames.size());
+    HILOG_INFO("bundleInfos size:%{public}zu,bundleNames size:%{public}zu", bundleInfos.size(), bundleNames.size());
     if (ret != ERR_OK) {
-        HILOG_ERROR("batch get bundleInfo failed, erroCode:%{public}d", ret);
+        HILOG_ERROR("batch get bundleInfo failed,erroCode:%{public}d", ret);
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
     for (auto &bundleInfo : bundleInfos) {
@@ -111,7 +111,7 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleNames(const std::vector<std::s
         }
         std::vector<FormInfo> formInfos;
         if (!hasAbilityInfos) {
-            HILOG_WARN("empty abilityInfos, %{public}s", bundleInfo.name.c_str());
+            HILOG_WARN("empty abilityInfos,%{public}s", bundleInfo.name.c_str());
             // Check if current bundle contains FA forms.
             LoadAbilityFormConfigInfo(bundleInfo, formInfos);
             // Check if current bundle contains Stage forms.
@@ -144,7 +144,7 @@ std::shared_ptr<Global::Resource::ResourceManager> FormInfoHelper::GetResMgr(
     bool isCompressed = !extensionInfo.hapPath.empty();
     std::string resourcePath = isCompressed ? extensionInfo.hapPath : extensionInfo.resourcePath;
     if (resourcePath.empty()) {
-        HILOG_ERROR("resource path is empty, bundleName:%{public}s", extensionInfo.bundleName.c_str());
+        HILOG_ERROR("resource path is empty,bundleName:%{public}s", extensionInfo.bundleName.c_str());
         return nullptr;
     }
     auto it = resMgrCache.find(resourcePath);
@@ -155,18 +155,18 @@ std::shared_ptr<Global::Resource::ResourceManager> FormInfoHelper::GetResMgr(
     // InitResMgr on purpose: no systemres, and PROF|STRING-only parsing.
     std::shared_ptr<Global::Resource::ResourceManager> resMgr(Global::Resource::CreateResourceManager(false));
     if (resMgr == nullptr) {
-        HILOG_ERROR("create ResourceManager failed, bundleName:%{public}s", extensionInfo.bundleName.c_str());
+        HILOG_ERROR("create ResourceManager failed,bundleName:%{public}s", extensionInfo.bundleName.c_str());
         return nullptr;
     }
     std::unique_ptr<Global::Resource::ResConfig> resConfig(Global::Resource::CreateResConfig());
     if (resConfig == nullptr) {
-        HILOG_ERROR("create ResConfig failed, bundleName:%{public}s", extensionInfo.bundleName.c_str());
+        HILOG_ERROR("create ResConfig failed,bundleName:%{public}s", extensionInfo.bundleName.c_str());
         return nullptr;
     }
     resMgr->UpdateResConfig(*resConfig);
     if (!resMgr->AddResource(resourcePath.c_str(),
         Global::Resource::SELECT_PROF | Global::Resource::SELECT_STRING)) {
-        HILOG_ERROR("AddResource failed, bundleName:%{public}s", extensionInfo.bundleName.c_str());
+        HILOG_ERROR("AddResource failed,bundleName:%{public}s", extensionInfo.bundleName.c_str());
         return nullptr;
     }
     resMgrCache.emplace(resourcePath, resMgr);
@@ -309,7 +309,7 @@ void FormInfoHelper::LoadFormsForExtension(const std::shared_ptr<BundleMgrClient
             TEMPLATE_FORM_METADATA_NAME, templateProfileInfos);
     }
     if (metaData && templateMetaData) {
-        HILOG_ERROR("fail get form metadata : %{public}d, %{public}d", metaData, templateMetaData);
+        HILOG_ERROR("fail get form metadata :%{public}d,%{public}d", metaData, templateMetaData);
         return;
     }
     LoadProfileFormInfos(formInfos, bundleInfo, extensionInfo, profileInfos, extraFormInfo);
@@ -365,7 +365,7 @@ bool FormInfoHelper::IsAccountMetadataEnabled(const BundleInfo &bundleInfo,
 
 void FormInfoHelper::PrintLoadStageFormConfigInfo(const FormInfo &formInfo, bool hasDistributedForm)
 {
-    HILOG_INFO("LoadStageFormConfigInfo, bundleName:%{public}s, name:%{public}s, renderingMode:%{public}d, "
+    HILOG_INFO("LoadStageFormConfigInfo,bundleName:%{public}s,name:%{public}s,renderingMode:%{public}d,"
         "moduleName:%{public}s, hasDistributedForm:%{public}d, isStandbySupported:%{public}d, "
         "isStandbyAdapted:%{public}d, isPrivacySensitive:%{public}d",
         formInfo.bundleName.c_str(),
@@ -417,7 +417,7 @@ std::shared_ptr<Global::Resource::ResourceManager> FormInfoHelper::GetResourceMa
     for (const auto &hapModuleInfo : bundleInfo.hapModuleInfos) {
         std::string moduleResPath = hapModuleInfo.hapPath.empty() ? hapModuleInfo.resourcePath : hapModuleInfo.hapPath;
         if (!moduleResPath.empty()) {
-            HILOG_DEBUG("DistributedBms::InitResourceManager, moduleResPath: %{private}s", moduleResPath.c_str());
+            HILOG_DEBUG("DistributedBms::InitResourceManager,moduleResPath:%{private}s", moduleResPath.c_str());
             if (!resourceManager->AddResource(moduleResPath.c_str())) {
                 HILOG_ERROR("DistributedBms::InitResourceManager AddResource failed");
             }

@@ -131,7 +131,7 @@ int FormProviderClient::NotifyFormsDelete(
     int errorCode = ERR_OK;
     do {
         if (formIds.size() > static_cast<size_t>(Constants::MAX_FORM_DATA_SIZE)) {
-            HILOG_ERROR("formIds size exceeds limit: %{public}zu", formIds.size());
+            HILOG_ERROR("formIds size exceeds limit:%{public}zu", formIds.size());
             errorCode = ERR_APPEXECFWK_FORM_INVALID_PARAM;
             break;
         }
@@ -147,7 +147,7 @@ int FormProviderClient::NotifyFormsDelete(
             break;
         }
 
-        HILOG_INFO("formIdsSize:%{public}zu, abilityName:%{public}s", formIds.size(),
+        HILOG_INFO("formIdsSize:%{public}zu,abilityName:%{public}s", formIds.size(),
             ownerAbility->GetAbilityName().c_str());
         for (int64_t formId : formIds) {
             ownerAbility->OnDelete(formId);
@@ -180,7 +180,7 @@ int FormProviderClient::NotifyFormUpdate(
             break;
         }
 
-        HILOG_INFO("AbilityName:%{public}s, formId:%{public}" PRId64, ownerAbility->GetAbilityName().c_str(), formId);
+        HILOG_INFO("AbilityName:%{public}s,formId:%{public}" PRId64, ownerAbility->GetAbilityName().c_str(), formId);
         ownerAbility->OnUpdate(formId, want.GetParams());
     } while (false);
 
@@ -202,7 +202,7 @@ int FormProviderClient::EventNotify(
     int errorCode = ERR_OK;
     do {
         if (formIds.size() > static_cast<size_t>(Constants::MAX_FORM_DATA_SIZE)) {
-            HILOG_ERROR("formIds size exceeds limit: %{public}zu", formIds.size());
+            HILOG_ERROR("formIds size exceeds limit:%{public}zu", formIds.size());
             errorCode = ERR_APPEXECFWK_FORM_INVALID_PARAM;
             break;
         }
@@ -396,7 +396,7 @@ bool FormProviderClient::CheckIsSystemApp() const
 
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     if (callingUid > Constants::MAX_SYSTEM_APP_UID) {
-        HILOG_WARN("callingUid is %{public}d, which is larger than %{public}d", callingUid,
+        HILOG_WARN("callingUid is %{public}d,which is larger than %{public}d", callingUid,
             Constants::MAX_SYSTEM_APP_UID);
         return false;
     }

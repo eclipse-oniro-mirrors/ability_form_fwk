@@ -160,7 +160,7 @@ bool FormRenderStatusTaskMgr::ScheduleRecycleTimeout(const int64_t formId)
 
     std::string str = std::to_string(formId);
     auto timeoutTask = [formId]() {
-        HILOG_ERROR("RecycleForm failed, wait form release timeout, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("RecycleForm failed,wait form release timeout,formId:%{public}" PRId64, formId);
         FormRenderStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::UNPROCESSABLE);
         FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
     };

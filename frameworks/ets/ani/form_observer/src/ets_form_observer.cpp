@@ -93,7 +93,7 @@ public:
             return;
         }
         if (!FormAniUtil::CheckCallerIsSystemApp()) {
-            HILOG_ERROR("The application not system-app, can't use system-api");
+            HILOG_ERROR("The application not system-app,can't use system-api");
             EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return;
         }
@@ -193,7 +193,7 @@ public:
         ErrCode ret = FormMgr::GetInstance().GetRunningFormInfosByBundleName(stdBundleName,
             isUnusedIncluded, runningFormInfos);
         if (ret != ERR_OK) {
-            HILOG_ERROR("GetRunningFormInfosByBundleName failed, ret = %{public}d", ret);
+            HILOG_ERROR("GetRunningFormInfosByBundleName failed,ret = %{public}d", ret);
             FormAniUtil::AsyncCallback(env, OBSERVER_CLASSNAME_ASYNC_CALLBACK_WRAPPER,
                 callback, EtsFormErrorUtil::CreateErrorByInternalErrorCode(env, ret), nullptr);
             return;
@@ -340,7 +340,7 @@ private:
         ani_status status = ANI_ERROR;
         ani_boolean isUndefined = false;
         if ((status = env->Reference_IsUndefined(ref, &isUndefined)) != ANI_OK) {
-            HILOG_ERROR("Failed to check undefined status: %{public}d", status);
+            HILOG_ERROR("Failed to check undefined status:%{public}d", status);
             return false;
         }
         return isUndefined;
@@ -633,7 +633,7 @@ void EtsFormObserverInit(ani_env* env)
     ani_namespace ns;
     status = env->FindNamespace(ETS_FORM_OBSERVER_NAME, &ns);
     if (status != ANI_OK) {
-        HILOG_ERROR("FindNamespace application failed status: %{public}d", status);
+        HILOG_ERROR("FindNamespace application failed status:%{public}d", status);
         return;
     }
 
@@ -667,7 +667,7 @@ void EtsFormObserverInit(ani_env* env)
     };
     status = env->Namespace_BindNativeFunctions(ns, methods.data(), methods.size());
     if (status != ANI_OK) {
-        HILOG_ERROR("Namespace_BindNativeFunctions failed status: %{public}d", status);
+        HILOG_ERROR("Namespace_BindNativeFunctions failed status:%{public}d", status);
     }
 }
 
@@ -685,7 +685,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     ani_status status = ANI_ERROR;
     status = vm->GetEnv(ANI_VERSION_1, &env);
     if (status != ANI_OK) {
-        HILOG_ERROR("GetEnv failed, status: %{public}d", status);
+        HILOG_ERROR("GetEnv failed,status:%{public}d", status);
         return ANI_NOT_FOUND;
     }
     EtsFormObserverInit(env);

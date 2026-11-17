@@ -42,26 +42,26 @@ FormLockInfo *FormLockInfo::Unmarshalling(Parcel &parcel)
     FormLockInfo *lockInfo = new (std::nothrow) FormLockInfo();
 
     if (lockInfo == nullptr) {
-        HILOG_ERROR("new FormLockInfo failed.");
+        HILOG_ERROR("new FormLockInfo failed");
         return nullptr;
     }
 
     if (!parcel.ReadString(lockInfo->bundleName)) {
-        HILOG_ERROR("marshall bundleName failed.");
+        HILOG_ERROR("marshall bundleName failed");
         delete lockInfo;
         lockInfo = nullptr;
         return lockInfo;
     }
 
     if (!parcel.ReadInt32(lockInfo->userId)) {
-        HILOG_ERROR("marshall userId failed.");
+        HILOG_ERROR("marshall userId failed");
         delete lockInfo;
         lockInfo = nullptr;
         return lockInfo;
     }
 
     if (!parcel.ReadBool(lockInfo->lock)) {
-        HILOG_ERROR("marshall lock failed.");
+        HILOG_ERROR("marshall lock failed");
         delete lockInfo;
         lockInfo = nullptr;
         return lockInfo;

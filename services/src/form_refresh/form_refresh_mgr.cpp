@@ -65,7 +65,7 @@ FormRefreshMgr::~FormRefreshMgr() {}
 
 int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)
 {
-    HILOG_INFO("refreshInputType:%{public}d, formId:%{public}" PRId64, refreshType, data.formId);
+    HILOG_INFO("refreshInputType:%{public}d,formId:%{public}" PRId64, refreshType, data.formId);
     auto it = REFRESH_MAP.find(refreshType);
     if (it != REFRESH_MAP.end()) {
         int ret = it->second->RefreshFormRequest(data);
@@ -89,7 +89,7 @@ int FormRefreshMgr::RequestRefresh(RefreshData &data, const int32_t refreshType)
 int32_t FormRefreshMgr::BatchRequestRefresh(const int32_t refreshType,
     const StaggerStrategyType strategyType, std::vector<RefreshData> &batch)
 {
-    HILOG_INFO("batchSize:%{public}zu, refreshType:%{public}d, strategyType:%{public}d",
+    HILOG_INFO("batchSize:%{public}zu,refreshType:%{public}d,strategyType:%{public}d",
         batch.size(), refreshType, static_cast<int>(strategyType));
 
     if (batch.empty()) {

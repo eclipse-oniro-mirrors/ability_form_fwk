@@ -208,7 +208,7 @@ bool ConvertFromDataProxies(const CArrProxyData& cArrProxyData, std::vector<Form
     }
     int64_t len = cArrProxyData.size;
     if (len < 0 || len > static_cast<int64_t>(MAX_SIZE)) {
-        HILOG_ERROR("invalid size: %{public}" PRId64, len);
+        HILOG_ERROR("invalid size:%{public}" PRId64, len);
         return false;
     }
     for (int64_t i = 0; i < len; i++) {

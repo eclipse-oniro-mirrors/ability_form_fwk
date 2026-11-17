@@ -76,7 +76,7 @@ static bool ConvertFormInfoFilterThrow(napi_env env, napi_value jsValue, AppExec
     napi_valuetype jsValueType = napi_undefined;
     napi_typeof(env, jsValue, &jsValueType);
     if (jsValueType != napi_object) {
-        HILOG_ERROR("an object is expected, but an argument of different type is passed in");
+        HILOG_ERROR("an object is expected,but an argument of different type is passed in");
         NapiFormUtil::ThrowParamTypeError(env, "filter", "formInfo.FormInfoFilter");
         return false;
     }
@@ -300,7 +300,7 @@ napi_value JsFormProvider::OnGetPublishedFormInfoById(napi_env env, size_t argc,
         return CreateJsUndefined(env);
     }
 
-    HILOG_INFO("before GetPublishedFormInfoById, formId:%{public}" PRId64, formId);
+    HILOG_INFO("before GetPublishedFormInfoById,formId:%{public}" PRId64, formId);
     NapiAsyncTask::CompleteCallback complete =
         [formId](napi_env env, NapiAsyncTask &task, int32_t status) {
             RunningFormInfo formInfo;
@@ -388,7 +388,7 @@ napi_value JsFormProvider::OnOpenFormManager(napi_env env, size_t argc, napi_val
     }).detach();
 #endif
     if (ret != ERR_OK) {
-        HILOG_ERROR("fail to StartAbilityByFms, error code: %{public}d", static_cast<int>(ret));
+        HILOG_ERROR("fail to StartAbilityByFms,error code:%{public}d", static_cast<int>(ret));
         if (ret == ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED ||
             ret == ERR_APPEXECFWK_FORM_GET_INFO_FAILED || ret == ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED) {
             NapiFormUtil::ThrowByInternalErrorCode(env, ret);
@@ -748,7 +748,7 @@ bool JsFormProvider::ConvertFormDataProxy(napi_env env, napi_value value,
     napi_value subscribeId = nullptr;
     napi_get_named_property(env, value, "subscriberId", &subscribeId);
     if (subscribeId != nullptr && !ConvertFromJsValue(env, subscribeId, formDataProxy.subscribeId)) {
-        HILOG_WARN("Parse subscribeId failed, use empty as default value");
+        HILOG_WARN("Parse subscribeId failed,use empty as default value");
         formDataProxy.subscribeId = "";
     }
     HILOG_INFO("key:%{public}s,subscribeId:%{public}s", formDataProxy.key.c_str(),
@@ -789,7 +789,7 @@ napi_value JsFormProvider::OnOpenFormEditAbility(napi_env env, size_t argc, napi
             isMainPage = true;
         }
     }
-    HILOG_INFO("OnOpenFormEditAbility abilityName: %{public}s, formId: %{public}" PRId64 "isMainPage: %{public}s",
+    HILOG_INFO("OnOpenFormEditAbility abilityName:%{public}s,formId:%{public}" PRId64 "isMainPage: %{public}s",
         abilityName.c_str(), formId, isMainPage ? "true" : "false");
     auto ret = FormMgr::GetInstance().OpenFormEditAbility(abilityName, formId, isMainPage);
     if (ret != ERR_OK) {
@@ -818,7 +818,7 @@ napi_value JsFormProvider::OnCloseFormEditAbility(napi_env env, size_t argc, nap
             return CreateJsUndefined(env);
         }
     }
-    HILOG_INFO("OnCloseFormEditAbility isMainPage: %{public}s", isMainPage ? "true" : "false");
+    HILOG_INFO("OnCloseFormEditAbility isMainPage:%{public}s", isMainPage ? "true" : "false");
     auto ret = FormMgr::GetInstance().CloseFormEditAbility(isMainPage);
     if (ret != ERR_OK) {
         NapiFormUtil::ThrowByInternalErrorCode(env, ret);
@@ -844,7 +844,7 @@ napi_value JsFormProvider::OnRequestOverflow(napi_env env, size_t argc, napi_val
 
     int64_t formId = 0;
     if (!ConvertFormId(env, argv[PARAM0], formId)) {
-        HILOG_ERROR("Convert formId failed, formId:%{public}" PRId64 ".", formId);
+        HILOG_ERROR("Convert formId failed,formId:%{public}" PRId64 ".", formId);
         NapiFormUtil::ThrowParamError(env, "The formId is invalid");
         return CreateJsUndefined(env);
     }
@@ -889,7 +889,7 @@ napi_value JsFormProvider::OnCancelOverflow(napi_env env, size_t argc, napi_valu
 
     int64_t formId = 0;
     if (!ConvertFormId(env, argv[PARAM0], formId)) {
-        HILOG_ERROR("convert formId failed, formId:%{public}" PRId64 ".", formId);
+        HILOG_ERROR("convert formId failed,formId:%{public}" PRId64 ".", formId);
         NapiFormUtil::ThrowParamError(env, "The formId is invalid");
         return CreateJsUndefined(env);
     }
@@ -905,7 +905,7 @@ napi_value JsFormProvider::OnCancelOverflow(napi_env env, size_t argc, napi_valu
             }
             ErrCode ret = FormMgr::GetInstance().RequestOverflow(formId, *overflowInfo, false);
             if (ret != ERR_OK) {
-                HILOG_ERROR("RequestOverflow failed, formId:%{public}" PRId64 ", errCode: %{public}d", formId, ret);
+                HILOG_ERROR("RequestOverflow failed,formId:%{public}" PRId64 ", errCode: %{public}d", formId, ret);
             }
             // Do not reject: historically no error codes were thrown to JS, keep for compatibility.
             task.ResolveWithNoError(env, CreateJsUndefined(env));
@@ -928,14 +928,14 @@ napi_value JsFormProvider::OnActivateSceneAnimation(napi_env env, size_t argc, n
     FormHistogramUtils::ReportHistogramBoolean("Form.Provider.activateSceneAnimation", HISTOGRAM_BOOLEAN_SAMPLE);
     HILOG_INFO("call");
     if (argc != ARGS_SIZE_ONE) {
-        HILOG_ERROR("OnActivateSceneAnimation wrong number of arguments.");
+        HILOG_ERROR("OnActivateSceneAnimation wrong number of arguments");
         NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
         return CreateJsUndefined(env);
     }
 
     int64_t formId = 0;
     if (!ConvertFormId(env, argv[PARAM0], formId)) {
-        HILOG_ERROR("Convert formId failed.");
+        HILOG_ERROR("Convert formId failed");
         NapiFormUtil::ThrowParamError(env, "The formId is invalid");
         return CreateJsUndefined(env);
     }
@@ -981,7 +981,7 @@ napi_value JsFormProvider::OnDeactivateSceneAnimation(napi_env env, size_t argc,
 
     int64_t formId = 0;
     if (!ConvertFormId(env, argv[PARAM0], formId)) {
-        HILOG_ERROR("Convert formId failed.");
+        HILOG_ERROR("Convert formId failed");
         NapiFormUtil::ThrowParamError(env, "The formId is invalid");
         return CreateJsUndefined(env);
     }
@@ -1037,20 +1037,20 @@ bool JsFormProvider::ConvertFormOverflowInfo(
         return false;
     }
     overflowInfo->duration = duration;
-    HILOG_INFO("ConvertFormOverflowInfo duration: %{public}d", duration);
+    HILOG_INFO("ConvertFormOverflowInfo duration:%{public}d", duration);
 
     napi_value defaultAnimateNapiVal;
     napi_status defaultAnimateRet = napi_get_named_property(env, argv, "useDefaultAnimation", &defaultAnimateNapiVal);
     bool defaultAnimation = true;
     if (defaultAnimateRet == napi_ok) {
         if (!ConvertFromJsValue(env, defaultAnimateNapiVal, defaultAnimation)) {
-            HILOG_ERROR("ConvertFormOverflowInfo defaultAnimation: failed");
+            HILOG_ERROR("ConvertFormOverflowInfo defaultAnimation:failed");
         }
     } else {
         HILOG_WARN("get overflowInfo defaultAnimation failed");
     }
     overflowInfo->useDefaultAnimation = defaultAnimation;
-    HILOG_INFO("ConvertFormOverflowInfo defaultAnimation: %{public}d", defaultAnimation);
+    HILOG_INFO("ConvertFormOverflowInfo defaultAnimation:%{public}d", defaultAnimation);
 
     AppExecFwk::Rect area;
     if (!ConvertOverflowInfoArea(env, rangeArea, area)) {
@@ -1058,7 +1058,7 @@ bool JsFormProvider::ConvertFormOverflowInfo(
         return false;
     }
     overflowInfo->area = area;
-    HILOG_INFO("ConvertFormOverflowInfo rect: %{public}f, %{public}f, %{public}f, %{public}f",
+    HILOG_INFO("ConvertFormOverflowInfo rect:%{public}f,%{public}f,%{public}f,%{public}f",
         area.left, area.top, area.width, area.height);
     return true;
 }
@@ -1068,7 +1068,7 @@ bool JsFormProvider::GetAndConvertProperty(napi_env env, napi_value object, cons
     napi_value propertyValue;
     napi_status status = napi_get_named_property(env, object, propertyName, &propertyValue);
     if (status != napi_ok) {
-        HILOG_ERROR("Failed to get property: %{public}s", propertyName);
+        HILOG_ERROR("Failed to get property:%{public}s", propertyName);
         return false;
     }
     if (!ConvertFromJsValue(env, propertyValue, outValue)) {
@@ -1104,14 +1104,14 @@ napi_value JsFormProvider::OnGetFormRect(napi_env env, size_t argc, napi_value* 
 {
     HILOG_INFO("call");
     if (argc != ARGS_SIZE_ONE) {
-        HILOG_ERROR("OnGetFormRect wrong number of arguments.");
+        HILOG_ERROR("OnGetFormRect wrong number of arguments");
         NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
         return CreateJsUndefined(env);
     }
 
     int64_t formId;
     if (!ConvertFormId(env, argv[PARAM0], formId)) {
-        HILOG_ERROR("OnGetFormRect convert formId failed.");
+        HILOG_ERROR("OnGetFormRect convert formId failed");
         NapiFormUtil::ThrowParamError(env, "The formId is invalid");
         return CreateJsUndefined(env);
     }
@@ -1122,7 +1122,7 @@ napi_value JsFormProvider::OnGetFormRect(napi_env env, size_t argc, napi_value* 
             AppExecFwk::Rect item;
             ErrCode ret = FormMgr::GetInstance().GetFormRect(formId, item);
             if (ret != ERR_OK) {
-                HILOG_INFO("OnGetFormRect failed, code:%{public}d", ret);
+                HILOG_INFO("OnGetFormRect failed,code:%{public}d", ret);
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
                 return;
             }
@@ -1190,7 +1190,7 @@ napi_value JsFormProvider::OnGetPublishedRunningFormInfoById(napi_env env, size_
         return CreateJsUndefined(env);
     }
 
-    HILOG_INFO("before GetPublishedRunningFormInfoById, formId:%{public}" PRId64, formId);
+    HILOG_INFO("before GetPublishedRunningFormInfoById,formId:%{public}" PRId64, formId);
     NapiAsyncTask::CompleteCallback complete =
         [formId](napi_env env, NapiAsyncTask &task, int32_t status) {
             RunningFormInfo runningFormInfo;
@@ -1312,7 +1312,7 @@ napi_value JsFormProvider::OnRegisterPublishFormCrossBundleControl(napi_env env,
 {
     HILOG_INFO("call");
     if (!CheckCallerIsSystemApp()) {
-        HILOG_ERROR("the app not system-app, can't use system-api");
+        HILOG_ERROR("the app not system-app,can't use system-api");
         NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
         return CreateJsUndefined(env);
     }
@@ -1462,14 +1462,14 @@ void JsFormProviderProxyMgr::PublishFormCrossBundleControlInner(
 {
     HILOG_INFO("call");
     if (crossBundleControlEnv_ == nullptr || crossBundleControlCallback_ == nullptr) {
-        HILOG_ERROR("crossBundle control not registered.");
+        HILOG_ERROR("crossBundle control not registered");
         dataParam->isCanOpen = false;
         return;
     }
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(crossBundleControlEnv_, &scope);
     if (scope == nullptr) {
-        HILOG_ERROR("scope is null.");
+        HILOG_ERROR("scope is null");
         return;
     }
     napi_value requestObj;
@@ -1485,7 +1485,7 @@ void JsFormProviderProxyMgr::PublishFormCrossBundleControlInner(
     if (valueType != napi_function) {
         dataParam->isCanOpen = false;
         napi_close_handle_scope(crossBundleControlEnv_, scope);
-        HILOG_ERROR("callback is not function.");
+        HILOG_ERROR("callback is not function");
         return;
     }
     napi_value args[] = { requestObj };
@@ -1494,7 +1494,7 @@ void JsFormProviderProxyMgr::PublishFormCrossBundleControlInner(
     if (status != napi_ok) {
         dataParam->isCanOpen = false;
         napi_close_handle_scope(crossBundleControlEnv_, scope);
-        HILOG_ERROR("callback error.");
+        HILOG_ERROR("callback error");
         return;
     }
     napi_valuetype returnType;
@@ -1502,11 +1502,11 @@ void JsFormProviderProxyMgr::PublishFormCrossBundleControlInner(
     if (returnType == napi_undefined) {
         dataParam->isCanOpen = false;
         napi_close_handle_scope(crossBundleControlEnv_, scope);
-        HILOG_ERROR("result is undefined.");
+        HILOG_ERROR("result is undefined");
         return;
     }
     if (napi_get_value_bool(crossBundleControlEnv_, callResult, &dataParam->isCanOpen) != napi_ok) {
-        HILOG_ERROR("get value bool error.");
+        HILOG_ERROR("get value bool error");
         dataParam->isCanOpen = false;
     }
     napi_close_handle_scope(crossBundleControlEnv_, scope);

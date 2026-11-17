@@ -39,7 +39,7 @@ FormFsmStatus FormRenderStatus::GetFormStatus(const int64_t formId)
     std::shared_lock<std::shared_mutex> lock(formStatusMutex_);
     auto iter = formStatusMap_.find(formId);
     if (iter == formStatusMap_.end()) {
-        HILOG_ERROR("formStatusMap_ do not exist, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("formStatusMap_ do not exist,formId:%{public}" PRId64, formId);
         return FormFsmStatus::UNPROCESSABLE;
     }
 
@@ -51,7 +51,7 @@ void FormRenderStatus::SetFormStatus(const int64_t formId, FormFsmStatus formSta
     std::unique_lock<std::shared_mutex> lock(formStatusMutex_);
     auto iter = formStatusMap_.find(formId);
     if (iter == formStatusMap_.end()) {
-        HILOG_INFO("set new form status, formId:%{public}" PRId64 ", status is %{public}d.",
+        HILOG_INFO("set new form status,formId:%{public}" PRId64 ", status is %{public}d.",
             formId,
             static_cast<int32_t>(formStatus));
         formStatusMap_.emplace(formId, formStatus);

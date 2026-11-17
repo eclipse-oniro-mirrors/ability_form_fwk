@@ -231,7 +231,7 @@ void FormCacheMgr::RollbackNewImgCaches(const std::vector<std::string> &rowIds)
     }
     if (!DeleteImgCachesInDb(rowIds)) {
         // Leftover rows are recovered by the version-triggered sweep
-        HILOG_ERROR("FormImgRollbackFail, size:%{public}zu", rowIds.size());
+        HILOG_ERROR("FormImgRollbackFail,size:%{public}zu", rowIds.size());
     }
 }
 
@@ -261,7 +261,7 @@ bool FormCacheMgr::AddImgData(
             rowIds.push_back(value.dump());
         }
         if (!DeleteImgCachesInDb(rowIds)) {
-            HILOG_ERROR("FormImgDeleteFail, size:%{public}zu", rowIds.size());
+            HILOG_ERROR("FormImgDeleteFail,size:%{public}zu", rowIds.size());
         }
     }
 
@@ -318,7 +318,7 @@ bool FormCacheMgr::AddImgDataToDb(
     for (const auto &iter : imgCache) {
         // Trust boundary: imageDataMap may come from IPC or in-process callers, so check each entry.
         if (iter.second.first == nullptr || iter.second.second < 0) {
-            HILOG_ERROR("invalid image data, imgName:%{public}s", iter.first.c_str());
+            HILOG_ERROR("invalid image data,imgName:%{public}s", iter.first.c_str());
             return false;
         }
         int64_t rowId = INVALID_INDEX;
@@ -349,7 +349,7 @@ bool FormCacheMgr::GetImageDataFromAshmem(
 {
     HILOG_DEBUG("GetImageDataFromAshmem start picName:%{public}s", picName.c_str());
     if (len <= 0 || len > MAX_IMAGE_DATA_SIZE) {
-        HILOG_ERROR("invalid len:%{public}d, picName:%{public}s", len, picName.c_str());
+        HILOG_ERROR("invalid len:%{public}d,picName:%{public}s", len, picName.c_str());
         return false;
     }
     if (ashmem == nullptr) {
@@ -359,7 +359,7 @@ bool FormCacheMgr::GetImageDataFromAshmem(
 
     bool ret = ashmem->MapReadOnlyAshmem();
     if (!ret) {
-        HILOG_ERROR("MapReadOnlyAshmem fail, fail reason:%{public}s, picName:%{public}s",
+        HILOG_ERROR("MapReadOnlyAshmem fail,fail reason:%{public}s,picName:%{public}s",
             strerror(errno), picName.c_str());
         return false;
     }
@@ -400,7 +400,7 @@ bool FormCacheMgr::DeleteData(const int64_t formId)
 
         imgCacheObj = SafeJsonParse(formCache.imgCache);
         if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
-            HILOG_WARN("parse imgCache failed, no image data, formId:%{public}s", formCache.formId.c_str());
+            HILOG_WARN("parse imgCache failed,no image data,formId:%{public}s", formCache.formId.c_str());
             isNeedDeleteImgCache = false;
         }
     }
@@ -449,24 +449,24 @@ bool FormCacheMgr::GetDataCacheFromDb(int64_t formId, FormCache &formCache) cons
 
     int ret = absSharedResultSet->GoToFirstRow();
     if (ret != NativeRdb::E_OK) {
-        HILOG_ERROR("GoToFirstRow failed, ret:%{public}d", ret);
+        HILOG_ERROR("GoToFirstRow failed,ret:%{public}d", ret);
         return false;
     }
 
     ret = absSharedResultSet->GetString(DATA_CACHE_INDEX, formCache.dataCache);
     if (ret != NativeRdb::E_OK) {
-        HILOG_DEBUG("GetString dataCache failed, ret:%{public}d", ret);
+        HILOG_DEBUG("GetString dataCache failed,ret:%{public}d", ret);
     }
 
     ret = absSharedResultSet->GetString(FORM_IMAGES_INDEX, formCache.imgCache);
     if (ret != NativeRdb::E_OK) {
-        HILOG_DEBUG("GetString imgCache failed, ret:%{public}d", ret);
+        HILOG_DEBUG("GetString imgCache failed,ret:%{public}d", ret);
     }
 
     int32_t cacheState = static_cast<int32_t>(CacheState::DEFAULT);
     ret = absSharedResultSet->GetInt(CACHE_STATE_INDEX, cacheState);
     if (ret != NativeRdb::E_OK) {
-        HILOG_DEBUG("GetInt cacheState failed, ret:%{public}d", ret);
+        HILOG_DEBUG("GetInt cacheState failed,ret:%{public}d", ret);
     }
     formCache.cacheState = static_cast<CacheState>(cacheState);
     return true;
@@ -482,7 +482,7 @@ bool FormCacheMgr::SaveDataCacheToDb(int64_t formId, const FormCache &formCache)
     int64_t rowId;
     bool ret = FormRdbDataMgr::GetInstance().InsertData(FORM_CACHE_TABLE, valuesBucket, rowId);
     if (!ret) {
-        HILOG_ERROR("SaveDataCacheToDb formId:%{public}s failed.", std::to_string(formId).c_str());
+        HILOG_ERROR("SaveDataCacheToDb formId:%{public}s failed", std::to_string(formId).c_str());
         return false;
     }
     return true;
@@ -519,13 +519,13 @@ bool FormCacheMgr::GetImgCacheFromDb(
 
     ret = absSharedResultSet->GetBlob(IMAGE_BIT_INDEX, blob);
     if (ret != NativeRdb::E_OK) {
-        HILOG_ERROR("GetBlob failed, ret:%{public}d", ret);
+        HILOG_ERROR("GetBlob failed,ret:%{public}d", ret);
         return false;
     }
 
     ret = absSharedResultSet->GetInt(IMAGE_SIZE_INDEX, size);
     if (ret != NativeRdb::E_OK) {
-        HILOG_ERROR("GetInt size failed, ret:%{public}d", ret);
+        HILOG_ERROR("GetInt size failed,ret:%{public}d", ret);
         return false;
     }
 
@@ -742,7 +742,7 @@ void FormCacheMgr::DeleteInvalidImgCache()
         }
     }
     if (orphanRowIds.empty()) {
-        HILOG_INFO("FormCacheSweepDone, orphan:0, total:%{public}zu", allImgIds.size());
+        HILOG_INFO("FormCacheSweepDone,orphan:0,total:%{public}zu", allImgIds.size());
         return;
     }
     size_t orphanCount = orphanRowIds.size();
@@ -750,10 +750,10 @@ void FormCacheMgr::DeleteInvalidImgCache()
         size_t end = std::min(begin + static_cast<size_t>(MAX_DELETE_BATCH_SIZE), orphanCount);
         std::vector<std::string> batch(orphanRowIds.begin() + begin, orphanRowIds.begin() + end);
         if (!DeleteImgCachesInDb(batch)) {
-            HILOG_ERROR("FormImgDeleteFail, sweep batch failed, batch size:%{public}zu", batch.size());
+            HILOG_ERROR("FormImgDeleteFail,sweep batch failed,batch size:%{public}zu", batch.size());
         }
     }
-    HILOG_INFO("FormCacheSweepDone, orphan:%{public}zu, total:%{public}zu", orphanCount, allImgIds.size());
+    HILOG_INFO("FormCacheSweepDone,orphan:%{public}zu,total:%{public}zu", orphanCount, allImgIds.size());
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

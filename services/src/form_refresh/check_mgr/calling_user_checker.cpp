@@ -24,7 +24,7 @@ CallingUserChecker::~CallingUserChecker() {}
 int CallingUserChecker::CheckValid(const CheckValidFactor &factor)
 {
     if (factor.record.uid != factor.callingUid) {
-        HILOG_ERROR("form uid:%{public}d does not match callingUid:%{public}d, formId:%{public}" PRId64,
+        HILOG_ERROR("form uid:%{public}d does not match callingUid:%{public}d,formId:%{public}" PRId64,
             factor.record.uid, factor.callingUid, factor.formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }

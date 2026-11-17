@@ -150,14 +150,14 @@ bool FormTimerMgr::AddFormTimerForMultiUpdate(int64_t formId, std::vector<std::v
         }
         if (time[0] < Constants::MIN_TIME || time[0] > Constants::MAX_HOUR ||
             time[1] < Constants::MIN_TIME || time[1] > Constants::MAX_MINUTE) {
-            HILOG_ERROR("Invalid time value, hour:%{public}d, min:%{public}d", (int)time[0], (int)time[1]);
+            HILOG_ERROR("Invalid time value,hour:%{public}d,min:%{public}d", (int)time[0], (int)time[1]);
             return false;
         }
         FormTimer timerTask(formId, time[0], time[1], userId);
         timerTask.needUpdateAlarm = false;
         result = AddFormTimer(timerTask);
         if (!result) {
-            HILOG_ERROR("set multiUpdateAtTimes failed time[0] : %{public}d ,time[1] : %{public}d ",
+            HILOG_ERROR("set multiUpdateAtTimes failed time[0] :%{public}d ,time[1] :%{public}d ",
                 (int)time[0], (int)time[1]);
             return false;
         }
@@ -183,7 +183,7 @@ bool FormTimerMgr::AddFormTimerForMultiUpdate(int64_t formId, std::vector<std::v
  */
 bool FormTimerMgr::RemoveFormTimer(int64_t formId)
 {
-    HILOG_INFO("remove timer, formId:%{public}" PRId64, formId);
+    HILOG_INFO("remove timer,formId:%{public}" PRId64, formId);
 
     if (!DeleteIntervalTimer(formId)) {
         if (!DeleteUpdateAtTimer(formId)) {
@@ -296,7 +296,7 @@ bool FormTimerMgr::UpdateTimerValue(int64_t formId, const FormTimerCfg &timerCfg
                 HILOG_ERROR("Insufficient length");
                 return false;
             }
-            HILOG_INFO("time[0] : %{public}d ,time[1] : %{public}d ", (int)time[0], (int)time[1]);
+            HILOG_INFO("time[0] :%{public}d ,time[1] :%{public}d ", (int)time[0], (int)time[1]);
             UpdateAtItem changedItem_ = changedItem;
             changedItem_.refreshTask.hour = time[0];
             changedItem_.refreshTask.min = time[1];
@@ -305,7 +305,7 @@ bool FormTimerMgr::UpdateTimerValue(int64_t formId, const FormTimerCfg &timerCfg
             AddUpdateAtItem(changedItem_);
         }
     } else {
-        HILOG_INFO("updateAtHour : %{public}d ,updateAtMin : %{public}d ",
+        HILOG_INFO("updateAtHour :%{public}d ,updateAtMin :%{public}d ",
             (int)timerCfg.updateAtHour, (int)timerCfg.updateAtMin);
         changedItem.refreshTask.hour = timerCfg.updateAtHour;
         changedItem.refreshTask.min = timerCfg.updateAtMin;
@@ -335,7 +335,7 @@ bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerC
         }
         if (time[0] < Constants::MIN_TIME || time[0] > Constants::MAX_HOUR ||
             time[1] < Constants::MIN_TIME || time[1] > Constants::MAX_MINUTE) {
-            HILOG_ERROR("Invalid time value, hour:%{public}d, min:%{public}d", (int)time[0], (int)time[1]);
+            HILOG_ERROR("Invalid time value,hour:%{public}d,min:%{public}d", (int)time[0], (int)time[1]);
             return false;
         }
     }
@@ -571,7 +571,7 @@ bool FormTimerMgr::AddUpdateAtTimer(const FormTimer &task)
         auto updateAtTime = task.hour * Constants::MIN_PER_HOUR + task.min;
         for (const auto &updateAtTimer : updateAtTimerTasks_) {
             if (updateAtTimer.refreshTask.formId == task.formId && updateAtTimer.updateAtTime == updateAtTime) {
-                HILOG_WARN("already exist formTimer, formId:%{public}" PRId64 " task",
+                HILOG_WARN("already exist formTimer,formId:%{public}" PRId64 " task",
                     task.formId);
                 return true;
             }
@@ -608,7 +608,7 @@ bool FormTimerMgr::AddIntervalTimer(const FormTimer &task)
         std::lock_guard<std::mutex> lock(intervalMutex_);
         EnsureInitIntervalTimer();
         if (intervalTimerTasks_.find(task.formId) != intervalTimerTasks_.end()) {
-            HILOG_WARN("already exist formTimer, formId:%{public}" PRId64 " task", task.formId);
+            HILOG_WARN("already exist formTimer,formId:%{public}" PRId64 " task", task.formId);
             return true;
         }
         intervalTimerTasks_.emplace(task.formId, task);
@@ -719,7 +719,7 @@ bool FormTimerMgr::OnUpdateAtTrigger(long updateTime)
     }
 
     if (!updateList.empty()) {
-        HILOG_INFO("update at timer triggered, trigger time:%{public}ld", updateTime);
+        HILOG_INFO("update at timer triggered,trigger time:%{public}ld", updateTime);
         for (auto &item : updateList) {
             item.refreshTask.refreshType = RefreshType::TYPE_UPDATETIMES;
             ExecTimerTask(item.refreshTask);
@@ -1238,7 +1238,7 @@ bool FormTimerMgr::IsNeedUpdate()
     }
     if (dynamicWakeUpTime_ == firstTask->settedTime &&
         Common::FormTimeUtil::GetBootTimeMs() - Constants::ABS_REFRESH_MS > dynamicWakeUpTime_) {
-        HILOG_WARN("invalid dynamicWakeUpTime_ less than currentTime, remove it");
+        HILOG_WARN("invalid dynamicWakeUpTime_ less than currentTime,remove it");
         firstTask = dynamicRefreshTasks_.erase(dynamicRefreshTasks_.begin());
         if (firstTask == dynamicRefreshTasks_.end()) {
             return false;
@@ -1699,7 +1699,7 @@ bool FormTimerMgr::UpdateAtTimerAlarmDetail(FormTimer &timerTask)
     int64_t diffTime = selectTime - currentTime;
     // Create updateAt timer that triggers within 10 seconds, request a refresh proactively.
     if (std::abs(diffTime) <= TIMER_UPDATEAT_CREATE_BEHIND_TRIGGER && timerTask.formId > 0) {
-        HILOG_WARN("the timer was created late, actively request a refresh. formId:%{public}" PRId64, timerTask.formId);
+        HILOG_WARN("the timer was created late,actively request a refresh.formId:%{public}" PRId64, timerTask.formId);
         timerTask.refreshType = RefreshType::TYPE_UPDATETIMES;
         ExecTimerTask(timerTask);
     }
@@ -1713,7 +1713,7 @@ bool FormTimerMgr::UpdateAtTimerAlarmDetail(FormTimer &timerTask)
     int64_t nextTime = timeInSec + (selectTime - currentTime);
     HILOG_INFO("nextTime:%{public}" PRId64, nextTime);
     if (nextTime == atTimerWakeUpTime_.load()) {
-        HILOG_WARN("end, wakeUpTime not change, no need update alarm");
+        HILOG_WARN("end,wakeUpTime not change,no need update alarm");
         return true;
     }
 

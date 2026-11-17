@@ -303,7 +303,7 @@ FormHostRecord FormHostRecord::CreateRecord(const FormItemInfo &info,
  */
 void FormHostRecord::ClientDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    HILOG_INFO("Form remote died hostBundleName: %{public}s", hostBundleName_.c_str());
+    HILOG_INFO("Form remote died hostBundleName:%{public}s", hostBundleName_.c_str());
     FormHostTaskMgr::GetInstance().PostHostDiedTask(remote.promote());
 }
 
@@ -415,7 +415,7 @@ bool FormHostRecord::ContainsTransparentForm(const int64_t formId)
 void FormHostRecord::SetTransparentFormColor(const int64_t formId, const std::string &transparencyColor)
 {
     transparentForms_[formId] = transparencyColor;
-    HILOG_DEBUG("transparentForms_ count: %{public}d", (int)transparentForms_.size());
+    HILOG_DEBUG("transparentForms_ count:%{public}d", (int)transparentForms_.size());
 }
 
 std::string FormHostRecord::GetTransparentFormColor(const int64_t formId) const

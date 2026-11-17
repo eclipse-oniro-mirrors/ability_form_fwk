@@ -77,11 +77,11 @@ ErrCode GetFormInfoFromBms(const Want &want, const BundleInfo &bundleInfo, FormI
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
     std::vector<FormInfo> formInfos;
     if (!FormBmsHelper::GetInstance().GetFormsInfoByModule(bundleInfo.name, moduleName, formInfos)) {
-        HILOG_ERROR("get forms info from bms failed, bundleName:%{public}s", bundleInfo.name.c_str());
+        HILOG_ERROR("get forms info from bms failed,bundleName:%{public}s", bundleInfo.name.c_str());
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
     if (!MatchFormInfo(formInfos, abilityName, formName, moduleName, formInfo)) {
-        HILOG_INFO("form not found in bms, bundleName:%{public}s, abilityName:%{public}s",
+        HILOG_INFO("form not found in bms,bundleName:%{public}s,abilityName:%{public}s",
             bundleInfo.name.c_str(), abilityName.c_str());
         return ERR_APPEXECFWK_FORM_NOT_SUPPORTED;
     }
@@ -167,7 +167,7 @@ void FormCommonAdapter::AlignCloneProviderUid(FormItemInfo &formItemInfo)
     ErrCode ret = FormBmsHelper::GetInstance().GetEnabledCloneIndex(
         currentUserId, formItemInfo.GetProviderBundleName(), appIndex);
     if (ret != ERR_OK) {
-        HILOG_ERROR("GetEnabledCloneIndex failed, keep caller appIndex");
+        HILOG_ERROR("GetEnabledCloneIndex failed,keep caller appIndex");
         return;
     }
     formItemInfo.SetAppIndex(appIndex);
@@ -239,14 +239,14 @@ ErrCode FormCommonAdapter::GetBundleInfo(const AAFwk::Want &want, BundleInfo &bu
 
     bool moduleExist = false;
     for (const auto &moduleInfo : bundleInfo.moduleNames) {
-        HILOG_DEBUG("bundleInfo.moduleNames, module name:%{public}s", moduleInfo.c_str());
+        HILOG_DEBUG("bundleInfo.moduleNames,module name:%{public}s", moduleInfo.c_str());
         if (moduleInfo.compare(moduleName) == 0) {
             moduleExist = true;
             break;
         }
     }
     if (!moduleExist) {
-        HILOG_ERROR("GetBundleInfo no such module, name:%{public}s", moduleName.c_str());
+        HILOG_ERROR("GetBundleInfo no such module,name:%{public}s", moduleName.c_str());
         return ERR_APPEXECFWK_FORM_NO_SUCH_MODULE;
     }
 
@@ -293,7 +293,7 @@ ErrCode FormCommonAdapter::GetFormInfo(const AAFwk::Want &want, const BundleInfo
         if (formInfo.versionCode == bundleInfo.versionCode) {
             return ERR_OK;
         }
-        HILOG_WARN("storage form info stale, bundleName:%{public}s, storage version:%{public}u, "
+        HILOG_WARN("storage form info stale,bundleName:%{public}s,storage version:%{public}u,"
             "bundle version:%{public}u", bundleInfo.name.c_str(), formInfo.versionCode,
             bundleInfo.versionCode);
     } else if (errCode != ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED) {
@@ -306,7 +306,7 @@ ErrCode FormCommonAdapter::GetFormInfo(const AAFwk::Want &want, const BundleInfo
         formInfo = bmsFormInfo;
         return ERR_OK;
     }
-    HILOG_WARN("BMS query failed, keep the storage form info, bundleName:%{public}s",
+    HILOG_WARN("BMS query failed,keep the storage form info,bundleName:%{public}s",
         bundleInfo.name.c_str());
     return errCode;
 }
@@ -415,7 +415,7 @@ void FormCommonAdapter::SetFormItemInfoParams(const BundleInfo& bundleInfo, cons
 
     HILOG_INFO("size:%{public}zu", bundleInfo.applicationInfo.moduleInfos.size());
     for (const auto &item : bundleInfo.applicationInfo.moduleInfos) {
-        HILOG_INFO("moduleName:%{public}s, moduleSourceDir:%{public}s",
+        HILOG_INFO("moduleName:%{public}s,moduleSourceDir:%{public}s",
             item.moduleName.c_str(), item.moduleSourceDir.c_str());
         if (formInfo.moduleName == item.moduleName) {
             itemInfo.AddHapSourceDirs(item.moduleSourceDir);
@@ -428,7 +428,7 @@ void FormCommonAdapter::SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo
 {
     auto hapPath = hapModuleInfo.hapPath;
     auto moduleName = hapModuleInfo.moduleName;
-    HILOG_INFO("module [%{public}s] packageName is %{public}s, hap path is %{public}s", moduleName.c_str(),
+    HILOG_INFO("module [%{public}s] packageName is %{public}s,hap path is %{public}s", moduleName.c_str(),
         hapModuleInfo.packageName.c_str(), FormFileUtil::GetMaskedPath(hapPath).c_str());
     if (hapPath.find(Constants::ABS_CODE_PATH) != std::string::npos) {
         hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH),
@@ -457,7 +457,7 @@ ErrCode FormCommonAdapter::SetHostBundleName(const AAFwk::Want &want, FormItemIn
     ErrCode ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
     if (isSaUid) {
         hostBundleName = want.GetStringParam(Constants::PARAM_FORM_HOST_BUNDLENAME_KEY);
-        HILOG_INFO("sa uid call CreateFormItemInfo, hostBundleName:%{public}s", hostBundleName.c_str());
+        HILOG_INFO("sa uid call CreateFormItemInfo,hostBundleName:%{public}s", hostBundleName.c_str());
         ret = ERR_OK;
     } else {
         ret = FormBmsHelper::GetInstance().GetCallerBundleName(hostBundleName);
@@ -518,7 +518,7 @@ ErrCode FormCommonAdapter::GetFormInfoByFormRecord(const FormRecord &record, For
 
 int32_t FormCommonAdapter::GetCallerType(const std::string &bundleName)
 {
-    HILOG_DEBUG("GetCallerType called, bundleName: %{public}s", bundleName.c_str());
+    HILOG_DEBUG("GetCallerType called,bundleName:%{public}s", bundleName.c_str());
     AppExecFwk::ApplicationInfo callerAppInfo;
     int32_t userId = GetCallingUserId();
     if (FormBmsHelper::GetInstance().GetApplicationInfo(bundleName, userId, callerAppInfo) != ERR_OK) {
@@ -614,7 +614,7 @@ void FormCommonAdapter::ClientDeathRecipient::OnRemoteDied(const wptr<IRemoteObj
 
 ErrCode FormCommonAdapter::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("RegisterAddObserver called, bundleName:%{public}s", bundleName.c_str());
+    HILOG_DEBUG("RegisterAddObserver called,bundleName:%{public}s", bundleName.c_str());
     std::lock_guard<std::mutex> lock(formObserversMutex_);
     auto formObserver = formObservers_.find(bundleName);
     if (formObserver == formObservers_.end()) {
@@ -629,7 +629,7 @@ ErrCode FormCommonAdapter::RegisterAddObserver(const std::string &bundleName, co
             HILOG_ERROR("callback is already exist");
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
-        HILOG_DEBUG("%{public}s add register.", bundleName.c_str());
+        HILOG_DEBUG("%{public}s add register", bundleName.c_str());
         remoteObjects.emplace_back(callerToken);
     }
     SetDeathRecipient(callerToken, new (std::nothrow) FormCommonAdapter::ClientDeathRecipient());
@@ -639,7 +639,7 @@ ErrCode FormCommonAdapter::RegisterAddObserver(const std::string &bundleName, co
 
 ErrCode FormCommonAdapter::RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("RegisterRemoveObserver called, bundleName:%{public}s", bundleName.c_str());
+    HILOG_DEBUG("RegisterRemoveObserver called,bundleName:%{public}s", bundleName.c_str());
     std::lock_guard<std::mutex> lock(formObserversMutex_);
     auto formObserver = formObservers_.find(bundleName);
     if (formObserver == formObservers_.end()) {
@@ -686,7 +686,7 @@ void FormCommonAdapter::CheckUpdateFormRecord(const int64_t formId, const FormIt
     }
 
     if (record.formLocation != info.GetFormLocation()) {
-        HILOG_INFO("formLocation change oldLocation: %{public}d, newLocation: %{public}d, formId: %{public}" PRId64,
+        HILOG_INFO("formLocation change oldLocation:%{public}d,newLocation:%{public}d,formId:%{public}" PRId64,
             (int)record.formLocation, (int)info.GetFormLocation(), formId);
         record.formLocation = info.GetFormLocation();
         record.isLocationChange = true;
@@ -718,7 +718,7 @@ bool FormCommonAdapter::CheckFormDueControl(const FormMajorInfo &formMajorInfo, 
     BundleInfo bundleInfo;
     std::string packageName;
     if (GetBundleInfo(want, bundleInfo, packageName) != ERR_OK) {
-        HILOG_WARN("Get bundle info failed, skip due control check (fail-open)");
+        HILOG_WARN("Get bundle info failed,skip due control check (fail-open)");
         return false;
     }
 
@@ -755,7 +755,7 @@ ErrCode FormCommonAdapter::AddFormTimer(const FormRecord &formRecord)
             formRecord.isEnableUpdate, formRecord.formTempFlag);
         return ERR_OK;
     }
-    HILOG_WARN("start, formId:%{public}" PRId64 ", isDataProxy:%{public}d, isSystemApp:%{public}d",
+    HILOG_WARN("start,formId:%{public}" PRId64 ", isDataProxy:%{public}d, isSystemApp:%{public}d",
         formRecord.formId, formRecord.isDataProxy, formRecord.isSystemApp);
     if (formRecord.updateDuration > 0 && (!formRecord.isDataProxy || !formRecord.isSystemApp)) {
         if (!formDataMgr_->HasFormCloudUpdateDuration(formRecord.bundleName)) {
@@ -763,18 +763,18 @@ ErrCode FormCommonAdapter::AddFormTimer(const FormRecord &formRecord)
         }
         int64_t updateDuration = formRecord.updateDuration;
         if (!GetValidFormUpdateDuration(formRecord.formId, updateDuration)) {
-            HILOG_WARN("Get updateDuration failed, uses local configuration");
+            HILOG_WARN("Get updateDuration failed,uses local configuration");
         }
         int32_t duration = ParamControl::GetInstance().GetDueUpdateDuration(formRecord);
         if (duration == 0) {
-            HILOG_WARN("Due disable interval refresh, formId:%{public}" PRId64, formRecord.formId);
+            HILOG_WARN("Due disable interval refresh,formId:%{public}" PRId64, formRecord.formId);
             return ERR_OK;
         }
         int64_t dueDuration = static_cast<int64_t>(duration) * static_cast<int64_t>(Constants::TIME_CONVERSION);
         updateDuration = std::max(updateDuration, dueDuration);
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
             updateDuration, formRecord.providerUserId);
-        HILOG_WARN("add interval timer result:%{public}d, formId:%{public}" PRId64, ret, formRecord.formId);
+        HILOG_WARN("add interval timer result:%{public}d,formId:%{public}" PRId64, ret, formRecord.formId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::vector<std::vector<int>> updateAtTimes = formRecord.updateAtTimes;
@@ -786,10 +786,10 @@ ErrCode FormCommonAdapter::AddFormTimer(const FormRecord &formRecord)
     } else if (formRecord.updateAtHour >= 0 && formRecord.updateAtMin >= 0) {
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
             formRecord.updateAtHour, formRecord.updateAtMin, formRecord.providerUserId);
-        HILOG_WARN("add updateAt timer result:%{public}d, formId:%{public}" PRId64, ret, formRecord.formId);
+        HILOG_WARN("add updateAt timer result:%{public}d,formId:%{public}" PRId64, ret, formRecord.formId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    HILOG_WARN("no need add form timer, formId:%{public}" PRId64, formRecord.formId);
+    HILOG_WARN("no need add form timer,formId:%{public}" PRId64, formRecord.formId);
     return ERR_OK;
 }
 
@@ -810,14 +810,14 @@ bool FormCommonAdapter::GetValidFormUpdateDuration(const int64_t formId, int64_t
     }
 
     if (appInfo.apiTargetVersion < API_11) {
-        HILOG_INFO("API version is lower than 11, uses local configuration");
+        HILOG_INFO("API version is lower than 11,uses local configuration");
         updateDuration = formRecord.updateDuration;
         return true;
     }
 
     int duration = formDataMgr_->GetFormCloudUpdateDuration(formRecord.bundleName);
     if (duration == 0) {
-        HILOG_INFO("No valid cloud update duration, uses local configuration");
+        HILOG_INFO("No valid cloud update duration,uses local configuration");
         updateDuration = formRecord.updateDuration;
         return true;
     }

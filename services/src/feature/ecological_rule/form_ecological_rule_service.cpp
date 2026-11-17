@@ -59,7 +59,7 @@ sptr<IFormEcologicalRule> FormEcologicalRuleClient::ConnectService()
 
     auto systemAbility = samgr->CheckSystemAbility(ECOLOGICAL_RULE_MANAGER_SA_ID);
     if (systemAbility == nullptr) {
-        HILOG_ERROR("CheckSystemAbility error, ECOLOGICAL_RULE_MANAGER_SA_ID = 6105");
+        HILOG_ERROR("CheckSystemAbility error,ECOLOGICAL_RULE_MANAGER_SA_ID = 6105");
         return nullptr;
     }
 
@@ -116,7 +116,7 @@ int32_t FormEcologicalRuleClient::IsSupportPublishForm(const std::vector<OHOS::A
         return -1;
     }
     int32_t res = ecologicalRuleMgrServiceProxy_->IsSupportPublishForm(wants, callerInfo, bSupport);
-    HILOG_DEBUG("IsSupportPublishForm end, bSupport = %{public}d", bSupport);
+    HILOG_DEBUG("IsSupportPublishForm end,bSupport = %{public}d", bSupport);
     return res;
 }
 
@@ -160,11 +160,11 @@ int32_t FormEcologicalRuleProxy::IsSupportPublishForm(const std::vector<Want> &w
     int32_t ret = remote->SendRequest(IS_SUPPORT_PUBLISH_FORM_CMD, data, reply, option);
     IPCSkeleton::SetCallingIdentity(originId);
     if (ret != ERR_NONE) {
-        HILOG_ERROR("SendRequest error, ret = %{public}d", ret);
+        HILOG_ERROR("SendRequest error,ret = %{public}d", ret);
         return ERR_FAILED;
     }
     bSupport = reply.ReadBool();
-    HILOG_INFO("end, bSupport=%{public}d", bSupport);
+    HILOG_INFO("end,bSupport=%{public}d", bSupport);
     return ERR_OK;
 }
 } // namespace AppExecFwk

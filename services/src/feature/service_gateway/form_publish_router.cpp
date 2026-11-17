@@ -88,7 +88,7 @@ ErrCode FormPublishRouter::RequestPublish(const FormCrossDeviceRequest &request,
         return ret;
     }
     StartPublishTimer(seqId, cb);
-    HILOG_INFO("publish request sent: seq=%{public}u peer=%{public}s",
+    HILOG_INFO("publish request sent:seq=%{public}u peer=%{public}s",
         seqId, request.peerNetworkId.c_str());
     return ERR_OK;
 }
@@ -97,7 +97,7 @@ ErrCode FormPublishRouter::ValidatePublishParams(const FormCrossDeviceRequest &r
     const sptr<IRemoteObject> &callback, sptr<IFormCrossDevicePublishCallback> &outCb)
 {
     if (request.peerNetworkId.empty()) {
-        HILOG_ERROR("invalid request: peerNetworkId empty");
+        HILOG_ERROR("invalid request:peerNetworkId empty");
         return ERR_APPEXECFWK_FORM_CD_INVALID_PARAM;
     }
     if (callback == nullptr) {
@@ -116,13 +116,13 @@ ErrCode FormPublishRouter::ValidatePublishParams(const FormCrossDeviceRequest &r
 ErrCode FormPublishRouter::EnsurePeerConnection(const std::string &peerNetworkId, int64_t peerServiceId)
 {
     if (!FormServiceDiscovery::GetInstance().IsDiscoveredPeer(peerNetworkId, peerServiceId)) {
-        HILOG_ERROR("peer not discovered: networkId=%{public}s serviceId=%{public}" PRId64,
+        HILOG_ERROR("peer not discovered:networkId=%{public}s serviceId=%{public}" PRId64,
             peerNetworkId.c_str(), peerServiceId);
         return ERR_APPEXECFWK_FORM_CD_PEER_SERVICE_UNAVAILABLE;
     }
     ErrCode connRet = connectionPool_->GetOrCreateConnection(peerNetworkId, peerServiceId, true);
     if (connRet != ERR_OK) {
-        HILOG_ERROR("GetOrCreateConnection failed for peer:%{public}s, ret=%{public}d",
+        HILOG_ERROR("GetOrCreateConnection failed for peer:%{public}s,ret=%{public}d",
             peerNetworkId.c_str(), connRet);
         return ERR_APPEXECFWK_FORM_CD_PEER_SERVICE_UNAVAILABLE;
     }
@@ -148,7 +148,7 @@ void FormPublishRouter::HandlePublishResponse(FormCdMsgType msgType, uint32_t se
             HILOG_ERROR("DecodeResult failed for RESPONSE_PUBLISH seq=%{public}u", seqId);
             res = PublishFormCrossDeviceResult{ ERR_APPEXECFWK_FORM_CD_CODEC_FAILED, FORM_CD_INVALID_FORM_ID };
         }
-        HILOG_INFO("RESPONSE_PUBLISH received: seq=%{public}u formId=%{public}" PRId64,
+        HILOG_INFO("RESPONSE_PUBLISH received:seq=%{public}u formId=%{public}" PRId64,
             seqId, res.formId);
         cb->OnResult(res);
         return;
@@ -174,7 +174,7 @@ ErrCode FormPublishRouter::SendPublishFrame(const FormCrossDeviceRequest &reques
     }
     ErrCode sendRet = connectionPool_->SendRawFrame(request.peerNetworkId, frame);
     if (sendRet != ERR_OK) {
-        HILOG_ERROR("SendRawFrame failed for peer:%{public}s, ret=%{public}d",
+        HILOG_ERROR("SendRawFrame failed for peer:%{public}s,ret=%{public}d",
             request.peerNetworkId.c_str(), sendRet);
         return ERR_APPEXECFWK_FORM_CD_PEER_SERVICE_UNAVAILABLE;
     }
@@ -186,7 +186,7 @@ void FormPublishRouter::StartPublishTimer(uint32_t seqId, const sptr<IFormCrossD
     int32_t timerId = HiviewDFX::XCollie::GetInstance().SetTimer(
         "FormPublishTimeout", FORM_CD_REQUEST_TIMEOUT_MS,
         [this, seqId, cb](void *) {
-            HILOG_ERROR("publish request timed out: seq=%{public}u", seqId);
+            HILOG_ERROR("publish request timed out:seq=%{public}u", seqId);
             connectionPool_->UnregisterResponseHandler(seqId);
             cb->OnResult(PublishFormCrossDeviceResult{
                 ERR_APPEXECFWK_FORM_CD_REQUEST_TIMEOUT, FORM_CD_INVALID_FORM_ID });
@@ -199,12 +199,12 @@ void FormPublishRouter::StartPublishTimer(uint32_t seqId, const sptr<IFormCrossD
 
 ErrCode FormPublishRouter::HandleIncomingPublish(const FormCrossDeviceRequest &req, PublishFormCrossDeviceResult &res)
 {
-    HILOG_INFO("remote gateway: incoming publish from peer=%{public}s",
+    HILOG_INFO("remote gateway:incoming publish from peer=%{public}s",
         req.peerNetworkId.c_str());
 
     int32_t userId = -1;
     if (!FormServiceDiscovery::GetInstance().GetUserIdByServiceId(req.peerServiceId, userId)) {
-        HILOG_ERROR("serviceId not found in local registration, serviceId=%{public}" PRId64, req.peerServiceId);
+        HILOG_ERROR("serviceId not found in local registration,serviceId=%{public}" PRId64, req.peerServiceId);
         res.errCode = ERR_APPEXECFWK_FORM_CD_PEER_SERVICE_UNAVAILABLE;
         return ERR_APPEXECFWK_FORM_CD_PEER_SERVICE_UNAVAILABLE;
     }
@@ -217,7 +217,7 @@ ErrCode FormPublishRouter::HandleIncomingPublish(const FormCrossDeviceRequest &r
     }
     ErrCode ret = FormMgrAdapterFacade::GetInstance().HandleCrossDevicePublish(want, userId, formId, formProviderData);
     if (ret != ERR_OK) {
-        HILOG_ERROR("HandleCrossDevicePublish failed, ret=%{public}d", ret);
+        HILOG_ERROR("HandleCrossDevicePublish failed,ret=%{public}d", ret);
         res.errCode = ret;
         return ret;
     }
@@ -229,7 +229,7 @@ void FormPublishRouter::OnFrame(int32_t fd, FormCdMsgType msgType,
     uint32_t seqId, const std::string &payload)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("OnFrame: fd=%{public}d msgType=%{public}u seq=%{public}u payloadLen=%{public}zu",
+    HILOG_INFO("OnFrame:fd=%{public}d msgType=%{public}u seq=%{public}u payloadLen=%{public}zu",
         fd, static_cast<uint32_t>(msgType), seqId, payload.size());
     switch (msgType) {
         case FormCdMsgType::REQUEST_PUBLISH: {
@@ -265,14 +265,14 @@ void FormPublishRouter::OnFrame(int32_t fd, FormCdMsgType msgType,
 void FormPublishRouter::SendResponseFrame(int32_t fd, const std::string &frame)
 {
     if (connectionPool_ == nullptr) {
-        HILOG_ERROR("connectionPool is null, cannot send response frame");
+        HILOG_ERROR("connectionPool is null,cannot send response frame");
         return;
     }
     ErrCode ret = connectionPool_->SendRawFrameByFd(fd, frame);
     if (ret != ERR_OK) {
-        HILOG_ERROR("SendResponseFrame failed: fd=%{public}d ret=%{public}d", fd, ret);
+        HILOG_ERROR("SendResponseFrame failed:fd=%{public}d ret=%{public}d", fd, ret);
     } else {
-        HILOG_DEBUG("SendResponseFrame ok: fd=%{public}d size=%{public}zu", fd, frame.size());
+        HILOG_DEBUG("SendResponseFrame ok:fd=%{public}d size=%{public}zu", fd, frame.size());
     }
 }
 

@@ -159,7 +159,7 @@ void FormRenderTaskMgr::SetRenderGroupEnableFlag(int64_t formId, bool isEnable, 
         HILOG_ERROR("fail");
         return;
     }
-    HILOG_INFO("formId: %{public}" PRId64 " isEnable change to: %{public}d", formId, isEnable);
+    HILOG_INFO("formId:%{public}" PRId64 " isEnable change to: %{public}d", formId, isEnable);
 }
 
 void FormRenderTaskMgr::SetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject)
@@ -238,7 +238,7 @@ void FormRenderTaskMgr::RestoreFormsRecycledStatus(const std::vector<FormRecord>
     std::vector<int64_t> recycleForms;
     for (const auto &formRecord : formRecords) {
         if (FormDataMgr::GetInstance().IsExpectRecycled(formRecord.formId)) {
-            HILOG_INFO("form is expect recycled, formId: %{public}" PRId64, formRecord.formId);
+            HILOG_INFO("form is expect recycled,formId:%{public}" PRId64, formRecord.formId);
             recycleForms.emplace_back(formRecord.formId);
             if (!formRecord.formUserUids.empty() && !callingUid) {
                 callingUid = *formRecord.formUserUids.begin();
@@ -276,10 +276,10 @@ void FormRenderTaskMgr::SetRenderGroupParams(int64_t formId, const Want &want, c
     renderWant.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(formRecord.providerUserId) + formRecord.bundleName);
     int32_t error = remoteFormRender->SetRenderGroupParams(formId, renderWant);
     if (error != ERR_OK) {
-        HILOG_ERROR("fail, error code: %{public}d, formId: %{public}" PRId64, error, formId);
+        HILOG_ERROR("fail,error code:%{public}d,formId:%{public}" PRId64, error, formId);
         return;
     }
-    HILOG_INFO("formId: %{public}" PRId64, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

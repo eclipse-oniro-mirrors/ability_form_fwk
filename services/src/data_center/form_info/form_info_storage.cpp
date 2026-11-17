@@ -205,7 +205,7 @@ bool FormInfoStorage::IsEquipmentLevelFiltered(const AppExecFwk::FormInfo &formI
         return false;
     }
 
-    HILOG_ERROR("fms not support form of bundleName: %{public}s, formName: %{public}s",
+    HILOG_ERROR("fms not support form of bundleName:%{public}s,formName:%{public}s",
         formInfo.bundleName.c_str(), formInfo.name.c_str());
     return true;
 }
@@ -224,7 +224,7 @@ bool FormInfoStorage::IsFunInterFormInfoFiltered(const AppExecFwk::FormInfo &for
         return false;
     }
 
-    HILOG_ERROR("fms not support fun interaction of bundleName: %{public}s", formInfo.bundleName.c_str());
+    HILOG_ERROR("fms not support fun interaction of bundleName:%{public}s", formInfo.bundleName.c_str());
     return true;
 }
 

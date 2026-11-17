@@ -54,7 +54,7 @@ static ani_object CreateFormBindingData(ani_env *env, ani_object paramObject)
         return nullptr;
     }
     if (isUndefined) {
-        HILOG_INFO("paramObject is undefined, return empty FormBindingData");
+        HILOG_INFO("paramObject is undefined,return empty FormBindingData");
         OHOS::AbilityRuntime::FormAniUtil::SetPropertyStringByName(env, formBindingDataObj, "data", "");
         return formBindingDataObj;
     }

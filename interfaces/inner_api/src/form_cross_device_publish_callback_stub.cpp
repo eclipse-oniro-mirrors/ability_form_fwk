@@ -34,7 +34,7 @@ FormCrossDevicePublishCallbackStub::~FormCrossDevicePublishCallbackStub()
 int FormCrossDevicePublishCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOG_DEBUG("code=%{public}u, flags=%{public}d", code, option.GetFlags());
+    HILOG_DEBUG("code=%{public}u,flags=%{public}d", code, option.GetFlags());
     std::u16string descriptor = FormCrossDevicePublishCallbackStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
@@ -44,7 +44,7 @@ int FormCrossDevicePublishCallbackStub::OnRemoteRequest(
 
     int32_t callerUid = IPCSkeleton::GetCallingUid();
     if (callerUid != FormConstants::SUBFOUNDATION_UID) {
-        HILOG_ERROR("caller uid %{public}d is not subfoundation, rejected", callerUid);
+        HILOG_ERROR("caller uid %{public}d is not subfoundation,rejected", callerUid);
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
 

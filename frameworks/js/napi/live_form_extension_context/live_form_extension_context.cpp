@@ -46,7 +46,7 @@ bool LiveFormExtensionContext::SetWindowBackgroundColor()
 
     Rosen::WMError ret = uiWindow->SetBackgroundColor(TRANSPARENT_COLOR);
     if (ret != Rosen::WMError::WM_OK) {
-        HILOG_ERROR("SetBackgroundColor failed, ret=%{public}d", ret);
+        HILOG_ERROR("SetBackgroundColor failed,ret=%{public}d", ret);
         return false;
     }
 #endif // SUPPORT_SCREEN
@@ -65,10 +65,10 @@ ErrCode LiveFormExtensionContext::SetUIExtCustomDensity(float layoutScale)
     }
 
     if (std::islessequal(layoutScale, 0.0f) || std::isgreaterequal(layoutScale, MAX_LAYOUT_SCALE)) {
-        HILOG_ERROR("layoutScale out of range (0, %{public}f), layoutScale: %{public}f", MAX_LAYOUT_SCALE, layoutScale);
+        HILOG_ERROR("layoutScale out of range (0,%{public}f),layoutScale:%{public}f", MAX_LAYOUT_SCALE, layoutScale);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    HILOG_INFO("SetUIExtCustomDensity layoutScale: %{public}f", layoutScale);
+    HILOG_INFO("SetUIExtCustomDensity layoutScale:%{public}f", layoutScale);
 
     auto defaultDisplay = Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
     if (defaultDisplay == nullptr) {
@@ -82,14 +82,14 @@ ErrCode LiveFormExtensionContext::SetUIExtCustomDensity(float layoutScale)
     }
     float density = displayInfo->GetDensityInCurResolution();
     if (density > 0.0f && layoutScale > std::numeric_limits<float>::max() / density) {
-        HILOG_ERROR("layoutScale too large, would cause overflow: layoutScale: %{public}f, density: %{public}f",
+        HILOG_ERROR("layoutScale too large,would cause overflow:layoutScale:%{public}f,density:%{public}f",
             layoutScale, density);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     density = density * layoutScale;
     Rosen::WMError ret = uiWindow->SetUIExtCustomDensity(density);
     if (ret != Rosen::WMError::WM_OK) {
-        HILOG_ERROR("SetUIExtCustomDensity failed, ret=%{public}d", ret);
+        HILOG_ERROR("SetUIExtCustomDensity failed,ret=%{public}d", ret);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 #endif // SUPPORT_SCREEN
@@ -99,7 +99,7 @@ ErrCode LiveFormExtensionContext::SetUIExtCustomDensity(float layoutScale)
 
 ErrCode LiveFormExtensionContext::StartAbilityByFms(const AAFwk::Want &want, const std::string &formId)
 {
-    HILOG_INFO("StartAbilityByFms want: %{private}s", want.ToString().c_str());
+    HILOG_INFO("StartAbilityByFms want:%{private}s", want.ToString().c_str());
     AAFwk::Want wantToHost;
     wantToHost.SetAction(Constants::FORM_PAGE_ACTION);
     ElementName elementName = want.GetElement();
@@ -109,10 +109,10 @@ ErrCode LiveFormExtensionContext::StartAbilityByFms(const AAFwk::Want &want, con
     wantToHost.SetParam(Constants::PARMA_REQUEST_METHOD, REQUEST_METHOD);
     wantToHost.SetParam(Constants::PARAM_LIVE_FORM_ID_KEY, formId);
  
-    HILOG_INFO("StartAbilityByFms wantToHost: %{private}s", wantToHost.ToString().c_str());
+    HILOG_INFO("StartAbilityByFms wantToHost:%{private}s", wantToHost.ToString().c_str());
     ErrCode err = AppExecFwk::FormMgr::GetInstance().StartAbilityByFms(wantToHost);
     if (err != ERR_OK) {
-        HILOG_ERROR("StartAbilityByFms fail, ret = %{public}d", err);
+        HILOG_ERROR("StartAbilityByFms fail,ret = %{public}d", err);
         return err;
     }
     HILOG_INFO("StartAbilityByFms success");

@@ -41,7 +41,7 @@ NetConnCallbackManager::~NetConnCallbackManager()
 
 void NetConnCallbackManager::RegisterNetConnCallback()
 {
-    HILOG_DEBUG("Register NetConn begin, post to queue");
+    HILOG_DEBUG("Register NetConn begin,post to queue");
     auto task = []() {
         NetConnCallbackManager::GetInstance().RegisterNetConnCallbackInternal();
     };
@@ -73,7 +73,7 @@ int32_t NetConnCallbackManager::RegisterNetConnCallbackInternal()
             observer_->SetNetConnect();
         }
     } else {
-        HILOG_ERROR("Register NetConnCallbackObserver failed, netConTime:%{public}d", netConTime_.load());
+        HILOG_ERROR("Register NetConnCallbackObserver failed,netConTime:%{public}d", netConTime_.load());
         netConTime_.fetch_add(1);
         if (netConTime_.load() >= FORM_CON_NET_MAX) {
             HILOG_ERROR("Register NetConnCallbackObserver failed FORM_CON_NET_MAX times");
@@ -87,7 +87,7 @@ int32_t NetConnCallbackManager::RegisterNetConnCallbackInternal()
 
 void NetConnCallbackManager::UnregisterNetConnCallback()
 {
-    HILOG_DEBUG("Unregister NetConn begin, post to queue");
+    HILOG_DEBUG("Unregister NetConn begin,post to queue");
     auto task = []() {
         NetConnCallbackManager::GetInstance().UnregisterNetConnCallbackInternal();
     };

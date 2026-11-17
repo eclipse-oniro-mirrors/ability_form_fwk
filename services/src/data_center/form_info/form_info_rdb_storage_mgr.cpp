@@ -65,7 +65,7 @@ ErrCode FormInfoRdbStorageMgr::LoadFormInfos(std::vector<std::pair<std::string, 
 
     for (const auto &item: value) {
         if (item.first.size() <= strlen(FORM_INFO_PREFIX)) {
-            HILOG_ERROR("invalid key: %{public}s", item.first.c_str());
+            HILOG_ERROR("invalid key:%{public}s", item.first.c_str());
             continue;
         }
         formInfoStorages.emplace_back(item.first.substr(strlen(FORM_INFO_PREFIX)), item.second);
@@ -81,7 +81,7 @@ ErrCode FormInfoRdbStorageMgr::RemoveBundleFormInfos(const std::string &bundleNa
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    HILOG_DEBUG("FormInfoRdbStorageMgr remove form info, bundleName=%{public}s", bundleName.c_str());
+    HILOG_DEBUG("FormInfoRdbStorageMgr remove form info,bundleName=%{public}s", bundleName.c_str());
 
     std::string key = std::string().append(FORM_INFO_PREFIX).append(bundleName);
     ErrCode result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
@@ -99,7 +99,7 @@ ErrCode FormInfoRdbStorageMgr::UpdateBundleFormInfos(const std::string &bundleNa
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    HILOG_DEBUG("FormInfoRdbStorageMgr update form info, bundleName=%{public}s", bundleName.c_str());
+    HILOG_DEBUG("FormInfoRdbStorageMgr update form info,bundleName=%{public}s", bundleName.c_str());
     nlohmann::json checkJson = SafeJsonParse(formInfoStorages);
     if (checkJson.is_discarded()) {
         HILOG_ERROR("formInfoStorages is not valid JSON for bundle %{public}s", bundleName.c_str());
@@ -128,7 +128,7 @@ ErrCode FormInfoRdbStorageMgr::BatchUpdateBundleFormInfos(
     }
     ErrCode result = FormRdbDataMgr::GetInstance().BatchInsert(Constants::FORM_RDB_TABLE_NAME, bundleStorages);
     if (result != ERR_OK) {
-        HILOG_ERROR("batch update formInfoStorages to rdbStore error, size:%{public}zu", bundleStorages.size());
+        HILOG_ERROR("batch update formInfoStorages to rdbStore error,size:%{public}zu", bundleStorages.size());
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ERR_OK;
@@ -141,7 +141,7 @@ void FormInfoRdbStorageMgr::SaveEntries(
         InnerFormInfo innerFormInfo;
         nlohmann::json jsonObject = SafeJsonParse(item.second);
         if (jsonObject.is_discarded() || innerFormInfo.FromJson(jsonObject) != true) {
-            HILOG_ERROR("error key: %{private}s", item.first.c_str());
+            HILOG_ERROR("error key:%{private}s", item.first.c_str());
             FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, item.first);
             continue;
         }
@@ -236,7 +236,7 @@ ErrCode FormInfoRdbStorageMgr::LoadStatusData(const std::string &formId, std::st
     std::string key = std::string().append(STATUS_DATA_PREFIX).append(formId);
     result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, key, statusData);
     if (result != ERR_OK) {
-        HILOG_ERROR("load status data of %{public}s failed, code is %{public}d", formId.c_str(), result);
+        HILOG_ERROR("load status data of %{public}s failed,code is %{public}d", formId.c_str(), result);
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
             key, static_cast<int32_t>(CallDbFailedErrorType::DATABASE_QUERY_FORMID_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -257,7 +257,7 @@ ErrCode FormInfoRdbStorageMgr::UpdateStatusData(const std::string &formId, const
     std::string key = std::string().append(STATUS_DATA_PREFIX).append(formId);
     result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, key, statusData);
     if (result != ERR_OK) {
-        HILOG_ERROR("update status data of %{public}s to rdbstore failed, code is %{public}d", formId.c_str(), result);
+        HILOG_ERROR("update status data of %{public}s to rdbstore failed,code is %{public}d", formId.c_str(), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -270,20 +270,20 @@ ErrCode FormInfoRdbStorageMgr::GetFormVersionCode(std::string &versionCode)
     ErrCode result = FormRdbDataMgr::GetInstance().QueryData(
         Constants::FORM_RDB_TABLE_NAME, FORM_VERSION_KEY, versionCode);
     if (result != ERR_OK) {
-        HILOG_ERROR("get form version code failed, code is %{public}d", result);
+        HILOG_ERROR("get form version code failed,code is %{public}d", result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    HILOG_INFO("get form version code success. versionCode:%{public}s", versionCode.c_str());
+    HILOG_INFO("get form version code success.versionCode:%{public}s", versionCode.c_str());
     return ERR_OK;
 }
 
 ErrCode FormInfoRdbStorageMgr::UpdateFormVersionCode()
 {
-    HILOG_INFO("call. versioncode:%{public}d", Constants::FORM_VERSION_CODE);
+    HILOG_INFO("call.versioncode:%{public}d", Constants::FORM_VERSION_CODE);
     ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, FORM_VERSION_KEY,
         std::to_string(Constants::FORM_VERSION_CODE));
     if (result != ERR_OK) {
-        HILOG_ERROR("update form version code to rdbstore failed, code is %{public}d", result);
+        HILOG_ERROR("update form version code to rdbstore failed,code is %{public}d", result);
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
             FORM_VERSION_KEY, static_cast<int32_t>(CallDbFailedErrorType::DATABASE_SAVE_FORMID_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -297,21 +297,21 @@ ErrCode FormInfoRdbStorageMgr::GetMultiAppFormVersionCode(const std::string &bun
     std::string key = MULTI_APP_FORM_VERSION_PREFIX + bundleName;
     ErrCode result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, key, versionCode);
     if (result != ERR_OK) {
-        HILOG_ERROR("get multi app form version code failed, code is %{public}d", result);
+        HILOG_ERROR("get multi app form version code failed,code is %{public}d", result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    HILOG_INFO("get multi app form version code success.");
+    HILOG_INFO("get multi app form version code success");
     return ERR_OK;
 }
 
 ErrCode FormInfoRdbStorageMgr::UpdateMultiAppFormVersionCode(const std::string &bundleName,
     const std::string &versionCode)
 {
-    HILOG_INFO("call. bundleName: %{public}s", bundleName.c_str());
+    HILOG_INFO("call.bundleName:%{public}s", bundleName.c_str());
     std::string key = MULTI_APP_FORM_VERSION_PREFIX + bundleName;
     ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, key, versionCode);
     if (result != ERR_OK) {
-        HILOG_ERROR("update multi app form version code to rdbstore failed, code is %{public}d", result);
+        HILOG_ERROR("update multi app form version code to rdbstore failed,code is %{public}d", result);
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
             key, static_cast<int32_t>(CallDbFailedErrorType::DATABASE_SAVE_FORMID_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;

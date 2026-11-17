@@ -26,12 +26,12 @@ FormSingletonQueueBase::FormSingletonQueueBase(const std::string &queueName,
       serialQueue_(std::make_shared<FormBaseSerialQueue>(queueName)),
       strategy_(strategy ? strategy : std::make_shared<NoWrapStrategy>())
 {
-    HILOG_INFO("create queue: %{public}s", queueName_.c_str());
+    HILOG_INFO("create queue:%{public}s", queueName_.c_str());
 }
 
 FormSingletonQueueBase::~FormSingletonQueueBase()
 {
-    HILOG_INFO("destroy queue: %{public}s", queueName_.c_str());
+    HILOG_INFO("destroy queue:%{public}s", queueName_.c_str());
 }
 
 bool FormSingletonQueueBase::ScheduleTask(uint64_t ms, std::function<void()> func, TaskQos qos)

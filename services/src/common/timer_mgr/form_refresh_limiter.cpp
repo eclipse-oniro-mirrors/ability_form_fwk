@@ -80,7 +80,7 @@ bool FormRefreshLimiter::IsEnableRefresh(const int64_t formId)
     std::lock_guard<std::mutex> lock(limiterMutex_);
     auto info = limiterMap_.find(formId);
     if (info != limiterMap_.end()) {
-        HILOG_INFO("refreshCount:%{public}d, formId:%{public}" PRId64, info->second.refreshCount, formId);
+        HILOG_INFO("refreshCount:%{public}d,formId:%{public}" PRId64, info->second.refreshCount, formId);
         if (info->second.refreshCount < Constants::LIMIT_COUNT) {
             FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_HIGH_FREQUENCY);
             isEnable = true;
@@ -88,7 +88,7 @@ bool FormRefreshLimiter::IsEnableRefresh(const int64_t formId)
 
         if (info->second.refreshCount == Constants::LIMIT_COUNT && !info->second.isReported) {
             info->second.isReported = true;
-            HILOG_INFO("report refresh to 50 count, formId:%{public}" PRId64 "", formId);
+            HILOG_INFO("report refresh to 50 count,formId:%{public}" PRId64 "", formId);
         }
     }
     HILOG_DEBUG("end");

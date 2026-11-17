@@ -51,12 +51,12 @@ std::string ParamReader::GetPathVersion(const std::string &path)
 {
     HILOG_INFO("GetPathVersion:%{public}s", path.c_str());
     if (path.empty()) {
-        HILOG_ERROR("path is empty, return default version");
+        HILOG_ERROR("path is empty,return default version");
         return Constants::FMC_DEFAULT_VERSION;
     }
     char canonicalPath[PATH_MAX] = { '\0' };
     if (realpath((path + Constants::VERSION_FILE_NAME).c_str(), canonicalPath) == nullptr) {
-        HILOG_ERROR("canonicalPath is null, return default version");
+        HILOG_ERROR("canonicalPath is null,return default version");
         return Constants::FMC_DEFAULT_VERSION;
     }
     canonicalPath[PATH_MAX - 1] = '\0';
@@ -130,7 +130,7 @@ std::string ParamReader::GetParamInfoStr(const std::string &filePathStr)
     canonicalPath[PATH_MAX - 1] = '\0';
     std::ifstream file(canonicalPath, std::ios::in | std::ios::binary);
     if (!file.good()) {
-        HILOG_ERROR("Failed to open the file!");
+        HILOG_ERROR("Failed to open the file");
         return paramInfo;
     }
     std::stringstream infile;
@@ -196,7 +196,7 @@ std::string ParamReader::CalcFileSha256Digest(const std::string &fileName)
     std::string calSha256Digest;
     std::tuple<int, std::string> ret = SignTools::CalcFileSha256Digest(filePath);
     if (std::get<0>(ret) != 0) {
-        HILOG_ERROR("CalcFileSha256Digest failed,error : %{public}d ", std::get<0>(ret));
+        HILOG_ERROR("CalcFileSha256Digest failed,error :%{public}d ", std::get<0>(ret));
         return calSha256Digest;
     }
     calSha256Digest = std::get<1>(ret);

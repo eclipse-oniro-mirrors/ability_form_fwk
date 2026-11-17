@@ -22,7 +22,7 @@ namespace AppExecFwk {
 FormSerialQueue::FormSerialQueue(const std::string &queueName)
     : baseQueue_(std::make_shared<Common::FormBaseSerialQueue>(queueName))
 {
-    HILOG_DEBUG("create FormSerialQueue, queueName :%{public}s", queueName.c_str());
+    HILOG_DEBUG("create FormSerialQueue,queueName :%{public}s", queueName.c_str());
 }
 
 FormSerialQueue::~FormSerialQueue()

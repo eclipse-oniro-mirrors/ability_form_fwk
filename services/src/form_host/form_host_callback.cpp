@@ -33,9 +33,9 @@ namespace AppExecFwk {
 void FormHostCallback::OnAcquired(const int64_t formId, const FormRecord& record,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("FormHostCallback OnAcquired, formId:%{public}" PRId64, formId);
+    HILOG_DEBUG("FormHostCallback OnAcquired,formId:%{public}" PRId64, formId);
     if (formId <= 0) {
-        HILOG_ERROR("OnAcquired invalid param, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("OnAcquired invalid param,formId:%{public}" PRId64, formId);
         return;
     }
     if (callerToken == nullptr) {
@@ -57,7 +57,7 @@ void FormHostCallback::OnUpdate(const int64_t formId, const FormRecord &record, 
 
     // check formId
     if (formId < 0) {
-        HILOG_ERROR("OnUpdate invalid param, formId:%{public}" PRId64 ".", formId);
+        HILOG_ERROR("OnUpdate invalid param,formId:%{public}" PRId64 ".", formId);
         return;
     }
 
@@ -79,7 +79,7 @@ void FormHostCallback::OnUninstall(std::vector<int64_t> &formIds, const sptr<IRe
 {
     // check formId
     if (formIds.empty()) {
-        HILOG_ERROR("OnUninstall invalid param, formIds is empty");
+        HILOG_ERROR("OnUninstall invalid param,formIds is empty");
         return;
     }
 
@@ -143,7 +143,7 @@ void FormHostCallback::OnRecycleForms(
 void FormHostCallback::OnEnableForms(
     const std::vector<int64_t> &formIds, const bool enable, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("size:%{public}zu, enable:%{public}d", formIds.size(), enable);
+    HILOG_INFO("size:%{public}zu,enable:%{public}d", formIds.size(), enable);
     if (formIds.empty()) {
         HILOG_ERROR("empty formIds");
         return;
@@ -160,7 +160,7 @@ void FormHostCallback::OnEnableForms(
 void FormHostCallback::OnLockForms(const std::vector<int64_t> &formIds,
     const bool lock, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("size:%{public}zu, lock:%{public}d", formIds.size(), lock);
+    HILOG_INFO("size:%{public}zu,lock:%{public}d", formIds.size(), lock);
     if (formIds.empty()) {
         HILOG_ERROR("empty formIds");
         return;
@@ -177,7 +177,7 @@ void FormHostCallback::OnLockForms(const std::vector<int64_t> &formIds,
 void FormHostCallback::OnDueControlForms(const std::vector<int64_t> &formIds, const bool isDisablePolicy,
     const bool isControl, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("size:%{public}zu, isDisablePolicy:%{public}d, isControl:%{public}d",
+    HILOG_INFO("size:%{public}zu,isDisablePolicy:%{public}d,isControl:%{public}d",
         formIds.size(), isDisablePolicy, isControl);
     if (formIds.empty()) {
         HILOG_ERROR("empty formIds");

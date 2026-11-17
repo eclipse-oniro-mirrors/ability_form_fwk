@@ -72,7 +72,7 @@ EtsLiveFormExtensionContext* EtsLiveFormExtensionContext::GetEtsLiveFormExtensio
     ani_status status = ANI_ERROR;
     ani_long etsContextLong = 0;
     if ((status = env->Object_GetFieldByName_Long(obj, "nativeEtsContext", &etsContextLong)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return nullptr;
     }
     etsContext = reinterpret_cast<EtsLiveFormExtensionContext *>(etsContextLong);
@@ -94,7 +94,7 @@ bool EtsLiveFormExtensionContext::CheckConnectionParam(ani_env *env, ani_object 
     ani_boolean res = ANI_FALSE;
     ani_status status = ANI_ERROR;
     if ((status = env->Object_GetType(connectOptionsObj, &type)) != ANI_OK) {
-        HILOG_ERROR("Failed to Object_GetType, status: %{public}d", status);
+        HILOG_ERROR("Failed to Object_GetType,status:%{public}d", status);
         return false;
     }
     if (type == nullptr) {
@@ -102,7 +102,7 @@ bool EtsLiveFormExtensionContext::CheckConnectionParam(ani_env *env, ani_object 
         return false;
     }
     if ((status = env->Object_InstanceOf(connectOptionsObj, type, &res)) != ANI_OK) {
-        HILOG_ERROR("Failed to Object_InstanceOf, status: %{public}d", status);
+        HILOG_ERROR("Failed to Object_InstanceOf,status:%{public}d", status);
         return false;
     }
     if (res != ANI_TRUE) {
@@ -123,7 +123,7 @@ bool EtsLiveFormExtensionContext::CheckConnectionParam(ani_env *env, ani_object 
             g_serialNumber = 0;
         }
     }
-    HILOG_DEBUG("Failed to find connection, make new one");
+    HILOG_DEBUG("Failed to find connection,make new one");
     return true;
 }
 
@@ -146,17 +146,17 @@ ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
     ani_method method = nullptr;
     ani_object contextObj = nullptr;
     if ((status = env->FindClass(LIVE_FORM_EXTENSION_CONTEXT, &cls)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return nullptr;
     }
     if ((status = env->Class_FindMethod(cls, "<ctor>", "l:", &method)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return nullptr;
     }
     std::unique_ptr<EtsLiveFormExtensionContext> etsContext = std::make_unique<EtsLiveFormExtensionContext>(context);
     if ((status = env->Object_New(cls, method, &contextObj, reinterpret_cast<ani_long>(etsContext.release()))) !=
         ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return nullptr;
     }
 
@@ -169,7 +169,7 @@ ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
             reinterpret_cast<void *>(EtsLiveFormExtensionContext::DisconnectServiceExtensionAbility) },
     };
     if ((status = env->Class_BindNativeMethods(cls, functions.data(), functions.size())) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return nullptr;
     }
 
@@ -185,7 +185,7 @@ ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
         return nullptr;
     }
     if (!EtsLiveFormExtensionContext::BindNativePtrCleaner(env)) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         delete workContext;
         return nullptr;
     }
@@ -198,7 +198,7 @@ ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
         return nullptr;
     }
     if ((status = env->GlobalReference_Create(contextObj, contextGlobalRef)) != ANI_OK) {
-        HILOG_ERROR("GlobalReference_Create failed status: %{public}d", status);
+        HILOG_ERROR("GlobalReference_Create failed status:%{public}d", status);
         delete contextGlobalRef;
         delete workContext;
         return nullptr;
@@ -216,7 +216,7 @@ bool EtsLiveFormExtensionContext::BindNativePtrCleaner(ani_env *env)
     ani_class cleanerCls;
     ani_status status = env->FindClass(LIVE_FORM_EXTENSION_CONTEXT_CLEANER_CLASS_NAME, &cleanerCls);
     if (ANI_OK != status) {
-        HILOG_ERROR("Not found Cleaner. status:%{public}d.", status);
+        HILOG_ERROR("Not found Cleaner.status:%{public}d", status);
         return false;
     }
     std::array methods = {
@@ -224,7 +224,7 @@ bool EtsLiveFormExtensionContext::BindNativePtrCleaner(ani_env *env)
     };
     if ((status = env->Class_BindNativeMethods(cleanerCls, methods.data(), methods.size())) != ANI_OK
         && status != ANI_ALREADY_BINDED) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return false;
     }
     return true;
@@ -371,7 +371,7 @@ ani_long EtsLiveFormExtensionContext::OnConnectServiceExtensionAbility(ani_env *
     }
     ani_vm *etsVm = nullptr;
     if ((status = env->GetVM(&etsVm)) != ANI_OK || etsVm == nullptr) {
-        HILOG_ERROR("Failed to getVM, status: %{public}d", status);
+        HILOG_ERROR("Failed to getVM,status:%{public}d", status);
         EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
         return FAILED_CODE;
     }
@@ -389,7 +389,7 @@ ani_long EtsLiveFormExtensionContext::OnConnectServiceExtensionAbility(ani_env *
     auto innerErrCode = context->ConnectAbility(want, connection);
     int64_t connectId = connection->GetConnectionId();
     if (innerErrCode != ERR_OK) {
-        HILOG_ERROR("Faied to ConnectAbility, innerErrCode is %{public}d", innerErrCode);
+        HILOG_ERROR("Faied to ConnectAbility,innerErrCode is %{public}d", innerErrCode);
         RemoveConnection(connectId);
         EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
         return FAILED_CODE;

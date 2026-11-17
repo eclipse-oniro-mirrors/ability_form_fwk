@@ -65,7 +65,7 @@ napi_value AttachUIExtensionContext(napi_env env, void *value, void *)
             delete static_cast<std::weak_ptr<LiveFormExtensionContext> *>(data);
         }, nullptr, nullptr);
     if (status != napi_ok && workContext != nullptr) {
-        HILOG_ERROR("napi_wrap Failed: %{public}d", status);
+        HILOG_ERROR("napi_wrap Failed:%{public}d", status);
         delete workContext;
         return nullptr;
     }
@@ -128,7 +128,7 @@ void JsLiveFormExtensionImpl::BindContext()
             delete static_cast<std::weak_ptr<LiveFormExtensionContext> *>(data);
         }, nullptr, nullptr);
     if (status != napi_ok && workContext != nullptr) {
-        HILOG_ERROR("napi_wrap Failed: %{public}d", status);
+        HILOG_ERROR("napi_wrap Failed:%{public}d", status);
         delete workContext;
     }
 

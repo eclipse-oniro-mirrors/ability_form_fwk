@@ -105,7 +105,7 @@ static napi_value GetFormIds(napi_env env, napi_value value, ErrCode &errCode, s
     uint32_t arrayLength = 0;
     NAPI_CALL(env, napi_get_array_length(env, value, &arrayLength));
     if (arrayLength > Constants::MAX_FORM_DATA_SIZE) {
-        HILOG_ERROR("arrayLength too large: %{public}u", arrayLength);
+        HILOG_ERROR("arrayLength too large:%{public}u", arrayLength);
         errCode = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR;
         return nullptr;
     }
@@ -152,12 +152,12 @@ void AcquireFormStateCallbackComplete(uv_work_t *work, int32_t status)
 {
     HILOG_INFO("call");
     if (work == nullptr) {
-        HILOG_ERROR("work == nullptr.");
+        HILOG_ERROR("work == nullptr");
         return;
     }
     auto *asyncCallbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo *>(work->data);
     if (asyncCallbackInfo == nullptr) {
-        HILOG_ERROR("asyncCallbackInfo == nullptr.");
+        HILOG_ERROR("asyncCallbackInfo == nullptr");
         delete work;
         return;
     }
@@ -189,12 +189,12 @@ void AcquireFormStatePromiseComplete(uv_work_t *work, int32_t status)
 {
     HILOG_INFO("onAcquireFormState back");
     if (work == nullptr) {
-        HILOG_ERROR("%{public}s, work == nullptr.", __func__);
+        HILOG_ERROR("%{public}s,work == nullptr", __func__);
         return;
     }
     auto *asyncCallbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo *>(work->data);
     if (asyncCallbackInfo == nullptr) {
-        HILOG_ERROR("asyncCallbackInfo == nullptr.");
+        HILOG_ERROR("asyncCallbackInfo == nullptr");
         delete work;
         return;
     }
@@ -238,7 +238,7 @@ public:
         uv_loop_s *loop = nullptr;
         napi_get_uv_event_loop(asyncCallbackInfo_->env, &loop);
         if (loop == nullptr) {
-            HILOG_ERROR("loop == nullptr.");
+            HILOG_ERROR("loop == nullptr");
             if (asyncCallbackInfo_->callback != nullptr) {
                 napi_delete_reference(asyncCallbackInfo_->env, asyncCallbackInfo_->callback);
                 asyncCallbackInfo_->callback = nullptr;
@@ -250,7 +250,7 @@ public:
 
         auto *work = new (std::nothrow) uv_work_t;
         if (work == nullptr) {
-            HILOG_ERROR("work == nullptr.");
+            HILOG_ERROR("work == nullptr");
             if (asyncCallbackInfo_->callback != nullptr) {
                 napi_delete_reference(asyncCallbackInfo_->env, asyncCallbackInfo_->callback);
                 asyncCallbackInfo_->callback = nullptr;
@@ -309,10 +309,10 @@ public:
         handler_->PostSyncTask([thisWeakPtr = weak_from_this(), formId]() {
             auto sharedThis = thisWeakPtr.lock();
             if (sharedThis == nullptr) {
-                HILOG_ERROR("sharedThis is null.");
+                HILOG_ERROR("sharedThis is null");
                 return;
             }
-            HILOG_DEBUG("task end formId: form: %{public}" PRId64 ".", formId);
+            HILOG_DEBUG("task end formId:form:%{public}" PRId64 ".", formId);
             std::string formIdString = std::to_string(formId);
             AbilityRuntime::HandleScope scopeGuard(sharedThis->env_);
             napi_value callbackValues;
@@ -406,7 +406,7 @@ bool DelFormUninstallCallback(napi_value callback)
             iter++;
         }
     }
-    HILOG_INFO("%{public}d form uninstall callback deleted.", count);
+    HILOG_INFO("%{public}d form uninstall callback deleted", count);
     return true;
 }
 
@@ -420,14 +420,14 @@ bool ClearFormUninstallCallback()
 
 static void InnerAcquireFormState(napi_env env, AsyncAcquireFormStateCallbackInfo *const asyncCallbackInfo)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called", __func__);
     std::shared_ptr<FormStateCallbackInterface> formStateCallback = std::make_shared<FormStateCallbackClient>(
         asyncCallbackInfo);
     FormHostClient::GetInstance()->AddFormState(formStateCallback, asyncCallbackInfo->want);
 
     asyncCallbackInfo->result = FormMgr::GetInstance().AcquireFormState(asyncCallbackInfo->want,
         FormHostClient::GetInstance(), asyncCallbackInfo->stateInfo);
-    HILOG_DEBUG("%{public}s, end", __func__);
+    HILOG_DEBUG("%{public}s,end", __func__);
 }
 
 static void AcquireFormStateExecuteWork(napi_env env, void *data)
@@ -474,7 +474,7 @@ static void AcquireFormStateCallbackComplete(napi_env env, napi_status status, v
         if (callback != nullptr) {
             napi_status refStatus = napi_delete_reference(env, callback);
             if (refStatus != napi_ok) {
-                HILOG_ERROR("napi_delete_reference failed: %{public}d", refStatus);
+                HILOG_ERROR("napi_delete_reference failed:%{public}d", refStatus);
             }
         }
         delete callbackInfo;
@@ -487,7 +487,7 @@ static void AcquireFormStateCallbackComplete(napi_env env, napi_status status, v
 napi_value AcquireFormStateCallback(napi_env env, napi_value callbackFunc,
     AsyncAcquireFormStateCallbackInfo *const asyncCallbackInfo)
 {
-    HILOG_INFO("asyncCallback.");
+    HILOG_INFO("asyncCallback");
     napi_value resourceName;
     napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
     napi_valuetype valueType = napi_undefined;
@@ -504,7 +504,7 @@ napi_value AcquireFormStateCallback(napi_env env, napi_value callbackFunc,
         static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
-        HILOG_ERROR("async work failed!");
+        HILOG_ERROR("async work failed");
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
@@ -519,7 +519,7 @@ napi_value AcquireFormStateCallback(napi_env env, napi_value callbackFunc,
 
 napi_value AcquireFormStatePromise(napi_env env, AsyncAcquireFormStateCallbackInfo *const asyncCallbackInfo)
 {
-    HILOG_INFO("promise.");
+    HILOG_INFO("promise");
     napi_deferred deferred;
     napi_value promise;
     NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
@@ -550,7 +550,7 @@ napi_value AcquireFormStatePromise(napi_env env, AsyncAcquireFormStateCallbackIn
         }, static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
-        HILOG_ERROR("async work failed!");
+        HILOG_ERROR("async work failed");
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
@@ -577,7 +577,7 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_TWO] = {nullptr, nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
     if (argc > ARGS_SIZE_TWO) {
-        HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
+        HILOG_ERROR("%{public}s,wrong number of arguments", __func__);
         return nullptr;
     }
     HILOG_INFO("argc:[%{public}zu]", argc);
@@ -591,7 +591,7 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
 
     auto asyncCallbackInfoPtr = std::make_unique<AsyncAcquireFormStateCallbackInfo>();
     if (!asyncCallbackInfoPtr) {
-        HILOG_ERROR("asyncCallbackInfo == nullptr.");
+        HILOG_ERROR("asyncCallbackInfo == nullptr");
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackType, argv[1]));
     }
 
@@ -600,7 +600,7 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
     asyncCallbackInfoPtr->result = ERR_OK;
 
     if (!UnwrapWant(env, argv[0], asyncCallbackInfoPtr->want)) {
-        HILOG_ERROR("%{public}s, failed to parse want.", __func__);
+        HILOG_ERROR("%{public}s,failed to parse want", __func__);
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_INVALID_PARAM, callbackType, argv[1]));
     }
 
@@ -635,7 +635,7 @@ napi_value NAPI_RegisterFormUninstallObserver(napi_env env, napi_callback_info i
     napi_value argv[ARGS_SIZE_TWO] = {nullptr, nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
     if (argc != ARGS_SIZE_TWO) {
-        HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
+        HILOG_ERROR("%{public}s,wrong number of arguments", __func__);
         return nullptr;
     }
     HILOG_INFO("argc:[%{public}zu]", argc);
@@ -643,24 +643,24 @@ napi_value NAPI_RegisterFormUninstallObserver(napi_env env, napi_callback_info i
     napi_valuetype valueType = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, argv[0], &valueType));
     if (valueType != napi_string) {
-        HILOG_ERROR("The type of args[0] is incorrect, expected type is string.");
+        HILOG_ERROR("The type of args[0] is incorrect,expected type is string");
         return nullptr;
     }
     std::string type;
     if (!UnwrapStringFromJS2(env, argv[0], type)) {
-        HILOG_ERROR("failed to get args[0].");
+        HILOG_ERROR("failed to get args[0]");
         return nullptr;
     }
 
     if (type != "formUninstall") {
-        HILOG_ERROR("args[0] should be formUninstall.");
+        HILOG_ERROR("args[0] should be formUninstall");
         return nullptr;
     }
 
     valueType = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, argv[1], &valueType));
     if (valueType != napi_function) {
-        HILOG_ERROR("The type of args[1] is incorrect, expected type is function.");
+        HILOG_ERROR("The type of args[1] is incorrect,expected type is function");
         return nullptr;
     }
 
@@ -686,7 +686,7 @@ napi_value NAPI_UnregisterFormUninstallObserver(napi_env env, napi_callback_info
     napi_value argv[ARGS_SIZE_TWO] = {nullptr, nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
     if (argc > ARGS_SIZE_TWO) {
-        HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
+        HILOG_ERROR("%{public}s,wrong number of arguments", __func__);
         return nullptr;
     }
     HILOG_INFO("argc:[%{public}zu]", argc);
@@ -694,17 +694,17 @@ napi_value NAPI_UnregisterFormUninstallObserver(napi_env env, napi_callback_info
     napi_valuetype valueType = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, argv[0], &valueType));
     if (valueType != napi_string) {
-        HILOG_ERROR("The type of args[0] is incorrect, expected type is string.");
+        HILOG_ERROR("The type of args[0] is incorrect,expected type is string");
         return nullptr;
     }
     std::string type;
     if (!UnwrapStringFromJS2(env, argv[0], type)) {
-        HILOG_ERROR("failed to get args[0].");
+        HILOG_ERROR("failed to get args[0]");
         return nullptr;
     }
 
     if (type != "formUninstall") {
-        HILOG_ERROR("args[0] should be formUninstall.");
+        HILOG_ERROR("args[0] should be formUninstall");
         return nullptr;
     }
 
@@ -712,7 +712,7 @@ napi_value NAPI_UnregisterFormUninstallObserver(napi_env env, napi_callback_info
         valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, argv[1], &valueType));
         if (valueType != napi_function) {
-            HILOG_ERROR("The type of args[1] is incorrect, expected type is function.");
+            HILOG_ERROR("The type of args[1] is incorrect,expected type is function");
             return nullptr;
         }
         DelFormUninstallCallback(argv[1]);
@@ -726,11 +726,11 @@ napi_value NAPI_UnregisterFormUninstallObserver(napi_env env, napi_callback_info
 
 static void InnerNotifyFormsVisible(napi_env env, AsyncNotifyFormsVisibleCallbackInfo *const asyncCallbackInfo)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called", __func__);
 
     asyncCallbackInfo->result = FormMgr::GetInstance().NotifyFormsVisible(asyncCallbackInfo->formIds,
         asyncCallbackInfo->isVisible, FormHostClient::GetInstance());
-    HILOG_DEBUG("%{public}s, end", __func__);
+    HILOG_DEBUG("%{public}s,end", __func__);
 }
 
 static void NotifyFormsVisibleCallbackComplete(napi_env env, napi_status, void *data)
@@ -785,7 +785,7 @@ napi_value NotifyFormsVisibleCallback(napi_env env, napi_value callbackFunc,
         static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
-        HILOG_ERROR("async work failed!");
+        HILOG_ERROR("async work failed");
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
@@ -809,7 +809,7 @@ static void NotifyFormsVisiblePromiseComplete(napi_env env, napi_status status, 
     napi_value result = nullptr;
     InnerCreatePromiseRetMsg(env, callbackInfo->result, &result);
     if (result == nullptr) {
-        HILOG_ERROR("InnerCreatePromiseRetMsg failed, result is nullptr");
+        HILOG_ERROR("InnerCreatePromiseRetMsg failed,result is nullptr");
         napi_get_undefined(env, &result);
     }
     if (callbackInfo->result == ERR_OK) {
@@ -847,7 +847,7 @@ napi_value NotifyFormsVisiblePromise(napi_env env, AsyncNotifyFormsVisibleCallba
         NotifyFormsVisiblePromiseComplete, static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
-        HILOG_ERROR("async work failed!");
+        HILOG_ERROR("async work failed");
         if (asyncCallbackInfo->asyncWork) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
@@ -876,7 +876,7 @@ napi_value NAPI_NotifyFormsVisible(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_THREE] = {nullptr, nullptr, nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
     if (argc > ARGS_SIZE_THREE || argc < ARGS_SIZE_TWO) {
-        HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
+        HILOG_ERROR("%{public}s,wrong number of arguments", __func__);
         return nullptr;
     }
 
@@ -897,7 +897,7 @@ napi_value NAPI_NotifyFormsVisible(napi_env env, napi_callback_info info)
 
     auto asyncCallbackInfoPtr = std::make_unique<AsyncNotifyFormsVisibleCallbackInfo>();
     if (!asyncCallbackInfoPtr) {
-        HILOG_ERROR("asyncCallbackInfo == nullptr.");
+        HILOG_ERROR("asyncCallbackInfo == nullptr");
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackType, argv[1]));
     }
     asyncCallbackInfoPtr->env = env;
@@ -922,11 +922,11 @@ napi_value NAPI_NotifyFormsVisible(napi_env env, napi_callback_info info)
 static void InnerNotifyFormsEnableUpdate(napi_env env,
                                          AsyncNotifyFormsEnableUpdateCallbackInfo *const asyncCallbackInfo)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called", __func__);
 
     asyncCallbackInfo->result = FormMgr::GetInstance().NotifyFormsEnableUpdate(asyncCallbackInfo->formIds,
         asyncCallbackInfo->isEnableUpdate, FormHostClient::GetInstance());
-    HILOG_DEBUG("%{public}s, end", __func__);
+    HILOG_DEBUG("%{public}s,end", __func__);
 }
 
 static void NotifyFormsEnableUpdateCallbackComplete(napi_env env, napi_status status, void *data)
@@ -982,7 +982,7 @@ napi_value NotifyFormsEnableUpdateCallback(napi_env env, napi_value callbackFunc
         static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
-        HILOG_ERROR("async work failed!");
+        HILOG_ERROR("async work failed");
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
@@ -1034,7 +1034,7 @@ napi_value NotifyFormsEnableUpdatePromise(napi_env env,
         }, static_cast<void *>(asyncCallbackInfo), &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
-        HILOG_ERROR("async work failed!");
+        HILOG_ERROR("async work failed");
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
@@ -1063,7 +1063,7 @@ napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_THREE] = {nullptr, nullptr, nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
     if (argc > ARGS_SIZE_THREE || argc < ARGS_SIZE_TWO) {
-        HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
+        HILOG_ERROR("%{public}s,wrong number of arguments", __func__);
         return nullptr;
     }
 
@@ -1084,7 +1084,7 @@ napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info)
 
     auto asyncCallbackInfoPtr = std::make_unique<AsyncNotifyFormsEnableUpdateCallbackInfo>();
     if (!asyncCallbackInfoPtr) {
-        HILOG_ERROR("asyncCallbackInfo == nullptr.");
+        HILOG_ERROR("asyncCallbackInfo == nullptr");
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackType, argv[1]));
     }
     asyncCallbackInfoPtr->env = env;
@@ -1215,7 +1215,7 @@ napi_value NapiFormHost::OnShareForm(napi_env env, size_t argc, napi_value* argv
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     int32_t errCode = ERR_OK;
     if (argc > ARGS_SIZE_THREE || argc < ARGS_SIZE_TWO) {
-        HILOG_ERROR("wrong number of arguments.");
+        HILOG_ERROR("wrong number of arguments");
         errCode = ERR_ADD_INVALID_PARAM;
     }
 
@@ -1228,7 +1228,7 @@ napi_value NapiFormHost::OnShareForm(napi_env env, size_t argc, napi_value* argv
 
     int64_t formId = 0;
     if (!ConvertStringToInt64(strFormId, formId)) {
-        HILOG_ERROR("convert string formId to int64 failed.");
+        HILOG_ERROR("convert string formId to int64 failed");
         errCode = ERR_COMMON;
     }
     if (formId == 0 || remoteDeviceId.empty()) {
@@ -1243,7 +1243,7 @@ napi_value NapiFormHost::OnShareForm(napi_env env, size_t argc, napi_value* argv
     std::shared_ptr<AbilityRuntime::NapiAsyncTask> asyncTask = std::move(uasyncTask);
 
     ShareFormTask task = [env, asyncTask](int32_t code) {
-        HILOG_DEBUG("task complete code: %{public}d", code);
+        HILOG_DEBUG("task complete code:%{public}d", code);
         AbilityRuntime::HandleScope scopeGuard(env);
         if (code == ERR_OK) {
             asyncTask->Resolve(env, CreateJsUndefined(env));
@@ -1268,24 +1268,24 @@ napi_value NapiFormHost::OnDisableFormsUpdate(napi_env env, size_t argc, napi_va
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     int32_t errCode = ERR_OK;
     if (argc > ARGS_TWO || argc < ARGS_ONE) {
-        HILOG_ERROR("wrong number of arguments!");
+        HILOG_ERROR("wrong number of arguments");
         return CreateJsUndefined(env);
     }
 
     std::vector<string> strFormIdList;
     if (!GetStringsValue(env, argv[PARAM0], strFormIdList)) {
-        HILOG_ERROR("conversion string failed!");
+        HILOG_ERROR("conversion string failed");
         errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
     }
     if (strFormIdList.empty()) {
-        HILOG_ERROR("formId list is empty!");
+        HILOG_ERROR("formId list is empty");
         errCode = ERR_APPEXECFWK_FORM_FORM_ID_ARRAY_ERR;
     }
     std::vector<int64_t> iFormIds;
     for (size_t i = 0; i < strFormIdList.size(); i++) {
         int64_t formIdValue;
         if (!ConvertStringToInt64(strFormIdList[i], formIdValue)) {
-            HILOG_ERROR("conversion int failed!");
+            HILOG_ERROR("conversion int failed");
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         } else {
             iFormIds.push_back(formIdValue);
@@ -1316,7 +1316,7 @@ napi_value NapiFormHost::OnIsSystemReady(napi_env env, size_t argc, napi_value* 
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     if (argc > ARGS_ONE || argc < ARGS_ZERO) {
-        HILOG_ERROR("wrong number of arguments.");
+        HILOG_ERROR("wrong number of arguments");
         return CreateJsUndefined(env);
     }
 
@@ -1342,7 +1342,7 @@ napi_value NapiFormHost::OnGetAllFormsInfo(napi_env env, size_t argc, napi_value
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     if (argc > ARGS_ONE || argc < ARGS_ZERO) {
-        HILOG_ERROR("wrong number of arguments!");
+        HILOG_ERROR("wrong number of arguments");
         return CreateJsUndefined(env);
     }
 
@@ -1368,13 +1368,13 @@ napi_value NapiFormHost::OnGetFormsInfo(napi_env env, size_t argc, napi_value* a
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     int32_t errCode = ERR_OK;
     if (argc > ARGS_THREE || argc < ARGS_ONE) {
-        HILOG_ERROR("wrong number of arguments!");
+        HILOG_ERROR("wrong number of arguments");
         return CreateJsUndefined(env);
     }
 
     std::string bName("");
     if (!ConvertFromJsValue(env, argv[PARAM0], bName)) {
-        HILOG_ERROR("conversion failed!");
+        HILOG_ERROR("conversion failed");
         errCode = ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
     }
 
@@ -1412,25 +1412,25 @@ napi_value NapiFormHost::OnGetFormsInfo(napi_env env, size_t argc, napi_value* a
 
 napi_value NapiFormHost::OnDeleteForm(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called", __func__);
 
     int32_t errCode = ERR_OK;
     int64_t formId = 0;
     if (argc > ARGS_TWO || argc < ARGS_ONE) {
-        HILOG_ERROR("OnDeleteForm wrong number of arguments.");
+        HILOG_ERROR("OnDeleteForm wrong number of arguments");
         return CreateJsUndefined(env);
     }
     if (!IsTypeForNapiValue(env, argv[PARAM0], napi_string)) {
-        HILOG_ERROR("input arguments is not string!");
+        HILOG_ERROR("input arguments is not string");
         errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     } else {
         std::string strFormId;
         if (!ConvertFromJsValue(env, argv[PARAM0], strFormId)) {
-            HILOG_ERROR("conversion failed!");
+            HILOG_ERROR("conversion failed");
             return CreateJsUndefined(env);
         }
         if (!ConvertStringToInt64(strFormId, formId)) {
-            HILOG_ERROR("OnDeleteForm convert string formId to int64 failed.");
+            HILOG_ERROR("OnDeleteForm convert string formId to int64 failed");
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         }
     }
@@ -1458,32 +1458,32 @@ napi_value NapiFormHost::OnDeleteForm(napi_env env, size_t argc, napi_value* arg
 napi_value NapiFormHost::OnReleaseForm(napi_env env,
     size_t argc, napi_value* argv)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called", __func__);
 
     int32_t errCode = ERR_OK;
     int64_t formId = 0;
     bool isReleaseCache = false;
     if (argc > ARGS_THREE || argc < ARGS_ONE) {
-        HILOG_ERROR("OnReleaseForm wrong number of arguments.");
+        HILOG_ERROR("OnReleaseForm wrong number of arguments");
         return CreateJsUndefined(env);
     }
     if (!IsTypeForNapiValue(env, argv[PARAM0], napi_string)) {
-        HILOG_ERROR("input params is not string!");
+        HILOG_ERROR("input params is not string");
         errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     } else {
         std::string strFormId;
         if (!ConvertFromJsValue(env, argv[PARAM0], strFormId)) {
-            HILOG_ERROR("conversion error!");
+            HILOG_ERROR("conversion error");
             return CreateJsUndefined(env);
         }
         if (!ConvertStringToInt64(strFormId, formId)) {
-            HILOG_ERROR("OnReleaseForm convert string formId to int64 failed.");
+            HILOG_ERROR("OnReleaseForm convert string formId to int64 failed");
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         } else if ((argc == ARGS_TWO || argc == ARGS_THREE) &&
             !IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
             if (IsTypeForNapiValue(env, argv[PARAM1], napi_boolean)) {
                 if (!ConvertFromJsValue(env, argv[PARAM1], isReleaseCache)) {
-                    HILOG_ERROR("conversion bool failed!");
+                    HILOG_ERROR("conversion bool failed");
                     return CreateJsUndefined(env);
                 }
             } else {
@@ -1523,25 +1523,25 @@ napi_value NapiFormHost::OnReleaseForm(napi_env env,
 
 napi_value NapiFormHost::OnRequestForm(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called", __func__);
 
     int32_t errCode = ERR_OK;
     int64_t formId = 0;
     if (argc > ARGS_TWO || argc < ARGS_ONE) {
-        HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
+        HILOG_ERROR("%{public}s,wrong number of arguments", __func__);
         return CreateJsUndefined(env);
     }
     if (!IsTypeForNapiValue(env, argv[PARAM0], napi_string)) {
-        HILOG_ERROR("input params is not string!");
+        HILOG_ERROR("input params is not string");
         errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     } else {
         std::string strFormId;
         if (!ConvertFromJsValue(env, argv[PARAM0], strFormId)) {
-            HILOG_ERROR("transform failed!");
+            HILOG_ERROR("transform failed");
             return CreateJsUndefined(env);
         }
         if (!ConvertStringToInt64(strFormId, formId)) {
-            HILOG_ERROR("%{public}s, convert string formId to int64 failed.", __func__);
+            HILOG_ERROR("%{public}s,convert string formId to int64 failed", __func__);
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         }
     }
@@ -1569,25 +1569,25 @@ napi_value NapiFormHost::OnRequestForm(napi_env env, size_t argc, napi_value* ar
 
 napi_value NapiFormHost::OnCastTempForm(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called", __func__);
 
     int32_t errCode = ERR_OK;
     int64_t formId = 0;
     if (argc > ARGS_TWO || argc < ARGS_ONE) {
-        HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
+        HILOG_ERROR("%{public}s,wrong number of arguments", __func__);
         return CreateJsUndefined(env);
     }
     if (!IsTypeForNapiValue(env, argv[PARAM0], napi_string)) {
-        HILOG_ERROR("input arguments is not string!");
+        HILOG_ERROR("input arguments is not string");
         errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     } else {
         std::string strFormId;
         if (!ConvertFromJsValue(env, argv[PARAM0], strFormId)) {
-            HILOG_ERROR("transform failed!");
+            HILOG_ERROR("transform failed");
             return CreateJsUndefined(env);
         }
         if (!ConvertStringToInt64(strFormId, formId)) {
-            HILOG_ERROR("%{public}s, convert string formId to int64 failed.", __func__);
+            HILOG_ERROR("%{public}s,convert string formId to int64 failed", __func__);
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         }
     }
@@ -1619,18 +1619,18 @@ napi_value NapiFormHost::OnEnableFormsUpdate(napi_env env, size_t argc, napi_val
     int32_t errCode = ERR_OK;
     std::vector<int64_t> iFormIds;
     if (argc > ARGS_TWO|| argc < ARGS_ONE) {
-        HILOG_ERROR("wrong number of arguments!");
+        HILOG_ERROR("wrong number of arguments");
         return CreateJsUndefined(env);
     }
     std::vector<string> strFormIdList;
     if (!GetStringsValue(env, argv[PARAM0], strFormIdList)) {
-        HILOG_ERROR("conversion string failed!");
+        HILOG_ERROR("conversion string failed");
         errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
     }
     for (size_t i = 0; i < strFormIdList.size(); i++) {
         int64_t formIdValue;
         if (!ConvertStringToInt64(strFormIdList[i], formIdValue)) {
-            HILOG_ERROR("conversion int failed!");
+            HILOG_ERROR("conversion int failed");
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         } else {
             iFormIds.push_back(formIdValue);
@@ -1745,7 +1745,7 @@ napi_value NapiFormHost::OnNotifyFormsPrivacyProtected(napi_env env, size_t argc
 {
     HILOG_INFO("call");
     if (argc > ARGS_SIZE_THREE || argc < ARGS_SIZE_TWO) {
-        HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
+        HILOG_ERROR("%{public}s,wrong number of arguments", __func__);
         return nullptr;
     }
 
@@ -1753,7 +1753,7 @@ napi_value NapiFormHost::OnNotifyFormsPrivacyProtected(napi_env env, size_t argc
     std::vector<int64_t> formIds {};
     GetFormIds(env, argv[0], errCode, formIds);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("get formIds faild, code is %{public}d", errCode);
+        HILOG_ERROR("get formIds faild,code is %{public}d", errCode);
         return nullptr;
     }
 
@@ -1762,14 +1762,14 @@ napi_value NapiFormHost::OnNotifyFormsPrivacyProtected(napi_env env, size_t argc
     bool isProtected = false;
 
     if (!ConvertFromJsValue(env, argv[1], isProtected)) {
-        HILOG_ERROR("convert from Js value failed!");
+        HILOG_ERROR("convert from Js value failed");
         return nullptr;
     }
 
     NapiAsyncTask::CompleteCallback complete =
         [formIds, isProtected, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
             if (errCode != ERR_OK) {
-                HILOG_ERROR("task reject, code is %{public}d", errCode);
+                HILOG_ERROR("task reject,code is %{public}d", errCode);
                 task.Reject(env, CreateJsError(env, errCode, QueryRetMsg(errCode)));
                 return;
             }
@@ -1779,7 +1779,7 @@ napi_value NapiFormHost::OnNotifyFormsPrivacyProtected(napi_env env, size_t argc
             if (ret == ERR_OK) {
                 task.Resolve(env, CreateJsUndefined(env));
             } else {
-                HILOG_ERROR("task reject, result code is %{public}d", ret);
+                HILOG_ERROR("task reject,result code is %{public}d", ret);
                 NapiFormUtil::RejectCurrentTask(env, task, ret);
             }
         };
@@ -1795,15 +1795,15 @@ bool NapiFormHost::OnDeleteInvalidFormsParseParam(napi_env env, size_t argc, nap
     int32_t &errCode, std::vector<std::string> &strFormIdList)
 {
     if (argc > ARGS_TWO || argc < ARGS_ONE) {
-        HILOG_ERROR("wrong number of arguments.");
+        HILOG_ERROR("wrong number of arguments");
         return false;
     }
     if (!GetStringsValue(env, argv[PARAM0], strFormIdList)) {
-        HILOG_ERROR("conversion string failed!");
+        HILOG_ERROR("conversion string failed");
         errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
     }
     if (strFormIdList.empty()) {
-        HILOG_ERROR("formId list is empty!");
+        HILOG_ERROR("formId list is empty");
         errCode = ERR_APPEXECFWK_FORM_FORM_ID_ARRAY_ERR;
     }
     return true;
@@ -1824,7 +1824,7 @@ napi_value NapiFormHost::OnDeleteInvalidForms(napi_env env, size_t argc, napi_va
     for (size_t i = 0; i < strFormIdList.size(); i++) {
         int64_t formIdValue;
         if (!ConvertStringToInt64(strFormIdList[i], formIdValue)) {
-            HILOG_ERROR("conversion int failed!");
+            HILOG_ERROR("conversion int failed");
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         } else {
             onDeleteInvalidForms->iFormIds.push_back(formIdValue);
@@ -1832,11 +1832,11 @@ napi_value NapiFormHost::OnDeleteInvalidForms(napi_env env, size_t argc, napi_va
     }
     auto execute = [data = onDeleteInvalidForms, errCode] {
         if (data == nullptr) {
-            HILOG_ERROR("onDeleteInvalidForms is nullptr.");
+            HILOG_ERROR("onDeleteInvalidForms is nullptr");
             return;
         }
         if (errCode != ERR_OK) {
-            HILOG_ERROR("parse param failed, code is %{public}d", errCode);
+            HILOG_ERROR("parse param failed,code is %{public}d", errCode);
             return;
         }
         data->result = FormMgr::GetInstance().DeleteInvalidForms(
@@ -1871,24 +1871,24 @@ napi_value NapiFormHost::OnNotifyVisibleForms(napi_env env, size_t argc, napi_va
     int32_t errCode = ERR_OK;
     std::vector<int64_t> iFormIds;
     if (argc > ARGS_TWO || argc < ARGS_ONE) {
-        HILOG_ERROR("wrong number of arguments!");
+        HILOG_ERROR("wrong number of arguments");
         return CreateJsUndefined(env);
     }
     bool isArray = false;
     napi_is_array(env, argv[PARAM0], &isArray);
     if (!isArray) {
-        HILOG_ERROR("input params0 is not array!");
+        HILOG_ERROR("input params0 is not array");
         errCode = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR;
     } else {
         std::vector<string> strFormIdList;
         if (!GetStringsValue(env, argv[PARAM0], strFormIdList)) {
-            HILOG_ERROR("conversion string failed!");
+            HILOG_ERROR("conversion string failed");
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         }
         for (size_t i = 0; i < strFormIdList.size(); i++) {
             int64_t formIdValue;
             if (!ConvertStringToInt64(strFormIdList[i], formIdValue)) {
-                HILOG_ERROR("conversion int error!");
+                HILOG_ERROR("conversion int error");
                 errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
             } else {
                 iFormIds.push_back(formIdValue);
@@ -1920,7 +1920,7 @@ int32_t NapiFormHost::OnNotifyInVisibleFormsParseParam(napi_env env, size_t argc
     std::vector<int64_t> &formIds)
 {
     if (argc > ARGS_TWO || argc < ARGS_ONE) {
-        HILOG_ERROR("wrong number of arguments. argc is %{public}zu", argc);
+        HILOG_ERROR("wrong number of arguments.argc is %{public}zu", argc);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -1928,23 +1928,23 @@ int32_t NapiFormHost::OnNotifyInVisibleFormsParseParam(napi_env env, size_t argc
     int32_t errCode = ERR_OK;
     napi_is_array(env, argv[PARAM0], &isArray);
     if (!isArray) {
-        HILOG_ERROR("input params is not array!");
+        HILOG_ERROR("input params is not array");
         errCode = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR;
     } else {
         std::vector<string> strFormIdList;
         if (!GetStringsValue(env, argv[PARAM0], strFormIdList)) {
-            HILOG_ERROR("conversion string failed!");
+            HILOG_ERROR("conversion string failed");
             errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
         } else {
             if (strFormIdList.size() == 0) {
-                HILOG_ERROR("input params is null!");
+                HILOG_ERROR("input params is null");
                 errCode = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR;
             }
         }
         for (size_t i = 0; i < strFormIdList.size(); i++) {
             int64_t formIdValue;
             if (!ConvertStringToInt64(strFormIdList[i], formIdValue)) {
-                HILOG_ERROR("transform  int failed!");
+                HILOG_ERROR("transform  int failed");
                 errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
             } else {
                 formIds.push_back(formIdValue);
