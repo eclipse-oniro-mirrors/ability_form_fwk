@@ -410,8 +410,8 @@ HWTEST_F(FmsFormEventReportTest, SendFourthFormEvent_001, TestSize.Level1)
     eventInfo.formId = TEST_FORM_ID;
     eventInfo.bundleName = "com.test.bundle";
     Want want;
-    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, "entry");
-    want.SetParam(Constants::PARAM_FORM_NAME_KEY, "formName");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("formName"));
     want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, 2);
     FormEventReport::SendFourthFormEvent(FormEventName::PROXY_UPDATE_FORM,
         HiSysEventType::BEHAVIOR, eventInfo, want);
@@ -431,10 +431,10 @@ HWTEST_F(FmsFormEventReportTest, SendFourthFormEvent_002, TestSize.Level1)
     NewFormEventInfo eventInfo;
     eventInfo.isDistributedForm = false;
     Want want;
-    want.SetParam(Constants::PARAM_CALLER_BUNDLE_NAME_KEY, "com.caller.bundle");
-    want.SetParam(Constants::PARAM_FORM_HOST_BUNDLENAME_KEY, "com.host.bundle");
-    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, "entry");
-    want.SetParam(Constants::PARAM_FORM_NAME_KEY, "formName");
+    want.SetParam(Constants::PARAM_CALLER_BUNDLE_NAME_KEY, std::string("com.caller.bundle"));
+    want.SetParam(Constants::PARAM_FORM_HOST_BUNDLENAME_KEY, std::string("com.host.bundle"));
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string("entry"));
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string("formName"));
     FormEventReport::SendFourthFormEvent(FormEventName::INVALID_PUBLISH_FORM_TO_HOST,
         HiSysEventType::FAULT, eventInfo, want);
     EXPECT_EQ(GetFormHiSysEventWrapperWriteCount(), 1);
