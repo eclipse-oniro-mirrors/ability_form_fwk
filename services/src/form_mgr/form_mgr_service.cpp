@@ -429,6 +429,22 @@ int FormMgrService::UpdateFormCrossBundle(const int64_t formId, const FormProvid
     return FormMgrAdapterFacade::GetInstance().UpdateFormCrossBundle(formId, callingUid, formBindingData);
 }
 
+int32_t FormMgrService::UpdateFormsWithReminderAgent(
+    const std::string &bundleName, const int32_t userId, const Want &want)
+{
+    HILOG_INFO("call, bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("updateFormsWithReminderAgent permission denied");
+        return ret;
+    }
+    if (bundleName.empty() || userId < 0) {
+        HILOG_ERROR("invalid bundleName or userId");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    return FormMgrAdapterFacade::GetInstance().UpdateFormsWithReminderAgent(bundleName, userId, want);
+}
+
 /**
  * @brief Request form with formId and want, send formId and want to form manager service.
  * @param formId The Id of the form to update.

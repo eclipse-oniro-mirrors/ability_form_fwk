@@ -63,6 +63,21 @@ public:
     }
 };
 
+class FormMgrStubReminderAgentTestTarget : public MockFormMgrService {
+public:
+    int32_t updateFormsWithReminderAgentCount = 0;
+    int32_t lastUserId = -1;
+    std::string lastBundleName;
+    int32_t UpdateFormsWithReminderAgent(const std::string &bundleName,
+        const int32_t userId, const Want &want) override
+    {
+        updateFormsWithReminderAgentCount++;
+        lastBundleName = bundleName;
+        lastUserId = userId;
+        return ERR_OK;
+    }
+};
+
 class FormMgrStubTest : public testing::Test {
 public:
     void SetUp() override
@@ -4367,6 +4382,95 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_007, TestSize.Level
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_GetVisibleFormRect_007 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_HandleUpdateFormsWithReminderAgent_001
+ * @tc.name: Verify OnRemoteRequest dispatches FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT with valid params.
+ * @tc.desc: test that bundleName/userId/Want are deserialized and reply echoes result.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormsWithReminderAgent_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormsWithReminderAgent_001 starts";
+    auto stub = new (std::nothrow) FormMgrStubReminderAgentTestTarget();
+    ASSERT_TRUE(stub != nullptr);
+    std::string bundleName = "com.test.bundle";
+    int32_t userId = 100;
+    Want want;
+    constexpr uint32_t code = static_cast<uint32_t>(
+        IFormMgr::Message::FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+
+    data.WriteInterfaceToken(FormMgrStubReminderAgentTestTarget::GetDescriptor());
+    data.WriteString(bundleName);
+    data.WriteInt32(userId);
+    data.WriteParcelable(&want);
+
+    auto result = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(stub->updateFormsWithReminderAgentCount, 1);
+    EXPECT_EQ(stub->lastBundleName, bundleName);
+    EXPECT_EQ(stub->lastUserId, userId);
+    EXPECT_EQ(reply.ReadInt32(), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormsWithReminderAgent_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_HandleUpdateFormsWithReminderAgent_002
+ * @tc.name: Verify OnRemoteRequest returns PARCEL_ERROR for empty bundleName.
+ * @tc.desc: test that empty bundleName is rejected before dispatching to service.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormsWithReminderAgent_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormsWithReminderAgent_002 starts";
+    auto stub = new (std::nothrow) FormMgrStubReminderAgentTestTarget();
+    ASSERT_TRUE(stub != nullptr);
+    std::string emptyBundleName;
+    int32_t userId = 100;
+    Want want;
+    constexpr uint32_t code = static_cast<uint32_t>(
+        IFormMgr::Message::FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+
+    data.WriteInterfaceToken(FormMgrStubReminderAgentTestTarget::GetDescriptor());
+    data.WriteString(emptyBundleName);
+    data.WriteInt32(userId);
+    data.WriteParcelable(&want);
+
+    auto result = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    EXPECT_EQ(stub->updateFormsWithReminderAgentCount, 0);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormsWithReminderAgent_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_HandleUpdateFormsWithReminderAgent_003
+ * @tc.name: Verify OnRemoteRequest returns PARCEL_ERROR when Want is missing.
+ * @tc.desc: test that missing Want parcelable returns PARCEL_ERROR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormsWithReminderAgent_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormsWithReminderAgent_003 starts";
+    auto stub = new (std::nothrow) FormMgrStubReminderAgentTestTarget();
+    ASSERT_TRUE(stub != nullptr);
+    std::string bundleName = "com.test.bundle";
+    int32_t userId = 100;
+    constexpr uint32_t code = static_cast<uint32_t>(
+        IFormMgr::Message::FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_SYNC};
+
+    data.WriteInterfaceToken(FormMgrStubReminderAgentTestTarget::GetDescriptor());
+    data.WriteString(bundleName);
+    data.WriteInt32(userId);
+    // Intentionally omit WriteParcelable(&want)
+
+    auto result = stub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    EXPECT_EQ(stub->updateFormsWithReminderAgentCount, 0);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleUpdateFormsWithReminderAgent_003 ends";
 }
 
 }

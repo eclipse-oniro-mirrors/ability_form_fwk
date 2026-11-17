@@ -1477,6 +1477,22 @@ void FormDataMgr::SetHostRefresh(const int64_t formId, const bool hostRefresh)
 }
 
 /**
+ * @brief Set isReminderAgentRefresh for FormRecord.
+ * @param formId The Id of the form.
+ * @param reminderAgentRefresh true or false.
+ */
+void FormDataMgr::SetReminderAgentRefresh(const int64_t formId, const bool reminderAgentRefresh)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find, form:%{public}" PRId64, formId);
+        return;
+    }
+    itFormRecord->second.isReminderAgentRefresh = reminderAgentRefresh;
+}
+
+/**
  * @brief Clear want cache for FormRecord.
  * @param formId The Id of the form.
  */
@@ -1492,10 +1508,10 @@ void FormDataMgr::ClearWantCache(const int64_t formId)
 }
 
 /**
- * @brief Clear host refresh flag.
+ * @brief Clear refresh flags (host/reminder agent) and cached want.
  * @param formId The Id of the form.
  */
-void FormDataMgr::ClearHostRefreshFlag(const int64_t formId)
+void FormDataMgr::ClearRefreshFlag(const int64_t formId)
 {
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     auto itFormRecord = formRecords_.find(formId);
@@ -1503,9 +1519,10 @@ void FormDataMgr::ClearHostRefreshFlag(const int64_t formId)
         HILOG_ERROR("form info not find, form:%{public}" PRId64, formId);
         return;
     }
-    if (itFormRecord->second.isHostRefresh) {
-        HILOG_INFO("clean host refresh flag, form:%{public}" PRId64, formId);
+    if (itFormRecord->second.isHostRefresh || itFormRecord->second.isReminderAgentRefresh) {
+        HILOG_INFO("clean refresh flag, form:%{public}" PRId64, formId);
         itFormRecord->second.isHostRefresh = false;
+        itFormRecord->second.isReminderAgentRefresh = false;
         itFormRecord->second.refreshWantMap.clear();
     }
 }

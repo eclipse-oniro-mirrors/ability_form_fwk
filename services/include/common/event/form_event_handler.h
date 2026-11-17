@@ -16,10 +16,10 @@
 #ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_EVENT_HANDLER_H
 #define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_EVENT_HANDLER_H
 
+#include <atomic>
 #include <memory>
+#include <mutex>
 #include <set>
-#include "event_handler.h"
-#include "event_runner.h"
 #include "common/util/form_serial_queue.h"
 
 namespace OHOS {

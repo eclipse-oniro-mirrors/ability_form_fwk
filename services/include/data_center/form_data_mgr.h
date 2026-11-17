@@ -404,16 +404,23 @@ public:
     void SetHostRefresh(const int64_t formId, const bool hostRefresh);
 
     /**
+    * @brief Set isReminderAgentRefresh for FormRecord.
+    * @param formId The Id of the form.
+    * @param reminderAgentRefresh true or false.
+    */
+    void SetReminderAgentRefresh(const int64_t formId, const bool reminderAgentRefresh);
+
+    /**
     * @brief Clear want cache for FormRecord.
     * @param formId The Id of the form.
     */
     void ClearWantCache(const int64_t formId);
 
     /**
-    * @brief Clear host refresh flag.
+    * @brief Clear refresh flags (host/reminder agent) and cached want.
     * @param formId The Id of the form.
     */
-    void ClearHostRefreshFlag(const int64_t formId);
+    void ClearRefreshFlag(const int64_t formId);
 
 /**
      * @brief Get updated form info.

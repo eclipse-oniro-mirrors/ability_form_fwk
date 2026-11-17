@@ -18,7 +18,6 @@
 #include "bundle_event_callback_host.h"
 #include "common_event_support.h"
 #include "fms_log_wrapper.h"
-#include "common/event/form_event_handler.h"
 #include "common/event/form_event_util.h"
 
 namespace OHOS {

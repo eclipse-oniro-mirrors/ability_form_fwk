@@ -43,6 +43,8 @@ public:
     virtual void CheckForms(const std::vector<int64_t> &formIds) = 0;
     // MergeFormWant removed - FormWant::MergeFrom is used directly now
     virtual void SetNeedRefresh(const int64_t formId, const bool needRefresh) = 0;
+    virtual void MergeRefreshWant(const int64_t formId, const Want &want) = 0;
+    virtual void SetReminderAgentRefresh(const int64_t formId, const bool reminderAgentRefresh) = 0;
     virtual bool GetUpdatedForm(const FormRecord &record, const std::vector<FormInfo> &targetForms,
         FormInfo &updatedForm) = 0;
     virtual bool SetRecordNeedFreeInstall(int64_t formId, bool isNeedFreeInstall) = 0;
@@ -122,6 +124,8 @@ public:
     MOCK_CONST_METHOD1(HasFormRecord, bool(const int64_t formId));
     MOCK_METHOD1(CheckForms, void(const std::vector<int64_t> &formIds));
     MOCK_METHOD2(SetNeedRefresh, void(const int64_t formId, const bool needRefresh));
+    MOCK_METHOD2(MergeRefreshWant, void(const int64_t formId, const Want &want));
+    MOCK_METHOD2(SetReminderAgentRefresh, void(const int64_t formId, const bool reminderAgentRefresh));
     MOCK_METHOD3(GetUpdatedForm, bool(const FormRecord &record, const std::vector<FormInfo> &targetForms,
         FormInfo &updatedForm));
     MOCK_METHOD2(SetRecordNeedFreeInstall, bool(int64_t formId, bool isNeedFreeInstall));
