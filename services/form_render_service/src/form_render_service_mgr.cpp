@@ -842,7 +842,13 @@ int32_t FormRenderServiceMgr::DeleteRenderRecordByUid(
         return RENDER_FORM_FAILED;
     }
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
-    if (search->IsEmpty() && !search->HasRenderFormTask()) {
+    if (search->HasRenderFormTask() || !search->IsRenderGroupEmpty()) {
+        return ERR_OK;
+    }
+    // Release the render thread once all renderer groups are removed.
+    search->Release();
+    // Only erase the record when form requests are also empty.
+    if (search->IsEmpty()) {
         auto iterator = renderRecordMap_.find(uid);
         if (iterator == renderRecordMap_.end()) {
             HILOG_ERROR("fail.");
@@ -853,7 +859,6 @@ int32_t FormRenderServiceMgr::DeleteRenderRecordByUid(
             HILOG_WARN("render record replaced for uid:%{public}s, skip erase", uid.c_str());
             return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDER_RECORD;
         }
-        search->Release();
         renderRecordMap_.erase(iterator);
         HILOG_INFO("DeleteRenderRecord success,uid:%{public}s", uid.c_str());
     }
