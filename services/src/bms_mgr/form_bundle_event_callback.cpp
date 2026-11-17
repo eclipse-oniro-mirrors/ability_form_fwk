@@ -54,25 +54,25 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         return;
     }
 
-    HILOG_INFO("action:%{public}s, userId:%{public}d", action.c_str(), userId);
+    HILOG_INFO("action:%{public}s,userId:%{public}d", action.c_str(), userId);
 
     wptr<FormBundleEventCallback> weakThis = this;
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED) {
         // install
-        HILOG_WARN("package added, bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+        HILOG_WARN("package added,bundleName:%{public}s,userId:%{public}d", bundleName.c_str(), userId);
         HandleBundleChange(bundleName, userId, true);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
         if (want.GetIntParam(EVENT_INFO_TYPE, 0) == BMS_EVENT_UNINSTALL_STATE) {
-            HILOG_WARN("package changed, type is UNINSTALL_STATE");
+            HILOG_WARN("package changed,type is UNINSTALL_STATE");
             return;
         }
         // update
-        HILOG_WARN("package changed, bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+        HILOG_WARN("package changed,bundleName:%{public}s,userId:%{public}d", bundleName.c_str(), userId);
         HandleBundleChange(bundleName, userId, false);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
         int appIndex = want.GetIntParam(KEY_APP_INDEX, Constants::MAIN_APP_INDEX);
-        HILOG_WARN("package removed, bundleName:%{public}s, userId:%{public}d, appIndex:%{public}d",
+        HILOG_WARN("package removed,bundleName:%{public}s,userId:%{public}d,appIndex:%{public}d",
             bundleName.c_str(), userId, appIndex);
         HandlePackageRemoved(bundleName, userId, appIndex);
     } else if (action == BMS_EVENT_ADDITIONAL_INFO_CHANGED) {

@@ -66,7 +66,7 @@ ErrCode FormAmsAdapter::StartUIAbilityByFms(const int32_t uid, const Want &want)
     }
     ErrCode retCode = FormAmsHelper::GetInstance().StartAbility(securedWant, userId);
     if (retCode != ERR_OK) {
-        HILOG_ERROR("StartAbility failed, code:%{public}d", retCode);
+        HILOG_ERROR("StartAbility failed,code:%{public}d", retCode);
     }
     return retCode;
 }

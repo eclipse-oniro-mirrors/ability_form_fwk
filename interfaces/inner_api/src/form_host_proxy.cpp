@@ -317,7 +317,7 @@ int FormHostProxy::SendTransactCmd(IFormHost::Message code, MessageParcel &data,
 {
     sptr<IRemoteObject> remote = Remote();
     if (!remote) {
-        HILOG_ERROR("get remoteObject failed, cmd:%{public}d", code);
+        HILOG_ERROR("get remoteObject failed,cmd:%{public}d", code);
         return ERR_APPEXECFWK_SERVICE_NOT_CONNECTED;
     }
     int32_t result = remote->SendRequest(static_cast<uint32_t>(code), data, reply, option);

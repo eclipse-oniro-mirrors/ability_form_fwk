@@ -31,7 +31,7 @@ int32_t DmServiceAdapter::InitDeviceManager(const std::string &pkgName,
     }
     int32_t ret = DistributedHardware::DeviceManager::GetInstance().InitDeviceManager(pkgName, callback);
     if (ret != 0) {
-        HILOG_ERROR("InitDeviceManager failed, pkgName=%{public}s, ret=%{public}d", pkgName.c_str(), ret);
+        HILOG_ERROR("InitDeviceManager failed,pkgName=%{public}s,ret=%{public}d", pkgName.c_str(), ret);
     }
     return ret;
 }
@@ -41,7 +41,7 @@ int32_t DmServiceAdapter::RegisterServiceInfo(const DistributedHardware::DmRegis
 {
     int32_t ret = DistributedHardware::DeviceManager::GetInstance().RegisterServiceInfo(regInfo, serviceId);
     if (ret != 0) {
-        HILOG_ERROR("RegisterServiceInfo failed, ret=%{public}d", ret);
+        HILOG_ERROR("RegisterServiceInfo failed,ret=%{public}d", ret);
     }
     return ret;
 }
@@ -50,7 +50,7 @@ int32_t DmServiceAdapter::UnRegisterServiceInfo(int64_t serviceId)
 {
     int32_t ret = DistributedHardware::DeviceManager::GetInstance().UnRegisterServiceInfo(serviceId);
     if (ret != 0) {
-        HILOG_ERROR("UnRegisterServiceInfo failed, serviceId=%{public}" PRId64 ", ret=%{public}d", serviceId, ret);
+        HILOG_ERROR("UnRegisterServiceInfo failed,serviceId=%{public}" PRId64 ", ret=%{public}d", serviceId, ret);
     }
     return ret;
 }
@@ -62,7 +62,7 @@ int32_t DmServiceAdapter::StartPublishService(const std::string &pkgName, int64_
     int32_t ret = DistributedHardware::DeviceManager::GetInstance().StartPublishService(
         pkgName, serviceId, publishServiceParam, callback);
     if (ret != 0) {
-        HILOG_ERROR("StartPublishService failed, pkgName=%{public}s, serviceId=%{public}" PRId64 ", ret=%{public}d",
+        HILOG_ERROR("StartPublishService failed,pkgName=%{public}s,serviceId=%{public}" PRId64 ", ret=%{public}d",
             pkgName.c_str(), serviceId, ret);
     }
     return ret;
@@ -72,7 +72,7 @@ int32_t DmServiceAdapter::StopPublishService(const std::string &pkgName, int64_t
 {
     int32_t ret = DistributedHardware::DeviceManager::GetInstance().StopPublishService(pkgName, serviceId);
     if (ret != 0) {
-        HILOG_ERROR("StopPublishService failed, pkgName=%{public}s, serviceId=%{public}" PRId64 ", ret=%{public}d",
+        HILOG_ERROR("StopPublishService failed,pkgName=%{public}s,serviceId=%{public}" PRId64 ", ret=%{public}d",
             pkgName.c_str(), serviceId, ret);
     }
     return ret;
@@ -84,7 +84,7 @@ int32_t DmServiceAdapter::GetTrustServiceInfo(const std::string &pkgName,
 {
     int32_t ret = DistributedHardware::DeviceManager::GetInstance().GetTrustServiceInfo(pkgName, param, serviceInfo);
     if (ret != 0) {
-        HILOG_ERROR("GetTrustServiceInfo failed, pkgName=%{public}s, ret=%{public}d", pkgName.c_str(), ret);
+        HILOG_ERROR("GetTrustServiceInfo failed,pkgName=%{public}s,ret=%{public}d", pkgName.c_str(), ret);
     }
     return ret;
 }
@@ -94,7 +94,7 @@ int32_t DmServiceAdapter::GetTrustedDeviceList(const std::string &pkgName, const
 {
     int32_t ret = DistributedHardware::DeviceManager::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
     if (ret != 0) {
-        HILOG_ERROR("GetTrustedDeviceList failed, pkgName=%{public}s, ret=%{public}d", pkgName.c_str(), ret);
+        HILOG_ERROR("GetTrustedDeviceList failed,pkgName=%{public}s,ret=%{public}d", pkgName.c_str(), ret);
     }
     return ret;
 }
@@ -103,7 +103,7 @@ int32_t DmServiceAdapter::GetLocalDeviceNetworkId(const std::string &pkgName, st
 {
     int32_t ret = DistributedHardware::DeviceManager::GetInstance().GetLocalDeviceNetWorkId(pkgName, networkId);
     if (ret != 0) {
-        HILOG_ERROR("GetLocalDeviceNetworkId failed, pkgName=%{public}s, ret=%{public}d", pkgName.c_str(), ret);
+        HILOG_ERROR("GetLocalDeviceNetworkId failed,pkgName=%{public}s,ret=%{public}d", pkgName.c_str(), ret);
     }
     return ret;
 }
@@ -112,7 +112,7 @@ int32_t DmServiceAdapter::GetLocalDeviceName(const std::string &pkgName, std::st
 {
     int32_t ret = DistributedHardware::DeviceManager::GetInstance().GetLocalDeviceName(pkgName, deviceName);
     if (ret != 0) {
-        HILOG_ERROR("GetLocalDeviceName failed, pkgName=%{public}s, ret=%{public}d", pkgName.c_str(), ret);
+        HILOG_ERROR("GetLocalDeviceName failed,pkgName=%{public}s,ret=%{public}d", pkgName.c_str(), ret);
     }
     return ret;
 }
@@ -122,7 +122,7 @@ int32_t DmServiceAdapter::GetUdidByNetworkId(const std::string &pkgName, const s
 {
     int32_t ret = DistributedHardware::DeviceManager::GetInstance().GetUdidByNetworkId(pkgName, networkId, udid);
     if (ret != 0) {
-        HILOG_ERROR("GetUdidByNetworkId failed, pkgName=%{public}s, ret=%{public}d", pkgName.c_str(), ret);
+        HILOG_ERROR("GetUdidByNetworkId failed,pkgName=%{public}s,ret=%{public}d", pkgName.c_str(), ret);
     }
     return ret;
 }

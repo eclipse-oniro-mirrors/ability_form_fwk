@@ -67,7 +67,7 @@ ErrCode FormVisibilityAdapter::NotifyWhetherVisibleForms(const std::vector<int64
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("call, formIds size:%{public}zu", formIds.size());
+    HILOG_INFO("call,formIds size:%{public}zu", formIds.size());
     if (callerToken == nullptr) {
         HILOG_ERROR("null callerToken");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -161,7 +161,7 @@ bool FormVisibilityAdapter::HasFormVisible(const uint32_t tokenId)
 
     std::string bundleName = hapTokenInfo.bundleName;
     int32_t userId = hapTokenInfo.userID;
-    HILOG_DEBUG("bundleName:%{public}s, userId:%{public}d, instIndex:%{public}d", bundleName.c_str(), userId,
+    HILOG_DEBUG("bundleName:%{public}s,userId:%{public}d,instIndex:%{public}d", bundleName.c_str(), userId,
         hapTokenInfo.instIndex);
 
     std::vector<FormRecord> formInfos;
@@ -170,7 +170,7 @@ bool FormVisibilityAdapter::HasFormVisible(const uint32_t tokenId)
     }
 
     for (const auto& formRecord : formInfos) {
-        HILOG_DEBUG("query record, visible:%{public}d, userId:%{public}d", formRecord.formVisibleNotifyState, userId);
+        HILOG_DEBUG("query record,visible:%{public}d,userId:%{public}d", formRecord.formVisibleNotifyState, userId);
         if (formRecord.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE) &&
             formRecord.userId == userId && formRecord.appIndex == hapTokenInfo.instIndex) {
                 return true;
@@ -250,7 +250,7 @@ void FormVisibilityAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<i
     }
     for (auto iter = localEventMaps.begin(); iter != localEventMaps.end(); iter++) {
         if (HandleEventNotify(iter->first, iter->second, formVisibleType) != ERR_OK) {
-            HILOG_WARN("HandleEventNotify error, key is %{public}s", iter->first.c_str());
+            HILOG_WARN("HandleEventNotify error,key is %{public}s", iter->first.c_str());
         }
     }
     if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
@@ -275,7 +275,7 @@ void FormVisibilityAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<i
     }
 
     if (!needConFormIds.empty()) {
-        HILOG_ERROR("reAddConnections, size: %{public}zu", needConFormIds.size());
+        HILOG_ERROR("reAddConnections,size:%{public}zu", needConFormIds.size());
         FormRenderMgr::GetInstance().reAddConnections(needConFormIds, userId, callerToken);
     }
 }
@@ -284,13 +284,13 @@ void FormVisibilityAdapter::NotifyWhetherFormsVisible(const std::string &bundleN
     const std::vector<sptr<IRemoteObject>> &remoteObjects,
     std::unordered_map<std::string, std::vector<FormInstance>> &formInstanceMaps, const int32_t formVisibleType)
 {
-    HILOG_DEBUG("bundleName:%{public}s, remoteObjects:%{public}d", bundleName.c_str(), (int)remoteObjects.size());
+    HILOG_DEBUG("bundleName:%{public}s,remoteObjects:%{public}d", bundleName.c_str(), (int)remoteObjects.size());
     for (auto remoteObject : remoteObjects) {
         sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
             iface_cast<AbilityRuntime::IJsFormStateObserver>(remoteObject);
         // Observer may be dead or registered with a mismatched interface descriptor.
         if (remoteJsFormStateObserver == nullptr) {
-            HILOG_WARN("invalid form state observer, bundleName:%{public}s", bundleName.c_str());
+            HILOG_WARN("invalid form state observer,bundleName:%{public}s", bundleName.c_str());
             continue;
         }
         auto observer = formInstanceMaps.find(bundleName);
@@ -318,9 +318,9 @@ void FormVisibilityAdapter::FilterDataByVisibleType(
     for (auto formRecordEntry : restoreFormRecords) {
         FormRecord formRecord = formRecordEntry.second;
         formRecord.isNeedNotify = false;
-        HILOG_INFO("formRecord no need notify, formId:%{public}" PRId64 ".", formRecord.formId);
+        HILOG_INFO("formRecord no need notify,formId:%{public}" PRId64 ".", formRecord.formId);
         if (!FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord)) {
-            HILOG_ERROR("update restoreFormRecords failed, formId:%{public}" PRId64 ".", formRecord.formId);
+            HILOG_ERROR("update restoreFormRecords failed,formId:%{public}" PRId64 ".", formRecord.formId);
         }
     }
 }
@@ -331,12 +331,12 @@ void FormVisibilityAdapter::FilterFormInstanceMapsByVisibleType(
 {
     for (auto iter = formInstanceMaps.begin(); iter != formInstanceMaps.end();) {
         std::vector<FormInstance> formInstances = iter->second;
-        HILOG_DEBUG("bundName:%{public}s, formInstances:%{public}d", iter->first.c_str(), (int)formInstances.size());
+        HILOG_DEBUG("bundName:%{public}s,formInstances:%{public}d", iter->first.c_str(), (int)formInstances.size());
         auto instanceIter = formInstances.begin();
         while (instanceIter != formInstances.end()) {
             FormRecord record;
             if (!FormDataMgr::GetInstance().GetFormRecord(instanceIter->formId, record)) {
-                HILOG_WARN("get formRecord failed! formId:%{public}" PRId64 ".", instanceIter->formId);
+                HILOG_WARN("get formRecord failed!formId:%{public}" PRId64 ".", instanceIter->formId);
                 ++instanceIter;
                 continue;
             }
@@ -371,12 +371,12 @@ void FormVisibilityAdapter::FilterEventMapsByVisibleType(
 {
     for (auto iter = eventMaps.begin(); iter != eventMaps.end();) {
         std::vector<int64_t> formIds = iter->second;
-        HILOG_DEBUG("bundName:%{public}s, eventMaps:%{public}d", iter->first.c_str(), (int)formIds.size());
+        HILOG_DEBUG("bundName:%{public}s,eventMaps:%{public}d", iter->first.c_str(), (int)formIds.size());
         auto formItr = formIds.begin();
         while (formItr != formIds.end()) {
             FormRecord record;
             if (!FormDataMgr::GetInstance().GetFormRecord(*formItr, record)) {
-                HILOG_WARN("get formRecord failed! formId:%{public}" PRId64 ".", *formItr);
+                HILOG_WARN("get formRecord failed!formId:%{public}" PRId64 ".", *formItr);
                 ++formItr;
                 continue;
             }
@@ -409,12 +409,12 @@ bool FormVisibilityAdapter::isFormShouldUpdateProviderInfoToHost(const int64_t &
     const sptr<IRemoteObject> &callerToken, FormRecord &formRecord)
 {
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
-        HILOG_WARN("not exist such form, formId:%{public}" PRId64 ".", matchedFormId);
+        HILOG_WARN("not exist such form,formId:%{public}" PRId64 ".", matchedFormId);
         return false;
     }
 
     if (formRecord.providerUserId != userId) {
-        HILOG_WARN("not self form, formId:%{public}" PRId64 ".", matchedFormId);
+        HILOG_WARN("not self form,formId:%{public}" PRId64 ".", matchedFormId);
         return false;
     }
     FormHostRecord formHostRecord;
@@ -466,7 +466,7 @@ bool FormVisibilityAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormI
         }
     };
     if (!FormMgrQueue::GetInstance().ScheduleTask(0, onUpdateTask)) {
-        HILOG_WARN("post OnUpdate task failed, exec now");
+        HILOG_WARN("post OnUpdate task failed,exec now");
         onUpdateTask();
     }
     return true;
@@ -476,7 +476,7 @@ bool FormVisibilityAdapter::CreateHandleEventMap(const int64_t matchedFormId, co
     std::unordered_map<std::string, std::vector<int64_t>> &eventMaps)
 {
     if (!formRecord.formVisibleNotify) {
-        HILOG_WARN("the config 'formVisibleNotify' is false, formId:%{public}" PRId64 ".",
+        HILOG_WARN("the config 'formVisibleNotify' is false,formId:%{public}" PRId64 ".",
             matchedFormId);
         return false;
     }
@@ -548,7 +548,7 @@ void FormVisibilityAdapter::PostVisibleNotify(const std::vector<int64_t> &formId
 
     bool ret = FormMgrQueue::GetInstance().ScheduleTask(visibleNotifyDelay, task);
     if (!ret) {
-        HILOG_WARN("post visible notify task failed, exec now");
+        HILOG_WARN("post visible notify task failed,exec now");
         FormVisibilityAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(formIds,
             formInstanceMaps, eventMaps, formVisibleType, callerToken);
     }
@@ -649,11 +649,11 @@ int32_t FormVisibilityAdapter::NotifyFormLocked(const int64_t &formId, bool isLo
     int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
     bool isBundleProtected = FormBundleLockMgr::GetInstance().IsBundleProtect(formRecord.bundleName, userId);
     if (!isBundleProtected && isLocked) {
-        HILOG_ERROR("can't lock form when bundle unprotected, formId %{public}" PRId64, formId);
+        HILOG_ERROR("can't lock form when bundle unprotected,formId %{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     if (formRecord.protectForm == isLocked) {
-        HILOG_WARN("protectForm state is same as before, formId:%{public}" PRId64, formId);
+        HILOG_WARN("protectForm state is same as before,formId:%{public}" PRId64, formId);
         return ERR_OK;
     }
 

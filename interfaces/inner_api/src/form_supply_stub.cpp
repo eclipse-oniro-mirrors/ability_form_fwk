@@ -93,7 +93,7 @@ int FormSupplyStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
     for (const auto &entry : handlerTable_) {
         if (entry.code == code) {
             if (!VerifyCaller(entry.callerType)) {
-                HILOG_ERROR("Caller verification failed, code:%{public}u, callerType:%{public}d",
+                HILOG_ERROR("Caller verification failed,code:%{public}u,callerType:%{public}d",
                     code, static_cast<int>(entry.callerType));
                 return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
             }
@@ -179,7 +179,7 @@ int32_t FormSupplyStub::HandleOnAcquireStateResult(MessageParcel &data, MessageP
     }
     if (stateValue < static_cast<int32_t>(FormState::UNKNOWN) ||
         stateValue > static_cast<int32_t>(FormState::READY)) {
-        HILOG_ERROR("Invalid FormState value: %{public}d", stateValue);
+        HILOG_ERROR("Invalid FormState value:%{public}d", stateValue);
         reply.WriteInt32(ERR_APPEXECFWK_FORM_INVALID_PARAM);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }

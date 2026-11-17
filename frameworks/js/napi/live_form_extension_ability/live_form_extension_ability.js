@@ -54,7 +54,7 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
           hilog.sLogI(domainID, TAG, 'setWindowBackgroundColor succeed');
       })
       .catch((err) => {
-        hilog.sLogE(domainID, TAG, `setWindowBackgroundColor failed, code is ${err?.code}, message is ${err?.message}`);
+        hilog.sLogE(domainID, TAG, `setWindowBackgroundColor failed,code is ${err?.code},message is ${err?.message}`);
       });
 
     let layoutScale = want.parameters[FORM_LAYOUT_SCALE];
@@ -65,10 +65,10 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
             hilog.sLogI(domainID, TAG, 'setUIExtCustomDensity succeed');
           })
           .catch((err) => {
-            hilog.sLogE(domainID, TAG, `setUIExtCustomDensity failed, code is ${err?.code}, message is ${err?.message}`);
+            hilog.sLogE(domainID, TAG, `setUIExtCustomDensity failed,code is ${err?.code},message is ${err?.message}`);
           });
       } catch(err) {
-        hilog.sLogE(domainID, TAG, `setUIExtCustomDensity failed, code is ${err?.code}, message is ${err?.message}`);
+        hilog.sLogE(domainID, TAG, `setUIExtCustomDensity failed,code is ${err?.code},message is ${err?.message}`);
       }
     }
 
@@ -77,17 +77,17 @@ export default class LiveFormExtensionAbility extends UIExtensionAbility {
     let fontWeight = want.parameters[FORM_FONT_WEIGHT_SCALE_KEY];
     if (typeof fontScale === NUMBER_TYPE && typeof fontWeight === NUMBER_TYPE) {
       hilog.sLogD(domainID, TAG,
-        `setFontScale ${FORM_FONT_SCALE_KEY}: ${fontScale}, ${FORM_FONT_WEIGHT_SCALE_KEY}: ${fontWeight}`);
+        `setFontScale ${FORM_FONT_SCALE_KEY}:${fontScale},${FORM_FONT_WEIGHT_SCALE_KEY}:${fontWeight}`);
       try {
         this.context.setFontScale(fontScale)
           .then(() => {
-            hilog.sLogI(domainID, TAG, `setFontScale succeed, scale is ${fontScale}`);
+            hilog.sLogI(domainID, TAG, `setFontScale succeed,scale is ${fontScale}`);
           })
           .catch((err) => {
-            hilog.sLogE(domainID, TAG, `setFontScale failed, code is ${err?.code}, message is ${err?.message}`);
+            hilog.sLogE(domainID, TAG, `setFontScale failed,code is ${err?.code},message is ${err?.message}`);
           });
       } catch(err) {
-        hilog.sLogE(domainID, TAG, `setFontScale failed, code is ${err?.code}, message is ${err?.message}`);
+        hilog.sLogE(domainID, TAG, `setFontScale failed,code is ${err?.code},message is ${err?.message}`);
       }
     } else {
       hilog.sLogE(domainID, TAG, `setFontScale fontScale or fontWeight isn't number type`);

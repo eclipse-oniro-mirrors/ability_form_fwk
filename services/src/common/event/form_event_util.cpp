@@ -65,7 +65,7 @@ void UpdateRecordByBundleInfo(const BundleInfo &bundleInfo, FormRecord &formReco
             formRecord.modulePkgNameMap.emplace(std::make_pair(moduleName, moduleInfos.dump()));
             if ((formRecord.isDistributedForm && moduleName == formRecord.uiModule) ||
                 (!formRecord.isDistributedForm && moduleName == formRecord.moduleName)) {
-                HILOG_INFO("update jsFormCodePath, isDistributedForm:%{public}d", formRecord.isDistributedForm);
+                HILOG_INFO("update jsFormCodePath,isDistributedForm:%{public}d", formRecord.isDistributedForm);
                 formRecord.jsFormCodePath = hapPath;
             }
         }
@@ -109,7 +109,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
 
     BundlePackInfo bundlePackInfo;
     bool hasPackInfo = FormBmsHelper::GetInstance().GetBundlePackInfo(bundleName, userId, bundlePackInfo);
-    HILOG_INFO("bundleName:%{public}s, hasPackInfo:%{public}d", bundleName.c_str(), hasPackInfo);
+    HILOG_INFO("bundleName:%{public}s,hasPackInfo:%{public}d", bundleName.c_str(), hasPackInfo);
     BundleInfo bundleInfo;
     if (FormBmsHelper::GetInstance().GetBundleInfoV9(bundleName, userId, bundleInfo) != ERR_OK) {
         HILOG_ERROR("get bundleInfo failed");
@@ -120,13 +120,13 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     bool isBundleDistributed = FormDistributedMgr::GetInstance().IsBundleDistributed(bundleInfo.name, userId);
     for (FormRecord& formRecord : formInfos) {
         int64_t formId = formRecord.formId;
-        HILOG_INFO("bundle update, formName:%{public}s, moduleName:%{public}s, isDistributedForm:%{public}d, "
+        HILOG_INFO("bundle update,formName:%{public}s,moduleName:%{public}s,isDistributedForm:%{public}d,"
             "isBundleDistributed:%{public}d, formId:%{public}" PRId64, formRecord.formName.c_str(),
             formRecord.moduleName.c_str(), formRecord.isDistributedForm, isBundleDistributed, formId);
 
         if (needCheckVersion && bundleInfo.versionCode == formRecord.versionCode &&
             formRecord.isDistributedForm == isBundleDistributed) {
-            HILOG_WARN("form: %{public}s, versionCode is same and no package format change. formId:%{public}" PRId64,
+            HILOG_WARN("form:%{public}s,versionCode is same and no package format change.formId:%{public}" PRId64,
                 formRecord.formName.c_str(), formId);
             continue;
         }
@@ -151,7 +151,7 @@ void FormEventUtil::RemoveUpdatedForm(FormRecord &formRecord, std::vector<int64_
     } else {
         FormDbCache::GetInstance().DeleteFormInfo(formRecord.formId);
     }
-    HILOG_WARN("delete form record, formName:%{public}s, formId:%{public}" PRId64,
+    HILOG_WARN("delete form record,formName:%{public}s,formId:%{public}" PRId64,
         formRecord.formName.c_str(), formRecord.formId);
     removedForms.emplace_back(formRecord.formId);
     FormDataMgr::GetInstance().DeleteFormRecord(formRecord.formId);
@@ -194,7 +194,7 @@ void FormEventUtil::HandleBundleFormInfoRemoved(const std::string &bundleName, i
 void FormEventUtil::HandleProviderRemoved(const std::string &bundleName, const int32_t userId,
     const int32_t appIndex)
 {
-    HILOG_INFO("bundleName:%{public}s, userId:%{public}d, appIndex:%{public}d",
+    HILOG_INFO("bundleName:%{public}s,userId:%{public}d,appIndex:%{public}d",
         bundleName.c_str(), userId, appIndex);
     // clean removed form in DB
     std::set<int64_t> removedForms;
@@ -226,7 +226,7 @@ void FormEventUtil::HandleProviderRemoved(const std::string &bundleName, const i
 
 void FormEventUtil::HandleBundleDataCleared(const std::string &bundleName, int32_t userId)
 {
-    HILOG_WARN("bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+    HILOG_WARN("bundleName:%{public}s,userId:%{public}d", bundleName.c_str(), userId);
     // clear dynamic form info
     FormInfoMgr::GetInstance().RemoveAllDynamicFormsInfo(bundleName, userId);
 
@@ -234,7 +234,7 @@ void FormEventUtil::HandleBundleDataCleared(const std::string &bundleName, int32
     int32_t appIndex = Constants::MAIN_APP_INDEX;
     ErrCode ret = FormBmsHelper::GetInstance().GetEnabledCloneIndex(userId, bundleName, appIndex);
     if (ret != ERR_OK) {
-        HILOG_ERROR("fail resolve appIndex, bundleName:%{public}s, ret:%{public}d", bundleName.c_str(), ret);
+        HILOG_ERROR("fail resolve appIndex,bundleName:%{public}s,ret:%{public}d", bundleName.c_str(), ret);
         return;
     }
 
@@ -248,7 +248,7 @@ void FormEventUtil::HandleBundleDataCleared(const std::string &bundleName, int32
     // the appIndex-less overload would always resolve to the main app
     int32_t uid = FormBmsHelper::GetInstance().GetUidByBundleName(bundleName, userId, appIndex);
     if (uid == FormBmsHelper::INVALID_UID) {
-        HILOG_ERROR("invalid uid, appIndex:%{public}d", appIndex);
+        HILOG_ERROR("invalid uid,appIndex:%{public}d", appIndex);
         return;
     }
     // as form host data is cleared
@@ -287,7 +287,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
 
     bool isBundleDistributed =
         FormDistributedMgr::GetInstance().IsBundleDistributed(bundleInfo.name, formRecord.providerUserId);
-    HILOG_INFO("bundleName: %{public}s, isBundleDistributed: %{public}d, formId:%{public}" PRId64,
+    HILOG_INFO("bundleName:%{public}s,isBundleDistributed:%{public}d,formId:%{public}" PRId64,
         bundleInfo.name.c_str(), isBundleDistributed, formId);
     if (formRecord.isDistributedForm != isBundleDistributed) {
         // The format of the installation package has changed.
@@ -296,7 +296,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
             formRecord.isDistributedForm = isBundleDistributed;
             formRecord.uiModule =
                 FormDistributedMgr::GetInstance().GetUiModuleName(bundleInfo.name, formRecord.providerUserId);
-            HILOG_INFO("form pack format change, uiModule:%{public}s", formRecord.uiModule.c_str());
+            HILOG_INFO("form pack format change,uiModule:%{public}s", formRecord.uiModule.c_str());
         }
     }
 
@@ -312,7 +312,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
         HILOG_INFO("no updated form");
         return false;
     }
-    HILOG_INFO("form is still exist, form:%{public}s, formId:%{public}" PRId64, formRecord.formName.c_str(), formId);
+    HILOG_INFO("form is still exist,form:%{public}s,formId:%{public}" PRId64, formRecord.formName.c_str(), formId);
 
     // update resource
     if (FormMgrAdapterFacade::GetInstance().IsDeleteCacheInUpgradeScene(formRecord)) {
@@ -341,7 +341,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
         return false;
     }
 
-    HILOG_INFO("form is still in package info, form:%{public}s", formRecord.formName.c_str());
+    HILOG_INFO("form is still in package info,form:%{public}s", formRecord.formName.c_str());
     FormDataMgr::GetInstance().SetRecordNeedFreeInstall(formId, true);
     FormTimerCfg timerCfg;
     GetTimerCfg(packForm.updateEnabled, packForm.updateDuration, packForm.scheduledUpdateTime, timerCfg);
@@ -547,7 +547,7 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
             HILOG_INFO("add interval timer:%{public}" PRId64, timerCfg.updateDuration);
             int64_t updateDuration = timerCfg.updateDuration;
             if (!FormMgrAdapterFacade::GetInstance().GetValidFormUpdateDuration(formId, updateDuration)) {
-                HILOG_WARN("Get updateDuration failed, uses local configuration");
+                HILOG_WARN("Get updateDuration failed,uses local configuration");
             }
             FormTimerMgr::GetInstance().AddFormTimer(formId, updateDuration, record.providerUserId);
         } else {
@@ -568,7 +568,7 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
     if (type == TYPE_INTERVAL_CHANGE || type == TYPE_ATTIME_TO_INTERVAL) {
         int64_t updateDuration = timerCfg.updateDuration;
         if (!FormMgrAdapterFacade::GetInstance().GetValidFormUpdateDuration(formId, updateDuration)) {
-            HILOG_WARN("Get updateDuration failed, uses local configuration");
+            HILOG_WARN("Get updateDuration failed,uses local configuration");
         }
         newTimerCfg.updateDuration = updateDuration;
     }
@@ -687,7 +687,7 @@ void FormEventUtil::BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, 
 
 bool FormEventUtil::HandleAdditionalInfoChanged(const std::string &bundleName)
 {
-    HILOG_DEBUG("Call, bundleName:%{public}s", bundleName.c_str());
+    HILOG_DEBUG("Call,bundleName:%{public}s", bundleName.c_str());
     FormMgrAdapterFacade::GetInstance().UpdateFormCloudUpdateDuration(bundleName);
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
@@ -701,7 +701,7 @@ bool FormEventUtil::HandleAdditionalInfoChanged(const std::string &bundleName)
         }
         int64_t updateDuration = formRecord.updateDuration;
         if (!FormMgrAdapterFacade::GetInstance().GetValidFormUpdateDuration(formRecord.formId, updateDuration)) {
-            HILOG_WARN("Get updateDuration failed, uses local configuration");
+            HILOG_WARN("Get updateDuration failed,uses local configuration");
         }
 
         FormTimerCfg timerCfg;
@@ -874,7 +874,7 @@ std::vector<FormInfo> FormEventUtil::BuildFormInfos(const std::vector<FormRecord
         if (FormInfoMgr::GetInstance().GetFormsInfoByRecord(record, formInfo) == ERR_OK) {
             formInfos.push_back(std::move(formInfo));
         } else {
-            HILOG_WARN("GetFormsInfoByRecord failed, formId:%{public}" PRId64, record.formId);
+            HILOG_WARN("GetFormsInfoByRecord failed,formId:%{public}" PRId64, record.formId);
             formInfos.emplace_back();
         }
     }
@@ -894,7 +894,7 @@ void FormEventUtil::ApplyWantParams(const std::vector<FormRecord> &records,
         hostWant.SetParams(params);
         FormDataMgr::GetInstance().UpdateHostWant(record.formId, hostWant, true);
         ErrCode ret = FormMgrAdapterFacade::GetInstance().AcquireProviderFormInfoByFormRecord(record, params);
-        HILOG_INFO("onAddForm via want callback, formId:%{public}" PRId64 ", ret:%{public}d", record.formId, ret);
+        HILOG_INFO("onAddForm via want callback,formId:%{public}" PRId64 ", ret:%{public}d", record.formId, ret);
     }
 }
 } // namespace AppExecFwk

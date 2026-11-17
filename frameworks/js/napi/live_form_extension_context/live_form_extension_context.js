@@ -31,30 +31,30 @@ export class LiveFormExtensionContext extends ExtensionContext {
   }
 
   setUIExtCustomDensity(layoutScale) {
-    hilog.sLogI(domainID, TAG, `setUIExtCustomDensity layoutScale: ${layoutScale}`);
+    hilog.sLogI(domainID, TAG, `setUIExtCustomDensity layoutScale:${layoutScale}`);
     return this.__context_impl__.setUIExtCustomDensity(layoutScale);
   }
 
   setFontScale(fontScale) {
-    hilog.sLogI(domainID, TAG, `setFontScale: ${fontScale}`);
+    hilog.sLogI(domainID, TAG, `setFontScale:${fontScale}`);
     return this.__context_impl__.setFontScale(fontScale);
   }
 
   startAbilityByLiveForm(want) {
     let jsonWant = JSON.stringify(want);
-    hilog.sLogI(domainID, TAG, `startAbilityByLiveForm: ${jsonWant}`);
+    hilog.sLogI(domainID, TAG, `startAbilityByLiveForm:${jsonWant}`);
     want.parameters = {};
     want.parameters[PARAM_JSON_WANT_KEY] = jsonWant;
     return this.__context_impl__.startAbilityByLiveForm(want, this.formId);
   }
 
   connectServiceExtensionAbility(want, options) {
-    hilog.sLogI(domainID, TAG, `connectServiceExtensionAbility: ${JSON.stringify(want)}`);
+    hilog.sLogI(domainID, TAG, `connectServiceExtensionAbility:${JSON.stringify(want)}`);
     return this.__context_impl__.connectServiceExtensionAbility(want, options);
   }
 
   disconnectServiceExtensionAbility(connection) {
-    hilog.sLogI(domainID, TAG, `disconnectServiceExtensionAbility: ${connection}`);
+    hilog.sLogI(domainID, TAG, `disconnectServiceExtensionAbility:${connection}`);
     return this.__context_impl__.disconnectServiceExtensionAbility(connection);
   }
 }

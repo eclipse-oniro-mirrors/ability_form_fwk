@@ -110,7 +110,7 @@ void FormObserverTaskMgr::PostBatchRefreshForms(const int32_t formRefreshType)
 */
 void FormObserverTaskMgr::PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration)
 {
-    HILOG_INFO("Call.");
+    HILOG_INFO("Call");
  
     auto batchConfigurationUpdate = [configuration]() {
         return FormMgrAdapterFacade::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
@@ -168,7 +168,7 @@ void FormObserverTaskMgr::FormClickEvent(const std::string &bundleName, const st
 void FormObserverTaskMgr::PostBatchColorModeUpdateForms(int32_t userId,
     const AppExecFwk::Configuration& configuration)
 {
-    HILOG_INFO("Call, userId:%{public}d", userId);
+    HILOG_INFO("Call,userId:%{public}d", userId);
 
     auto batchColorModeUpdate = [userId, configuration]() {
         return FormMgrAdapterFacade::GetInstance().BatchNotifyFormsColorModeUpdate(userId, configuration);

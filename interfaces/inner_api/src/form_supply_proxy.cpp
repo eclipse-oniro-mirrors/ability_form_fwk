@@ -336,12 +336,12 @@ int FormSupplyProxy::SendTransactCmd(IFormSupply::Message code, MessageParcel &d
 {
     sptr<IRemoteObject> remote = Remote();
     if (!remote) {
-        HILOG_ERROR("get remoteObject failed, cmd:%{public}d", code);
+        HILOG_ERROR("get remoteObject failed,cmd:%{public}d", code);
         return ERR_APPEXECFWK_SERVICE_NOT_CONNECTED;
     }
     int32_t result = remote->SendRequest(static_cast<uint32_t>(code), data, reply, option);
     if (result != ERR_OK) {
-        HILOG_ERROR("SendRequest failed:%{public}d, cmd:%{public}d", result, code);
+        HILOG_ERROR("SendRequest failed:%{public}d,cmd:%{public}d", result, code);
         return result;
     }
     return ERR_OK;

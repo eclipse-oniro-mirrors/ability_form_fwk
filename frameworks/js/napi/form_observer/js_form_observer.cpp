@@ -280,7 +280,7 @@ private:
 
     napi_value OnUnregisterFormIsVisibleObserver(napi_env env, size_t argc, napi_value *argv, bool isVisibility)
     {
-        HILOG_DEBUG("argc is %{public}zu, isVisibility is %{public}d", argc, isVisibility);
+        HILOG_DEBUG("argc is %{public}zu,isVisibility is %{public}d", argc, isVisibility);
         int32_t funcPos = 0;
         int32_t bundlePos = 0;
         if (CheckParamNum(env, argc, ARGS_ONE, ARGS_THREE) == false) {
@@ -484,7 +484,7 @@ private:
     {
         HILOG_DEBUG("call");
         if (!CheckCallerIsSystemApp()) {
-            HILOG_ERROR("The application not system-app, can't use system-api");
+            HILOG_ERROR("The application not system-app,can't use system-api");
             NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return CreateJsUndefined(env);
         }

@@ -101,7 +101,7 @@ bool FormXMLParser::ParseInternal(xmlNodePtr &node)
         }
         xmlChar* content = xmlNodeGetContent(curChildNodePtr);
         if (content == nullptr) {
-            HILOG_ERROR("read xml node error: nodeName:(%{public}s)", curChildNodePtr->name);
+            HILOG_ERROR("read xml node error:nodeName:(%{public}s)", curChildNodePtr->name);
             continue;
         }
         std::string contentStr = reinterpret_cast<const char*>(content);

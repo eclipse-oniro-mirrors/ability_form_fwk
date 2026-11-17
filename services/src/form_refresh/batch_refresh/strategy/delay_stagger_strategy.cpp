@@ -30,7 +30,7 @@ void RefreshBatch(size_t startIdx, size_t endIdx, std::vector<RefreshData> &batc
     for (size_t j = startIdx; j < endIdx; ++j) {
         int32_t ret = formRenderMgr.RequestRefresh(batch[j], refreshType);
         if (ret != ERR_OK) {
-            HILOG_WARN("DelayStaggerStrategy::ExecuteRefresh: refresh failed for form %{public}" PRId64 ","
+            HILOG_WARN("DelayStaggerStrategy::ExecuteRefresh:refresh failed for form %{public}" PRId64 ","
                 "err = %{public}d", batch[j].formId, ret);
         }
     }

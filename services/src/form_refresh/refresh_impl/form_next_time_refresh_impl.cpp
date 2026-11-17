@@ -39,13 +39,13 @@ FormNextTimeRefreshImpl::~FormNextTimeRefreshImpl() {}
 int FormNextTimeRefreshImpl::DoRefresh(RefreshData &data)
 {
     if (data.nextTime < 0) {
-        HILOG_ERROR("nextTime is negative, formId:%{public}" PRId64, data.formId);
+        HILOG_ERROR("nextTime is negative,formId:%{public}" PRId64, data.formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     static const int32_t MAX_NEXT_TIME = INT32_MAX / Constants::SEC_PER_MIN;
     if (data.nextTime > MAX_NEXT_TIME) {
-        HILOG_ERROR("nextTime exceeds safety range, formId:%{public}" PRId64, data.formId);
+        HILOG_ERROR("nextTime exceeds safety range,formId:%{public}" PRId64, data.formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -55,7 +55,7 @@ int FormNextTimeRefreshImpl::DoRefresh(RefreshData &data)
 
     int32_t timerRefreshedCount = FormTimerMgr::GetInstance().GetRefreshCount(data.formId);
     if (timerRefreshedCount >= Constants::LIMIT_COUNT) {
-        HILOG_WARN("already reach max times:%{public}d, formId:%{public}" PRId64, timerRefreshedCount, data.formId);
+        HILOG_WARN("already reach max times:%{public}d,formId:%{public}" PRId64, timerRefreshedCount, data.formId);
         FormRecordReport::GetInstance().IncreaseUpdateTimes(data.formId, HiSysEventPointType::TYPE_HIGH_FREQUENCY);
         FormTimerMgr::GetInstance().MarkRemind(data.formId);
         return ERR_APPEXECFWK_FORM_MAX_REFRESH;
@@ -64,7 +64,7 @@ int FormNextTimeRefreshImpl::DoRefresh(RefreshData &data)
     int64_t safeNextTime = static_cast<int64_t>(data.nextTime) * Constants::SEC_PER_MIN;
     int32_t userId = FormUtil::GetCallerUserId(data.callingUid);
     if (!FormTimerMgr::GetInstance().SetNextRefreshTime(data.formId, safeNextTime, userId)) {
-        HILOG_ERROR("set next time refresh failed, formId:%{public}" PRId64, data.formId);
+        HILOG_ERROR("set next time refresh failed,formId:%{public}" PRId64, data.formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 

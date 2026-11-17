@@ -121,7 +121,7 @@ int FormDataAdapter::RefreshAndUpdateProxies(int64_t matchedFormId, int32_t call
     data.providerData = formProviderData;
     int ret = FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_DATA);
     if (ret != ERR_OK) {
-        HILOG_ERROR("RequestRefresh failed, ret:%{public}d, skip proxy update for form:%{public}" PRId64,
+        HILOG_ERROR("RequestRefresh failed,ret:%{public}d,skip proxy update for form:%{public}" PRId64,
             ret, matchedFormId);
         return ret;
     }
@@ -178,7 +178,7 @@ ErrCode FormDataAdapter::UpdateFormCrossBundle(const int64_t formId, const int32
         return err;
     }
 
-    HILOG_INFO("cross-bundle update: real caller uid=%{public}d, form provider uid=%{public}d, "
+    HILOG_INFO("cross-bundle update:real caller uid=%{public}d,form provider uid=%{public}d,"
         "formId:%{public}" PRId64, callingUid, formRecord.uid, matchedFormId);
 
     RefreshData data;
@@ -195,11 +195,11 @@ int32_t FormDataAdapter::UpdateFormsWithReminderAgent(
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     std::vector<FormRecord> formRecords;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formRecords, userId)) {
-        HILOG_INFO("FormInfo not find, bundleName:%{public}s, userId:%{public}d",
+        HILOG_INFO("FormInfo not find,bundleName:%{public}s,userId:%{public}d",
             bundleName.c_str(), userId);
         return ERR_OK;
     }
-    HILOG_INFO("reminder agent refresh, bundleName:%{public}s, userId:%{public}d, formCount:%{public}zu",
+    HILOG_INFO("reminder agent refresh,bundleName:%{public}s,userId:%{public}d,formCount:%{public}zu",
         bundleName.c_str(), userId, formRecords.size());
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     std::vector<RefreshData> batch;
@@ -274,7 +274,7 @@ int FormDataAdapter::RequestForm(const int64_t formId,
         };
         FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, delayRefreshForm);
         if (errCode != ERR_OK) {
-            HILOG_ERROR("AcquireProviderFormInfoByFormRecord failed, formId:%{public}" PRId64, formId);
+            HILOG_ERROR("AcquireProviderFormInfoByFormRecord failed,formId:%{public}" PRId64, formId);
         }
         return errCode;
     }
@@ -291,7 +291,7 @@ void FormDataAdapter::UpdateFormSize(const int64_t &formId,
 ErrCode FormDataAdapter::UpdateFormSize(const int64_t formId,
     const int32_t newDimension, const Rect &newRect)
 {
-    HILOG_INFO("call, formId:%{public} " PRId64, formId);
+    HILOG_INFO("call,formId:%{public} " PRId64, formId);
     FormRecord record;
     bool result = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     if (!result) {
@@ -359,7 +359,7 @@ ErrCode FormDataAdapter::BatchRefreshForms(const int32_t formRefreshType)
     std::vector<FormRecord> visibleFormRecords;
     std::vector<FormRecord> invisibleFormRecords;
     FormDataMgr::GetInstance().GetRecordsByFormType(formRefreshType, visibleFormRecords, invisibleFormRecords);
-    HILOG_INFO("getRecords visible size:%{public}zu, invisible size:%{public}zu",
+    HILOG_INFO("getRecords visible size:%{public}zu,invisible size:%{public}zu",
         visibleFormRecords.size(), invisibleFormRecords.size());
     std::vector<RefreshData> batch;
     for (auto &formRecord : visibleFormRecords) {
@@ -451,14 +451,14 @@ int FormDataAdapter::UpdateFormLocation(const int64_t &formId, const int32_t &fo
 
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
-        HILOG_ERROR("not exist such form, formId = %{public}" PRId64 " formLocation = %{public}d",
+        HILOG_ERROR("not exist such form,formId = %{public}" PRId64 " formLocation = %{public}d",
             formId, formLocation);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
     bool isFormLocationChange = (int32_t)formRecord.formLocation != formLocation;
     if (isFormLocationChange || (formRecord.isSystemApp && isRequestPublishFormWithSnapshot)) {
-        HILOG_INFO("UpdateFormLocation isFormLocationChange = %{public}d, isSystemApp = %{public}d, "
+        HILOG_INFO("UpdateFormLocation isFormLocationChange = %{public}d,isSystemApp = %{public}d,"
             "isRequestPublishFormWithSnapshot = %{public}d", isFormLocationChange,
             formRecord.isSystemApp, isRequestPublishFormWithSnapshot);
         Want locationWant;
@@ -503,7 +503,7 @@ ErrCode FormDataAdapter::AcquireProviderFormInfoByFormRecord(const FormRecord &f
         formInfo.defaultDimension));
     errCode = FormCommonAdapter::GetInstance().CreateFormItemInfo(bundleInfo, formInfo, formItemInfo);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("get form config info failed. formId: %{public}" PRId64 " code: %{public}d",
+        HILOG_ERROR("get form config info failed.formId:%{public}" PRId64 " code: %{public}d",
             formRecord.formId, errCode);
         return errCode;
     }
@@ -600,7 +600,7 @@ ErrCode FormDataAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         want, formAcquireConnection, record.providerUserId);
     FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
     if (errorCode != ERR_OK && errorCode != ERR_ECOLOGICAL_CONTROL_STATUS) {
-        HILOG_ERROR("ConnectServiceAbility failed, errorCode:%{public}d", errorCode);
+        HILOG_ERROR("ConnectServiceAbility failed,errorCode:%{public}d", errorCode);
         FormEventReport::SendFormFailedEvent(FormEventName::CONNECT_FORM_ABILITY_FAILED, formId,
             record.bundleName, "", static_cast<int32_t>(ConnectFormAbilityErrorType::ACQUIRE_FORM_FAILED), errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -611,7 +611,7 @@ ErrCode FormDataAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
 ErrCode FormDataAdapter::ReAcquireProviderFormInfoAsync(const FormItemInfo &info, const WantParams &wantParams)
 {
     int64_t formId = info.GetFormId();
-    HILOG_INFO("reconnect bundleName:%{public}s, formId:%{public}" PRId64, info.GetProviderBundleName().c_str(),
+    HILOG_INFO("reconnect bundleName:%{public}s,formId:%{public}" PRId64, info.GetProviderBundleName().c_str(),
         formId);
     std::lock_guard<std::mutex> lock(reconnectMutex_);
     auto iter = formReconnectMap_.find(formId);
@@ -812,7 +812,7 @@ void FormDataAdapter::DelayRefreshFormsOnAppUpgrade(const std::vector<FormRecord
             data.want = want;
             ErrCode errCode = FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_APP_UPGRADE);
             if (errCode == ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED) {
-                HILOG_WARN("RefreshForm failed one time, PostRefreshFormTask to retry. form %{public}" PRId64 "",
+                HILOG_WARN("RefreshForm failed one time,PostRefreshFormTask to retry.form %{public}" PRId64 "",
                     updatedForm.formId);
                 FormDataAdapter::GetInstance().PostEnterpriseAppInstallFailedRetryTask(updatedForm, want);
             }
@@ -879,7 +879,7 @@ void FormDataAdapter::UpdateFormRenderParamsAfterReload(const int64_t formId)
     if (formUpgradeInfo.enableBlurBackground) {
         renderWant.SetParam(Constants::PARAM_FORM_ENABLE_BLUR_BACKGROUND_KEY, true);
     }
-    HILOG_INFO("Need to set transparencyColor: %{public}s, enableBlurBackground: %{public}d",
+    HILOG_INFO("Need to set transparencyColor:%{public}s,enableBlurBackground:%{public}d",
         transparencyColor.c_str(), formUpgradeInfo.enableBlurBackground);
     FormRenderMgr::GetInstance().SetRenderGroupParams(formId, renderWant);
 }
@@ -912,7 +912,7 @@ void FormDataAdapter::DeleteInvalidFormCacheIfNeed()
             if (FormDbCache::GetInstance().HasDBRecord(formId)) {
                 continue;
             }
-            HILOG_INFO("delete invalid formId: %{public}" PRId64, formId);
+            HILOG_INFO("delete invalid formId:%{public}" PRId64, formId);
             FormCacheMgr::GetInstance().DeleteData(formId);
         }
         // Level 2: sweep img_cache rows not referenced by any FORM_IMAGES

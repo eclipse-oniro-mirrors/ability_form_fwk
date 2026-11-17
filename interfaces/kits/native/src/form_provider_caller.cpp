@@ -122,7 +122,7 @@ void FormProviderCaller::UpdateForm(int64_t formId, const FormProviderData &form
     HILOG_DEBUG("formId is %{public}" PRId64, formId);
     FormJsInfo formJsInfo;
     if (!GetFormJsInfo(formId, formJsInfo)) {
-        HILOG_ERROR("get form js info failed, formId is %{public}" PRId64, formId);
+        HILOG_ERROR("get form js info failed,formId is %{public}" PRId64, formId);
         return;
     }
     formJsInfo.formData = formProviderData.GetDataString();

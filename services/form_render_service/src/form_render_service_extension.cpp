@@ -124,7 +124,7 @@ void FormRenderServiceExtension::OnConfigurationUpdated(const AppExecFwk::Config
         HILOG_ERROR("null configuration");
         return;
     }
-    HILOG_INFO("configuration detail: %{public}s", config->GetName().c_str());
+    HILOG_INFO("configuration detail:%{public}s", config->GetName().c_str());
     FormRenderServiceMgr::GetInstance().OnConfigurationUpdated(config);
 }
 }

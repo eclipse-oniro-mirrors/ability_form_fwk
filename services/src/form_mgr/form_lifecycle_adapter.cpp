@@ -106,7 +106,7 @@ ErrCode FormLifecycleAdapter::CheckFormCountLimit(const int64_t formId, const Wa
     ErrCode checkCode = 0;
     if (tempFormFlag && ((formId == 0) || !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId))) {
         if (formId > 0) {
-            HILOG_ERROR("invalid tempFormId, formId:%{public}" PRId64 "", formId);
+            HILOG_ERROR("invalid tempFormId,formId:%{public}" PRId64 "", formId);
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
         checkCode = FormDataMgr::GetInstance().CheckTempEnoughForm(currentUserId);
@@ -181,10 +181,10 @@ void FormLifecycleAdapter::CheckIsAddFormByHost(const FormRecord &formRecord, Wa
     bool isAddFormByHost = allotFormWant.GetBoolParam(Constants::IS_ADD_FORM_BY_HOST, false);
     int64_t formId = formRecord.formId;
     if (isAddFormByHost) {
-        HILOG_INFO("formId: %{public}" PRId64 " is add form by host.", formId);
+        HILOG_INFO("formId:%{public}" PRId64 " is add form by host.", formId);
         return;
     }
-    HILOG_INFO("formId: %{public}" PRId64 " is not add form by host, extract params.", formId);
+    HILOG_INFO("formId:%{public}" PRId64 " is not add form by host, extract params.", formId);
     formRecord.hostWant.ExtractHostParamsToWant(allotFormWant);
     FormInfo formInfo;
     FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
@@ -198,12 +198,12 @@ void FormLifecycleAdapter::CheckIsAddFormByHost(const FormRecord &formRecord, Wa
 ErrCode FormLifecycleAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
     const FormRecord &record, const int64_t formId, const WantParams &wantParams, FormJsInfo &formInfo)
 {
-    HILOG_WARN("add exist formRecord, formId:%{public}" PRId64, formId);
+    HILOG_WARN("add exist formRecord,formId:%{public}" PRId64, formId);
     // allot form host record
     int callingUid = IPCSkeleton::GetCallingUid();
     bool isCreated = FormDataMgr::GetInstance().AllotFormHostRecord(info, callerToken, formId, callingUid);
     if (!isCreated) {
-        HILOG_ERROR("AllotFormHostRecord failed when no matched formRecord, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("AllotFormHostRecord failed when no matched formRecord,formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -221,7 +221,7 @@ ErrCode FormLifecycleAdapter::AddExistFormRecord(const FormItemInfo &info, const
     if (newRecord.needRefresh || newRecord.needAddForm
         || FormCacheMgr::GetInstance().NeedAcquireProviderData(newRecord.formId)
         || wantParams.HasParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY)) {
-        HILOG_INFO("acquire ProviderFormInfo async, formId:%{public}" PRId64, formId);
+        HILOG_INFO("acquire ProviderFormInfo async,formId:%{public}" PRId64, formId);
         newRecord.isInited = false;
         FormDataMgr::GetInstance().SetFormCacheInited(formId, false);
         FormDataMgr::GetInstance().SetNeedAddForm(formId, false);
@@ -230,7 +230,7 @@ ErrCode FormLifecycleAdapter::AddExistFormRecord(const FormItemInfo &info, const
         // acquire formInfo from provider
         ErrCode errorCode = FormDataAdapter::GetInstance().AcquireProviderFormInfoAsync(formId, info, wantParams);
         if (errorCode != ERR_OK) {
-            HILOG_ERROR("AcquireProviderFormInfoAsync failed, formId:%{public}" PRId64, formId);
+            HILOG_ERROR("AcquireProviderFormInfoAsync failed,formId:%{public}" PRId64, formId);
             return errorCode;
         }
     } else if (newRecord.isLocationChange) {
@@ -255,7 +255,7 @@ ErrCode FormLifecycleAdapter::AllotFormById(const FormItemInfo &info,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
 {
     int64_t formId = FormDataMgr::GetInstance().PaddingUdidHash(info.GetFormId());
-    HILOG_WARN("call, formId:%{public}" PRId64, formId);
+    HILOG_WARN("call,formId:%{public}" PRId64, formId);
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     record.enableForm = info.IsEnableForm();
@@ -276,7 +276,7 @@ ErrCode FormLifecycleAdapter::AllotFormById(const FormItemInfo &info,
     // ark ts form can only exist with one form host
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     if (info.GetUiSyntax() == FormType::ETS && !FormDbCache::GetInstance().IsHostOwner(formId, callingUid)) {
-        HILOG_ERROR("the specified form id does not exist in caller. formId:%{public}s",
+        HILOG_ERROR("the specified form id does not exist in caller.formId:%{public}s",
             std::to_string(formId).c_str());
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
@@ -297,7 +297,7 @@ ErrCode FormLifecycleAdapter::AllotFormById(const FormItemInfo &info,
         if (dbRecord.userId == currentUserId) {
             return AddNewFormRecord(info, formId, callerToken, wholeWantParams, formInfo);
         }
-        HILOG_ERROR("the form id does not belong to callerUser. formId:%{public}" PRId64, formId);
+        HILOG_ERROR("the form id does not belong to callerUser.formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
@@ -340,7 +340,7 @@ ErrCode FormLifecycleAdapter::AllotFormByInfo(const FormItemInfo &info,
         HILOG_ERROR("generateFormId no invalid formId");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    HILOG_WARN("Add new form bundleName: %{public}s abilityName: %{public}s formId: %{public}" PRId64,
+    HILOG_WARN("Add new form bundleName:%{public}s abilityName:%{public}s formId:%{public}" PRId64,
         formInfo.bundleName.c_str(), formInfo.abilityName.c_str(), newFormId);
     FormDataAdapter::GetInstance().UpdateReUpdateFormMap(newFormId);
     return AddNewFormRecord(info, newFormId, callerToken, wantParams, formInfo);
@@ -435,12 +435,12 @@ ErrCode FormLifecycleAdapter::HandleDeleteForm(const int64_t formId, const sptr<
 
     ErrCode result = HandleDeleteFormCache(dbRecord, callingUid, formId);
     if (result != ERR_OK) {
-        HILOG_ERROR("handle delete form cache failed, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("handle delete form cache failed,formId:%{public}" PRId64, formId);
         return result;
     }
 
     if (!FormDataMgr::GetInstance().DeleteHostRecord(callerToken, formId)) {
-        HILOG_ERROR("fail remove host record, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("fail remove host record,formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -545,7 +545,7 @@ int FormLifecycleAdapter::DeleteThemeForm(const int64_t formId)
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) == record.formUserUids.end()) {
-        HILOG_ERROR("caller is not form owner, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("caller is not form owner,formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
@@ -585,7 +585,7 @@ int FormLifecycleAdapter::DeleteCommonForm(const int64_t formId,
 
     int ret = HandleDeleteForm(matchedFormId, callerToken);
     if (ret != ERR_OK) {
-        HILOG_ERROR("delete failed, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("delete failed,formId:%{public}" PRId64, formId);
         FormEventReport::SendFormFailedEvent(FormEventName::DELETE_FORM_FAILED, formId, runningFormInfo.bundleName,
             runningFormInfo.formName, static_cast<int32_t>(DeleteFormErrorType::DELETE_NORMAL_FORM_FAILED), ret);
         return ret;
@@ -601,7 +601,7 @@ ErrCode FormLifecycleAdapter::HandleAddRequestPublishForm(const int64_t formId, 
 {
     ErrCode ret = AddRequestPublishForm(formItemInfo, want, callerToken, formJsInfo);
     if (ret != ERR_OK) {
-        HILOG_ERROR("add request publish form failed. formId: %{public}" PRId64 " code: %{public}d", formId, ret);
+        HILOG_ERROR("add request publish form failed.formId:%{public}" PRId64 " code: %{public}d", formId, ret);
         return ret;
     }
     bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
@@ -618,7 +618,7 @@ int FormLifecycleAdapter::AddForm(const int64_t formId, const Want &want,
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("call");
     if (formId < 0 || callerToken == nullptr) {
-        HILOG_ERROR("param error, formId: %{public}" PRId64 " code: %{public}d",
+        HILOG_ERROR("param error,formId:%{public}" PRId64 " code: %{public}d",
             formId, ERR_APPEXECFWK_FORM_INVALID_PARAM);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
@@ -626,13 +626,13 @@ int FormLifecycleAdapter::AddForm(const int64_t formId, const Want &want,
     AddFormResultErrorCodes states = AddFormResultErrorCodes::SUCCESS;
     ErrCode ret = FormPublishAdapter::GetInstance().CheckAddFormTaskTimeoutOrFailed(formId, states);
     if (ret != ERR_OK) {
-        HILOG_ERROR("AddForm Task Timeout or Failed. formId: %{public}" PRId64 " code: %{public}d", formId, ret);
+        HILOG_ERROR("AddForm Task Timeout or Failed.formId:%{public}" PRId64 " code: %{public}d", formId, ret);
         return ret;
     }
 
     ret = CheckFormCountLimit(formId, want);
     if (ret != ERR_OK) {
-        HILOG_ERROR("CheckFormCountLimit failed. formId: %{public}" PRId64 " code: %{public}d", formId, ret);
+        HILOG_ERROR("CheckFormCountLimit failed.formId:%{public}" PRId64 " code: %{public}d", formId, ret);
         return ret;
     }
 
@@ -645,13 +645,13 @@ int FormLifecycleAdapter::AddForm(const int64_t formId, const Want &want,
     formItemInfo.SetFormId(formId);
     int32_t errCode = FormCommonAdapter::GetInstance().GetFormConfigInfo(want, formItemInfo);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("get %{public}s form config info failed. formId: %{public}" PRId64 " code: %{public}d",
+        HILOG_ERROR("get %{public}s form config info failed.formId:%{public}" PRId64 " code: %{public}d",
             formJsInfo.bundleName.c_str(), formId, errCode);
         return errCode;
     }
 
     if (!FormTrustMgr::GetInstance().IsTrust(formItemInfo.GetProviderBundleName())) {
-        HILOG_ERROR("AddForm fail,%{public}s is unTrust. formId: %{public}" PRId64 " code: %{public}d",
+        HILOG_ERROR("AddForm fail,%{public}s is unTrust.formId:%{public}" PRId64 " code: %{public}d",
             formItemInfo.GetProviderBundleName().c_str(), formId, ERR_APPEXECFWK_FORM_NOT_TRUST);
         return ERR_APPEXECFWK_FORM_NOT_TRUST;
     }
@@ -665,7 +665,7 @@ int FormLifecycleAdapter::AddForm(const int64_t formId, const Want &want,
     formMajorInfo.dimension = dimensionId;
 
     if (formId == 0 && FormCommonAdapter::GetInstance().CheckFormDueControl(formMajorInfo, false)) {
-        HILOG_ERROR("Add new form fail,%{public}s is due removed. formId: %{public}" PRId64 " code: %{public}d",
+        HILOG_ERROR("Add new form fail,%{public}s is due removed.formId:%{public}" PRId64 " code: %{public}d",
             formItemInfo.GetProviderBundleName().c_str(), formId, ERR_APPEXECFWK_FORM_DUE_REMOVE);
         return ERR_APPEXECFWK_FORM_DUE_REMOVE;
     }
@@ -682,14 +682,14 @@ int FormLifecycleAdapter::AddForm(const int64_t formId, const Want &want,
     }
 
     if (!ValidateFormItemParams(formItemInfo)) {
-        HILOG_ERROR("invalid form param length, formId: %{public}" PRId64, formId);
+        HILOG_ERROR("invalid form param length,formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     ret = AllotForm(formId, want, callerToken, formJsInfo, formItemInfo);
     FormPublishAdapter::GetInstance().RemoveFormIdMapElement(formId);
     if (ret != ERR_OK) {
-        HILOG_ERROR("allot form failed. formId: %{public}" PRId64 " code: %{public}d", formId, ret);
+        HILOG_ERROR("allot form failed.formId:%{public}" PRId64 " code: %{public}d", formId, ret);
     }
     return ret;
 }
@@ -712,7 +712,7 @@ int FormLifecycleAdapter::DeleteForm(const int64_t formId,
 #ifdef THEME_MGR_ENABLE
     FormDBInfo dbInfo;
     ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbInfo);
-    HILOG_INFO("getDbRet:%{public}d, isThemeForm:%{public}d", getDbRet, dbInfo.isThemeForm);
+    HILOG_INFO("getDbRet:%{public}d,isThemeForm:%{public}d", getDbRet, dbInfo.isThemeForm);
     if (getDbRet == ERR_OK && dbInfo.isThemeForm) {
         int32_t ret = DeleteThemeForm(formId);
         if (ret != ERR_OK) {
@@ -834,18 +834,18 @@ int FormLifecycleAdapter::CastTempForm(const int64_t formId,
     }
 
     if (!FormDataMgr::GetInstance().DeleteTempForm(matchedFormId)) {
-        HILOG_ERROR("delete temp form error, formId:%{public}" PRId64 ".", matchedFormId);
+        HILOG_ERROR("delete temp form error,formId:%{public}" PRId64 ".", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
     if (!FormDataMgr::GetInstance().ModifyFormTempFlag(matchedFormId, false)) {
-        HILOG_ERROR("modify form temp flag error, formId:%{public}" PRId64 ".",
+        HILOG_ERROR("modify form temp flag error,formId:%{public}" PRId64 ".",
             matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
     if (!FormDataMgr::GetInstance().AddFormUserUid(matchedFormId, callingUid)) {
-        HILOG_ERROR("add form user uid error, formId:%{public}" PRId64 ".", matchedFormId);
+        HILOG_ERROR("add form user uid error,formId:%{public}" PRId64 ".", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
@@ -856,7 +856,7 @@ int FormLifecycleAdapter::CastTempForm(const int64_t formId,
 
     ErrCode errorCode = FormDbCache::GetInstance().UpdateDBRecord(matchedFormId, formRecord);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("update db record error, formId:%{public}" PRId64 ".", matchedFormId);
+        HILOG_ERROR("update db record error,formId:%{public}" PRId64 ".", matchedFormId);
         return errorCode;
     }
 
@@ -897,7 +897,7 @@ int FormLifecycleAdapter::CreateForm(const Want &want, RunningFormInfo &runningF
 
         ret = AddThemeDBRecord(want, formId);
         if (ret != ERR_OK) {
-            HILOG_ERROR("AddThemeDBRecord failed, rollback ThemeManager");
+            HILOG_ERROR("AddThemeDBRecord failed,rollback ThemeManager");
             ThemeFormClient::GetInstance().DeleteForms({formId});
             return ret;
         }
@@ -940,12 +940,12 @@ int FormLifecycleAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds
     for (int64_t formId : formIds) {
         int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
         matchedFormIds.emplace(matchedFormId);
-        HILOG_INFO("valid formId, formId:%{public}" PRId64, formId);
+        HILOG_INFO("valid formId,formId:%{public}" PRId64, formId);
     }
     std::map<int64_t, bool> removedFormsMap {};
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
-    HILOG_WARN("userId:%{public}d, callingUid:%{public}d", userId, callingUid);
+    HILOG_WARN("userId:%{public}d,callingUid:%{public}d", userId, callingUid);
     FormDbCache::GetInstance().DeleteInvalidDBForms(userId, callingUid, matchedFormIds, removedFormsMap);
     FormDataMgr::GetInstance().DeleteInvalidTempForms(userId, callingUid, matchedFormIds, removedFormsMap);
 
@@ -970,7 +970,7 @@ int FormLifecycleAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds
     }
 
     numFormsDeleted = static_cast<int32_t>(removedFormsMap.size());
-    HILOG_INFO("done,%{public}d forms, deleted", numFormsDeleted);
+    HILOG_INFO("done,%{public}d forms,deleted", numFormsDeleted);
     return ERR_OK;
 }
 
@@ -997,7 +997,7 @@ FormRecord FormLifecycleAdapter::AllotThemeRecord(const Want &want, int64_t form
         !IsValidFormParam(moduleName, Constants::MAX_MODULE_NAME_LENGTH) ||
         !IsValidFormParam(abilityName, Constants::MAX_ABILITY_NAME_LENGTH) ||
         !IsValidFormParam(formName, Constants::MAX_FORM_NAME_LENGTH)) {
-        HILOG_ERROR("invalid theme form param length, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("invalid theme form param length,formId:%{public}" PRId64, formId);
         return FormRecord();
     }
     FormItemInfo formInfo;
@@ -1024,11 +1024,11 @@ ErrCode FormLifecycleAdapter::EnableForms(const std::string &bundleName, const i
         HILOG_ERROR("GetFormRecord error");
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    HILOG_INFO("userId:%{public}d, bundleName:%{public}s, infosSize:%{public}zu, enable:%{public}d",
+    HILOG_INFO("userId:%{public}d,bundleName:%{public}s,infosSize:%{public}zu,enable:%{public}d",
         userId, bundleName.c_str(), formInfos.size(), enable);
     std::vector<int64_t> enabledFormIds;
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
-        HILOG_DEBUG("enableForm:%{public}d, transparencyEnabled:%{public}d",
+        HILOG_DEBUG("enableForm:%{public}d,transparencyEnabled:%{public}d",
             iter->enableForm, iter->transparencyEnabled);
         if (enable) {
             FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTaskByFormId(iter->formId);
@@ -1051,7 +1051,7 @@ ErrCode FormLifecycleAdapter::EnableForms(const std::string &bundleName, const i
     }
     // Dispatch cached colorMode updates to forms released from healthy control
     if (!enabledFormIds.empty()) {
-        HILOG_INFO("consume colorMode cache after healthy control release, "
+        HILOG_INFO("consume colorMode cache after healthy control release,"
             "formIds size:%{public}zu, userId:%{public}d", enabledFormIds.size(), userId);
         ConsumeColorModeCache(enabledFormIds, userId);
     }
@@ -1063,7 +1063,7 @@ ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, in
 {
     if (FormBundleLockMgr::GetInstance().IsLockServiceInitialized() &&
         FormBundleLockMgr::GetInstance().IsBundleProtect(bundleName, userId) == protect) {
-        HILOG_INFO("No need to change protect status, bundleName = %{public}s, protect = %{public}d",
+        HILOG_INFO("No need to change protect status,bundleName = %{public}s,protect = %{public}d",
             bundleName.c_str(), protect);
         return ERR_OK;
     }
@@ -1089,9 +1089,9 @@ ErrCode FormLifecycleAdapter::ProtectLockForms(const std::string &bundleName, in
 #endif
     }
 
-    HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, protect:%{public}d", userId, formInfos.size(), protect);
+    HILOG_INFO("userId:%{public}d,infosSize:%{public}zu,protect:%{public}d", userId, formInfos.size(), protect);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
-        HILOG_DEBUG("bundleName:%{public}s, lockForm:%{public}d, transparencyEnabled:%{public}d",
+        HILOG_DEBUG("bundleName:%{public}s,lockForm:%{public}d,transparencyEnabled:%{public}d",
             iter->bundleName.c_str(), iter->lockForm, iter->transparencyEnabled);
         if (FormExemptLockMgr::GetInstance().IsExemptLock(iter->formId)) {
             iter = formInfos.erase(iter);
@@ -1132,7 +1132,7 @@ int32_t FormLifecycleAdapter::RecoverForms(const std::vector<int64_t> &formIds, 
     int callingUid = IPCSkeleton::GetCallingUid();
     bool needHandleCachedClick =
         want.GetBoolParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, false);
-    HILOG_INFO("recover by click: %{public}d", needHandleCachedClick);
+    HILOG_INFO("recover by click:%{public}d", needHandleCachedClick);
     for (int64_t formId : formIds) {
         if (formId <= 0) {
             HILOG_ERROR("form id is negative");
@@ -1212,7 +1212,7 @@ int64_t FormLifecycleAdapter::GetRecycleFormIdIfValid(int64_t formId, FormRecord
     }
     if (!isCheckCallingUid && callingUid < Constants::CALLING_UID_TRANSFORM_DIVISOR) {
         if (record.formUserUids.empty()) {
-            HILOG_ERROR("formUserUids is empty, formId:%{public}" PRId64, formId);
+            HILOG_ERROR("formUserUids is empty,formId:%{public}" PRId64, formId);
             return INVALID_FORM_ID;
         }
         callingUid = *(record.formUserUids.begin());
@@ -1262,7 +1262,7 @@ bool FormLifecycleAdapter::IsFormRenderServiceCall(int callingUid)
 ErrCode FormLifecycleAdapter::SwitchLockForms(const std::string &bundleName, int32_t userId, const bool lock)
 {
     if (FormBundleLockMgr::GetInstance().IsBundleLock(bundleName, userId) == lock) {
-        HILOG_INFO("No need to change lock status, bundleName = %{public}s, lock = %{public}d",
+        HILOG_INFO("No need to change lock status,bundleName = %{public}s,lock = %{public}d",
             bundleName.c_str(), lock);
         return ERR_OK;
     }
@@ -1273,9 +1273,9 @@ ErrCode FormLifecycleAdapter::SwitchLockForms(const std::string &bundleName, int
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, lock:%{public}d", userId, formInfos.size(), lock);
+    HILOG_INFO("userId:%{public}d,infosSize:%{public}zu,lock:%{public}d", userId, formInfos.size(), lock);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
-        HILOG_INFO("bundleName:%{public}s, lockForm:%{public}d, formId:%{public}" PRId64,
+        HILOG_INFO("bundleName:%{public}s,lockForm:%{public}d,formId:%{public}" PRId64,
             iter->bundleName.c_str(), iter->lockForm, iter->formId);
         bool isSystemApp = iter->isSystemApp;
         FormInfo formInfo;
@@ -1310,7 +1310,7 @@ ErrCode FormLifecycleAdapter::BatchNotifyFormsConfigurationUpdate(const AppExecF
     std::set<std::string> notified;
     FormDataMgr::GetInstance().GetRecordsByFormType(Constants::REFRESH_SYSTEMAPP_FORM,
         visibleFormRecords, invisibleFormRecords);
-    HILOG_INFO("getRecords visible size:%{public}zu, invisible size:%{public}zu",
+    HILOG_INFO("getRecords visible size:%{public}zu,invisible size:%{public}zu",
         visibleFormRecords.size(), invisibleFormRecords.size());
     Want reqWant;
     for (const auto &formRecord : visibleFormRecords) {
@@ -1397,13 +1397,13 @@ ErrCode FormLifecycleAdapter::AddRequestPublishForm(const FormItemInfo &formItem
 ErrCode FormLifecycleAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t formId,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formJsInfo)
 {
-    HILOG_WARN("call formId: %{public}" PRId64, formId);
+    HILOG_WARN("call formId:%{public}" PRId64, formId);
     FormItemInfo newInfo(info);
     newInfo.SetFormId(formId);
     // allot form host record
     int callingUid = IPCSkeleton::GetCallingUid();
     if (!FormDataMgr::GetInstance().AllotFormHostRecord(newInfo, callerToken, formId, callingUid)) {
-        HILOG_ERROR("AllotFormHostRecord failed when no matched formRecord, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("AllotFormHostRecord failed when no matched formRecord,formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -1426,7 +1426,7 @@ ErrCode FormLifecycleAdapter::AddNewFormRecord(const FormItemInfo &info, const i
     // acquire formInfo from provider
     ErrCode errorCode = FormDataAdapter::GetInstance().AcquireProviderFormInfoAsync(formId, newInfo, wantParams);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("AcquireProviderFormInfoAsync failed, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("AcquireProviderFormInfoAsync failed,formId:%{public}" PRId64, formId);
         return errorCode;
     }
 
@@ -1437,7 +1437,7 @@ ErrCode FormLifecycleAdapter::AddNewFormRecord(const FormItemInfo &info, const i
     if (!newInfo.IsTemporaryForm()) {
         ErrCode errorCode = FormDbCache::GetInstance().UpdateDBRecord(formId, formRecord);
         if (errorCode != ERR_OK) {
-            HILOG_ERROR("UpdateDBRecord failed, formId:%{public}" PRId64, formId);
+            HILOG_ERROR("UpdateDBRecord failed,formId:%{public}" PRId64, formId);
             return errorCode;
         }
     }
@@ -1456,7 +1456,7 @@ ErrCode FormLifecycleAdapter::AddNewFormRecord(const FormItemInfo &info, const i
 ErrCode FormLifecycleAdapter::HandleCastTempForm(const int64_t formId, const FormRecord &formRecord)
 {
 #ifndef WATCH_API_DISABLE
-    HILOG_DEBUG("cast temp form to normal form, notify supplier, package:%{public}s, class:%{public}s",
+    HILOG_DEBUG("cast temp form to normal form,notify supplier,package:%{public}s,class:%{public}s",
         formRecord.bundleName.c_str(), formRecord.abilityName.c_str());
     sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId,
         formRecord.bundleName, formRecord.abilityName, FormCommonAdapter::GetInstance().GetCallingUserId());
@@ -1586,7 +1586,7 @@ ErrCode FormLifecycleAdapter::BatchNotifyFormsColorModeUpdate(int32_t userId,
         FormInfo formInfo;
         ErrCode ret = FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
         if (ret != ERR_OK) {
-            HILOG_WARN("get formInfo failed, formId:%{public}" PRId64 ", ret:%{public}d",
+            HILOG_WARN("get formInfo failed,formId:%{public}" PRId64 ", ret:%{public}d",
                 formRecord.formId, ret);
             continue;
         }
@@ -1603,7 +1603,7 @@ ErrCode FormLifecycleAdapter::BatchNotifyFormsColorModeUpdate(int32_t userId,
         if (RefreshControlMgr::GetInstance().IsHealthyControl(formRecord)) {
             std::lock_guard<std::mutex> lock(colorModeCacheMutex_);
             colorModeUpdateCache_[key] = configuration;
-            HILOG_INFO("cache colorMode for healthy control, key:%{public}s", key.c_str());
+            HILOG_INFO("cache colorMode for healthy control,key:%{public}s", key.c_str());
             continue;
         }
 
@@ -1611,13 +1611,13 @@ ErrCode FormLifecycleAdapter::BatchNotifyFormsColorModeUpdate(int32_t userId,
             ErrCode connectRet = FormProviderMgr::GetInstance().ConnectForConfigUpdateWithUserId(
                 configuration, formRecord, reqWant, userId);
             if (connectRet == ERR_OK) {
-                HILOG_INFO("notify colorMode success, key:%{public}s", key.c_str());
+                HILOG_INFO("notify colorMode success,key:%{public}s", key.c_str());
                 notified.insert(key);
                 // Clear cached configuration since the app has been notified directly
                 std::lock_guard<std::mutex> lock(colorModeCacheMutex_);
                 colorModeUpdateCache_.erase(key);
             } else {
-                HILOG_ERROR("ConnectForConfigUpdateWithUserId failed, connectRet:%{public}d, "
+                HILOG_ERROR("ConnectForConfigUpdateWithUserId failed,connectRet:%{public}d,"
                     "cache for retry, key:%{public}s", connectRet, key.c_str());
                 // Direct callback failed, cache for retry when visible next time
                 std::lock_guard<std::mutex> lock(colorModeCacheMutex_);
@@ -1626,16 +1626,16 @@ ErrCode FormLifecycleAdapter::BatchNotifyFormsColorModeUpdate(int32_t userId,
         } else {
             std::lock_guard<std::mutex> lock(colorModeCacheMutex_);
             colorModeUpdateCache_[key] = configuration;
-            HILOG_INFO("cache colorMode for invisible form, key:%{public}s", key.c_str());
+            HILOG_INFO("cache colorMode for invisible form,key:%{public}s", key.c_str());
         }
     }
-    HILOG_INFO("colorMode update done, notified size:%{public}zu", notified.size());
+    HILOG_INFO("colorMode update done,notified size:%{public}zu", notified.size());
     return ERR_OK;
 }
 
 void FormLifecycleAdapter::ConsumeColorModeCache(const std::vector<int64_t> &formIds, int32_t userId)
 {
-    HILOG_INFO("consume colorMode cache, formIds size:%{public}zu, userId:%{public}d, cache size:%{public}zu",
+    HILOG_INFO("consume colorMode cache,formIds size:%{public}zu,userId:%{public}d,cache size:%{public}zu",
         formIds.size(), userId, colorModeUpdateCache_.size());
     if (colorModeUpdateCache_.empty() || formIds.empty()) {
         return;
@@ -1670,7 +1670,7 @@ void FormLifecycleAdapter::ConsumeColorModeCache(const std::vector<int64_t> &for
             }
             // Only consume when form is visible; invisible forms get cached updates on visibility change
             if (!FormDataMgr::GetInstance().GetFormVisible(formRecord.formId)) {
-                HILOG_INFO("form not visible, keep cache, key:%{public}s", key.c_str());
+                HILOG_INFO("form not visible,keep cache,key:%{public}s", key.c_str());
                 continue;
             }
             // Snapshot configuration under lock, IPC outside lock to avoid long hold
@@ -1679,10 +1679,10 @@ void FormLifecycleAdapter::ConsumeColorModeCache(const std::vector<int64_t> &for
         ErrCode ret = FormProviderMgr::GetInstance().ConnectForConfigUpdateWithUserId(
             cachedConfig, formRecord, reqWant, userId);
         if (ret == ERR_OK) {
-            HILOG_INFO("consume cache success, key:%{public}s", key.c_str());
+            HILOG_INFO("consume cache success,key:%{public}s", key.c_str());
             consumedKeys.push_back(key);
         } else {
-            HILOG_ERROR("consume cache failed, ret:%{public}d, keep cache for retry, key:%{public}s",
+            HILOG_ERROR("consume cache failed,ret:%{public}d,keep cache for retry,key:%{public}s",
                 ret, key.c_str());
         }
     }
@@ -1691,7 +1691,7 @@ void FormLifecycleAdapter::ConsumeColorModeCache(const std::vector<int64_t> &for
         for (const auto &key : consumedKeys) {
             colorModeUpdateCache_.erase(key);
         }
-        HILOG_INFO("consume colorMode cache done, remaining:%{public}zu", colorModeUpdateCache_.size());
+        HILOG_INFO("consume colorMode cache done,remaining:%{public}zu", colorModeUpdateCache_.size());
     }
 }
 

@@ -40,7 +40,7 @@ const std::pair<FormFsmStatus, FormFsmStatus> FormStatus::GetFormStatusPair(cons
     std::shared_lock<std::shared_mutex> lock(formStatusMutex_);
     auto iter = formStatusMap_.find(formId);
     if (iter == formStatusMap_.end()) {
-        HILOG_ERROR("formStatusMap_ do not exist, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("formStatusMap_ do not exist,formId:%{public}" PRId64, formId);
         return std::make_pair(FormFsmStatus::INIT, FormFsmStatus::INIT);
     }
 
@@ -62,7 +62,7 @@ void FormStatus::SetFormStatus(const int64_t formId, FormFsmStatus formStatus)
     std::unique_lock<std::shared_mutex> lock(formStatusMutex_);
     auto iter = formStatusMap_.find(formId);
     if (iter == formStatusMap_.end()) {
-        HILOG_INFO("set new form status, formId:%{public}" PRId64 ", status is %{public}d.",
+        HILOG_INFO("set new form status,formId:%{public}" PRId64 ", status is %{public}d.",
             formId, static_cast<int32_t>(formStatus));
         formStatusMap_.emplace(formId, std::make_pair(FormFsmStatus::INIT, formStatus));
         return;
@@ -78,7 +78,7 @@ void FormStatus::DeleteFormStatus(const int64_t formId)
     std::unique_lock<std::shared_mutex> lock(formStatusMutex_);
     auto iter = formStatusMap_.find(formId);
     if (iter != formStatusMap_.end()) {
-        HILOG_INFO("delete form status, formId:%{public}" PRId64, formId);
+        HILOG_INFO("delete form status,formId:%{public}" PRId64, formId);
         formStatusMap_.erase(iter);
     } else {
         HILOG_INFO("not find formId:%{public}" PRId64, formId);

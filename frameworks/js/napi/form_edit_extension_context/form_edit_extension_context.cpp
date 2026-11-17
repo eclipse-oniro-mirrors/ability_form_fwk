@@ -31,7 +31,7 @@ void FormEditExtensionContext::SetWant(const std::shared_ptr<AAFwk::Want> &want)
 
 bool FormEditExtensionContext::SetWindowBackgroundColor(const std::string &color)
 {
-    HILOG_DEBUG("SetWindowBackgroundColor begin, color=%{public}s", color.c_str());
+    HILOG_DEBUG("SetWindowBackgroundColor begin,color=%{public}s", color.c_str());
 #ifdef SUPPORT_SCREEN
     sptr<Rosen::Window> uiWindow = UIExtensionContext::GetWindow();
     if (uiWindow == nullptr) {
@@ -40,7 +40,7 @@ bool FormEditExtensionContext::SetWindowBackgroundColor(const std::string &color
     }
     Rosen::WMError ret = uiWindow->SetBackgroundColor(color);
     if (ret != Rosen::WMError::WM_OK) {
-        HILOG_ERROR("SetBackgroundColor failed, ret=%{public}d", ret);
+        HILOG_ERROR("SetBackgroundColor failed,ret=%{public}d", ret);
         return false;
     }
 #endif // SUPPORT_SCREEN

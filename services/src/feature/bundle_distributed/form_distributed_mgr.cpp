@@ -112,12 +112,12 @@ bool FormDistributedMgr::Init()
 bool FormDistributedMgr::IsBundleDistributed(const std::string &bundleName, int32_t userId)
 {
     if (bundleName.empty() || userId == Constants::INVALID_USER_ID) {
-        HILOG_ERROR("invalid bundleName or userId, userId:%{public}d", userId);
+        HILOG_ERROR("invalid bundleName or userId,userId:%{public}d", userId);
         return false;
     }
 
     if (!IsBundleDistributedInit()) {
-        HILOG_ERROR("distributed mgr init failed, get status error");
+        HILOG_ERROR("distributed mgr init failed,get status error");
         return false;
     }
 
@@ -140,7 +140,7 @@ void FormDistributedMgr::SetBundleDistributedStatus(
     }
 
     std::unique_lock<std::shared_mutex> lock(bundleDistributedMapMutex_);
-    HILOG_INFO("set bundle: %{public}s distributed status: %{public}d, userId:%{public}d",
+    HILOG_INFO("set bundle:%{public}s distributed status:%{public}d,userId:%{public}d",
         bundleName.c_str(), isDistributed, distributedModule.userId);
     std::string key = bundleName + std::to_string(distributedModule.userId);
     auto iter = distributedBundleMap_.find(key);
@@ -180,12 +180,12 @@ void FormDistributedMgr::AlterTableAddColumn()
 std::string FormDistributedMgr::GetUiModuleName(const std::string &bundleName, int32_t userId)
 {
     if (bundleName.empty() || userId == Constants::INVALID_USER_ID) {
-        HILOG_ERROR("invalid bundleName or userId, userId:%{public}d", userId);
+        HILOG_ERROR("invalid bundleName or userId,userId:%{public}d", userId);
         return "";
     }
 
     if (!IsBundleDistributedInit()) {
-        HILOG_ERROR("distributed mgr init failed, get uiModuleName error");
+        HILOG_ERROR("distributed mgr init failed,get uiModuleName error");
         return "";
     }
 
@@ -238,7 +238,7 @@ void FormDistributedMgr::SaveDataToDb(const std::string &bundleName, const Distr
     valuesBucket.PutString(VALUE, distributedModule.extraValue);
     int64_t rowId;
     bool ret = FormRdbDataMgr::GetInstance().InsertData(DISTRIBUTED_FORM_BUNDLE_TABLE, valuesBucket, rowId);
-    HILOG_INFO("insert data ret:%{public}d, bundleName:%{public}s, userId:%{public}d",
+    HILOG_INFO("insert data ret:%{public}d,bundleName:%{public}s,userId:%{public}d",
         ret, bundleName.c_str(), distributedModule.userId);
 }
 
@@ -247,7 +247,7 @@ void FormDistributedMgr::DeleteDataInDb(const std::string &bundleName, int32_t u
     NativeRdb::AbsRdbPredicates absRdbPredicates(DISTRIBUTED_FORM_BUNDLE_TABLE);
     absRdbPredicates.EqualTo(KEY, bundleName + std::to_string(userId));
     bool ret = FormRdbDataMgr::GetInstance().DeleteData(absRdbPredicates);
-    HILOG_INFO("delete data ret:%{public}d, bundleName:%{public}s, userId:%{public}d", ret, bundleName.c_str(), userId);
+    HILOG_INFO("delete data ret:%{public}d,bundleName:%{public}s,userId:%{public}d", ret, bundleName.c_str(), userId);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

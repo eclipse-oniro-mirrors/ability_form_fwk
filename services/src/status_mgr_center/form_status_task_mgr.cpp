@@ -49,7 +49,7 @@ void CreateRenderFormJsInfo(const FormRecord &formRecord, const Want &want, Form
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     FormProviderData formProviderData;
     if (renderType != Constants::RENDER_FORM) {
-        HILOG_INFO("renderType is not RENDER_FORM, formId: %{public}" PRId64, formRecord.formId);
+        HILOG_INFO("renderType is not RENDER_FORM,formId:%{public}" PRId64, formRecord.formId);
         formProviderData = formRecord.formProviderInfo.GetFormData();
         // if the form status is not RENDERED or formProviderData is empty, fetch from DB to refresh
         auto status = FormStatus::GetInstance().GetFormLastStatus(formRecord.formId);
@@ -60,11 +60,11 @@ void CreateRenderFormJsInfo(const FormRecord &formRecord, const Want &want, Form
 
     if (formProviderData.HasData()) {
         FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formProviderData, formJsInfo);
-        HILOG_INFO("RenderForm formId: %{public}" PRId64 ", imageDataState: %{public}d dataSize: %{public}zu",
+        HILOG_INFO("RenderForm formId:%{public}" PRId64 ", imageDataState: %{public}d dataSize: %{public}zu",
             formRecord.formId, formProviderData.GetImageDataState(), formProviderData.GetDataString().size());
     } else {
         FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formJsInfo);
-        HILOG_WARN("RenderForm formId: %{public}" PRId64 ", not cache", formRecord.formId);
+        HILOG_WARN("RenderForm formId:%{public}" PRId64 ", not cache", formRecord.formId);
     }
 }
 }
@@ -91,7 +91,7 @@ void FormStatusTaskMgr::PostRecycleForms(const std::vector<int64_t> &formIds, co
             FormRecord formRecord;
             FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
             if (formRecord.lowMemoryRecycleStatus != LowMemoryRecycleStatus::RECYCLABLE) {
-                HILOG_WARN("form not need recycle, formId: %{public}" PRId64, formId);
+                HILOG_WARN("form not need recycle,formId:%{public}" PRId64, formId);
                 continue;
             }
         }
@@ -316,7 +316,7 @@ bool FormStatusTaskMgr::ScheduleRecycleTimeout(const int64_t formId)
     FormStatusQueue::GetInstance().CancelDelayTask(std::make_pair(formId, WAIT_RELEASE_RENDERER_MSG));
 
     auto timeoutTask = [formId]() {
-        HILOG_ERROR("RecycleForm failed, wait form release timeout, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("RecycleForm failed,wait form release timeout,formId:%{public}" PRId64, formId);
         FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECYCLE_FORM_FAIL);
         FormStatusQueue::GetInstance().CancelDelayTask(std::make_pair(formId, WAIT_RELEASE_RENDERER_MSG));
     };
@@ -332,11 +332,11 @@ bool FormStatusTaskMgr::CancelRecycleTimeout(const int64_t formId)
 void FormStatusTaskMgr::RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost,
     const sptr<IRemoteObject> &remoteObjectOfRender)
 {
-    HILOG_INFO("start formId: %{public}" PRId64, formId);
+    HILOG_INFO("start formId:%{public}" PRId64, formId);
 
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObjectOfRender);
     if (remoteFormRender == nullptr) {
-        HILOG_ERROR("fail get form render proxy, formId is %{public}" PRId64, formId);
+        HILOG_ERROR("fail get form render proxy,formId is %{public}" PRId64, formId);
         return;
     }
 
@@ -353,7 +353,7 @@ void FormStatusTaskMgr::RecycleForm(const int64_t &formId, const sptr<IRemoteObj
     want.SetParam(Constants::FORM_STATUS_EVENT_ID, eventId);
     int32_t error = remoteFormRender->RecycleForm(formId, want);
     if (error != ERR_OK) {
-        HILOG_ERROR("RecycleForm fail formId: %{public}" PRId64 " error: %{public}d", formId, error);
+        HILOG_ERROR("RecycleForm fail formId:%{public}" PRId64 " error: %{public}d", formId, error);
         FormEventReport::SendFormFailedEvent(FormEventName::RECYCLE_RECOVER_FORM_FAILED,
             formId,
             formRecord.bundleName,
@@ -367,7 +367,7 @@ void FormStatusTaskMgr::RecycleForm(const int64_t &formId, const sptr<IRemoteObj
 
 void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("start formId: %{public}" PRId64, record.formId);
+    HILOG_INFO("start formId:%{public}" PRId64, record.formId);
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
@@ -385,11 +385,11 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
     FormJsInfo formJsInfo;
     if (formProviderData.HasData()) {
         FormDataMgr::GetInstance().CreateFormJsInfo(record.formId, record, formProviderData, formJsInfo);
-        HILOG_INFO("RecoverForm formId: %{public}" PRId64 ", imageDataState: %{public}d dataSize: %{public}zu",
+        HILOG_INFO("RecoverForm formId:%{public}" PRId64 ", imageDataState: %{public}d dataSize: %{public}zu",
             record.formId, formProviderData.GetImageDataState(), formProviderData.GetDataString().size());
     } else {
         FormDataMgr::GetInstance().CreateFormJsInfo(record.formId, record, formJsInfo);
-        HILOG_WARN("RecoverForm formId: %{public}" PRId64 ", not cache", record.formId);
+        HILOG_WARN("RecoverForm formId:%{public}" PRId64 ", not cache", record.formId);
     }
     Want newWant(want);
     std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(record.formId);
@@ -397,7 +397,7 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
 
     int32_t error = remoteFormRender->RecoverForm(formJsInfo, newWant);
     if (error != ERR_OK) {
-        HILOG_ERROR("RecoverForm fail formId: %{public}" PRId64 " error: %{public}d", formJsInfo.formId, error);
+        HILOG_ERROR("RecoverForm fail formId:%{public}" PRId64 " error: %{public}d", formJsInfo.formId, error);
         RemoveConnection(connectId);
         FormEventReport::SendFormFailedEvent(FormEventName::RECYCLE_RECOVER_FORM_FAILED,
             record.formId,
@@ -414,7 +414,7 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
 void FormStatusTaskMgr::ReleaseRenderer(
     int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("begin formId: %{public}" PRId64, formId);
+    HILOG_DEBUG("begin formId:%{public}" PRId64, formId);
 
     sptr<IFormRender> remoteFormDeleteRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormDeleteRender == nullptr) {
@@ -428,11 +428,11 @@ void FormStatusTaskMgr::ReleaseRenderer(
 
     int32_t error = remoteFormDeleteRender->ReleaseRenderer(formId, compId, uid, newWant);
     if (error != ERR_OK) {
-        HILOG_ERROR("ReleaseRenderer fail formId: %{public}" PRId64 " error: %{public}d", formId, error);
+        HILOG_ERROR("ReleaseRenderer fail formId:%{public}" PRId64 " error: %{public}d", formId, error);
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECYCLE_FORM_FAIL);
     }
-    HILOG_INFO("end formId: %{public}" PRId64, formId);
+    HILOG_INFO("end formId:%{public}" PRId64, formId);
 }
 
 bool FormStatusTaskMgr::PostDelayReleaseRenderer(
@@ -451,7 +451,7 @@ bool FormStatusTaskMgr::PostDelayReleaseRenderer(
 void FormStatusTaskMgr::StopRenderingForm(
     const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("begin formId: %{public}" PRId64, formRecord.formId);
+    HILOG_INFO("begin formId:%{public}" PRId64, formRecord.formId);
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormRender> remoteFormDeleteRender = iface_cast<IFormRender>(remoteObject);
@@ -469,7 +469,7 @@ void FormStatusTaskMgr::StopRenderingForm(
 
     int32_t error = remoteFormDeleteRender->StopRenderingForm(formInfo, newWant, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
-        HILOG_ERROR("StopRenderingForm fail formId: %{public}" PRId64 " error: %{public}d", formRecord.formId, error);
+        HILOG_ERROR("StopRenderingForm fail formId:%{public}" PRId64 " error: %{public}d", formRecord.formId, error);
         RemoveConnection(connectId);
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formInfo.formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formInfo.formId, FormFsmEvent::DELETE_FORM_FAIL);
@@ -480,7 +480,7 @@ void FormStatusTaskMgr::StopRenderingForm(
 void FormStatusTaskMgr::RenderForm(
     const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("render form formId: %{public}" PRId64 ",%{public}zu", formRecord.formId,
+    HILOG_INFO("render form formId:%{public}" PRId64 ",%{public}zu", formRecord.formId,
         formRecord.formProviderInfo.GetFormDataString().length());
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
@@ -510,7 +510,7 @@ void FormStatusTaskMgr::RenderForm(
             formRecord.formId, HiSysEventPointType::TYPE_INVISIBLE_UPDATE);
     }
     if (error != ERR_OK) {
-        HILOG_ERROR("StopRenderingForm fail formId: %{public}" PRId64 " error: %{public}d", formRecord.formId, error);
+        HILOG_ERROR("StopRenderingForm fail formId:%{public}" PRId64 " error: %{public}d", formRecord.formId, error);
         RemoveConnection(connectId);
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formRecord.formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formRecord.formId, FormFsmEvent::RENDER_FORM_FAIL);
@@ -525,7 +525,7 @@ void FormStatusTaskMgr::RemoveConnection(int32_t connectId)
 {
     auto formSupplyCallback = FormSupplyCallback::GetInstance();
     if (formSupplyCallback == nullptr) {
-        HILOG_ERROR("formSupplyCallback is nullptr.");
+        HILOG_ERROR("formSupplyCallback is nullptr");
         return;
     }
     formSupplyCallback->RemoveConnection(connectId);
@@ -536,10 +536,10 @@ void FormStatusTaskMgr::RestoreFormRecycledStatus(const FormRecord &formRecord, 
     if (!FormDataMgr::GetInstance().IsExpectRecycled(formRecord.formId)) {
         return;
     }
-    HILOG_INFO("form is expect recycled, formId: %{public}" PRId64, formRecord.formId);
+    HILOG_INFO("form is expect recycled,formId:%{public}" PRId64, formRecord.formId);
     auto recycleForm = [formRecord, remoteObject]() {
         if (!FormDataMgr::GetInstance().IsExpectRecycled(formRecord.formId)) {
-            HILOG_WARN("form not need recycle, formId: %{public}" PRId64, formRecord.formId);
+            HILOG_WARN("form not need recycle,formId:%{public}" PRId64, formRecord.formId);
             const std::string eventId = FormStatusMgr::GetInstance().GetFormEventId(formRecord.formId);
             FormStatusMgr::GetInstance().CancelFormEventTimeout(formRecord.formId, eventId);
             FormStatusMgr::GetInstance().PostFormEvent(formRecord.formId, FormFsmEvent::RECYCLE_DATA_FAIL);

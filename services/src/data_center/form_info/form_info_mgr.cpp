@@ -72,11 +72,11 @@ ErrCode FormInfoMgr::LoadFormInfosFromDb()
         auto bundleFormInfoPtr = std::make_shared<BundleFormInfo>(bundleName);
         errCode = bundleFormInfoPtr->InitFromJson(formInfoStoragesJson);
         if (errCode != ERR_OK) {
-            HILOG_ERROR("InitFromJson failed for %{public}s, removing corrupted entry", bundleName.c_str());
+            HILOG_ERROR("InitFromJson failed for %{public}s,removing corrupted entry", bundleName.c_str());
             FormInfoRdbStorageMgr::GetInstance().RemoveBundleFormInfos(bundleName);
             continue;
         }
-        HILOG_INFO("load bundle %{public}s form infos success.", bundleName.c_str());
+        HILOG_INFO("load bundle %{public}s form infos success", bundleName.c_str());
         bundleFormInfoMap_[bundleName] = bundleFormInfoPtr;
     }
     HILOG_INFO("load bundle form infos from db done");
@@ -92,7 +92,7 @@ ErrCode FormInfoMgr::Start()
 
 ErrCode FormInfoMgr::UpdateStaticFormInfos(const std::string &bundleName, int32_t userId)
 {
-    HILOG_INFO("UpdateStaticFormInfos: %{public}s", bundleName.c_str());
+    HILOG_INFO("UpdateStaticFormInfos:%{public}s", bundleName.c_str());
     if (bundleName.empty()) {
         HILOG_ERROR("empty bundleName");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -112,7 +112,7 @@ ErrCode FormInfoMgr::UpdateStaticFormInfos(const std::string &bundleName, int32_
     bundleNames.push_back(bundleName);
     ErrCode errCode = FormInfoHelper::LoadFormConfigInfoByBundleNames(bundleNames, userId, formInfosMap);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("get formInfosMap fail, errCode:%{public}d", errCode);
+        HILOG_ERROR("get formInfosMap fail,errCode:%{public}d", errCode);
         return errCode;
     }
     std::vector<FormInfo> formInfos;
@@ -122,7 +122,7 @@ ErrCode FormInfoMgr::UpdateStaticFormInfos(const std::string &bundleName, int32_
     }
     errCode = bundleFormInfoPtr->UpdateStaticFormInfos(formInfos, userId);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("UpdateStaticFormInfos failed!");
+        HILOG_ERROR("UpdateStaticFormInfos failed");
         return errCode;
     }
 
@@ -132,7 +132,7 @@ ErrCode FormInfoMgr::UpdateStaticFormInfos(const std::string &bundleName, int32_
     }
 
     bundleFormInfoMap_[bundleName] = bundleFormInfoPtr;
-    HILOG_INFO("success, bundleName=%{public}s", bundleName.c_str());
+    HILOG_INFO("success,bundleName=%{public}s", bundleName.c_str());
     return ERR_OK;
 }
 
@@ -158,7 +158,7 @@ ErrCode FormInfoMgr::Remove(const std::string &bundleName, int32_t userId)
     if (bundleFormInfoIter->second && bundleFormInfoIter->second->Empty()) {
         bundleFormInfoMap_.erase(bundleFormInfoIter);
     }
-    HILOG_INFO("success, bundleName=%{public}s", bundleName.c_str());
+    HILOG_INFO("success,bundleName=%{public}s", bundleName.c_str());
     return errCode;
 }
 
@@ -512,7 +512,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId, std::function<void()>
     {
         std::shared_lock<std::shared_mutex> lock(reloadUserIdsMutex_);
         if (reloadUserIds_.count(userId) != 0) {
-            HILOG_INFO("userId %{public}d already reloaded, skip", userId);
+            HILOG_INFO("userId %{public}d already reloaded,skip", userId);
             lock.unlock();
             if (doneCallback != nullptr) {
                 doneCallback();
@@ -532,7 +532,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId, std::function<void()>
                 // Normally unreachable: while the entry exists, at least one queued
                 // closure of the chain still holds the shared_ptr. A null here means
                 // the old chain ended abnormally without erase (coding error).
-                HILOG_ERROR("userId %{public}d stale reload entry, clean up", userId);
+                HILOG_ERROR("userId %{public}d stale reload entry,clean up", userId);
                 reloadingCtxs_.erase(it);
                 lock.unlock();
                 if (doneCallback != nullptr) {
@@ -540,7 +540,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId, std::function<void()>
                 }
                 return ERR_OK;
             }
-            HILOG_INFO("userId %{public}d reload in-flight, append callback", userId);
+            HILOG_INFO("userId %{public}d reload in-flight,append callback", userId);
             if (doneCallback != nullptr) {
                 inFlight->doneCallbacks.push_back(std::move(doneCallback));
             }
@@ -563,7 +563,7 @@ void FormInfoMgr::StartReloadBatches(std::shared_ptr<ReloadContext> ctx)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     if (ctx->aborted.load()) {
-        HILOG_INFO("reload aborted before start, userId:%{public}d", ctx->userId);
+        HILOG_INFO("reload aborted before start,userId:%{public}d", ctx->userId);
         SubmitBatchTask(ctx, [ctx]() {
             FormInfoMgr::GetInstance().FinishReloadBatches(ctx);
         });
@@ -583,7 +583,7 @@ void FormInfoMgr::StartReloadBatches(std::shared_ptr<ReloadContext> ctx)
     bool convertOk = FormUtil::ConvertStringToInt(versionCode, oldVersionCode);
     ctx->isNeedUpdateAll = versionCode.empty() || !convertOk ||
         Constants::FORM_VERSION_CODE != oldVersionCode;
-    HILOG_INFO("bundle number:%{public}zu, old versionCode:%{public}s, new versionCode:%{public}d",
+    HILOG_INFO("bundle number:%{public}zu,old versionCode:%{public}s,new versionCode:%{public}d",
         bundleVersionMap.size(), versionCode.c_str(), Constants::FORM_VERSION_CODE);
 
     BundleClassifyResult classify;
@@ -597,7 +597,7 @@ void FormInfoMgr::StartReloadBatches(std::shared_ptr<ReloadContext> ctx)
     ctx->pendingBundles.insert(ctx->pendingBundles.end(),
         std::make_move_iterator(classify.updateBundles.begin()),
         std::make_move_iterator(classify.updateBundles.end()));
-    HILOG_INFO("reload batches begin, user:%{public}d, total:%{public}zu, batches:%{public}zu",
+    HILOG_INFO("reload batches begin,user:%{public}d,total:%{public}zu,batches:%{public}zu",
         ctx->userId, ctx->pendingBundles.size(),
         (ctx->pendingBundles.size() + RELOAD_BATCH_SIZE - 1) / RELOAD_BATCH_SIZE);
 
@@ -612,7 +612,7 @@ void FormInfoMgr::StartReloadBatches(std::shared_ptr<ReloadContext> ctx)
 
 void FormInfoMgr::HandleReloadRetry(std::shared_ptr<ReloadContext> ctx, ErrCode result)
 {
-    HILOG_ERROR("GetBundleVersionMap failed, %{public}d, retryCount:%{public}d",
+    HILOG_ERROR("GetBundleVersionMap failed,%{public}d,retryCount:%{public}d",
         result, ctx->retryCount);
     if (ctx->retryCount >= MAX_RELOAD_RETRY) {
         FireReloadCallbacks(ctx);
@@ -630,7 +630,7 @@ void FormInfoMgr::HandleReloadRetry(std::shared_ptr<ReloadContext> ctx, ErrCode 
         Common::TaskQos::QOS_DEADLINE_REQUEST);
     if (!scheduled) {
         // Anti-hang: submission failed, give up this chain instead of leaking it.
-        HILOG_ERROR("schedule retry failed, give up, userId:%{public}d", ctx->userId);
+        HILOG_ERROR("schedule retry failed,give up,userId:%{public}d", ctx->userId);
         FireReloadCallbacks(ctx);
         FormEventReport::SendFormFailedEvent(FormEventName::RELOAD_FORM_FAILED,
             HiSysEventType::FAULT, result);
@@ -653,7 +653,7 @@ void FormInfoMgr::FireReloadCallbacks(std::shared_ptr<ReloadContext> ctx)
 void FormInfoMgr::SubmitBatchTask(std::shared_ptr<ReloadContext> ctx, std::function<void()> task)
 {
     if (!batchExecutor_(std::move(task))) {
-        HILOG_ERROR("batchExecutor_ submission failed, give up chain, userId:%{public}d", ctx->userId);
+        HILOG_ERROR("batchExecutor_ submission failed,give up chain,userId:%{public}d", ctx->userId);
         FireReloadCallbacks(ctx);
         FormEventReport::SendFormFailedEvent(FormEventName::RELOAD_FORM_FAILED,
             HiSysEventType::FAULT, ERR_APPEXECFWK_FORM_COMMON_CODE);
@@ -663,10 +663,10 @@ void FormInfoMgr::SubmitBatchTask(std::shared_ptr<ReloadContext> ctx, std::funct
 void FormInfoMgr::ProcessReloadBatch(std::shared_ptr<ReloadContext> ctx)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("process reload batch, offset:%{public}zu, total:%{public}zu, userId:%{public}d",
+    HILOG_INFO("process reload batch,offset:%{public}zu,total:%{public}zu,userId:%{public}d",
         ctx->offset, ctx->pendingBundles.size(), ctx->userId);
     if (ctx->aborted.load()) {
-        HILOG_INFO("reload aborted at batch offset:%{public}zu, userId:%{public}d",
+        HILOG_INFO("reload aborted at batch offset:%{public}zu,userId:%{public}d",
             ctx->offset, ctx->userId);
         // T_fin (aborted branch) fires callbacks and clears the registry: no hanging.
         SubmitBatchTask(ctx, [ctx]() {
@@ -687,7 +687,7 @@ void FormInfoMgr::ProcessReloadBatch(std::shared_ptr<ReloadContext> ctx)
     ErrCode batchErr = ProcessBundleBatch(batch, ctx->userId);
     if (batchErr != ERR_OK) {
         ctx->failedBatches.push_back(ctx->offset);
-        HILOG_ERROR("batch range %{public}zu to %{public}zu failed, %{public}d", ctx->offset, end, batchErr);
+        HILOG_ERROR("batch range %{public}zu to %{public}zu failed,%{public}d", ctx->offset, end, batchErr);
     }
     ctx->offset = end;
 
@@ -707,7 +707,7 @@ void FormInfoMgr::FinishReloadBatches(std::shared_ptr<ReloadContext> ctx)
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     // Aborted (user removed): fire callbacks only, skip mark/publish/version write-back.
     if (ctx->aborted.load()) {
-        HILOG_INFO("reload aborted at finish, userId:%{public}d, skip mark/publish", ctx->userId);
+        HILOG_INFO("reload aborted at finish,userId:%{public}d,skip mark/publish", ctx->userId);
         FireReloadCallbacks(ctx);
         return;
     }
@@ -743,7 +743,7 @@ void FormInfoMgr::RetryFailedBatches(std::shared_ptr<ReloadContext> ctx)
                                        ctx->pendingBundles.begin() + end);
         ErrCode retryErr = ProcessBundleBatch(batch, ctx->userId);
         if (retryErr != ERR_OK) {
-            HILOG_ERROR("retry batch from %{public}zu still failed, %{public}d", start, retryErr);
+            HILOG_ERROR("retry batch from %{public}zu still failed,%{public}d", start, retryErr);
         }
     }
     ctx->failedBatches.clear();
@@ -757,13 +757,13 @@ void FormInfoMgr::RemoveUninstalledBundles(std::shared_ptr<ReloadContext> ctx)
         if (it == bundleFormInfoMap_.end()) {
             continue;
         }
-        HILOG_WARN("bundle %{public}s not in versionMap and not installed, Remove", bundleName.c_str());
+        HILOG_WARN("bundle %{public}s not in versionMap and not installed,Remove", bundleName.c_str());
         it->second->Remove(ctx->userId);
         if (it->second->Empty()) {
             bundleFormInfoMap_.erase(it);
         }
     }
-    HILOG_INFO("batches end, formInfoMapSize:%{public}zu", bundleFormInfoMap_.size());
+    HILOG_INFO("batches end,formInfoMapSize:%{public}zu", bundleFormInfoMap_.size());
 }
 
 ErrCode FormInfoMgr::ProcessBundleBatch(const std::vector<std::string> &bundleNames, int32_t userId)
@@ -771,7 +771,7 @@ ErrCode FormInfoMgr::ProcessBundleBatch(const std::vector<std::string> &bundleNa
     std::unordered_map<std::string, std::vector<FormInfo>> formInfosMap;
     ErrCode errCode = FormInfoHelper::LoadFormConfigInfoByBundleNames(bundleNames, userId, formInfosMap);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("LoadFormConfigInfoByBundleNames fail, errCode:%{public}d", errCode);
+        HILOG_ERROR("LoadFormConfigInfoByBundleNames fail,errCode:%{public}d", errCode);
         return errCode;
     }
     std::vector<std::pair<std::string, std::string>> dirtyStorages;
@@ -783,7 +783,7 @@ ErrCode FormInfoMgr::ProcessBundleBatch(const std::vector<std::string> &bundleNa
     }
     if (errCode != ERR_OK) {
         // Whole batch rolled back: memory is ahead of RDB until the T_fin retry re-runs it.
-        HILOG_ERROR("batch commit form info storages failed, errCode:%{public}d", errCode);
+        HILOG_ERROR("batch commit form info storages failed,errCode:%{public}d", errCode);
         return errCode;
     }
     return ERR_OK;
@@ -799,7 +799,7 @@ void FormInfoMgr::MergeBundleBatch(std::unordered_map<std::string, std::vector<F
     for (auto &formInfoPair : formInfosMap) {
         const std::string &bundleName = formInfoPair.first;
         if (bundleName.empty()) {
-            HILOG_WARN("empty bundleName, skip");
+            HILOG_WARN("empty bundleName,skip");
             continue;
         }
         std::vector<FormInfo> &formInfos = formInfoPair.second;
@@ -815,7 +815,7 @@ void FormInfoMgr::MergeBundleBatch(std::unordered_map<std::string, std::vector<F
         ErrCode errCode = bundleFormInfoPtr->UpdateStaticFormInfosBatch(
             formInfos, userId, storageJson, needRemoveStorage);
         if (errCode != ERR_OK) {
-            HILOG_ERROR("update forms info failed, bundleName=%{public}s, errCode:%{public}d",
+            HILOG_ERROR("update forms info failed,bundleName=%{public}s,errCode:%{public}d",
                 bundleName.c_str(), errCode);
             continue;
         }
@@ -826,9 +826,9 @@ void FormInfoMgr::MergeBundleBatch(std::unordered_map<std::string, std::vector<F
         }
         if (bundleFormInfoIter == bundleFormInfoMap_.end()) {
             bundleFormInfoMap_[bundleName] = bundleFormInfoPtr;
-            HILOG_INFO("add forms info success, bundleName=%{public}s", bundleName.c_str());
+            HILOG_INFO("add forms info success,bundleName=%{public}s", bundleName.c_str());
         } else {
-            HILOG_INFO("update forms info success, bundleName=%{public}s", bundleName.c_str());
+            HILOG_INFO("update forms info success,bundleName=%{public}s", bundleName.c_str());
         }
         dirtyStorages.emplace_back(bundleName, std::move(storageJson));
     }
@@ -905,7 +905,7 @@ ErrCode FormInfoMgr::GetAppFormVisibleNotifyByBundleName(const std::string &bund
         }
         appFormVisibleNotifyMap_.emplace(bundleName, info.formVisibleNotify);
         appFormVisibleNotify = info.formVisibleNotify;
-        HILOG_INFO("bundleName=%{public}s, appFormVisibleNotify=%{public}d", bundleName.c_str(), appFormVisibleNotify);
+        HILOG_INFO("bundleName=%{public}s,appFormVisibleNotify=%{public}d", bundleName.c_str(), appFormVisibleNotify);
     } else {
         appFormVisibleNotify = iter->second;
     }
@@ -1001,11 +1001,11 @@ FormInfoMgr::BundleClassifyResult FormInfoMgr::ClassifyBundles(bool isNeedUpdate
             bool bundleExists = FormBmsHelper::GetInstance().GetBundleInfoByFlags(
                 bundleName, flags, userId, bundleInfo);
             if (bundleExists) {
-                HILOG_WARN("bundle %{public}s not in versionMap but still installed(disabled), skip Remove",
+                HILOG_WARN("bundle %{public}s not in versionMap but still installed(disabled),skip Remove",
                     bundleName.c_str());
                 continue;
             }
-            HILOG_WARN("bundle %{public}s not in versionMap and not installed, removeBundles",
+            HILOG_WARN("bundle %{public}s not in versionMap and not installed,removeBundles",
                 bundleName.c_str());
             result.removeBundles.push_back(bundleName);
             continue;
@@ -1017,7 +1017,7 @@ FormInfoMgr::BundleClassifyResult FormInfoMgr::ClassifyBundles(bool isNeedUpdate
             if (oldVersionCode == newVersionCode) {
                 continue;
             }
-            HILOG_INFO("bundle %{public}s version changed, old:%{public}u, new:%{public}u, userId:%{public}d",
+            HILOG_INFO("bundle %{public}s version changed,old:%{public}u,new:%{public}u,userId:%{public}d",
                 bundleName.c_str(), oldVersionCode, newVersionCode, userId);
         }
         result.updateBundles.push_back(bundleName);
@@ -1029,14 +1029,14 @@ FormInfoMgr::BundleClassifyResult FormInfoMgr::ClassifyBundles(bool isNeedUpdate
             result.newBundles.push_back(bundleVersionPair.first);
         }
     }
-    HILOG_INFO("classify done, update:%{public}zu, remove:%{public}zu, new:%{public}zu",
+    HILOG_INFO("classify done,update:%{public}zu,remove:%{public}zu,new:%{public}zu",
         result.updateBundles.size(), result.removeBundles.size(), result.newBundles.size());
     return result;
 }
 
 void FormInfoMgr::UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs)
 {
-    HILOG_DEBUG("call, config size:%{public}zu", configs.size());
+    HILOG_DEBUG("call,config size:%{public}zu", configs.size());
     // Group configs by bundleName
     std::unordered_map<std::string, std::vector<FormCustomConfig>> bundleConfigsMap;
     for (const auto &config : configs) {

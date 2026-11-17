@@ -319,14 +319,14 @@ napi_value JsFormAgent::GetVisibleFormRect(napi_env env, napi_callback_info info
 napi_value JsFormAgent::OnGetVisibleFormRect(napi_env env, size_t argc, napi_value* argv)
 {
     if (argc != ARGS_SIZE_ONE) {
-        HILOG_ERROR("wrong number of arguments.");
+        HILOG_ERROR("wrong number of arguments");
         NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
         return CreateJsUndefined(env);
     }
 
     int64_t formId = 0;
     if (!ConvertFormId(env, argv[PARAM_INDEX_ZERO], formId)) {
-        HILOG_ERROR("convert formId failed.");
+        HILOG_ERROR("convert formId failed");
         NapiFormUtil::ThrowParamError(env, "The formId is invalid");
         return CreateJsUndefined(env);
     }

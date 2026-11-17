@@ -27,7 +27,7 @@ int MultiActiveUsersChecker::CheckValid(const CheckValidFactor &factor)
 {
     int32_t providerUserId = factor.record.providerUserId;
     if (!FormUtil::IsActiveUser(providerUserId)) {
-        HILOG_ERROR("not active users, providerUserId:%{public}d, formId:%{public}" PRId64, providerUserId,
+        HILOG_ERROR("not active users,providerUserId:%{public}d,formId:%{public}" PRId64, providerUserId,
             factor.formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }

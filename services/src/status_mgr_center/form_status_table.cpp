@@ -448,7 +448,7 @@ bool FormStatusTable::GetFormStatusInfo(FormFsmStatus curStatus, FormFsmEvent ev
 {
     auto iter = FORM_STATUS_TABLE.find(curStatus);
     if (iter == FORM_STATUS_TABLE.end()) {
-        HILOG_ERROR("form status error, curStatus is %{public}s, event is %{public}s.",
+        HILOG_ERROR("form status error,curStatus is %{public}s,event is %{public}s",
             FormStatusPrint::FormStatusToString(curStatus).c_str(),
             FormStatusPrint::FormEventToString(event).c_str());
         return false;
@@ -462,7 +462,7 @@ bool FormStatusTable::GetFormStatusInfo(FormFsmStatus curStatus, FormFsmEvent ev
         }
     }
 
-    HILOG_ERROR("form status error, curStatus is %{public}s, event is %{public}s.",
+    HILOG_ERROR("form status error,curStatus is %{public}s,event is %{public}s",
         FormStatusPrint::FormStatusToString(curStatus).c_str(),
         FormStatusPrint::FormEventToString(event).c_str());
     return false;

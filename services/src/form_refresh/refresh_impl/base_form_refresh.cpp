@@ -52,7 +52,7 @@ int BaseFormRefresh::RefreshFormRequest(RefreshData &data)
     if (ret == ERR_CONTINUE_REFRESH) {
         ret = DoRefresh(data);
         if (ret != ERR_OK) {
-            HILOG_ERROR("do refresh failed, ret:%{public}d, formId:%{public}" PRId64, ret, data.formId);
+            HILOG_ERROR("do refresh failed,ret:%{public}d,formId:%{public}" PRId64, ret, data.formId);
             return ret;
         }
     }
@@ -131,7 +131,7 @@ int BaseFormRefresh::DoRefresh(RefreshData &data)
     FormRecord refreshRecord = FormDataMgr::GetInstance().GetFormAbilityInfo(data.record);
     ErrCode ret = RefreshExecMgr::AskForProviderData(data.formId, refreshRecord, data.want);
     if (ret != ERR_OK) {
-        HILOG_ERROR("ask for provider data failed, ret:%{public}d, formId:%{public}" PRId64, ret, data.formId);
+        HILOG_ERROR("ask for provider data failed,ret:%{public}d,formId:%{public}" PRId64, ret, data.formId);
         return ret;
     }
     return ERR_OK;

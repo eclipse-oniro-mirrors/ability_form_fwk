@@ -37,7 +37,7 @@ RefreshControlMgr::~RefreshControlMgr() {}
 void RefreshControlMgr::SetSystemOverloadFlag(bool flag)
 {
     bool isSystemOverload = isSystemOverload_.load();
-    HILOG_INFO("isSystemOverload_ old: %{public}d, new: %{public}d", isSystemOverload, flag);
+    HILOG_INFO("isSystemOverload_ old:%{public}d,new:%{public}d", isSystemOverload, flag);
     isSystemOverload_.store(flag);
     if (isSystemOverload && !flag) {
         RefreshCacheMgr::GetInstance().ConsumeOverloadTaskQueue();
@@ -73,7 +73,7 @@ bool RefreshControlMgr::IsScreenOff(const FormRecord &record)
     bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
     bool isHicar = (record.moduleName == HICAR_FORM);
     if (!screenOnFlag && !collaborationScreenOnFlag && !isHicar) {
-        HILOG_WARN("screen off contorl, formId:%{public}" PRId64, record.formId);
+        HILOG_WARN("screen off contorl,formId:%{public}" PRId64, record.formId);
         return true;
     }
 #endif
@@ -83,7 +83,7 @@ bool RefreshControlMgr::IsScreenOff(const FormRecord &record)
 bool RefreshControlMgr::IsHealthyControl(const FormRecord &record)
 {
     if (!record.enableForm) {
-        HILOG_WARN("be healthy usage controlling, formId:%{public}" PRId64, record.formId);
+        HILOG_WARN("be healthy usage controlling,formId:%{public}" PRId64, record.formId);
         return true;
     }
 
@@ -97,7 +97,7 @@ bool RefreshControlMgr::IsNeedToFresh(FormRecord &record, bool isVisibleToFresh)
     if (isEnableRefresh) {
         return true;
     }
-    HILOG_INFO("isVisibleToFresh is %{public}d, record.isVisible is %{public}d", isVisibleToFresh, record.isVisible);
+    HILOG_INFO("isVisibleToFresh is %{public}d,record.isVisible is %{public}d", isVisibleToFresh, record.isVisible);
     if (isVisibleToFresh) {
         if (!record.isVisible) {
             FormRecordReport::GetInstance().IncreaseUpdateTimes(record.formId,

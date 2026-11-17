@@ -42,7 +42,7 @@ int Convert2FfrtQos(TaskQos qos)
 FormBaseSerialQueue::FormBaseSerialQueue(const std::string &queueName)
     : queueName_(queueName), queue_(queueName.c_str())
 {
-    HILOG_DEBUG("create FormBaseSerialQueue, queueName: %{public}s", queueName.c_str());
+    HILOG_DEBUG("create FormBaseSerialQueue,queueName:%{public}s", queueName.c_str());
 }
 
 FormBaseSerialQueue::~FormBaseSerialQueue()
@@ -134,7 +134,7 @@ bool FormBaseSerialQueue::CancelDelayTask(const TaskKey& taskKey)
         int32_t ret = queue_.cancel(it->second.first);
         if (ret != 0) {
             // Expected when the task is already executing; its wrapper cleans up the map entry.
-            HILOG_WARN("Cancel skipped, task already running, errCode:%{public}d", ret);
+            HILOG_WARN("Cancel skipped,task already running,errCode:%{public}d", ret);
             result = false;
         }
     }

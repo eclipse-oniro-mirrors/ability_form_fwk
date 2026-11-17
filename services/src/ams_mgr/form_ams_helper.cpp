@@ -244,7 +244,7 @@ bool FormAmsHelper::GetConfiguration(AppExecFwk::Configuration& config, int32_t 
         return false;
     }
     if (appMgrClient->GetConfiguration(config, userId) != AppMgrResultCode::RESULT_OK) {
-        HILOG_ERROR("GetConfiguration failed, userId:%{public}d", userId);
+        HILOG_ERROR("GetConfiguration failed,userId:%{public}d", userId);
         return false;
     }
     return true;
@@ -252,7 +252,7 @@ bool FormAmsHelper::GetConfiguration(AppExecFwk::Configuration& config, int32_t 
 
 void FormAmsHelper::RegisterConfigurationObserver(int32_t userId)
 {
-    HILOG_INFO("begin, userId:%{public}d", userId);
+    HILOG_INFO("begin,userId:%{public}d", userId);
     std::lock_guard<std::mutex> lock(configObserverMutex_);
     if (configurationObservers_.find(userId) != configurationObservers_.end()) {
         HILOG_WARN("configurationObserver already exists for userId:%{public}d", userId);
@@ -275,24 +275,24 @@ void FormAmsHelper::RegisterConfigurationObserver(int32_t userId)
         resCode = appMgrClient->RegisterConfigurationObserver(configurationObserver, userId);
     }
     if (resCode != AppMgrResultCode::RESULT_OK) {
-        HILOG_ERROR("RegisterConfigurationObserver failed, userId:%{public}d", userId);
+        HILOG_ERROR("RegisterConfigurationObserver failed,userId:%{public}d", userId);
         return;
     }
     configurationObservers_[userId] = configurationObserver;
-    HILOG_INFO("end, userId:%{public}d", userId);
+    HILOG_INFO("end,userId:%{public}d", userId);
 }
 
 void FormAmsHelper::UnRegisterConfigurationObserver(int32_t userId)
 {
     std::lock_guard<std::mutex> lock(configObserverMutex_);
-    HILOG_INFO("begin, userId:%{public}d", userId);
+    HILOG_INFO("begin,userId:%{public}d", userId);
     auto it = configurationObservers_.find(userId);
     if (it == configurationObservers_.end()) {
         HILOG_WARN("no configurationObserver for userId:%{public}d", userId);
         return;
     }
     if (it->second == nullptr) {
-        HILOG_ERROR("configurationObserver is null, userId:%{public}d", userId);
+        HILOG_ERROR("configurationObserver is null,userId:%{public}d", userId);
         configurationObservers_.erase(it);
         return;
     }
@@ -303,11 +303,11 @@ void FormAmsHelper::UnRegisterConfigurationObserver(int32_t userId)
     }
     AppMgrResultCode resCode = appMgrClient->UnregisterConfigurationObserver(it->second);
     if (resCode != AppMgrResultCode::RESULT_OK) {
-        HILOG_ERROR("UnregisterConfigurationObserver failed, userId:%{public}d", userId);
+        HILOG_ERROR("UnregisterConfigurationObserver failed,userId:%{public}d", userId);
         return;
     }
     configurationObservers_.erase(it);
-    HILOG_INFO("end, userId:%{public}d", userId);
+    HILOG_INFO("end,userId:%{public}d", userId);
 }
 
 void FormAmsHelper::UnRegisterAllConfigurationObservers()
@@ -329,12 +329,12 @@ void FormAmsHelper::UnRegisterAllConfigurationObservers()
     // IPC outside lock to avoid deadlock; local sptr copies keep observers alive
     for (auto &item : observers) {
         if (item.second == nullptr) {
-            HILOG_ERROR("configurationObserver is null, userId:%{public}d", item.first);
+            HILOG_ERROR("configurationObserver is null,userId:%{public}d", item.first);
             continue;
         }
         AppMgrResultCode resCode = appMgrClient->UnregisterConfigurationObserver(item.second);
         if (resCode != AppMgrResultCode::RESULT_OK) {
-            HILOG_ERROR("UnregisterConfigurationObserver failed, userId:%{public}d", item.first);
+            HILOG_ERROR("UnregisterConfigurationObserver failed,userId:%{public}d", item.first);
         }
     }
     HILOG_INFO("end");

@@ -194,7 +194,7 @@ int FormDebugAdapter::DumpHasFormVisible(const std::string &bundleInfo, std::str
             }
         }
     }
-    HILOG_INFO("resolve bundleInfo, bundleName:%{public}s, userId:%{public}d, instIndex:%{public}d",
+    HILOG_INFO("resolve bundleInfo,bundleName:%{public}s,userId:%{public}d,instIndex:%{public}d",
         bundleName.c_str(), userId, instIndex);
     uint32_t tokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(userId, bundleName, instIndex);
     FormDumpMgr::GetInstance().DumpHasFormVisible(tokenId, bundleName, userId, instIndex, formInfos);

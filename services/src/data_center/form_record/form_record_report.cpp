@@ -123,7 +123,7 @@ void FormRecordReport::HandleFormRefreshCount()
         }
         FormRecord formRecord;
         if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
-            HILOG_ERROR("GetFormRecord failed for formId: %{public}" PRId64, formId);
+            HILOG_ERROR("GetFormRecord failed for formId:%{public}" PRId64, formId);
             continue;
         }
         FormRecordReportInfo &record = queue.front();

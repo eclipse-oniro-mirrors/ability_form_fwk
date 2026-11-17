@@ -37,7 +37,7 @@ class FormServiceDmInitCallback : public DmInitCallback {
 public:
     void OnRemoteDied() override
     {
-        HILOG_ERROR("device manager service died, cross-device features may be unavailable");
+        HILOG_ERROR("device manager service died,cross-device features may be unavailable");
     }
 };
 } // namespace
@@ -66,7 +66,7 @@ void FormServiceDiscovery::EnsureMembers()
         int32_t dmRet = dmAdapter_->InitDeviceManager(
             FORM_SERVICE_OWNER_PKG, std::make_shared<FormServiceDmInitCallback>());
         if (dmRet != 0) {
-            HILOG_WARN("InitDeviceManager failed %{public}d, service discovery may fail until DM ready", dmRet);
+            HILOG_WARN("InitDeviceManager failed %{public}d,service discovery may fail until DM ready", dmRet);
         }
     });
 }
@@ -116,7 +116,7 @@ ErrCode FormServiceDiscovery::GetAvailableFormHostServices(std::vector<PeerFormH
 
     int64_t totalElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now().time_since_epoch()).count() - startTime;
-    HILOG_INFO("GetAvailableFormHostServices done: services=%{public}zu elapsed=%{public}" PRId64 "ms",
+    HILOG_INFO("GetAvailableFormHostServices done:services=%{public}zu elapsed=%{public}" PRId64 "ms",
         services.size(), totalElapsed);
     return ERR_OK;
 }
@@ -126,7 +126,7 @@ std::unordered_set<std::string> FormServiceDiscovery::CollectIdenticalNetworkIds
 {
     std::unordered_set<std::string> identicalIds;
     for (const auto &dev : onlineDevices) {
-        HILOG_DEBUG("online device: {deviceId=%{private}s, deviceName=%{private}s, networkId=%{private}s"
+        HILOG_DEBUG("online device:{deviceId=%{private}s,deviceName=%{private}s,networkId=%{private}s"
             ", deviceTypeId=%{public}u, authForm=%{public}d}",
             dev.deviceId, dev.deviceName, dev.networkId,
             static_cast<uint32_t>(dev.deviceTypeId), static_cast<int32_t>(dev.authForm));
@@ -147,21 +147,21 @@ void FormServiceDiscovery::FilterPeerServices(const std::vector<DmServiceInfo> &
         discoveredPeerKeys_.clear();
     }
     for (const auto &svc : dmServices) {
-        HILOG_DEBUG("trusted service: networkId=%{public}s, serviceId=%{public}" PRId64
+        HILOG_DEBUG("trusted service:networkId=%{public}s,serviceId=%{public}" PRId64
             ", serviceType=%{public}s, publishState=%{public}d, authform=%{public}d",
             svc.networkId.c_str(), svc.serviceId, svc.serviceType.c_str(),
             static_cast<int32_t>(svc.publishState), static_cast<int32_t>(svc.authform));
         if (svc.serviceType != FORM_CD_SERVICE_TYPE) {
-            HILOG_DEBUG("skipped non-FMS service: serviceType=%{public}s", svc.serviceType.c_str());
+            HILOG_DEBUG("skipped non-FMS service:serviceType=%{public}s", svc.serviceType.c_str());
             continue;
         }
         if (svc.publishState != DMPublishState::SERVICE_PUBLISHED_STATE) {
-            HILOG_INFO("skipped unpublished service: networkId=%{public}s, publishState=%{public}d",
+            HILOG_INFO("skipped unpublished service:networkId=%{public}s,publishState=%{public}d",
                 svc.networkId.c_str(), static_cast<int32_t>(svc.publishState));
             continue;
         }
         if (identicalIds.count(svc.networkId) == 0) {
-            HILOG_INFO("skipped offline or non-IDENTICAL_ACCOUNT service: networkId=%{public}s, authform=%{public}d",
+            HILOG_INFO("skipped offline or non-IDENTICAL_ACCOUNT service:networkId=%{public}s,authform=%{public}d",
                 svc.networkId.c_str(), static_cast<int32_t>(svc.authform));
             continue;
         }
@@ -211,7 +211,7 @@ void FormServiceDiscovery::TranslateDmServiceToPeer(const DmServiceInfo &dmSvc, 
     if (ret == 0 && !udid.empty()) {
         peerInfo.deviceId = udid;
     } else {
-        HILOG_WARN("GetUdidByNetworkId failed, fallback to dmSvc.deviceId, networkId=%{public}s, ret=%{public}d",
+        HILOG_WARN("GetUdidByNetworkId failed,fallback to dmSvc.deviceId,networkId=%{public}s,ret=%{public}d",
             dmSvc.networkId.c_str(), ret);
         peerInfo.deviceId = dmSvc.deviceId;
     }

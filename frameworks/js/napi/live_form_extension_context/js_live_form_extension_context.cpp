@@ -179,7 +179,7 @@ napi_value JsLiveFormExtensionContext::OnSetWindowBackgroundColor(napi_env env, 
 
 napi_value JsLiveFormExtensionContext::OnSetUIExtCustomDensity(napi_env env, NapiCallbackInfo &info)
 {
-    HILOG_DEBUG("called: param size: %{public}d", static_cast<int32_t>(info.argc));
+    HILOG_DEBUG("called:param size:%{public}d", static_cast<int32_t>(info.argc));
     if (info.argc != ARGC_ONE) {
         HILOG_ERROR("argc is not one");
         ThrowError(env, ERR_FORM_EXTERNAL_PARAM_INVALID,
@@ -272,7 +272,7 @@ napi_value JsLiveFormExtensionContext::OnSetFontScale(napi_env env, NapiCallback
 
 napi_value JsLiveFormExtensionContext::OnStartAbilityByLiveForm(napi_env env, NapiCallbackInfo &info)
 {
-    HILOG_DEBUG("called: param size: %{public}d", static_cast<int32_t>(info.argc));
+    HILOG_DEBUG("called:param size:%{public}d", static_cast<int32_t>(info.argc));
     if (info.argc != ARGC_TWO) {
         HILOG_ERROR("argc is not two");
         ThrowError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),

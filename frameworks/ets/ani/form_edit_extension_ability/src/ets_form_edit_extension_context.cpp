@@ -54,7 +54,7 @@ EtsFormEditExtensionContext* EtsFormEditExtensionContext::GetEtsFormEditExtensio
     ani_status status = ANI_ERROR;
     ani_long etsContextLong = 0;
     if ((status = env->Object_GetFieldByName_Long(obj, "nativeExtensionContext", &etsContextLong)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return nullptr;
     }
     etsContext = reinterpret_cast<EtsFormEditExtensionContext *>(etsContextLong);
@@ -84,17 +84,17 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
     ani_method method = nullptr;
     ani_object contextObj = nullptr;
     if ((status = env->FindClass(FORM_EDIT_EXTENSION_CONTEXT, &cls)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return nullptr;
     }
     if ((status = env->Class_FindMethod(cls, "<ctor>", "l:", &method)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return nullptr;
     }
     std::unique_ptr<EtsFormEditExtensionContext> etsContext = std::make_unique<EtsFormEditExtensionContext>(context);
     if ((status = env->Object_New(cls, method, &contextObj, reinterpret_cast<ani_long>(etsContext.release()))) !=
         ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return nullptr;
     }
 
@@ -107,7 +107,7 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
             reinterpret_cast<void *>(EtsFormEditExtensionContext::SetWindowBackgroundColor) },
     };
     if ((status = env->Class_BindNativeMethods(cls, functions.data(), functions.size())) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return nullptr;
     }
 
@@ -123,7 +123,7 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
         return nullptr;
     }
     if (!EtsFormEditExtensionContext::BindNativePtrCleaner(env)) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         delete workContext;
         return nullptr;
     }
@@ -136,7 +136,7 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
         return nullptr;
     }
     if ((status = env->GlobalReference_Create(contextObj, contextGlobalRef)) != ANI_OK) {
-        HILOG_ERROR("GlobalReference_Create failed status: %{public}d", status);
+        HILOG_ERROR("GlobalReference_Create failed status:%{public}d", status);
         delete contextGlobalRef;
         delete workContext;
         return nullptr;
@@ -154,7 +154,7 @@ bool EtsFormEditExtensionContext::BindNativePtrCleaner(ani_env *env)
     ani_class cleanerCls;
     ani_status status = env->FindClass(UI_EXTENSION_CONTEXT_CLEANER_CLASS_NAME, &cleanerCls);
     if (ANI_OK != status) {
-        HILOG_ERROR("Not found Cleaner. status:%{public}d.", status);
+        HILOG_ERROR("Not found Cleaner.status:%{public}d", status);
         return false;
     }
     std::array methods = {
@@ -162,7 +162,7 @@ bool EtsFormEditExtensionContext::BindNativePtrCleaner(ani_env *env)
     };
     if ((status = env->Class_BindNativeMethods(cleanerCls, methods.data(), methods.size())) != ANI_OK
         && status != ANI_ALREADY_BINDED) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return false;
     }
     return true;

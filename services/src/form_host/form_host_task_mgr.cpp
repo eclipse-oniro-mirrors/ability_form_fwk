@@ -373,7 +373,7 @@ void FormHostTaskMgr::HostDied(const sptr<IRemoteObject> &remoteHost)
     HILOG_INFO("remote client died event");
 
     if (remoteHost == nullptr) {
-        HILOG_ERROR("remote client died, invalid param");
+        HILOG_ERROR("remote client died,invalid param");
         return;
     }
     FormDataMgr::GetInstance().HandleHostDied(remoteHost);

@@ -73,7 +73,7 @@ void FormTrustMgr::MarkTrustFlag(const std::string &bundleName, bool isTrust)
     if (isTrust && iter != unTrustList_.end()) {
         auto ret = FormRdbDataMgr::GetInstance().DeleteData(UNTRUST_LIST, bundleName);
         if (ret != ERR_OK) {
-            HILOG_ERROR("DeleteData failed, key:%{public}s", bundleName.c_str());
+            HILOG_ERROR("DeleteData failed,key:%{public}s", bundleName.c_str());
         }
 
         unTrustList_.erase(iter);
@@ -92,7 +92,7 @@ void FormTrustMgr::MarkTrustFlag(const std::string &bundleName, bool isTrust)
         if (trustNum > UNTRUST_THRESHOLD) {
             auto ret = FormRdbDataMgr::GetInstance().InsertData(UNTRUST_LIST, bundleName);
             if (ret != ERR_OK) {
-                HILOG_ERROR("InsertData failed, key:%{public}s", bundleName.c_str());
+                HILOG_ERROR("InsertData failed,key:%{public}s", bundleName.c_str());
             }
         }
     }

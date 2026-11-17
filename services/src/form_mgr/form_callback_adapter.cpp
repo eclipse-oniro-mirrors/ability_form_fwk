@@ -90,7 +90,7 @@ ErrCode FormCallbackAdapter::RegisterFormRouterProxy(const std::vector<int64_t> 
             HILOG_ERROR("The formId:%{public}" PRId64 " owned by other formHost", formId);
             continue;
         } else {
-            HILOG_DEBUG("The setup was successful, matchedFormIds:%{public}" PRId64 "", formId);
+            HILOG_DEBUG("The setup was successful,matchedFormIds:%{public}" PRId64 "", formId);
             hostOwnFormIds.push_back(formId);
         }
     }
@@ -139,7 +139,7 @@ ErrCode FormCallbackAdapter::UnregisterFormRouterProxy(const std::vector<int64_t
             HILOG_ERROR("The formId:%{public}" PRId64 " owned by other formHost", formId);
             continue;
         } else {
-            HILOG_DEBUG("The setup was successful, matchedFormIds:%{public}" PRId64 "", formId);
+            HILOG_DEBUG("The setup was successful,matchedFormIds:%{public}" PRId64 "", formId);
             hostOwnFormIds.push_back(formId);
         }
     }
@@ -237,7 +237,7 @@ ErrCode FormCallbackAdapter::RequestOverflow(const int64_t formId, const int32_t
         }
         result = proxy->RequestOverflow(formId, overflowInfo, isOverflow);
     }
-    HILOG_INFO("RequestOverflow result: %{public}d", result);
+    HILOG_INFO("RequestOverflow result:%{public}d", result);
     return result;
 }
 
@@ -285,7 +285,7 @@ ErrCode FormCallbackAdapter::ChangeSceneAnimationState(const int64_t formId,
             break;
         }
     }
-    HILOG_INFO("ChangeSceneAnimationState result: %{public}d", result);
+    HILOG_INFO("ChangeSceneAnimationState result:%{public}d", result);
     return result;
 }
 
@@ -332,7 +332,7 @@ ErrCode FormCallbackAdapter::GetFormRect(const int64_t formId,
             break;
         }
     }
-    HILOG_DEBUG("GetFormRect, result:%{public}d", result);
+    HILOG_DEBUG("GetFormRect,result:%{public}d", result);
     return result;
 }
 
@@ -388,7 +388,7 @@ ErrCode FormCallbackAdapter::GetVisibleFormRect(const int64_t formId,
             break;
         }
     }
-    HILOG_DEBUG("GetVisibleFormRect, result:%{public}d", result);
+    HILOG_DEBUG("GetVisibleFormRect,result:%{public}d", result);
     // Only ERR_OK exits the loop early; any other result (no host answered, or a
     // host-side IPC failure) settles as the declared 16500100.
     return (result == ERR_OK) ? result : ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
@@ -430,7 +430,7 @@ ErrCode FormCallbackAdapter::GetLiveFormStatus(
             liveFormStatusMap.insert(partialMap.begin(), partialMap.end());
         }
     }
-    HILOG_INFO("GetLiveFormStatus, result:%{public}d", result);
+    HILOG_INFO("GetLiveFormStatus,result:%{public}d", result);
     return result;
 }
 
@@ -451,7 +451,7 @@ ErrCode FormCallbackAdapter::UnregisterPublishFormCrossBundleControl()
 
 bool FormCallbackAdapter::PublishFormCrossBundleControl(const PublishFormCrossBundleInfo &bundleInfo)
 {
-    HILOG_INFO("call, callerBundleName:%{public}s, targetBundleName:%{public}s, targetTemplateFormDetailId:%{public}s,",
+    HILOG_INFO("call,callerBundleName:%{public}s,targetBundleName:%{public}s,targetTemplateFormDetailId:%{public}s",
         bundleInfo.callerBundleName.c_str(), bundleInfo.targetBundleName.c_str(),
         bundleInfo.targetTemplateFormDetailId.c_str());
     int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
@@ -470,7 +470,7 @@ bool FormCallbackAdapter::PublishFormCrossBundleControl(const PublishFormCrossBu
         }
         bool isCanOpen = false;
         ErrCode result = remoteFormProviderDelegateProxy->PublishFormCrossBundleControl(bundleInfo, isCanOpen);
-        HILOG_INFO("result:%{public}d, isCanOpen:%{public}d", result, isCanOpen);
+        HILOG_INFO("result:%{public}d,isCanOpen:%{public}d", result, isCanOpen);
         if (result != ERR_OK || !isCanOpen) {
             return false;
         }
@@ -508,7 +508,7 @@ ErrCode FormCallbackAdapter::UpdateTemplateFormDetailInfo(
         sptr<IFormHostDelegate> remoteFormHostDelegateProxy =
             iface_cast<IFormHostDelegate>(callerToken);
         if (remoteFormHostDelegateProxy == nullptr) {
-            HILOG_ERROR("failed, remoteFormHostDelegateProxy is nullptr!");
+            HILOG_ERROR("failed,remoteFormHostDelegateProxy is nullptr");
             continue;
         }
         ErrCode ret = remoteFormHostDelegateProxy->TemplateFormDetailInfoChange(templateFormInfo);
@@ -540,7 +540,7 @@ ErrCode FormCallbackAdapter::UnregisterUpdateFormsConfigCallback()
 
 ErrCode FormCallbackAdapter::UpdateFormsConfig(const std::vector<FormCustomConfig> &configs)
 {
-    HILOG_INFO("call, config size: %{public}zu", configs.size());
+    HILOG_INFO("call,config size:%{public}zu", configs.size());
     {
         std::lock_guard<std::mutex> lock(formCustomConfigCacheMutex_);
         formCustomConfigCache_ = configs;
@@ -568,7 +568,7 @@ ErrCode FormCallbackAdapter::UnregisterDeleteFormsCallback()
 
 ErrCode FormCallbackAdapter::DeleteForms(const std::vector<FormRecordFilter> &filters)
 {
-    HILOG_INFO("call, filter size: %{public}zu", filters.size());
+    HILOG_INFO("call,filter size:%{public}zu", filters.size());
     std::vector<std::string> matchedFormIds;
     GetMatchedFormIds(filters, matchedFormIds);
     if (matchedFormIds.empty()) {
@@ -611,23 +611,23 @@ ErrCode FormCallbackAdapter::NotifyAllHosts(FormProxyRegistry &registry, const s
         int32_t userId = FormUtil::GetCallerUserId(callingUid);
         std::string bundleName;
         if (FormBmsHelper::GetInstance().GetBundleNameByUid(callingUid, bundleName) != ERR_OK) {
-            HILOG_WARN("get bundleName failed, %{public}s, uid=%{public}d", tag.c_str(), callingUid);
+            HILOG_WARN("get bundleName failed,%{public}s,uid=%{public}d", tag.c_str(), callingUid);
         }
         sptr<IFormHostDelegate> proxy = iface_cast<IFormHostDelegate>(callerToken);
         if (proxy == nullptr) {
-            HILOG_ERROR("iface_cast failed, %{public}s, userId=%{public}d, bundleName=%{public}s",
+            HILOG_ERROR("iface_cast failed,%{public}s,userId=%{public}d,bundleName=%{public}s",
                 tag.c_str(), userId, bundleName.c_str());
             result = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
             continue;
         }
         ErrCode notifyRet = callback(proxy);
         if (notifyRet != ERR_OK) {
-            HILOG_ERROR("notify failed, %{public}s, userId=%{public}d, bundleName=%{public}s, ret=%{public}d",
+            HILOG_ERROR("notify failed,%{public}s,userId=%{public}d,bundleName=%{public}s,ret=%{public}d",
                 tag.c_str(), userId, bundleName.c_str(), notifyRet);
             result = notifyRet;
         }
     }
-    HILOG_INFO("%{public}s notified %{public}zu hosts, result=%{public}d", tag.c_str(), entries.size(), result);
+    HILOG_INFO("%{public}s notified %{public}zu hosts,result=%{public}d", tag.c_str(), entries.size(), result);
     return result;
 }
 
@@ -671,7 +671,7 @@ ErrCode FormCallbackAdapter::SceneAnimationCheck(const int64_t formId, const int
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     bool isBundleProtect = FormBundleLockMgr::GetInstance().IsBundleProtect(formRecord.bundleName, userId, formId);
     if (isBundleProtect) {
-        HILOG_ERROR("Failed, application is locked");
+        HILOG_ERROR("Failed,application is locked");
         return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
     }
     Want want;
@@ -711,7 +711,7 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
     wantToHost.SetParam(Constants::PARAM_FORM_USER_ID, userId);
 
     int32_t pageRouterServiceCode = want.GetIntParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, -1);
-    HILOG_DEBUG("StartAbilityByFms pageRouterServiceCode: %{public}" PRId32, pageRouterServiceCode);
+    HILOG_DEBUG("StartAbilityByFms pageRouterServiceCode:%{public}" PRId32, pageRouterServiceCode);
     if (pageRouterServiceCode == Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE) {
         HILOG_DEBUG("StartAbilityByFms getForegroundApplications begin");
         bool isForeground = IsForegroundApp();
@@ -727,12 +727,12 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
         const std::string formId = want.GetStringParam(Constants::PARAM_LIVE_FORM_ID_KEY);
         auto it = liveFormStatusMap.find(formId);
         if (it == liveFormStatusMap.end()) {
-            HILOG_ERROR("This live form is non-existent, formId:%{public}s", formId.c_str());
+            HILOG_ERROR("This live form is non-existent,formId:%{public}s", formId.c_str());
             return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
         }
         std::string status = it->second;
         if (!FormConstantsUtil::IsLiveFormSupportLauncher(status)) {
-            HILOG_ERROR("This live form is not support launcher, status:%{public}s", status.c_str());
+            HILOG_ERROR("This live form is not support launcher,status:%{public}s", status.c_str());
             return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
         }
         HILOG_DEBUG("support launcher check success");
@@ -744,7 +744,7 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
     wantToHost.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, dstBundleName);
     wantToHost.SetParam(Constants::PARAM_ABILITY_NAME_KEY, dstAbilityName);
 
-    HILOG_INFO("dstBundleName:%{public}s, dstAbilityName:%{public}s",
+    HILOG_INFO("dstBundleName:%{public}s,dstAbilityName:%{public}s",
         dstBundleName.c_str(), dstAbilityName.c_str());
 
     // Query ability info by action
@@ -755,7 +755,7 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
     }
 
     if (!FormPublishAdapter::GetInstance().IsActionAllowToPublish(action)) {
-        HILOG_ERROR("action is not allowed to publish: %{public}s", action.c_str());
+        HILOG_ERROR("action is not allowed to publish:%{public}s", action.c_str());
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -772,15 +772,15 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
     }
 
     if (!abilityInfo.name.empty()) {
-        HILOG_DEBUG("Query highest priority ability success. bundleName:%{public}s, ability:%{public}s",
+        HILOG_DEBUG("Query highest priority ability success.bundleName:%{public}s,ability:%{public}s",
             abilityInfo.bundleName.c_str(), abilityInfo.name.c_str());
         wantToHost.SetElementName(abilityInfo.bundleName, abilityInfo.name);
     } else if (!extensionAbilityInfo.name.empty()) {
-        HILOG_DEBUG("Query highest priority extension ability success. bundleName:%{public}s, ability:%{public}s",
+        HILOG_DEBUG("Query highest priority extension ability success.bundleName:%{public}s,ability:%{public}s",
             extensionAbilityInfo.bundleName.c_str(), extensionAbilityInfo.name.c_str());
         wantToHost.SetElementName(extensionAbilityInfo.bundleName, extensionAbilityInfo.name);
     } else {
-        HILOG_ERROR("Query highest priority ability failed, no form host ability found");
+        HILOG_ERROR("Query highest priority ability failed,no form host ability found");
         if (want.GetStringParam(Constants::PARMA_REQUEST_METHOD) == Constants::OPEN_FORM_MANAGE_VIEW) {
             FormEventReport::SendRequestPublicFormEvent(dstBundleName, "",
                 RequestFormType::OPEN_FORM_MANAGER);
@@ -809,7 +809,7 @@ bool FormCallbackAdapter::IsForegroundApp()
     std::vector<AppExecFwk::AppStateData> curForegroundApps;
     IN_PROCESS_CALL_WITHOUT_RET(appMgrProxy->GetForegroundApplications(curForegroundApps));
     for (auto &appData : curForegroundApps) {
-        HILOG_DEBUG("appData.bundleName: %{public}s", appData.bundleName.c_str());
+        HILOG_DEBUG("appData.bundleName:%{public}s", appData.bundleName.c_str());
         if (appData.bundleName == bundleName) {
             checkFlag = true;
             break;

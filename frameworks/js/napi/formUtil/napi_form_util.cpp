@@ -460,7 +460,7 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo *rawCallbackInfo)
         asyncCallbackInfo.get(), &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
-        HILOG_ERROR("async work failed!");
+        HILOG_ERROR("async work failed");
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
@@ -506,7 +506,7 @@ napi_value RetErrMsgForPromise(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
         &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
-        HILOG_ERROR("async work failed!");
+        HILOG_ERROR("async work failed");
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
@@ -601,7 +601,7 @@ napi_value CreateFormInfos(napi_env env, const std::vector<FormInfo> &formInfos)
         }
         status = napi_set_element(env, arrayValue, index, element);
         if (status != napi_ok) {
-            HILOG_ERROR("napi_set_element failed, index:%{public}u", index);
+            HILOG_ERROR("napi_set_element failed,index:%{public}u", index);
         }
         index++;
     }
@@ -691,7 +691,7 @@ napi_value CreateRunningFormInfos(napi_env env, const std::vector<RunningFormInf
         }
         status = napi_set_element(env, arrayValue, index, element);
         if (status != napi_ok) {
-            HILOG_ERROR("napi_set_element failed, index:%{public}u", index);
+            HILOG_ERROR("napi_set_element failed,index:%{public}u", index);
         }
         index++;
     }
@@ -744,7 +744,7 @@ napi_value CreateNewRunningFormInfos(napi_env env, const std::vector<RunningForm
         }
         status = napi_set_element(env, arrayValue, index, element);
         if (status != napi_ok) {
-            HILOG_ERROR("napi_set_element failed, index:%{public}u", index);
+            HILOG_ERROR("napi_set_element failed,index:%{public}u", index);
         }
         index++;
     }
@@ -834,7 +834,7 @@ bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
     napi_value prop = nullptr;
     napi_status status = napi_get_named_property(env, args, "bundleName", &prop);
     if (status != napi_ok || prop == nullptr) {
-        HILOG_ERROR("ParseParam, get property value fail, propertyName:bundleName");
+        HILOG_ERROR("ParseParam,get property value fail,propertyName:bundleName");
         return false;
     }
     napi_typeof(env, prop, &valueType);
@@ -858,7 +858,7 @@ bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
         prop = nullptr;
         status = napi_get_named_property(env, args, "isUnusedIncluded", &prop);
         if (status != napi_ok || prop == nullptr) {
-            HILOG_ERROR("ParseParam, get property value fail, propertyName:isUnusedIncluded");
+            HILOG_ERROR("ParseParam,get property value fail,propertyName:isUnusedIncluded");
             return false;
         }
         if (napi_get_value_bool(env, prop, &filter.isUnusedIncluded) != napi_ok) {
@@ -873,7 +873,7 @@ bool GetStringPropFromNapi(napi_env env, napi_value args, const char *name, std:
     napi_value prop = nullptr;
     napi_status status = napi_get_named_property(env, args, name, &prop);
     if (status != napi_ok || prop == nullptr) {
-        HILOG_ERROR("GetStringPropFromNapi, get property value fail, propertyName:%{public}s",
+        HILOG_ERROR("GetStringPropFromNapi,get property value fail,propertyName:%{public}s",
             name);
         return false;
     }
@@ -926,7 +926,7 @@ napi_value CreateFormInstances(napi_env env, const std::vector<FormInstance> &fo
         }
         status = napi_set_element(env, arrayValue, index, element);
         if (status != napi_ok) {
-            HILOG_ERROR("napi_set_element failed, index:%{public}u", index);
+            HILOG_ERROR("napi_set_element failed,index:%{public}u", index);
         }
         index++;
     }
@@ -1089,7 +1089,7 @@ bool ConvertFormInfoFilter(napi_env env, napi_value value, AppExecFwk::FormInfoF
     napi_value nativeDataValue = nullptr;
     napi_status status = napi_get_named_property(env, value, "moduleName", &nativeDataValue);
     if (status != napi_ok) {
-        HILOG_ERROR("ConvertFormInfoFilter, get property value fail, propertyName: moduleName");
+        HILOG_ERROR("ConvertFormInfoFilter,get property value fail,propertyName:moduleName");
         return false;
     }
     napi_valuetype nativeDataValueType = napi_undefined;
@@ -1138,12 +1138,12 @@ bool GetPropertyValueByPropertyName(napi_env env, napi_value value, const char *
     napi_value propertyValue;
     napi_status status = napi_get_named_property(env, value, propertyName, &propertyValue);
     if (status != napi_ok) {
-        HILOG_ERROR("GetPropertyValueByPropertyName, get property value fail, propertyName:%{public}s",
+        HILOG_ERROR("GetPropertyValueByPropertyName,get property value fail,propertyName:%{public}s",
             propertyName);
         return false;
     }
     if (!ConvertFromJsValue(env, propertyValue, result)) {
-        HILOG_ERROR("GetPropertyValueByPropertyName, convertFromJsValue property fail, propertyName:%{public}s",
+        HILOG_ERROR("GetPropertyValueByPropertyName,convertFromJsValue property fail,propertyName:%{public}s",
             propertyName);
         return false;
     }
@@ -1171,7 +1171,7 @@ bool CreateFormRectInfo(napi_env env, napi_value value, AppExecFwk::Rect &rect)
     if (!std::isfinite(rectLeft) || !std::isfinite(rectTop) ||
         !std::isfinite(rectWidth) || !std::isfinite(rectHeight) ||
         rectWidth < 0 || rectHeight < 0) {
-        HILOG_ERROR("invalid rect values: left=%{public}f, top=%{public}f, width=%{public}f, height=%{public}f",
+        HILOG_ERROR("invalid rect values:left=%{public}f,top=%{public}f,width=%{public}f,height=%{public}f",
             rectLeft, rectTop, rectWidth, rectHeight);
         return false;
     }
@@ -1206,12 +1206,12 @@ int NapiFormUtil::CatchErrorCode(napi_env env)
         napi_value errCode = nullptr;
         napi_status status = napi_get_named_property(env, errResult, "code", &errCode);
         if (status != napi_ok || errCode == nullptr) {
-            HILOG_ERROR("CatchErrorCode, get property value fail, propertyName:code");
+            HILOG_ERROR("CatchErrorCode,get property value fail,propertyName:code");
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
         napi_valuetype errCodeType;
         if (napi_typeof(env, errCode, &errCodeType) != napi_ok) {
-            HILOG_ERROR("CatchErrorCode, typeof failed");
+            HILOG_ERROR("CatchErrorCode,typeof failed");
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
         if (errCodeType == napi_number) {

@@ -58,7 +58,7 @@ void FormProviderTaskMgr::PostAcquireTask(const int64_t formId, const Want &want
 void FormProviderTaskMgr::PostRefreshLocationTask(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("Call.");
+    HILOG_DEBUG("Call");
     auto notifyFormLocationUpdateFunc = [formId, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().NotifyFormLocationUpdate(formId, want, remoteObject);
     };
@@ -76,7 +76,7 @@ void FormProviderTaskMgr::PostRefreshLocationTask(const int64_t formId, const Wa
 void FormProviderTaskMgr::PostRefreshTask(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call, formId:%{public}" PRId64, formId);
+    HILOG_INFO("call,formId:%{public}" PRId64, formId);
 
     auto notifyFormUpdateFunc = [formId, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().NotifyFormUpdate(formId, want, remoteObject);
@@ -220,7 +220,7 @@ void FormProviderTaskMgr::PostEventNotifyTask(const std::vector<int64_t> &formEv
 void FormProviderTaskMgr::PostSizeChangedTask(const int64_t formId, const int32_t newDimension,
     const Rect &newRect, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("Call.");
+    HILOG_INFO("Call");
     auto sizeChangedFunc = [formId, newDimension, newRect, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().NotifySizeChanged(formId, newDimension, newRect, want, remoteObject);
     };
@@ -247,7 +247,7 @@ void FormProviderTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Wa
     }
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
-        HILOG_ERROR("get formRecord failed, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("get formRecord failed,formId:%{public}" PRId64, formId);
         RemoveConnection(connectId);
         return;
     }
@@ -262,7 +262,7 @@ void FormProviderTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Wa
         FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
         return;
     }
-    HILOG_ERROR("fail acquire providerFormInfo, error:%{public}d", error);
+    HILOG_ERROR("fail acquire providerFormInfo,error:%{public}d", error);
     bool handled = FormProviderErrorHandlerFactory::GetAcquireHandler()
         ->HandleSendRequestFailed(formId, error, want);
     if (!handled) {
@@ -283,7 +283,7 @@ void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &wan
     const sptr<IRemoteObject> &remoteObject)
 {
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
-    HILOG_INFO("call, formId:%{public}" PRId64", connectId:%{public}d", formId, connectId);
+    HILOG_INFO("call,formId:%{public}" PRId64", connectId:%{public}d", formId, connectId);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
@@ -296,7 +296,7 @@ void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &wan
         DelayedFormExitDetect(connectId);
         return;
     }
-    HILOG_ERROR("fail notify form update, error:%{public}d", error);
+    HILOG_ERROR("fail notify form update,error:%{public}d", error);
     bool handled = FormProviderErrorHandlerFactory::GetRefreshHandler()
         ->HandleSendRequestFailed(formId, error, want);
     if (!handled) {
@@ -518,7 +518,7 @@ void FormProviderTaskMgr::RemoveConnection(int32_t connectId)
 {
     auto formSupplyCallback = FormSupplyCallback::GetInstance();
     if (formSupplyCallback == nullptr) {
-        HILOG_ERROR("formSupplyCallback is nullptr.");
+        HILOG_ERROR("formSupplyCallback is nullptr");
         return;
     }
     formSupplyCallback->RemoveConnection(connectId);
@@ -593,7 +593,7 @@ void FormProviderTaskMgr::NotifySizeChanged(const int64_t formId, const int32_t 
 void FormProviderTaskMgr::DelayedFormExitDetect(int32_t connectId)
 {
     auto detectFunc = [connectId]() {
-        HILOG_INFO("form exit timeout, handle it. connectId:%{public}d", connectId);
+        HILOG_INFO("form exit timeout,handle it.connectId:%{public}d", connectId);
         FormProviderTaskMgr::GetInstance().RemoveConnection(connectId);
     };
     FormProviderQueue::GetInstance().ScheduleDelayTask(
