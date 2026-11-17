@@ -898,6 +898,10 @@ void FormMgrService::OnStart()
 
     if (FormResourceParam::IsBopdMode()) {
         HILOG_ERROR("is bopd mode");
+        // bopd mode need publish sa
+        if (!Publish(DelayedSingleton<FormMgrService>::GetInstance().get())) {
+            HILOG_ERROR("FormMgrService::Onstart Publish failed");
+        }
         return;
     }
     HILOG_INFO("start,time:%{public}s", onStartBeginTime_.c_str());
