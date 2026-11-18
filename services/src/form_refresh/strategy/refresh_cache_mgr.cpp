@@ -121,8 +121,8 @@ void RefreshCacheMgr::ConsumeInvisibleFlag(const std::vector<FormRecord> &visibl
     bool isActiveUser = FormUtil::IsActiveUser(userId);
     for (const auto &record : visibleFormRecords) {
         const int64_t formId = record.formId;
-        HILOG_INFO("[%{public}s]formId:%{public}" PRId64", userId:%{public}d, isTimerRefresh:%{public}d, isHostRefresh:%{public}d,"
-            " isReminderAgentRefresh:%{public}d", __FUNCTION__,
+        HILOG_INFO("[%{public}s]formId:%{public}" PRId64", userId:%{public}d, isTimerRefresh:%{public}d,"
+            " isHostRefresh:%{public}d, isReminderAgentRefresh:%{public}d", __FUNCTION__,
             formId, userId, record.isTimerRefresh, record.isHostRefresh, record.isReminderAgentRefresh);
         Want want;
         if (record.isTimerRefresh) {

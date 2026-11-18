@@ -60,7 +60,8 @@ void CreateRenderFormJsInfo(const FormRecord &formRecord, const Want &want, Form
 
     if (formProviderData.HasData()) {
         FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formProviderData, formJsInfo);
-        HILOG_INFO("[%{public}s]RenderForm formId:%{public}" PRId64 ", imageDataState: %{public}d dataSize: %{public}zu",
+        HILOG_INFO("[%{public}s]RenderForm formId:%{public}" PRId64
+            ", imageDataState: %{public}d dataSize: %{public}zu",
             __FUNCTION__,
             formRecord.formId, formProviderData.GetImageDataState(), formProviderData.GetDataString().size());
     } else {
@@ -388,7 +389,8 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
     FormJsInfo formJsInfo;
     if (formProviderData.HasData()) {
         FormDataMgr::GetInstance().CreateFormJsInfo(record.formId, record, formProviderData, formJsInfo);
-        HILOG_INFO("[%{public}s]RecoverForm formId:%{public}" PRId64 ", imageDataState: %{public}d dataSize: %{public}zu",
+        HILOG_INFO("[%{public}s]RecoverForm formId:%{public}" PRId64
+            ", imageDataState: %{public}d dataSize: %{public}zu",
             __FUNCTION__,
             record.formId, formProviderData.GetImageDataState(), formProviderData.GetDataString().size());
     } else {
