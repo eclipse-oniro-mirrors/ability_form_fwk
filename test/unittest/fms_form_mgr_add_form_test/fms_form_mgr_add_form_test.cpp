@@ -71,7 +71,7 @@ const std::string FORM_PROVIDER_MODULE_SOURCE_DIR = "";
 const std::string FORM_HOST_BUNDLE_NAME = "com.form.host.app";
 
 const int32_t PARAM_FORM_DIMENSION_VALUE = 1;
-const int32_t PARAM_FORM_DIMENSION_2_1 = 5;
+const int32_t PARAM_FORM_DIMENSION_2_1 = 10;
 const int32_t PARAM_FORM_DIMENSION_6_4 = 7;
 const int32_t DEFAULT_CALLING_UID = 20000001;
 
@@ -136,7 +136,7 @@ void FmsFormMgrAddFormTest::CreateProviderData()
     formInfo.scheduledUpdateTime = "06:06";
     formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
     formInfo.formVisibleNotify = true;
-    formInfo.supportDimensions = {1, 2, 5, 7};
+    formInfo.supportDimensions = {1, 2, 10, 7};
     formInfo.defaultDimension = 1;
     formInfo.supportShapes = {1};
     FormInfoStorage formInfoStorage;
