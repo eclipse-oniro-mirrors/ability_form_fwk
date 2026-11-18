@@ -1789,7 +1789,8 @@ bool FormDataMgr::UpdateHostForm(const int64_t formId, const FormRecord &formRec
     for (itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
         bool enableRefresh = formRecord.isVisible || itHostRecord->IsEnableUpdate(formId) ||
             itHostRecord->IsEnableRefresh(formId);
-        HILOG_INFO("[%{public}s]formId:%{public}" PRId64 " enableRefresh:%{public}d", __FUNCTION__, formId, enableRefresh);
+        HILOG_INFO("[%{public}s]formId:%{public}" PRId64 " enableRefresh:%{public}d",
+            __FUNCTION__, formId, enableRefresh);
         if (enableRefresh) {
             // update form
             itHostRecord->OnUpdate(formId, formRecord);
@@ -1812,7 +1813,8 @@ ErrCode FormDataMgr::HandleUpdateHostFormFlag(const std::vector<int64_t> &formId
 
         int64_t matchedFormId = FindMatchedFormId(formId);
         if (!formHostRecord.Contains(matchedFormId)) {
-            HILOG_WARN("[%{public}s]form %{public}" PRId64 "not owned by this client, don't need to update flag", __FUNCTION__, formId);
+            HILOG_WARN("[%{public}s]form %{public}" PRId64 "not owned by this client, don't need to update flag",
+                __FUNCTION__, formId);
             continue;
         }
 
@@ -2276,7 +2278,8 @@ ErrCode FormDataMgr::SetRecordVisible(int64_t matchedFormId, bool isVisible)
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     info->second.isVisible = isVisible;
-    HILOG_DEBUG("[%{public}s]set isVisible to %{public}d,formId:%{public}" PRId64 " ", __FUNCTION__, isVisible, matchedFormId);
+    HILOG_DEBUG("[%{public}s]set isVisible to %{public}d,formId:%{public}" PRId64 " ",
+        __FUNCTION__, isVisible, matchedFormId);
     return ERR_OK;
 }
 
@@ -3658,7 +3661,8 @@ void FormDataMgr::SetExpectRecycledStatus(int64_t formId, bool isExpectRecycled)
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     auto info = formRecords_.find(formId);
     if (info != formRecords_.end()) {
-        HILOG_INFO("[%{public}s]formId:%{public}" PRId64 " isExpectRecycled:%{public}d", __FUNCTION__, formId, isExpectRecycled);
+        HILOG_INFO("[%{public}s]formId:%{public}" PRId64 " isExpectRecycled:%{public}d",
+            __FUNCTION__, formId, isExpectRecycled);
         info->second.expectRecycled = isExpectRecycled;
     }
 }
@@ -3809,7 +3813,8 @@ void FormDataMgr::SetHostTransparentFormColor(const int64_t formId, const std::s
     std::vector<FormHostRecord>::iterator itHostRecord;
     for (itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
         if (itHostRecord->Contains(formId)) {
-            HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", transparencyColor:%{public}s", __FUNCTION__, formId, transparencyColor.c_str());
+            HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", transparencyColor:%{public}s",
+                __FUNCTION__, formId, transparencyColor.c_str());
             itHostRecord->SetTransparentFormColor(formId, transparencyColor);
         }
     }

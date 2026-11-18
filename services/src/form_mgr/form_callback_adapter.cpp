@@ -77,7 +77,8 @@ ErrCode FormCallbackAdapter::RegisterFormRouterProxy(const std::vector<int64_t> 
         }
         auto matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
         if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
-            HILOG_ERROR("[%{public}s]No matching formRecord was found for formId:%{public}" PRId64 "", __FUNCTION__, formId);
+            HILOG_ERROR("[%{public}s]No matching formRecord was found for formId:%{public}" PRId64 "",
+                __FUNCTION__, formId);
             continue;
         }
         matchedFormIds.push_back(formId);
@@ -90,7 +91,8 @@ ErrCode FormCallbackAdapter::RegisterFormRouterProxy(const std::vector<int64_t> 
             HILOG_ERROR("[%{public}s]The formId:%{public}" PRId64 " owned by other formHost", __FUNCTION__, formId);
             continue;
         } else {
-            HILOG_DEBUG("[%{public}s]The setup was successful,matchedFormIds:%{public}" PRId64 "", __FUNCTION__, formId);
+            HILOG_DEBUG("[%{public}s]The setup was successful,matchedFormIds:%{public}" PRId64 "",
+                __FUNCTION__, formId);
             hostOwnFormIds.push_back(formId);
         }
     }
@@ -125,7 +127,8 @@ ErrCode FormCallbackAdapter::UnregisterFormRouterProxy(const std::vector<int64_t
         }
         auto matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
         if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
-            HILOG_ERROR("[%{public}s]No matching formRecord was found for formId:%{public}" PRId64 "", __FUNCTION__, formId);
+            HILOG_ERROR("[%{public}s]No matching formRecord was found for formId:%{public}" PRId64 "",
+                __FUNCTION__, formId);
             continue;
         }
         matchedFormIds.push_back(formId);
@@ -139,7 +142,8 @@ ErrCode FormCallbackAdapter::UnregisterFormRouterProxy(const std::vector<int64_t
             HILOG_ERROR("[%{public}s]The formId:%{public}" PRId64 " owned by other formHost", __FUNCTION__, formId);
             continue;
         } else {
-            HILOG_DEBUG("[%{public}s]The setup was successful,matchedFormIds:%{public}" PRId64 "", __FUNCTION__, formId);
+            HILOG_DEBUG("[%{public}s]The setup was successful,matchedFormIds:%{public}" PRId64 "",
+                __FUNCTION__, formId);
             hostOwnFormIds.push_back(formId);
         }
     }
@@ -354,7 +358,7 @@ ErrCode FormCallbackAdapter::GetVisibleFormRect(const int64_t formId,
     const int32_t callingUid, Rect &rect)
 {
     HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    // Inline caller checks (mirrors CallerCheck semantics/order) — avoids
+    // Inline caller checks (mirrors CallerCheck semantics/order) 鈥?avoids
     // duplicate FindMatchedFormId + GetFormRecord lookups.
     if (formId <= 0) {
         HILOG_ERROR("[%{public}s]invalid formId", __FUNCTION__);
@@ -645,7 +649,8 @@ ErrCode FormCallbackAdapter::CallerCheck(const int64_t formId, const int32_t cal
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     if (formRecord.uid != callingUid) {
-        HILOG_ERROR("[%{public}s]not match providerUid:%{public}d and callingUid:%{public}d", __FUNCTION__, formRecord.uid, callingUid);
+        HILOG_ERROR("[%{public}s]not match providerUid:%{public}d and callingUid:%{public}d",
+            __FUNCTION__, formRecord.uid, callingUid);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
     return ERR_OK;

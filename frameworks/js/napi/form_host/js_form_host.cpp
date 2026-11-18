@@ -4702,7 +4702,8 @@ bool JsFormRouterProxyMgr::CreateStringArray(const std::vector<std::string> &str
         }
         status = napi_set_element(deleteFormsCallbackEnv_, array, static_cast<uint32_t>(i), jsValue);
         if (status != napi_ok) {
-            HILOG_ERROR("[%{public}s]napi_set_element failed,index:%{public}zu,status:%{public}d", __FUNCTION__, i, static_cast<int>(status));
+            HILOG_ERROR("[%{public}s]napi_set_element failed,index:%{public}zu,status:%{public}d",
+                __FUNCTION__, i, static_cast<int>(status));
             return false;
         }
     }
@@ -4777,7 +4778,8 @@ bool JsFormRouterProxyMgr::GetFormCustomConfigArray(
         napi_value jsConfig = nullptr;
         napi_status status = napi_create_object(updateFormsConfigEnv_, &jsConfig);
         if (status != napi_ok || jsConfig == nullptr) {
-            HILOG_ERROR("[%{public}s]napi_create_object failed,status:%{public}d", __FUNCTION__, static_cast<int>(status));
+            HILOG_ERROR("[%{public}s]napi_create_object failed,status:%{public}d",
+                __FUNCTION__, static_cast<int>(status));
             return false;
         }
         setStringProperty(jsConfig, "bundleName", config.bundleName);
@@ -4789,7 +4791,8 @@ bool JsFormRouterProxyMgr::GetFormCustomConfigArray(
         setBoolProperty(jsConfig, "isRepeatAdditionSupported", config.isRepeatAdditionSupported);
         status = napi_set_element(updateFormsConfigEnv_, configArray, static_cast<uint32_t>(i), jsConfig);
         if (status != napi_ok) {
-            HILOG_ERROR("[%{public}s]napi_set_element failed,index:%{public}zu,status:%{public}d", __FUNCTION__, i, static_cast<int>(status));
+            HILOG_ERROR("[%{public}s]napi_set_element failed,index:%{public}zu,status:%{public}d",
+                __FUNCTION__, i, static_cast<int>(status));
             return false;
         }
     }

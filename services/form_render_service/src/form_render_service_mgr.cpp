@@ -275,7 +275,8 @@ int32_t FormRenderServiceMgr::ReleaseRenderer(
 int32_t FormRenderServiceMgr::ProcessReleaseRenderer(
     int64_t formId, const std::string &compId, const std::string &uid, const Want &want)
 {
-    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ",compId:%{public}s,uid:%{public}s", __FUNCTION__, formId, compId.c_str(), uid.c_str());
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ",compId:%{public}s,uid:%{public}s",
+        __FUNCTION__, formId, compId.c_str(), uid.c_str());
     if (formId <= 0 || compId.empty() || uid.empty()) {
         HILOG_ERROR("param invalid");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -401,7 +402,8 @@ int32_t FormRenderServiceMgr::SetRenderGroupEnableFlag(const int64_t formId, boo
         HILOG_ERROR("[%{public}s]empty uid,formId:%{public}" PRId64, __FUNCTION__, formId);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ",uid:%{public}s isEnable: %{public}d", __FUNCTION__, formId, uid.c_str(), isEnable);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ",uid:%{public}s isEnable: %{public}d",
+        __FUNCTION__, formId, uid.c_str(), isEnable);
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
         if (search->second == nullptr) {

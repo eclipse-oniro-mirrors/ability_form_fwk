@@ -225,7 +225,8 @@ private:
         } else if (type == "router" || type == "message" || type == "call") {
             return OnRegisterClickEventCallback(env, argc, argv, type);
         } else {
-            HILOG_ERROR("[%{public}s]args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call",
+                __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "type",
                 "formAdd, formRemove, notifyVisible, notifyInvisible, router, message, call.");
             return CreateJsUndefined(env);
@@ -509,7 +510,8 @@ private:
         } else if (type == "router" || type == "message" || type == "call") {
             return OnUnregisterClickEventCallback(env, argc, argv, type);
         } else {
-            HILOG_ERROR("[%{public}s]args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call",
+                __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "type",
                 "args[0] should be formAdd, formRemove,"
                 "notifyVisible, notifyInvisible, router, message, call");

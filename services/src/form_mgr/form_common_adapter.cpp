@@ -271,13 +271,15 @@ ErrCode FormCommonAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formIn
     ErrCode errCode = formInfoMgr_->GetFormsInfoByModule(bundleName, moduleName,
         formInfos, userId);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("[%{public}s]GetFormsInfoByModule,get formConfigInfo failed,userId:%{public}d", __FUNCTION__, userId);
+        HILOG_ERROR("[%{public}s]GetFormsInfoByModule,get formConfigInfo failed,userId:%{public}d",
+            __FUNCTION__, userId);
         return errCode;
     }
 
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
     if (!MatchFormInfo(formInfos, abilityName, formName, moduleName, formInfo)) {
-        HILOG_ERROR("[%{public}s]fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d", __FUNCTION__,
+        HILOG_ERROR("[%{public}s]fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d",
+            __FUNCTION__,
             abilityName.c_str(), formName.c_str(), userId);
         return ERR_APPEXECFWK_FORM_NOT_SUPPORTED;
     }
@@ -500,7 +502,8 @@ ErrCode FormCommonAdapter::GetFormInfoByFormRecord(const FormRecord &record, For
     ErrCode errCode = formInfoMgr_->GetFormsInfoByModule(record.bundleName, record.moduleName,
         formInfos, userId);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("[%{public}s]GetFormsInfoByModule,get formConfigInfo failed,userId:%{public}d", __FUNCTION__, userId);
+        HILOG_ERROR("[%{public}s]GetFormsInfoByModule,get formConfigInfo failed,userId:%{public}d",
+            __FUNCTION__, userId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     for (const auto &form : formInfos) {
@@ -511,7 +514,8 @@ ErrCode FormCommonAdapter::GetFormInfoByFormRecord(const FormRecord &record, For
             return ERR_OK;
         }
     }
-    HILOG_ERROR("[%{public}s]fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d", __FUNCTION__,
+    HILOG_ERROR("[%{public}s]fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d",
+        __FUNCTION__,
         record.abilityName.c_str(), record.formName.c_str(), userId);
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }

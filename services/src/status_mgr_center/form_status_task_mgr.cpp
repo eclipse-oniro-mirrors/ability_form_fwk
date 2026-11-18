@@ -60,7 +60,8 @@ void CreateRenderFormJsInfo(const FormRecord &formRecord, const Want &want, Form
 
     if (formProviderData.HasData()) {
         FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formProviderData, formJsInfo);
-        HILOG_INFO("[%{public}s]RenderForm formId:%{public}" PRId64 ", imageDataState: %{public}d dataSize: %{public}zu", __FUNCTION__,
+        HILOG_INFO("[%{public}s]RenderForm formId:%{public}" PRId64 ", imageDataState: %{public}d dataSize: %{public}zu",
+            __FUNCTION__,
             formRecord.formId, formProviderData.GetImageDataState(), formProviderData.GetDataString().size());
     } else {
         FormDataMgr::GetInstance().CreateFormJsInfo(formRecord.formId, formRecord, formJsInfo);
@@ -232,7 +233,8 @@ int32_t FormStatusTaskMgr::OnRecycleDataDone(const int64_t formId, const Want &w
         HILOG_ERROR("[%{public}s]invalid form event:%{public}d", __FUNCTION__, event);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.", __FUNCTION__,
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
+        __FUNCTION__,
         formId,
         eventId.c_str(),
         curTid.c_str(),
@@ -295,7 +297,8 @@ int32_t FormStatusTaskMgr::HandleFrsEventReply(const int64_t formId, const Want 
         HILOG_ERROR("[%{public}s]invalid form event:%{public}d", __FUNCTION__, event);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.", __FUNCTION__,
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", eventId:%{public}s, curTid:%{public}s, event:%{public}d.",
+        __FUNCTION__,
         formId,
         eventId.c_str(),
         curTid.c_str(),
@@ -385,7 +388,8 @@ void FormStatusTaskMgr::RecoverForm(const FormRecord &record, const Want &want, 
     FormJsInfo formJsInfo;
     if (formProviderData.HasData()) {
         FormDataMgr::GetInstance().CreateFormJsInfo(record.formId, record, formProviderData, formJsInfo);
-        HILOG_INFO("[%{public}s]RecoverForm formId:%{public}" PRId64 ", imageDataState: %{public}d dataSize: %{public}zu", __FUNCTION__,
+        HILOG_INFO("[%{public}s]RecoverForm formId:%{public}" PRId64 ", imageDataState: %{public}d dataSize: %{public}zu",
+            __FUNCTION__,
             record.formId, formProviderData.GetImageDataState(), formProviderData.GetDataString().size());
     } else {
         FormDataMgr::GetInstance().CreateFormJsInfo(record.formId, record, formJsInfo);
@@ -469,7 +473,8 @@ void FormStatusTaskMgr::StopRenderingForm(
 
     int32_t error = remoteFormDeleteRender->StopRenderingForm(formInfo, newWant, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s]StopRenderingForm fail formId:%{public}" PRId64 " error: %{public}d", __FUNCTION__, formRecord.formId, error);
+        HILOG_ERROR("[%{public}s]StopRenderingForm fail formId:%{public}" PRId64 " error: %{public}d",
+            __FUNCTION__, formRecord.formId, error);
         RemoveConnection(connectId);
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formInfo.formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formInfo.formId, FormFsmEvent::DELETE_FORM_FAIL);
@@ -510,7 +515,8 @@ void FormStatusTaskMgr::RenderForm(
             formRecord.formId, HiSysEventPointType::TYPE_INVISIBLE_UPDATE);
     }
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s]StopRenderingForm fail formId:%{public}" PRId64 " error: %{public}d", __FUNCTION__, formRecord.formId, error);
+        HILOG_ERROR("[%{public}s]StopRenderingForm fail formId:%{public}" PRId64 " error: %{public}d",
+            __FUNCTION__, formRecord.formId, error);
         RemoveConnection(connectId);
         FormStatusMgr::GetInstance().CancelFormEventTimeout(formRecord.formId, eventId);
         FormStatusMgr::GetInstance().PostFormEvent(formRecord.formId, FormFsmEvent::RENDER_FORM_FAIL);

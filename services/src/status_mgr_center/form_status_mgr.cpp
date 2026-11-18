@@ -184,7 +184,8 @@ void FormStatusMgr::AddTaskToQueueUnique(const int64_t formId, const FormFsmEven
         temptaskInfoQueue.pop();
         formEventQueue->PushFormEvent(eventTaskInfo);
     }
-    HILOG_INFO("[%{public}s]formEventQueue event size %{public}d", __FUNCTION__, static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
+    HILOG_INFO("[%{public}s]formEventQueue event size %{public}d",
+        __FUNCTION__, static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
 
     FormDataMgr::GetInstance().UpdateFormRecordSetIsExistRecycleTask(formId, false);
 }
@@ -222,7 +223,8 @@ void FormStatusMgr::AddTaskToQueueDelete(const int64_t formId, const FormFsmEven
         }
     }
     formEventQueue->PushFormEvent(taskInfo);
-    HILOG_INFO("[%{public}s]formEventQueue event size %{public}d", __FUNCTION__, static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
+    HILOG_INFO("[%{public}s]formEventQueue event size %{public}d",
+        __FUNCTION__, static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
 }
 
 void FormStatusMgr::ProcessTaskFromQueue(const int64_t formId)
@@ -318,7 +320,8 @@ std::string FormStatusMgr::GetFormEventId(const int64_t formId)
         return "";
     }
 
-    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", eventId:%{public}s.", __FUNCTION__, formId, (formEventIdMap_[formId]).c_str());
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", eventId:%{public}s.",
+        __FUNCTION__, formId, (formEventIdMap_[formId]).c_str());
     return formEventIdMap_[formId];
 }
 

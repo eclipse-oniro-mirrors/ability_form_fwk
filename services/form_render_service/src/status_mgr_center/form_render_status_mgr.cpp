@@ -50,7 +50,8 @@ int32_t FormRenderStatusMgr::PostFormEvent(
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
 
-    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", status is %{public}s, event is %{public}s, nextStatus is %{public}s.", __FUNCTION__,
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", status is %{public}s, event is %{public}s, nextStatus is %{public}s.",
+        __FUNCTION__,
         formId,
         FormStatusPrint::FormStatusToString(status).c_str(),
         FormStatusPrint::FormEventToString(event).c_str(),

@@ -137,7 +137,8 @@ ErrCode FormRdbDataMgr::ExecuteSql(const std::string &sql)
     if (ret == NativeRdb::E_OK) {
         if (rdbStore->IsSlaveDiffFromMaster()) {
             auto backupRet = rdbStore->Backup("");
-            HILOG_WARN("[%{public}s]rdb slave corrupt,backup from master,ret=%{public}" PRId32, __FUNCTION__, backupRet);
+            HILOG_WARN("[%{public}s]rdb slave corrupt,backup from master,ret=%{public}" PRId32,
+                __FUNCTION__, backupRet);
         }
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
@@ -182,7 +183,8 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
     if (ret == NativeRdb::E_OK) {
         if (rdbStore->IsSlaveDiffFromMaster()) {
             auto backupRet = rdbStore->Backup("");
-            HILOG_WARN("[%{public}s]rdb slave corrupt,backup from master,ret=%{public}" PRId32, __FUNCTION__, backupRet);
+            HILOG_WARN("[%{public}s]rdb slave corrupt,backup from master,ret=%{public}" PRId32,
+                __FUNCTION__, backupRet);
         }
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
@@ -202,7 +204,8 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
         UpdateWriteCount(key.size());
         return ERR_OK;
     }
-    HILOG_WARN("[%{public}s]Insert operation failed,key=%{public}s,ret=%{public}" PRId32, __FUNCTION__, key.c_str(), ret);
+    HILOG_WARN("[%{public}s]Insert operation failed,key=%{public}s,ret=%{public}" PRId32,
+        __FUNCTION__, key.c_str(), ret);
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
@@ -230,7 +233,8 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
     if (ret == NativeRdb::E_OK) {
         if (rdbStore->IsSlaveDiffFromMaster()) {
             auto backupRet = rdbStore->Backup("");
-            HILOG_WARN("[%{public}s]rdb slave corrupt,backup from master,ret=%{public}" PRId32, __FUNCTION__, backupRet);
+            HILOG_WARN("[%{public}s]rdb slave corrupt,backup from master,ret=%{public}" PRId32,
+                __FUNCTION__, backupRet);
         }
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
@@ -251,7 +255,8 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
         return ERR_OK;
     }
 
-    HILOG_WARN("[%{public}s]Insert operation failed,key=%{public}s,ret=%{public}" PRId32, __FUNCTION__, key.c_str(), ret);
+    HILOG_WARN("[%{public}s]Insert operation failed,key=%{public}s,ret=%{public}" PRId32,
+        __FUNCTION__, key.c_str(), ret);
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
@@ -278,7 +283,8 @@ ErrCode FormRdbDataMgr::DeleteData(const std::string &tableName, const std::stri
     if (ret == NativeRdb::E_OK) {
         if (rdbStore->IsSlaveDiffFromMaster()) {
             auto backupRet = rdbStore->Backup("");
-            HILOG_WARN("[%{public}s]rdb slave corrupt,backup from master,ret=%{public}" PRId32, __FUNCTION__, backupRet);
+            HILOG_WARN("[%{public}s]rdb slave corrupt,backup from master,ret=%{public}" PRId32,
+                __FUNCTION__, backupRet);
         }
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
@@ -647,7 +653,8 @@ bool FormRdbDataMgr::InsertData(
     if (ret == NativeRdb::E_OK) {
         if (rdbStore->IsSlaveDiffFromMaster()) {
             auto backupRet = rdbStore->Backup("");
-            HILOG_WARN("[%{public}s]rdb slave corrupt,backup from master,ret=%{public}" PRId32, __FUNCTION__, backupRet);
+            HILOG_WARN("[%{public}s]rdb slave corrupt,backup from master,ret=%{public}" PRId32,
+                __FUNCTION__, backupRet);
         }
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
@@ -684,7 +691,8 @@ bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredica
     if (ret == NativeRdb::E_OK) {
         if (rdbStore->IsSlaveDiffFromMaster()) {
             auto backupRet = rdbStore->Backup("");
-            HILOG_WARN("[%{public}s]rdb slave corrupt,backup from master,ret=%{public}" PRId32, __FUNCTION__, backupRet);
+            HILOG_WARN("[%{public}s]rdb slave corrupt,backup from master,ret=%{public}" PRId32,
+                __FUNCTION__, backupRet);
         }
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
@@ -724,14 +732,14 @@ ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
         return ERR_APPEXECFWK_FORM_RDB_REPEATED_BUILD;
     }
 
-    // 用备库恢复主库
+    // 鐢ㄥ搴撴仮澶嶄富搴?
     auto restoreRet = rdbStore->Restore("");
     if (restoreRet == NativeRdb::E_OK) {
         HILOG_INFO("Restore rdb succeeded");
     } else {
         HILOG_WARN("Restore rdb failed,errorCode:%{public}" PRId32, restoreRet);
         if (restoreRet == NativeRdb::E_SQLITE_CORRUPT) {
-            // 删库，避免拿到缓存的开库信息
+            // 鍒犲簱锛岄伩鍏嶆嬁鍒扮紦瀛樼殑寮€搴撲俊鎭?
             HILOG_WARN("Need rdb clear cache,delete db");
             std::unique_lock<std::shared_mutex> lock(rdbStoreMutex_);
             std::string rdbPath = std::string(Constants::FORM_MANAGER_SERVICE_PATH) + Constants::FORM_RDB_NAME;

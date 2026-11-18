@@ -336,12 +336,14 @@ void FormVisibilityAdapter::FilterFormInstanceMapsByVisibleType(
         while (instanceIter != formInstances.end()) {
             FormRecord record;
             if (!FormDataMgr::GetInstance().GetFormRecord(instanceIter->formId, record)) {
-                HILOG_WARN("[%{public}s]get formRecord failed!formId:%{public}" PRId64 ".", __FUNCTION__, instanceIter->formId);
+                HILOG_WARN("[%{public}s]get formRecord failed!formId:%{public}" PRId64 ".",
+                    __FUNCTION__, instanceIter->formId);
                 ++instanceIter;
                 continue;
             }
             if (record.formVisibleNotifyState != formVisibleType) {
-                HILOG_INFO("[%{public}s]erase formId:%{public}" PRId64 ", formVisibleNotifyState:%{public}d", __FUNCTION__,
+                HILOG_INFO("[%{public}s]erase formId:%{public}" PRId64 ", formVisibleNotifyState:%{public}d",
+                    __FUNCTION__,
                     instanceIter->formId, record.formVisibleNotifyState);
                 restoreFormRecords[record.formId] = record;
                 instanceIter = formInstances.erase(instanceIter);
@@ -381,7 +383,8 @@ void FormVisibilityAdapter::FilterEventMapsByVisibleType(
                 continue;
             }
             if (record.formVisibleNotifyState != formVisibleType) {
-                HILOG_INFO("[%{public}s]erase formId:%{public}" PRId64 ", formVisibleNotifyState:%{public}d", __FUNCTION__,
+                HILOG_INFO("[%{public}s]erase formId:%{public}" PRId64 ", formVisibleNotifyState:%{public}d",
+                    __FUNCTION__,
                     *formItr, record.formVisibleNotifyState);
                 restoreFormRecords[record.formId] = record;
                 formItr = formIds.erase(formItr);
@@ -620,7 +623,8 @@ int32_t FormVisibilityAdapter::SetFormsRecyclable(const std::vector<int64_t> &fo
         }
         if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
             record.formUserUids.end()) {
-            HILOG_WARN("[%{public}s]form %{public}" PRId64 " not owned by %{public}d", __FUNCTION__, formId, callingUid);
+            HILOG_WARN("[%{public}s]form %{public}" PRId64 " not owned by %{public}d",
+                __FUNCTION__, formId, callingUid);
             continue;
         }
 

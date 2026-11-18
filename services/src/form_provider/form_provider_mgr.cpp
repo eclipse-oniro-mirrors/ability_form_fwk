@@ -662,7 +662,8 @@ int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record
  ErrCode FormProviderMgr::ConnectAmsChangeLocation(const int64_t formId, const FormRecord &record,
     const Want &want)
 {
-    HILOG_INFO("[%{public}s]formId:%{public} " PRId64 ", bundleName:%{public}s, abilityName:%{public}s", __FUNCTION__, formId,
+    HILOG_INFO("[%{public}s]formId:%{public} " PRId64 ", bundleName:%{public}s, abilityName:%{public}s",
+        __FUNCTION__, formId,
         record.bundleName.c_str(), record.abilityName.c_str());
 
     sptr<IAbilityConnection> formLocationConnection = new (std::nothrow) FormLocationConnection(formId, want,

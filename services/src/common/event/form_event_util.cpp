@@ -401,7 +401,8 @@ void FormEventUtil::BatchDeleteNoHostTempForms(const int uid, std::map<FormIdKey
         int result = FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, moduleName,
             formIds, userId);
         if (result != ERR_OK) {
-            HILOG_ERROR("[%{public}s]NotifyProviderFormsBatchDelete fail bundle:%{public}s ability:%{public}s", __FUNCTION__,
+            HILOG_ERROR("[%{public}s]NotifyProviderFormsBatchDelete fail bundle:%{public}s ability:%{public}s",
+                __FUNCTION__,
                 bundleName.c_str(), abilityName.c_str());
             for (int64_t formId : formIds) {
                 FormDataMgr::GetInstance().AddFormUserUid(formId, uid);
@@ -518,7 +519,8 @@ void FormEventUtil::HandleAddMultiUpdateTimes(const int64_t formId,
                 time[0], time[1], record.providerUserId);
         }
     } else {
-        HILOG_INFO("[%{public}s]add at timer:%{public}d,%{public}d", __FUNCTION__, timerCfg.updateAtHour, timerCfg.updateAtMin);
+        HILOG_INFO("[%{public}s]add at timer:%{public}d,%{public}d",
+            __FUNCTION__, timerCfg.updateAtHour, timerCfg.updateAtMin);
         FormTimerMgr::GetInstance().AddFormTimer(formId, timerCfg.updateAtHour,
             timerCfg.updateAtMin, record.providerUserId);
     }
@@ -650,7 +652,8 @@ void FormEventUtil::BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, 
         int result = FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, moduleName,
             formIds, userId);
         if (result != ERR_OK) {
-            HILOG_ERROR("[%{public}s]NotifyProviderFormsBatchDelete fail bundle:%{public}s ability:%{public}s", __FUNCTION__,
+            HILOG_ERROR("[%{public}s]NotifyProviderFormsBatchDelete fail bundle:%{public}s ability:%{public}s",
+                __FUNCTION__,
                 bundleName.c_str(), abilityName.c_str());
             for (int64_t formId : formIds) {
                 FormDBInfo dbInfo;

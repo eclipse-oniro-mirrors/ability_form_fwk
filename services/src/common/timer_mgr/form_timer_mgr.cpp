@@ -150,7 +150,8 @@ bool FormTimerMgr::AddFormTimerForMultiUpdate(int64_t formId, std::vector<std::v
         }
         if (time[0] < Constants::MIN_TIME || time[0] > Constants::MAX_HOUR ||
             time[1] < Constants::MIN_TIME || time[1] > Constants::MAX_MINUTE) {
-            HILOG_ERROR("[%{public}s]Invalid time value,hour:%{public}d,min:%{public}d", __FUNCTION__, (int)time[0], (int)time[1]);
+            HILOG_ERROR("[%{public}s]Invalid time value,hour:%{public}d,min:%{public}d",
+                __FUNCTION__, (int)time[0], (int)time[1]);
             return false;
         }
         FormTimer timerTask(formId, time[0], time[1], userId);
@@ -335,7 +336,8 @@ bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerC
         }
         if (time[0] < Constants::MIN_TIME || time[0] > Constants::MAX_HOUR ||
             time[1] < Constants::MIN_TIME || time[1] > Constants::MAX_MINUTE) {
-            HILOG_ERROR("[%{public}s]Invalid time value,hour:%{public}d,min:%{public}d", __FUNCTION__, (int)time[0], (int)time[1]);
+            HILOG_ERROR("[%{public}s]Invalid time value,hour:%{public}d,min:%{public}d",
+                __FUNCTION__, (int)time[0], (int)time[1]);
             return false;
         }
     }
@@ -608,7 +610,8 @@ bool FormTimerMgr::AddIntervalTimer(const FormTimer &task)
         std::lock_guard<std::mutex> lock(intervalMutex_);
         EnsureInitIntervalTimer();
         if (intervalTimerTasks_.find(task.formId) != intervalTimerTasks_.end()) {
-            HILOG_WARN("[%{public}s]already exist formTimer,formId:%{public}" PRId64 " task", __FUNCTION__, task.formId);
+            HILOG_WARN("[%{public}s]already exist formTimer,formId:%{public}" PRId64 " task",
+                __FUNCTION__, task.formId);
             return true;
         }
         intervalTimerTasks_.emplace(task.formId, task);
@@ -1347,7 +1350,8 @@ void FormTimerMgr::EnsureInitIntervalTimer()
     // 2. Create Timer and get TimerId
     intervalTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
     int64_t timeInSec = Common::FormTimeUtil::GetBootTimeMs();
-    HILOG_INFO("[%{public}s]TimerId:%{public}" PRId64 ", timeInSec:%{public}" PRId64 ", interval:%{public}" PRId64, __FUNCTION__,
+    HILOG_INFO("[%{public}s]TimerId:%{public}" PRId64 ", timeInSec:%{public}" PRId64 ", interval:%{public}" PRId64,
+        __FUNCTION__,
         intervalTimerId_, timeInSec, interval);
 
     // 3. Start Timer
@@ -1384,7 +1388,8 @@ bool FormTimerMgr::StartFormCheckTimer()
         return false;
     }
     int64_t timeInSec = Common::FormTimeUtil::GetBootTimeMs();
-    HILOG_INFO("[%{public}s]TimerId:%{public}" PRId64 " timeInSec:%{public}" PRId64 " interval:%{public}" PRId64, __FUNCTION__,
+    HILOG_INFO("[%{public}s]TimerId:%{public}" PRId64 " timeInSec:%{public}" PRId64 " interval:%{public}" PRId64,
+        __FUNCTION__,
         formCheckTimerId_, timeInSec, interval);
     int64_t startTime = timeInSec + interval;
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(formCheckTimerId_,
@@ -1428,7 +1433,8 @@ void FormTimerMgr::FormPeriodReport()
     timerOption->SetCallbackInfo(timeCallback);
     limiterTimerReportId_.store(MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption));
     int64_t timeInSec = Common::FormTimeUtil::GetBootTimeMs();
-    HILOG_INFO("[%{public}s]TimerId:%{public}" PRId64 ", timeInSec:%{public}" PRId64 ", interval:%{public}" PRId64 ".", __FUNCTION__,
+    HILOG_INFO("[%{public}s]TimerId:%{public}" PRId64 ", timeInSec:%{public}" PRId64 ", interval:%{public}" PRId64 ".",
+        __FUNCTION__,
         limiterTimerReportId_.load(), timeInSec, interval);
     int64_t startTime = timeInSec + interval;
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(limiterTimerReportId_.load(),
@@ -1461,7 +1467,8 @@ void FormTimerMgr::StartDiskUseInfoReportTimer()
         return;
     }
     int64_t timeInSec = Common::FormTimeUtil::GetBootTimeMs();
-    HILOG_INFO("[%{public}s]TimerId:%{public}" PRId64 ", timeInSec:%{public}" PRId64 ", interval:%{public}" PRId64 ".", __FUNCTION__,
+    HILOG_INFO("[%{public}s]TimerId:%{public}" PRId64 ", timeInSec:%{public}" PRId64 ", interval:%{public}" PRId64 ".",
+        __FUNCTION__,
         reportDiskUseTimerId_.load(), timeInSec, interval);
     int64_t startTime = timeInSec + interval;
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(reportDiskUseTimerId_.load(),

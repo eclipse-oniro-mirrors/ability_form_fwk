@@ -80,7 +80,8 @@ bool FormRenderMgr::GetIsVerified() const
 ErrCode FormRenderMgr::RenderForm(
     const FormRecord &formRecord, const WantParams &wantParams, const sptr<IRemoteObject> &hostToken)
 {
-    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", formUserId:%{public}d", __FUNCTION__, formRecord.formId, formRecord.userId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", formUserId:%{public}d",
+        __FUNCTION__, formRecord.formId, formRecord.userId);
     GetFormRenderState(formRecord.userId);
     HILOG_INFO("the current user authentication status:%{public}d,%{public}d",
         isVerified_.load(), isScreenUnlocked_.load());
@@ -125,7 +126,8 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
     FormRecord formRecord;
     bool isGetFormRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!isGetFormRecord) {
-        HILOG_ERROR("[%{public}s]get FormRecord fail,not exist such form,formId:%{public}" PRId64 "", __FUNCTION__, formId);
+        HILOG_ERROR("[%{public}s]get FormRecord fail,not exist such form,formId:%{public}" PRId64 "",
+            __FUNCTION__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     int32_t formUserId = formRecord.userId;
@@ -472,7 +474,8 @@ ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &wan
 
 ErrCode FormRenderMgr::ReleaseRenderer(int64_t formId, const FormRecord &formRecord, const std::string &compId)
 {
-    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", formUserId:%{public}d", __FUNCTION__, formId, formRecord.userId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", formUserId:%{public}d",
+        __FUNCTION__, formId, formRecord.userId);
     if (formRecord.privacyLevel > 0) {
         std::shared_ptr<FormSandboxRenderMgrInner> sandboxInner;
         if (!GetFormSandboxMgrInner(formRecord.userId, sandboxInner)) {
@@ -509,7 +512,8 @@ ErrCode FormRenderMgr::AddConnection(
 
 void FormRenderMgr::RemoveConnection(int64_t formId, const FormRecord &formRecord)
 {
-    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", formUserId:%{public}d", __FUNCTION__, formId, formRecord.userId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", formUserId:%{public}d",
+        __FUNCTION__, formId, formRecord.userId);
     if (formRecord.privacyLevel > 0) {
         std::shared_ptr<FormSandboxRenderMgrInner> sandboxInner;
         if (GetFormSandboxMgrInner(formRecord.userId, sandboxInner)) {
@@ -654,10 +658,12 @@ bool FormRenderMgr::IsRerenderForRenderServiceDied(int64_t formId)
     FormRecord formRecord;
     bool isGetFormRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!isGetFormRecord) {
-        HILOG_ERROR("[%{public}s]get FormRecord fail,not exist such form,formId:%{public}" PRId64 "", __FUNCTION__, formId);
+        HILOG_ERROR("[%{public}s]get FormRecord fail,not exist such form,formId:%{public}" PRId64 "",
+            __FUNCTION__, formId);
         return true;
     }
-    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", formUserId:%{public}d", __FUNCTION__, formId, formRecord.userId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", formUserId:%{public}d",
+        __FUNCTION__, formId, formRecord.userId);
     std::shared_ptr<FormRenderMgrInner> renderInner;
     if (GetFormRenderMgrInner(formRecord.userId, renderInner)) {
         rerenderCount = renderInner->GetReRenderCount();

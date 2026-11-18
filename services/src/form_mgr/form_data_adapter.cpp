@@ -430,7 +430,8 @@ void FormDataAdapter::UpdateFormRenderParam(const int64_t formId, const sptr<IRe
         formUpgradeInfo.transparencyColor.clear();
         FormDataMgr::GetInstance().DelHostTransparentFormColor(formId);
     }
-    HILOG_INFO("[%{public}s]FormId:%{public}" PRId64 " curTransparencyColor: %{public}s, cacheTransparencyColor: %{public}s", __FUNCTION__,
+    HILOG_INFO("[%{public}s]FormId:%{public}" PRId64 " curTransparencyColor: %{public}s, cacheTransparencyColor: %{public}s",
+        __FUNCTION__,
         formId, curTransparencyColor.c_str(), cacheTransparencyColor.c_str());
     FormDataMgr::GetInstance().UpdateFormUpgradeInfo(formId, formUpgradeInfo);
 

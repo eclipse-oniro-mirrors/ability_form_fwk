@@ -326,7 +326,8 @@ void GetFormsInfo([[maybe_unused]] ani_env *env, ani_object callback, ani_object
         ani_status status = env->Object_CallMethodByName_Void(formInfosArray, ANI_SETTER_MARKER,
             PROVIDER_SET_SIGNATURE, index, formInfoAni);
         if (status != ANI_OK) {
-            HILOG_ERROR("[%{public}s]Object_CallMethodByName_Void failed,error code:%{public}d", __FUNCTION__, static_cast<int>(status));
+            HILOG_ERROR("[%{public}s]Object_CallMethodByName_Void failed,error code:%{public}d",
+                __FUNCTION__, static_cast<int>(status));
             InvokeAsyncWithBusinessError(env, callback, ERR_APPEXECFWK_FORM_COMMON_CODE, nullptr);
             return;
         }
@@ -754,7 +755,8 @@ void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
         ani_status status = env->Object_CallMethodByName_Void(
             formInfosArray, ANI_SETTER_MARKER, PROVIDER_SET_SIGNATURE, index, runningFormInfoAni);
         if (status != ANI_OK) {
-            HILOG_ERROR("[%{public}s]Object_CallMethodByName_Void failed,error code:%{public}d", __FUNCTION__, static_cast<int>(status));
+            HILOG_ERROR("[%{public}s]Object_CallMethodByName_Void failed,error code:%{public}d",
+                __FUNCTION__, static_cast<int>(status));
         }
         index++;
     }

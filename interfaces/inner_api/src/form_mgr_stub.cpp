@@ -3137,7 +3137,8 @@ ErrCode FormMgrStub::HandleUpdateFormsConfig(MessageParcel &data, MessageParcel 
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (size <= 0 || size > Constants::UPDATE_FORM_CONFIG_MAX_NUM) {
-        HILOG_ERROR("[%{public}s]invalid size:%{public}d,max:%{public}d", __FUNCTION__, size, Constants::UPDATE_FORM_CONFIG_MAX_NUM);
+        HILOG_ERROR("[%{public}s]invalid size:%{public}d,max:%{public}d",
+            __FUNCTION__, size, Constants::UPDATE_FORM_CONFIG_MAX_NUM);
         if (!reply.WriteInt32(ERR_APPEXECFWK_FORM_COMMON_CODE)) {
             HILOG_ERROR("[%{public}s]write error code failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -3202,7 +3203,8 @@ ErrCode FormMgrStub::HandleDeleteForms(MessageParcel &data, MessageParcel &reply
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (size <= 0 || size > Constants::DELETE_FORMS_FILTER_MAX_NUM) {
-        HILOG_ERROR("[%{public}s]invalid size:%{public}d,max:%{public}d", __FUNCTION__, size, Constants::DELETE_FORMS_FILTER_MAX_NUM);
+        HILOG_ERROR("[%{public}s]invalid size:%{public}d,max:%{public}d",
+            __FUNCTION__, size, Constants::DELETE_FORMS_FILTER_MAX_NUM);
         if (!reply.WriteInt32(ERR_APPEXECFWK_FORM_INVALID_PARAM)) {
             HILOG_ERROR("[%{public}s]write error code failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;

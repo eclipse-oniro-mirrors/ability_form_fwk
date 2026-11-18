@@ -1307,7 +1307,8 @@ int32_t FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &form
         bool isNeedUpdate = false;
         auto lastReleasedFormRequest = formRequests.begin();
         for (auto iter = formRequests.begin(); iter != formRequests.end(); ++iter) {
-            HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", compId: %{public}s, hasRelease: %{public}d.", __FUNCTION__,
+            HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", compId: %{public}s, hasRelease: %{public}d.",
+                __FUNCTION__,
                 form.formId, iter->first.c_str(), iter->second.hasRelease);
             if (!iter->second.hasRelease) {
                 continue;

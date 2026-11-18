@@ -77,7 +77,8 @@ public:
         } else if (type == "router" || type == "message" || type == "call") {
             OnRegisterClickEventCallback(env, type, aniHostBundleName, callback);
         } else {
-            HILOG_ERROR("[%{public}s]args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call",
+                __FUNCTION__);
             EtsFormErrorUtil::ThrowParamTypeError(env, "type",
                 "formAdd, formRemove, notifyVisible, notifyInvisible, router, message, call.");
             return;
@@ -116,7 +117,8 @@ public:
         } else if (type == "router" || type == "message" || type == "call") {
             return OnUnregisterClickEventCallback(env, type, aniHostBundleName, callback);
         } else {
-            HILOG_ERROR("[%{public}s]args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call",
+                __FUNCTION__);
             EtsFormErrorUtil::ThrowParamTypeError(env, "type",
                 "args[0] should be formAdd, formRemove,"
                 "notifyVisible, notifyInvisible, router, message, call");

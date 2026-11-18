@@ -334,7 +334,8 @@ void FormAmsHelper::UnRegisterAllConfigurationObservers()
         }
         AppMgrResultCode resCode = appMgrClient->UnregisterConfigurationObserver(item.second);
         if (resCode != AppMgrResultCode::RESULT_OK) {
-            HILOG_ERROR("[%{public}s]UnregisterConfigurationObserver failed,userId:%{public}d", __FUNCTION__, item.first);
+            HILOG_ERROR("[%{public}s]UnregisterConfigurationObserver failed,userId:%{public}d",
+                __FUNCTION__, item.first);
         }
     }
     HILOG_INFO("end");

@@ -233,7 +233,8 @@ int FormQueryAdapter::AcquireFormState(const Want &want, const sptr<IRemoteObjec
     FormItemInfo info;
     FormDataMgr::GetInstance().CreateFormStateRecord(provider, info, callerToken, callingUid);
 
-    HILOG_DEBUG("[%{public}s]bundleName:%{public}s,abilityName:%{public}s,moduleName:%{public}s", __FUNCTION__, bundleName.c_str(),
+    HILOG_DEBUG("[%{public}s]bundleName:%{public}s,abilityName:%{public}s,moduleName:%{public}s",
+        __FUNCTION__, bundleName.c_str(),
         abilityName.c_str(), moduleName.c_str());
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     sptr<IAbilityConnection> connection =

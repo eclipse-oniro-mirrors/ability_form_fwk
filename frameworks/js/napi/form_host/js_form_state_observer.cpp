@@ -379,7 +379,8 @@ int JsFormStateObserver::RegisterFormInstanceCallback(napi_env env, napi_value j
     if (isVisibility) {
         auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
         if (visibleCallback != formVisibleCallbackMap_.end()) {
-            HILOG_ERROR("[%{public}s]bundleName is already in the map,bundleName id %{public}s", __FUNCTION__, bundleName.c_str());
+            HILOG_ERROR("[%{public}s]bundleName is already in the map,bundleName id %{public}s",
+                __FUNCTION__, bundleName.c_str());
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
         napi_status refStatus = napi_create_reference(env, jsObserverObject, 1, &ref);
@@ -392,7 +393,8 @@ int JsFormStateObserver::RegisterFormInstanceCallback(napi_env env, napi_value j
     } else {
         auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
         if (invisibleCallback != formInvisibleCallbackMap_.end()) {
-            HILOG_ERROR("[%{public}s]bundleName is already in the map,bundleName id %{public}s", __FUNCTION__, bundleName.c_str());
+            HILOG_ERROR("[%{public}s]bundleName is already in the map,bundleName id %{public}s",
+                __FUNCTION__, bundleName.c_str());
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
         napi_status refStatus = napi_create_reference(env, jsObserverObject, 1, &ref);

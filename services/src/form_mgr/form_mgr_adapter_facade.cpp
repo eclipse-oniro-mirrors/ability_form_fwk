@@ -367,7 +367,8 @@ int FormMgrAdapterFacade::AcquireFormState(const Want &want, const sptr<IRemoteO
 int FormMgrAdapterFacade::AcquireFormData(int64_t formId, int64_t requestCode,
     const sptr<IRemoteObject> &callerToken, AAFwk::WantParams &formData)
 {
-    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", requestCode:%{public}" PRId64, __FUNCTION__, formId, requestCode);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", requestCode:%{public}" PRId64,
+        __FUNCTION__, formId, requestCode);
     return FormQueryAdapter::GetInstance().AcquireFormData(formId, requestCode, callerToken, formData);
 }
 

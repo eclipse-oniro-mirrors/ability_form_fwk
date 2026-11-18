@@ -203,7 +203,8 @@ ErrCode FormLifecycleAdapter::AddExistFormRecord(const FormItemInfo &info, const
     int callingUid = IPCSkeleton::GetCallingUid();
     bool isCreated = FormDataMgr::GetInstance().AllotFormHostRecord(info, callerToken, formId, callingUid);
     if (!isCreated) {
-        HILOG_ERROR("[%{public}s]AllotFormHostRecord failed when no matched formRecord,formId:%{public}" PRId64, __FUNCTION__, formId);
+        HILOG_ERROR("[%{public}s]AllotFormHostRecord failed when no matched formRecord,formId:%{public}" PRId64,
+            __FUNCTION__, formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -230,7 +231,8 @@ ErrCode FormLifecycleAdapter::AddExistFormRecord(const FormItemInfo &info, const
         // acquire formInfo from provider
         ErrCode errorCode = FormDataAdapter::GetInstance().AcquireProviderFormInfoAsync(formId, info, wantParams);
         if (errorCode != ERR_OK) {
-            HILOG_ERROR("[%{public}s]AcquireProviderFormInfoAsync failed,formId:%{public}" PRId64, __FUNCTION__, formId);
+            HILOG_ERROR("[%{public}s]AcquireProviderFormInfoAsync failed,formId:%{public}" PRId64,
+                __FUNCTION__, formId);
             return errorCode;
         }
     } else if (newRecord.isLocationChange) {
@@ -420,7 +422,8 @@ ErrCode FormLifecycleAdapter::HandleDeleteForm(const int64_t formId, const sptr<
     bool isSelfDbFormId = (userId == dbRecord.providerUserId) && ((std::find(dbRecord.formUserUids.begin(),
         dbRecord.formUserUids.end(), callingUid) != dbRecord.formUserUids.end()) ? true : false);
     if (!isSelfDbFormId) {
-        HILOG_ERROR("[%{public}s]not self form:%{public}" PRId64 ", callingUid:%{public}d", __FUNCTION__, formId, callingUid);
+        HILOG_ERROR("[%{public}s]not self form:%{public}" PRId64 ", callingUid:%{public}d",
+            __FUNCTION__, formId, callingUid);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
@@ -1159,7 +1162,8 @@ int32_t FormLifecycleAdapter::RecoverForms(const std::vector<int64_t> &formIds, 
         }
         if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
             record.formUserUids.end() && !IsFormRenderServiceCall(callingUid)) {
-            HILOG_WARN("[%{public}s]form %{public}" PRId64 " not owned by %{public}d", __FUNCTION__, formId, callingUid);
+            HILOG_WARN("[%{public}s]form %{public}" PRId64 " not owned by %{public}d",
+                __FUNCTION__, formId, callingUid);
             continue;
         }
 
@@ -1403,7 +1407,8 @@ ErrCode FormLifecycleAdapter::AddNewFormRecord(const FormItemInfo &info, const i
     // allot form host record
     int callingUid = IPCSkeleton::GetCallingUid();
     if (!FormDataMgr::GetInstance().AllotFormHostRecord(newInfo, callerToken, formId, callingUid)) {
-        HILOG_ERROR("[%{public}s]AllotFormHostRecord failed when no matched formRecord,formId:%{public}" PRId64, __FUNCTION__, formId);
+        HILOG_ERROR("[%{public}s]AllotFormHostRecord failed when no matched formRecord,formId:%{public}" PRId64,
+            __FUNCTION__, formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 

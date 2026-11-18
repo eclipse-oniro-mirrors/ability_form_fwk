@@ -72,7 +72,8 @@ void FormRenderTaskMgr::PostSetVisibleChange(int64_t formId, bool isVisible, con
         FormRenderTaskMgr::GetInstance().SetVisibleChange(formId, isVisible, remoteObject);
     };
     FormRenderQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, task);
-    HILOG_INFO("[%{public}s]start task formId:%{public}" PRId64 " isVisible:%{public}d", __FUNCTION__, formId, isVisible);
+    HILOG_INFO("[%{public}s]start task formId:%{public}" PRId64 " isVisible:%{public}d",
+        __FUNCTION__, formId, isVisible);
 }
 
 void FormRenderTaskMgr::PostReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,

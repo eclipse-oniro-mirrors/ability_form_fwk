@@ -3679,7 +3679,8 @@ bool EtsFormRouterProxyMgr::RequestFormWantsInner(const std::vector<AppExecFwk::
         }
         ani_status status = env->GlobalReference_Create(formWantCallbackRef_, &callbackRef);
         if (status != ANI_OK) {
-            HILOG_ERROR("[%{public}s]GlobalReference_Create failed status:%{public}d", __FUNCTION__, static_cast<int>(status));
+            HILOG_ERROR("[%{public}s]GlobalReference_Create failed status:%{public}d",
+                __FUNCTION__, static_cast<int>(status));
             return false;
         }
     }
@@ -3773,7 +3774,8 @@ bool EtsFormRouterProxyMgr::UpdateFormsConfigCallbackInner(
         }
         ani_status status = env->GlobalReference_Create(updateFormsConfigCallbackRef_, &callbackRef);
         if (status != ANI_OK) {
-            HILOG_ERROR("[%{public}s]GlobalReference_Create failed status:%{public}d", __FUNCTION__, static_cast<int>(status));
+            HILOG_ERROR("[%{public}s]GlobalReference_Create failed status:%{public}d",
+                __FUNCTION__, static_cast<int>(status));
             return false;
         }
     }
@@ -3851,7 +3853,8 @@ bool EtsFormRouterProxyMgr::GetFormCustomConfigAniArray(ani_env *env,
         FormAniUtil::SetPropertyBoolByName(env, object, "isRepeatAdditionSupported", config.isRepeatAdditionSupported);
         ani_status status = env->Array_Set(configArray, i, static_cast<ani_ref>(object));
         if (status != ANI_OK) {
-            HILOG_ERROR("[%{public}s]Array_Set failed at index %{public}zu,status:%{public}d", __FUNCTION__, i, static_cast<int>(status));
+            HILOG_ERROR("[%{public}s]Array_Set failed at index %{public}zu,status:%{public}d",
+                __FUNCTION__, i, static_cast<int>(status));
             return false;
         }
     }
@@ -3975,7 +3978,8 @@ bool EtsFormRouterProxyMgr::DeleteFormsCallbackInner(const std::vector<std::stri
         }
         ani_status status = env->GlobalReference_Create(deleteFormsCallbackRef_, &callbackRef);
         if (status != ANI_OK) {
-            HILOG_ERROR("[%{public}s]GlobalReference_Create failed status:%{public}d", __FUNCTION__, static_cast<int>(status));
+            HILOG_ERROR("[%{public}s]GlobalReference_Create failed status:%{public}d",
+                __FUNCTION__, static_cast<int>(status));
             return false;
         }
     }
@@ -4007,7 +4011,8 @@ bool EtsFormRouterProxyMgr::CreateAniStringArray(ani_env *env,
             return false;
         }
         if ((status = env->Array_Set(strArray, i, static_cast<ani_ref>(aniStr))) != ANI_OK) {
-            HILOG_ERROR("[%{public}s]Array_Set failed at index %{public}zu,status:%{public}d", __FUNCTION__, i, static_cast<int>(status));
+            HILOG_ERROR("[%{public}s]Array_Set failed at index %{public}zu,status:%{public}d",
+                __FUNCTION__, i, static_cast<int>(status));
             return false;
         }
     }
