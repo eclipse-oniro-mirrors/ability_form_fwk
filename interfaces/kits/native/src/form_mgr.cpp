@@ -987,7 +987,7 @@ void FormMgr::FormMgrDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &rem
     }
 
     int expected = Constants::NOT_IN_RECOVERY;
-    if (!isRecovering_.compare_exchange_strong(expected, Constants::IN_RECOVERING)) {
+    if (!recoverStatus_.compare_exchange_strong(expected, Constants::IN_RECOVERING)) {
         HILOG_WARN("fms in recovering, another thread owns the recover token");
         return;
     }
