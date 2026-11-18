@@ -129,9 +129,9 @@ static std::string GetStringByProp(napi_env env, napi_value value, const std::st
 
 static void InnerRequestPublishForm(napi_env env, AsyncRequestPublishFormCallbackInfo *const asyncCallbackInfo)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called", __func__);
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("%{public}s error,form is in recover status,can't do action on form", __func__);
         asyncCallbackInfo->result = ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
         return;
     }

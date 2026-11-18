@@ -340,7 +340,7 @@ int FormMgr::UpdateForm(const int64_t formId, const FormProviderInfo &formProvid
  */
 int FormMgr::UpdateFormCrossBundle(const int64_t formId, const FormProviderData &formBindingData)
 {
-    HILOG_INFO("call, formId:%{public}" PRId64, formId);
+    HILOG_INFO("call,formId:%{public}" PRId64, formId);
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("UpdateFormCrossBundle failed,form is in recover status");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
