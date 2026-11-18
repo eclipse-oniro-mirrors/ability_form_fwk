@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_PARAM_MANAGER_H
 #define OHOS_FORM_FWK_PARAM_MANAGER_H
 
+#include <mutex>
 #include <singleton.h>
 #include <string>
 
@@ -31,8 +32,8 @@ class ParamManager final : public DelayedRefSingleton<ParamManager> {
 public:
     DISALLOW_COPY_AND_MOVE(ParamManager);
     void InitParam();
-    const std::string &GetParamStr();
-    const std::string &GetParamVersion();
+    std::string GetParamStr();
+    std::string GetParamVersion();
 
 private:
     void ReloadParam(const std::string &versionStr, const std::string path);
@@ -42,6 +43,7 @@ private:
     void SaveParamStr(const std::string &paramStr);
     bool VersionStrToNumber(const std::string &versionStr, long long &versionNum);
     
+    std::mutex paramMutex_;
     std::string g_paramStr;
     std::string g_currentVersion;
 };

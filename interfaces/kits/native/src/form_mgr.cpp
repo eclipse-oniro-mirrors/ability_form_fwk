@@ -340,7 +340,7 @@ int FormMgr::UpdateForm(const int64_t formId, const FormProviderInfo &formProvid
  */
 int FormMgr::UpdateFormCrossBundle(const int64_t formId, const FormProviderData &formBindingData)
 {
-    HILOG_INFO("call,formId:%{public}" PRId64, formId);
+    HILOG_INFO("call, formId:%{public}" PRId64, formId);
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("UpdateFormCrossBundle failed,form is in recover status");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
@@ -986,8 +986,9 @@ void FormMgr::FormMgrDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &rem
         return;
     }
 
-    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_WARN("fms in recovering");
+    int expected = Constants::NOT_IN_RECOVERY;
+    if (!isRecovering_.compare_exchange_strong(expected, Constants::IN_RECOVERING)) {
+        HILOG_WARN("fms in recovering, another thread owns the recover token");
         return;
     }
     // Reset proxy
@@ -1014,7 +1015,7 @@ void FormMgr::Reconnect()
     auto systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemManager == nullptr) {
         HILOG_ERROR("get system ability manager failed");
-        FormMgr::SetRecoverStatus(Constants::RECOVER_FAIL);
+        FormMgr::SetRecoverStatus(Constants::NOT_IN_RECOVERY);
         return;
     }
     if (loadCallback_ == nullptr) {
@@ -1022,13 +1023,13 @@ void FormMgr::Reconnect()
     }
     if (loadCallback_ == nullptr) {
         HILOG_ERROR("null loadCallback_");
-        FormMgr::SetRecoverStatus(Constants::RECOVER_FAIL);
+        FormMgr::SetRecoverStatus(Constants::NOT_IN_RECOVERY);
         return;
     }
     int32_t ret = systemManager->LoadSystemAbility(FORM_MGR_SERVICE_ID, loadCallback_);
     if (ret != ERR_OK) {
-        HILOG_ERROR("request fms load failed,ret:%{public}d", ret);
-        FormMgr::SetRecoverStatus(Constants::RECOVER_FAIL);
+        HILOG_ERROR("request fms load failed, ret:%{public}d", ret);
+        FormMgr::SetRecoverStatus(Constants::NOT_IN_RECOVERY);
     }
 }
 
@@ -1067,7 +1068,7 @@ void FormMgr::OnFmsLoaded(const sptr<IRemoteObject> &remoteObject)
 void FormMgr::OnFmsLoadFail()
 {
     HILOG_ERROR("load fms failed");
-    FormMgr::SetRecoverStatus(Constants::RECOVER_FAIL);
+    FormMgr::SetRecoverStatus(Constants::NOT_IN_RECOVERY);
 }
 
 bool FormMgr::IsRemoteProxyValid()
@@ -1144,11 +1145,9 @@ void FormMgr::ResetProxy(const wptr<IRemoteObject> &remote)
     std::lock_guard<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
+        FormMgr::SetRecoverStatus(Constants::NOT_IN_RECOVERY);
         return;
     }
-
-    // set formMgr's recover status to IN_RECOVERING.
-    SetRecoverStatus(Constants::IN_RECOVERING);
 
     // remove the death recipient
     auto serviceRemote = remoteProxy_->AsObject();

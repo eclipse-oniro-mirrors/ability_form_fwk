@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_TIMER_MGR_H
 #define OHOS_FORM_FWK_FORM_TIMER_MGR_H
 
+#include <atomic>
 #include <list>
 #include <map>
 #include <mutex>
@@ -408,7 +409,7 @@ private:
     std::list<DynamicRefreshItem> dynamicRefreshTasks_;
     std::shared_ptr<TimerReceiver> systemTimerEventReceiver_ = nullptr;
     std::shared_ptr<TimerReceiver> customTimerEventReceiver_ = nullptr;
-    int32_t timeSpeed_ = 1;
+    std::atomic<int32_t> timeSpeed_ {1};
 
     uint64_t intervalTimerId_ = 0L;
     uint64_t updateAtTimerId_ = 0L;

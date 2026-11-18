@@ -38,29 +38,21 @@ FormRenderStatusMgr::~FormRenderStatusMgr()
 int32_t FormRenderStatusMgr::PostFormEvent(
     const int64_t formId, const FormFsmEvent event, std::function<int32_t()> func)
 {
-    // get status machine info
-    if (!FormRenderStatus::GetInstance().HasFormStatus(formId)) {
-        HILOG_INFO("create new status");
-        FormRenderStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::INIT);
-    }
-    FormFsmStatus status = FormRenderStatus::GetInstance().GetFormStatus(formId);
-
     FormRenderStatusMachineInfo info;
-    if (!FormRenderStatusTable::GetInstance().GetFormStatusInfo(status, event, info)) {
+    // The transition is applied atomically; func runs outside the status lock
+    // because it may re-enter PostFormEvent (non-recursive lock).
+    if (!FormRenderStatus::GetInstance().TransitionFormStatus(formId, event, info)) {
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
 
     HILOG_INFO("formId:%{public}" PRId64 ", status is %{public}s, event is %{public}s, nextStatus is %{public}s.",
         formId,
-        FormStatusPrint::FormStatusToString(status).c_str(),
+        FormStatusPrint::FormStatusToString(info.curStatus).c_str(),
         FormStatusPrint::FormEventToString(event).c_str(),
         FormStatusPrint::FormStatusToString(info.nextStatus).c_str());
 
-    // state machine switches to the next state.
-    FormRenderStatus::GetInstance().SetFormStatus(formId, info.nextStatus);
-
     // state machine excute
-    return ExecFormTask(info.processType, formId, event, status, func);
+    return ExecFormTask(info.processType, formId, event, info.curStatus, func);
 }
 
 int32_t FormRenderStatusMgr::ExecFormTask(FormFsmProcessType processType, const int64_t formId,

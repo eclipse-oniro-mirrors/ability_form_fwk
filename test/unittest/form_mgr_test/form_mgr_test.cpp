@@ -1412,7 +1412,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0071, TestSize.Level1) {
 
 /**
  * @tc.name: FormMgrTest_0073
- * @tc.desc: Verify Reconnect sets recover status to RECOVER_FAIL when samgr rejects the load request
+ * @tc.desc: Verify Reconnect sets recover status to NOT_IN_RECOVERY when samgr rejects the load request
  * @tc.type: FUNC
  * @tc.require: issueI63Y7Y
  */
@@ -1422,7 +1422,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0073, TestSize.Level1) {
     sptr<ISystemAbilityManager> backupSamgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = failSamgr;
     FormMgr::GetInstance().Reconnect();
-    EXPECT_EQ(FormMgr::GetRecoverStatus(), Constants::RECOVER_FAIL);
+    EXPECT_EQ(FormMgr::GetRecoverStatus(), Constants::NOT_IN_RECOVERY);
     SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = backupSamgr;
     FormMgr::SetRecoverStatus(Constants::NOT_IN_RECOVERY);
     GTEST_LOG_(INFO) << "FormMgrTest_0073 test ends";
@@ -3487,7 +3487,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0194, TestSize.Level1)
     SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = failSamgr;
     FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
     formMgrDeath->OnRemoteDied(mockFormProviderClient);
-    EXPECT_TRUE(FormMgr::GetInstance().GetRecoverStatus() == Constants::RECOVER_FAIL);
+    EXPECT_TRUE(FormMgr::GetInstance().GetRecoverStatus() == Constants::NOT_IN_RECOVERY);
     SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = backupSamgr;
     GTEST_LOG_(INFO) << "FormMgrTest_0194 test ends";
 }

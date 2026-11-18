@@ -87,9 +87,10 @@ bool FormTimerMgr::AddFormTimer(const FormTimer &task)
             return false;
         }
     } else {
-        if (task.period >= (Constants::MIN_PERIOD / timeSpeed_) && // Min period is 30 minutes
-            task.period <= (Constants::MAX_PERIOD / timeSpeed_) && // Max period is 1 week
-            task.period % (Constants::MIN_PERIOD / timeSpeed_) == 0) {
+        const int32_t speed = timeSpeed_.load();
+        if (task.period >= (Constants::MIN_PERIOD / speed) && // Min period is 30 minutes
+            task.period <= (Constants::MAX_PERIOD / speed) && // Max period is 1 week
+            task.period % (Constants::MIN_PERIOD / speed) == 0) {
             return AddIntervalTimer(task);
         } else {
             HILOG_ERROR("invalid intervalTime");
@@ -106,7 +107,7 @@ bool FormTimerMgr::AddFormTimer(const FormTimer &task)
  */
 bool FormTimerMgr::AddFormTimer(int64_t formId, long updateDuration, int32_t userId)
 {
-    auto duration = updateDuration / timeSpeed_;
+    auto duration = updateDuration / timeSpeed_.load();
     HILOG_INFO("formId:%{public}s duration:%{public}s",
         std::to_string(formId).c_str(), std::to_string(duration).c_str());
     FormTimer timerTask(formId, duration, userId);
@@ -254,7 +255,7 @@ bool FormTimerMgr::UpdateIntervalValue(int64_t formId, const FormTimerCfg &timer
     std::lock_guard<std::mutex> lock(intervalMutex_);
     auto intervalTask = intervalTimerTasks_.find(formId);
     if (intervalTask != intervalTimerTasks_.end()) {
-        intervalTask->second.period = timerCfg.updateDuration / timeSpeed_;
+        intervalTask->second.period = timerCfg.updateDuration / timeSpeed_.load();
         return true;
     } else {
         HILOG_ERROR("intervalTimer not exist");
@@ -493,7 +494,7 @@ bool FormTimerMgr::SetNextRefreshTime(int64_t formId, long nextGapTime, int32_t 
         return false;
     }
     int64_t timeInSec = Common::FormTimeUtil::GetBootTimeMs();
-    int64_t refreshTime = timeInSec + nextGapTime * Constants::MS_PER_SECOND / timeSpeed_;
+    int64_t refreshTime = timeInSec + nextGapTime * Constants::MS_PER_SECOND / timeSpeed_.load();
     HILOG_INFO("currentTime:%{public}s refreshTime:%{public}s",
         std::to_string(timeInSec).c_str(), std::to_string(refreshTime).c_str());
     bool isExist = false;
@@ -887,7 +888,7 @@ void FormTimerMgr::SetTimeSpeed(int32_t timeSpeed)
 {
     HILOG_INFO("set time speed to:%{public}d", timeSpeed);
     // Enforce documented range; zero or negative speed would cause divide-by-zero in timer calc.
-    timeSpeed_ = std::clamp(timeSpeed, Constants::MIN_TIME_SPEED, Constants::MAX_TIME_SPEED);
+    timeSpeed_.store(std::clamp(timeSpeed, Constants::MIN_TIME_SPEED, Constants::MAX_TIME_SPEED));
     HandleResetLimiter();
     ClearIntervalTimer();
     FormPeriodReport();
@@ -991,7 +992,7 @@ void FormTimerMgr::OnIntervalTimeOut()
             intervalTask.refreshTime, intervalTask.isEnable);
         if (!((currentTime - intervalTask.refreshTime) >= intervalTask.period ||
             std::abs((currentTime - intervalTask.refreshTime) - intervalTask.period) <
-            (Constants::ABS_TIME / timeSpeed_))) {
+            (Constants::ABS_TIME / timeSpeed_.load()))) {
             continue;
         }
 
@@ -1338,7 +1339,7 @@ void FormTimerMgr::EnsureInitIntervalTimer()
       | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
     timerOption->SetType(flag);
     timerOption->SetRepeat(true);
-    int64_t interval = TIMER_UPDATE_INTERVAL / timeSpeed_;
+    int64_t interval = TIMER_UPDATE_INTERVAL / timeSpeed_.load();
     timerOption->SetInterval(interval);
     timerOption->SetName("fms_cyclical_refresh_timer");
     auto timeCallback = []() { FormTimerMgr::GetInstance().OnIntervalTimeOut(); };
@@ -1370,7 +1371,7 @@ bool FormTimerMgr::StartFormCheckTimer()
     }
     auto timerOption = std::make_shared<FormTimerOption>();
     int32_t flag = ((unsigned int)(timerOption->TIMER_TYPE_REALTIME)) | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
-    int64_t interval = CHECK_INTERVAL / timeSpeed_;
+    int64_t interval = CHECK_INTERVAL / timeSpeed_.load();
     timerOption->SetType(flag);
     timerOption->SetRepeat(true);
     timerOption->SetInterval(interval);
@@ -1418,7 +1419,7 @@ void FormTimerMgr::FormPeriodReport()
       | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
     timerOption->SetType(flag);
     timerOption->SetRepeat(true);
-    int64_t interval = Constants::MS_PER_DAY / timeSpeed_;
+    int64_t interval = Constants::MS_PER_DAY / timeSpeed_.load();
     timerOption->SetInterval(interval);
     auto timeCallback = []() {
         FormRecordReport::GetInstance().HandleFormRefreshCount();

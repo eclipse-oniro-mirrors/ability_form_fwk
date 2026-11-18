@@ -928,11 +928,11 @@ void FormMgrService::OnStop()
 
     DelayedSingleton<FormShareMgr>::GetInstance()->UnregisterObserver();
 
-    if (serialQueue_) {
+    // Reset under instanceMutex_ so a concurrent binder-thread read in
+    // InitFormShareMgrSerialQueue cannot copy a torn shared_ptr.
+    {
+        std::lock_guard<std::mutex> lock(instanceMutex_);
         serialQueue_.reset();
-    }
-
-    if (handler_) {
         handler_.reset();
     }
     FormAmsHelper::GetInstance().UnRegisterAllConfigurationObservers();
@@ -1019,16 +1019,21 @@ void FormMgrService::UnsubscribeSystemEvents()
 ErrCode FormMgrService::Init()
 {
     HILOG_INFO("call");
-    serialQueue_ = std::make_shared<FormSerialQueue>(FORM_MGR_SERVICE_QUEUE);
-    if (serialQueue_ == nullptr) {
-        HILOG_ERROR("Init failed,null serialQueue_");
-        return ERR_INVALID_OPERATION;
-    }
+    // Assign under instanceMutex_ so a concurrent binder-thread read in
+    // InitFormShareMgrSerialQueue cannot copy a torn shared_ptr.
+    {
+        std::lock_guard<std::mutex> lock(instanceMutex_);
+        serialQueue_ = std::make_shared<FormSerialQueue>(FORM_MGR_SERVICE_QUEUE);
+        if (serialQueue_ == nullptr) {
+            HILOG_ERROR("Init failed,null serialQueue_");
+            return ERR_INVALID_OPERATION;
+        }
 
-    handler_ = std::make_shared<FormEventHandler>(serialQueue_);
-    if (handler_ == nullptr) {
-        HILOG_ERROR("init failed.null handler_");
-        return ERR_INVALID_OPERATION;
+        handler_ = std::make_shared<FormEventHandler>(serialQueue_);
+        if (handler_ == nullptr) {
+            HILOG_ERROR("init failed.null handler_");
+            return ERR_INVALID_OPERATION;
+        }
     }
     /* Publish service maybe failed, so we need call this function at the last,
      * so it can't affect the TDD test program */
@@ -1527,7 +1532,17 @@ int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
 
 void FormMgrService::InitFormShareMgrSerialQueue()
 {
-    DelayedSingleton<FormShareMgr>::GetInstance()->Initialize(handler_, serialQueue_);
+    // Copy the shared_ptrs under instanceMutex_ so OnStop cannot reset them
+    // mid-copy (torn shared_ptr). Initialize is called outside the lock: its
+    // RegisterEventTimeoutObserver virtual callback may re-enter the service.
+    std::shared_ptr<FormEventHandler> handler;
+    std::shared_ptr<FormSerialQueue> serialQueue;
+    {
+        std::lock_guard<std::mutex> lock(instanceMutex_);
+        handler = handler_;
+        serialQueue = serialQueue_;
+    }
+    DelayedSingleton<FormShareMgr>::GetInstance()->Initialize(handler, serialQueue);
 }
 
 int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,
