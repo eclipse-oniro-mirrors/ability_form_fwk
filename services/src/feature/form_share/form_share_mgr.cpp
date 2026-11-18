@@ -318,28 +318,28 @@ bool FormShareMgr::IsExistFormPackage(const std::string &bundleName, const std::
 void FormShareMgr::RemoveFormShareInfo(const std::string &formShareInfoKey)
 {
     HILOG_DEBUG("call");
-    {
-        std::unique_lock<std::shared_mutex> guard(eventMapMutex_);
-        int64_t eventId = 0;
-        for (auto iter = eventMap_.begin(); iter != eventMap_.end(); iter++) {
-            if (iter->second == formShareInfoKey) {
-                eventId = iter->first;
-                break;
-            }
-        }
+    // Hold both locks so the {eventMap_, shareInfo_} removal is atomic: a concurrent
+    // OnInstallFinished must not read a shareInfo_ entry that this removal is about to
+    // delete. Lock order (shareInfoMapMutex_ then eventMapMutex_) matches
+    // HandleRecvFormShareInfoFromRemoteTask to avoid deadlock.
+    std::unique_lock<std::shared_mutex> shareGuard(shareInfoMapMutex_);
+    std::unique_lock<std::shared_mutex> eventGuard(eventMapMutex_);
 
-        if (eventId != 0) {
-            eventMap_.erase(eventId);
-            if (serialQueue_ != nullptr) {
-                serialQueue_->CancelDelayTask(std::make_pair(MSG::FORM_SHARE_INFO_DELAY_MSG, eventId));
-            }
+    int64_t eventId = 0;
+    for (auto iter = eventMap_.begin(); iter != eventMap_.end(); iter++) {
+        if (iter->second == formShareInfoKey) {
+            eventId = iter->first;
+            break;
         }
     }
 
-    {
-        std::unique_lock<std::shared_mutex> guard(shareInfoMapMutex_);
-        shareInfo_.erase(formShareInfoKey);
+    if (eventId != 0) {
+        eventMap_.erase(eventId);
+        if (serialQueue_ != nullptr) {
+            serialQueue_->CancelDelayTask(std::make_pair(MSG::FORM_SHARE_INFO_DELAY_MSG, eventId));
+        }
     }
+    shareInfo_.erase(formShareInfoKey);
 }
 
 void FormShareMgr::FinishFreeInstallTask(const std::shared_ptr<FormFreeInstallOperator> &freeInstallOperator)

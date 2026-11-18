@@ -51,6 +51,9 @@ ParamManager::~ParamManager()
 void ParamManager::InitParam()
 {
     HILOG_INFO("call");
+    // Hold for the whole body: ReloadParam is only called from here and must not
+    // re-acquire the non-recursive mutex.
+    std::lock_guard<std::mutex> lock(paramMutex_);
     g_paramStr = LoadParamStr();
     g_currentVersion = LoadVersion();
     std::string presetVersion = ParamReader::GetInstance().GetPathVersion(PARAM_PRESET_PATH);
@@ -85,13 +88,15 @@ void ParamManager::InitParam()
     ParamControl::GetInstance().DealDueParam(g_paramStr);
 }
 
-const std::string &ParamManager::GetParamStr()
+std::string ParamManager::GetParamStr()
 {
+    std::lock_guard<std::mutex> lock(paramMutex_);
     return g_paramStr;
 }
 
-const std::string &ParamManager::GetParamVersion()
+std::string ParamManager::GetParamVersion()
 {
+    std::lock_guard<std::mutex> lock(paramMutex_);
     return g_currentVersion;
 }
 

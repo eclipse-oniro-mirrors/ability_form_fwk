@@ -72,5 +72,21 @@ void FormRenderStatus::DeleteFormStatus(const int64_t formId)
         formStatusMap_.erase(iter);
     }
 }
+
+bool FormRenderStatus::TransitionFormStatus(const int64_t formId, const FormFsmEvent event,
+    FormRenderStatusMachineInfo &info)
+{
+    std::unique_lock<std::shared_mutex> lock(formStatusMutex_);
+    auto iter = formStatusMap_.find(formId);
+    if (iter == formStatusMap_.end()) {
+        HILOG_INFO("create new status.");
+        iter = formStatusMap_.emplace(formId, FormFsmStatus::INIT).first;
+    }
+    if (!FormRenderStatusTable::GetInstance().GetFormStatusInfo(iter->second, event, info)) {
+        return false;
+    }
+    iter->second = info.nextStatus;
+    return true;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
