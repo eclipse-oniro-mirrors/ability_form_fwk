@@ -42,7 +42,7 @@ public:
     {
         ani_env *env = FormAniUtil::GetEnvFromVm(m_vm);
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] Env is null", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]Env is null", __FUNCTION__);
             return;
         }
         env->GlobalReference_Delete(m_callback);
@@ -65,7 +65,7 @@ public:
 
             ani_env *env = FormAniUtil::GetEnvFromVm(sharedThis->m_vm);
             if (env == nullptr) {
-                HILOG_ERROR("[%{public}s] Env is null", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]Env is null", __FUNCTION__);
                 return;
             }
 

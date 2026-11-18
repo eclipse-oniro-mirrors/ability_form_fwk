@@ -60,13 +60,13 @@ void FormRenderStatus::SetFormStatus(const int64_t formId, FormFsmStatus formSta
 
     iter->second = formStatus;
     HILOG_INFO(
-        "[%{public}s] formId:%{public}" PRId64 ", status is %{public}d.", __FUNCTION__, formId, static_cast<int32_t>(formStatus));
+        "[%{public}s]formId:%{public}" PRId64 ", status is %{public}d.", __FUNCTION__, formId, static_cast<int32_t>(formStatus));
 }
 
 void FormRenderStatus::DeleteFormStatus(const int64_t formId)
 {
     std::unique_lock<std::shared_mutex> lock(formStatusMutex_);
-    HILOG_INFO("[%{public}s] formId:%{public}" PRId64, __FUNCTION__, formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formId);
     auto iter = formStatusMap_.find(formId);
     if (iter != formStatusMap_.end()) {
         formStatusMap_.erase(iter);

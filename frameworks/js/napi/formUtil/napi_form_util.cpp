@@ -122,7 +122,7 @@ const std::map<int32_t, std::string> CODE_MSG_MAP = {
 bool NapiFormUtil::Throw(napi_env env, int32_t errCode, const std::string &errMessage)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return false;
     }
     napi_value error = CreateJsError(env, errCode, errMessage);
@@ -137,7 +137,7 @@ bool NapiFormUtil::Throw(napi_env env, int32_t errCode, const std::string &errMe
 bool NapiFormUtil::ThrowByInternalErrorCode(napi_env env, int32_t internalErrorCode)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return false;
     }
     int32_t externalErrorCode = 0;
@@ -149,7 +149,7 @@ bool NapiFormUtil::ThrowByInternalErrorCode(napi_env env, int32_t internalErrorC
 bool NapiFormUtil::ThrowByExternalErrorCode(napi_env env, int32_t externalErrorCode)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return false;
     }
     std::string externalErrorMessage = FormMgr::GetInstance().GetErrorMsgByExternalErrorCode(externalErrorCode);
@@ -352,10 +352,10 @@ bool ConvertFormId(napi_env env, napi_value jsValue, int64_t &formId)
  */
 void InnerCreateCallbackRetMsg(napi_env env, int32_t code, napi_value (&result)[CALLBACK_RETURN_MSG_SIZE])
 {
-    HILOG_DEBUG("[%{public}s] code:%{public}d", __FUNCTION__, code);
+    HILOG_DEBUG("[%{public}s]code:%{public}d", __FUNCTION__, code);
     napi_value error = nullptr;
     if (napi_create_object(env, &error) != napi_ok || error == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_object failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_object failed", __FUNCTION__);
         napi_get_undefined(env, &result[0]);
         napi_get_undefined(env, &result[1]);
         return;
@@ -374,7 +374,7 @@ void InnerCreateCallbackRetMsg(napi_env env, int32_t code, napi_value (&result)[
 
     result[0] = error;
     napi_get_undefined(env, &result[1]);
-    HILOG_DEBUG("[%{public}s] end", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]end", __FUNCTION__);
 }
 
 /**
@@ -388,14 +388,14 @@ void InnerCreateCallbackRetMsg(napi_env env, int32_t code, napi_value (&result)[
  */
 void InnerCreatePromiseRetMsg(napi_env env, int32_t code, napi_value* result)
 {
-    HILOG_DEBUG("[%{public}s] code:%{public}d", __FUNCTION__, code);
+    HILOG_DEBUG("[%{public}s]code:%{public}d", __FUNCTION__, code);
     if (code == ERR_OK) {
         napi_get_undefined(env, result);
         return;
     }
     napi_value errInfo = nullptr;
     if (napi_create_object(env, &errInfo) != napi_ok || errInfo == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_object failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_object failed", __FUNCTION__);
         napi_get_undefined(env, result);
         return;
     }
@@ -412,12 +412,12 @@ void InnerCreatePromiseRetMsg(napi_env env, int32_t code, napi_value* result)
     napi_set_named_property(env, errInfo, "message", errMsg);
 
     *result = errInfo;
-    HILOG_DEBUG("[%{public}s] end", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]end", __FUNCTION__);
 }
 
 napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo *rawCallbackInfo)
 {
-    HILOG_INFO("[%{public}s] call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
 
     // Take ownership so all failure paths below release automatically.
     std::unique_ptr<AsyncErrMsgCallbackInfo> asyncCallbackInfo(rawCallbackInfo);
@@ -460,7 +460,7 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo *rawCallbackInfo)
         asyncCallbackInfo.get(), &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
-        HILOG_ERROR("[%{public}s] async work failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]async work failed", __FUNCTION__);
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
@@ -476,7 +476,7 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo *rawCallbackInfo)
 
 napi_value RetErrMsgForPromise(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
 {
-    HILOG_INFO("[%{public}s] call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
 
     napi_env env = asyncCallbackInfo->env;
     napi_deferred deferred;
@@ -506,7 +506,7 @@ napi_value RetErrMsgForPromise(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
         &asyncCallbackInfo->asyncWork);
     napi_status status = napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     if (status != napi_ok) {
-        HILOG_ERROR("[%{public}s] async work failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]async work failed", __FUNCTION__);
         if (asyncCallbackInfo->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         }
@@ -527,7 +527,7 @@ napi_value RetErrMsgForPromise(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
  */
 napi_value RetErrMsg(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
 {
-    HILOG_INFO("[%{public}s] call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     if (asyncCallbackInfo == nullptr) {
         HILOG_ERROR("null asyncCallback");
         return nullptr;
@@ -555,7 +555,7 @@ AsyncErrMsgCallbackInfo *InitErrMsg(napi_env env, int32_t code, int32_t type, na
 void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFormInfo, napi_value &result)
 {
     if (napi_create_object(env, &result) != napi_ok || result == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_object failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_object failed", __FUNCTION__);
         return;
     }
 
@@ -589,7 +589,7 @@ napi_value CreateFormInfos(napi_env env, const std::vector<FormInfo> &formInfos)
     napi_value arrayValue = nullptr;
     napi_status status = napi_create_array_with_length(env, formInfos.size(), &arrayValue);
     if (status != napi_ok || arrayValue == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_array_with_length failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_array_with_length failed", __FUNCTION__);
         return nullptr;
     }
     uint32_t index = 0;
@@ -601,7 +601,7 @@ napi_value CreateFormInfos(napi_env env, const std::vector<FormInfo> &formInfos)
         }
         status = napi_set_element(env, arrayValue, index, element);
         if (status != napi_ok) {
-            HILOG_ERROR("[%{public}s] napi_set_element failed,index:%{public}u", __FUNCTION__, index);
+            HILOG_ERROR("[%{public}s]napi_set_element failed,index:%{public}u", __FUNCTION__, index);
         }
         index++;
     }
@@ -610,11 +610,11 @@ napi_value CreateFormInfos(napi_env env, const std::vector<FormInfo> &formInfos)
 
 napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     napi_value objContext = nullptr;
     if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_object failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_object failed", __FUNCTION__);
         return nullptr;
     }
 
@@ -679,7 +679,7 @@ napi_value CreateRunningFormInfos(napi_env env, const std::vector<RunningFormInf
     napi_value arrayValue = nullptr;
     napi_status status = napi_create_array_with_length(env, runningFormInfos.size(), &arrayValue);
     if (status != napi_ok || arrayValue == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_array_with_length failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_array_with_length failed", __FUNCTION__);
         return nullptr;
     }
     uint32_t index = 0;
@@ -691,7 +691,7 @@ napi_value CreateRunningFormInfos(napi_env env, const std::vector<RunningFormInf
         }
         status = napi_set_element(env, arrayValue, index, element);
         if (status != napi_ok) {
-            HILOG_ERROR("[%{public}s] napi_set_element failed,index:%{public}u", __FUNCTION__, index);
+            HILOG_ERROR("[%{public}s]napi_set_element failed,index:%{public}u", __FUNCTION__, index);
         }
         index++;
     }
@@ -700,11 +700,11 @@ napi_value CreateRunningFormInfos(napi_env env, const std::vector<RunningFormInf
 
 napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     napi_value objContext = nullptr;
     if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_object failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_object failed", __FUNCTION__);
         return nullptr;
     }
 
@@ -732,7 +732,7 @@ napi_value CreateNewRunningFormInfos(napi_env env, const std::vector<RunningForm
     napi_value arrayValue = nullptr;
     napi_status status = napi_create_array_with_length(env, runningFormInfos.size(), &arrayValue);
     if (status != napi_ok || arrayValue == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_array_with_length failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_array_with_length failed", __FUNCTION__);
         return nullptr;
     }
     uint32_t index = 0;
@@ -744,7 +744,7 @@ napi_value CreateNewRunningFormInfos(napi_env env, const std::vector<RunningForm
         }
         status = napi_set_element(env, arrayValue, index, element);
         if (status != napi_ok) {
-            HILOG_ERROR("[%{public}s] napi_set_element failed,index:%{public}u", __FUNCTION__, index);
+            HILOG_ERROR("[%{public}s]napi_set_element failed,index:%{public}u", __FUNCTION__, index);
         }
         index++;
     }
@@ -753,11 +753,11 @@ napi_value CreateNewRunningFormInfos(napi_env env, const std::vector<RunningForm
 
 napi_value CreateNewRunningFormInfo(napi_env env, const RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     napi_value objContext = nullptr;
     if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_object failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_object failed", __FUNCTION__);
         return nullptr;
     }
 
@@ -780,7 +780,7 @@ napi_value CreateFormCustomizeDatas(napi_env env, const std::vector<FormCustomiz
 {
     napi_value objContext = nullptr;
     if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_object failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_object failed", __FUNCTION__);
         return nullptr;
     }
 
@@ -795,7 +795,7 @@ napi_value CreateFunInteractionParamsDatas(napi_env env, const FormFunInteractio
 {
     napi_value objContext = nullptr;
     if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_object failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_object failed", __FUNCTION__);
         return nullptr;
     }
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, funInteractionParamsDatas.abilityName));
@@ -812,7 +812,7 @@ napi_value CreateSceneAnimationParamsDatas(napi_env env, const FormSceneAnimatio
 {
     napi_value objContext = nullptr;
     if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_object failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_object failed", __FUNCTION__);
         return nullptr;
     }
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, sceneAnimationParamsDatas.abilityName));
@@ -914,7 +914,7 @@ napi_value CreateFormInstances(napi_env env, const std::vector<FormInstance> &fo
     napi_value arrayValue = nullptr;
     napi_status status = napi_create_array_with_length(env, formInstances.size(), &arrayValue);
     if (status != napi_ok || arrayValue == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_array_with_length failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_array_with_length failed", __FUNCTION__);
         return nullptr;
     }
     uint32_t index = 0;
@@ -926,7 +926,7 @@ napi_value CreateFormInstances(napi_env env, const std::vector<FormInstance> &fo
         }
         status = napi_set_element(env, arrayValue, index, element);
         if (status != napi_ok) {
-            HILOG_ERROR("[%{public}s] napi_set_element failed,index:%{public}u", __FUNCTION__, index);
+            HILOG_ERROR("[%{public}s]napi_set_element failed,index:%{public}u", __FUNCTION__, index);
         }
         index++;
     }
@@ -935,11 +935,11 @@ napi_value CreateFormInstances(napi_env env, const std::vector<FormInstance> &fo
 
 napi_value CreateFormInstance(napi_env env, const FormInstance &formInstance)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     napi_value objContext = nullptr;
     if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_object failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_object failed", __FUNCTION__);
         return nullptr;
     }
 
@@ -987,7 +987,7 @@ napi_value CreatePeerFormHostServiceInfos(napi_env env,
 
 napi_value CreatePeerFormHostServiceInfo(napi_env env, const AppExecFwk::PeerFormHostServiceInfo &service)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     napi_value objContext = nullptr;
     napi_create_object(env, &objContext);
     napi_set_named_property(env, objContext, "serviceName", CreateJsValue(env, service.serviceName));
@@ -1020,7 +1020,7 @@ static bool GetOptionalString(napi_env env, napi_value obj, const char *key, std
 
 bool ParsePeerFormHostServiceInfo(napi_env env, napi_value value, AppExecFwk::PeerFormHostServiceInfo &service)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     napi_valuetype valueType = napi_undefined;
     NAPI_CALL_BASE(env, napi_typeof(env, value, &valueType), false);
     if (valueType != napi_object) {
@@ -1032,12 +1032,12 @@ bool ParsePeerFormHostServiceInfo(napi_env env, napi_value value, AppExecFwk::Pe
     napi_get_named_property(env, value, "serviceName", &prop);
     napi_typeof(env, prop, &valueType);
     if (valueType != napi_string) {
-        HILOG_ERROR("[%{public}s] serviceName missing or not string", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]serviceName missing or not string", __FUNCTION__);
         return false;
     }
     service.serviceName = GetStringFromNapi(env, prop);
     if (service.serviceName.empty()) {
-        HILOG_ERROR("[%{public}s] empty serviceName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]empty serviceName", __FUNCTION__);
         return false;
     }
     GetOptionalString(env, value, "serviceDisplayName", service.serviceDisplayName);
@@ -1051,7 +1051,7 @@ bool ParsePeerFormHostServiceInfo(napi_env env, napi_value value, AppExecFwk::Pe
 
 bool ParseFormHostServiceInfo(napi_env env, napi_value value, AppExecFwk::FormHostServiceInfo &service)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     napi_valuetype valueType = napi_undefined;
     NAPI_CALL_BASE(env, napi_typeof(env, value, &valueType), false);
     if (valueType != napi_object) {
@@ -1063,12 +1063,12 @@ bool ParseFormHostServiceInfo(napi_env env, napi_value value, AppExecFwk::FormHo
     napi_get_named_property(env, value, "serviceName", &prop);
     napi_typeof(env, prop, &valueType);
     if (valueType != napi_string) {
-        HILOG_ERROR("[%{public}s] serviceName missing or not string", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]serviceName missing or not string", __FUNCTION__);
         return false;
     }
     service.serviceName = GetStringFromNapi(env, prop);
     if (service.serviceName.empty()) {
-        HILOG_ERROR("[%{public}s] empty serviceName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]empty serviceName", __FUNCTION__);
         return false;
     }
     GetOptionalString(env, value, "serviceDisplayName", service.serviceDisplayName);
@@ -1186,10 +1186,10 @@ bool CreateFormRectInfo(napi_env env, napi_value value, AppExecFwk::Rect &rect)
 // C++ Rect -> JS {left, top, width, height}; inverse of CreateFormRectInfo above.
 napi_value CreateFormRect(napi_env env, const AppExecFwk::Rect &rect)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     napi_value objContext = nullptr;
     if (napi_create_object(env, &objContext) != napi_ok || objContext == nullptr) {
-        HILOG_ERROR("[%{public}s] napi_create_object failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]napi_create_object failed", __FUNCTION__);
         return nullptr;
     }
     napi_set_named_property(env, objContext, "left", CreateJsValue(env, rect.left));

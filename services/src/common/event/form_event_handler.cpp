@@ -59,7 +59,7 @@ int64_t FormEventHandler::GetEventId()
 
 void FormEventHandler::RegisterEventTimeoutObserver(const std::shared_ptr<FormEventTimeoutObserver> &observer)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(observerMutex_);
     auto iter = observers_.find(observer);
     if (iter != observers_.end()) {
@@ -71,7 +71,7 @@ void FormEventHandler::RegisterEventTimeoutObserver(const std::shared_ptr<FormEv
 
 void FormEventHandler::UnregisterEventTimeoutObserver(const std::shared_ptr<FormEventTimeoutObserver> &observer)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(observerMutex_);
     auto iter = observers_.find(observer);
     if (iter == observers_.end()) {

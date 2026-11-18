@@ -51,12 +51,12 @@ bool FormAppMgrHelper::IsAbilityForeground(const std::string &bundleName, Extens
 {
     HILOG_INFO("bundleName:%{public}s,extensionAbilityType:%{public}d", bundleName.c_str(), extensionAbilityType);
     if (bundleName.empty()) {
-        HILOG_ERROR("[%{public}s] Empty bundle name", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Empty bundle name", __FUNCTION__);
         return false;
     }
     auto appMgrProxy = GetAppMgr();
     if (!appMgrProxy) {
-        HILOG_ERROR("[%{public}s] Get app mgr failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Get app mgr failed", __FUNCTION__);
         return false;
     }
     std::vector<AppExecFwk::AppStateData> list;
@@ -80,12 +80,12 @@ bool FormAppMgrHelper::GetRunningProcessInfo(
     const std::string &bundleName, int32_t userId, RunningProcessInfo &info, const std::string &processNameSuffix)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("[%{public}s] Empty bundle name", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Empty bundle name", __FUNCTION__);
         return false;
     }
     auto appMgr = GetAppMgr();
     if (!appMgr) {
-        HILOG_ERROR("[%{public}s] Get app mgr failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Get app mgr failed", __FUNCTION__);
         return false;
     }
 

@@ -31,12 +31,12 @@ void FormHostProxy::OnAcquired(const FormJsInfo &formInfo, const sptr<IRemoteObj
     MessageOption option;
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write interface token failed", __FUNCTION__);
         return;
     }
 
     if (!data.WriteParcelable(&formInfo)) {
-        HILOG_ERROR("[%{public}s] write formInfo failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write formInfo failed", __FUNCTION__);
     }
 
     if (token != nullptr) {
@@ -55,7 +55,7 @@ void FormHostProxy::OnAcquired(const FormJsInfo &formInfo, const sptr<IRemoteObj
         reply,
         option);
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
+        HILOG_ERROR("[%{public}s]SendRequest:%{public}d failed", __FUNCTION__, error);
     }
 }
 
@@ -72,17 +72,17 @@ void FormHostProxy::OnUpdate(const FormJsInfo &formInfo)
     MessageOption option;
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write interface token failed", __FUNCTION__);
         return;
     }
 
     if (!data.WriteParcelable(&formInfo)) {
-        HILOG_ERROR("[%{public}s] write formInfo failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write formInfo failed", __FUNCTION__);
     }
 
     error = SendTransactCmd(IFormHost::Message::FORM_HOST_ON_UPDATE, data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
+        HILOG_ERROR("[%{public}s]SendRequest:%{public}d failed", __FUNCTION__, error);
     }
 }
 
@@ -99,12 +99,12 @@ void  FormHostProxy::OnUninstall(const std::vector<int64_t> &formIds)
     MessageOption option;
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write interface token failed", __FUNCTION__);
         return;
     }
 
     if (!data.WriteInt64Vector(formIds)) {
-        HILOG_ERROR("[%{public}s] write formIds failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write formIds failed", __FUNCTION__);
     }
 
     error = SendTransactCmd(
@@ -113,7 +113,7 @@ void  FormHostProxy::OnUninstall(const std::vector<int64_t> &formIds)
         reply,
         option);
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
+        HILOG_ERROR("[%{public}s]SendRequest:%{public}d failed", __FUNCTION__, error);
     }
 }
 
@@ -130,7 +130,7 @@ void FormHostProxy::OnAcquireState(FormState state, const AAFwk::Want &want)
     MessageOption option;
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write interface token failed", __FUNCTION__);
         return;
     }
 
@@ -150,7 +150,7 @@ void FormHostProxy::OnAcquireState(FormState state, const AAFwk::Want &want)
         reply,
         option);
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
+        HILOG_ERROR("[%{public}s]SendRequest:%{public}d failed", __FUNCTION__, error);
     }
 }
 
@@ -161,7 +161,7 @@ void FormHostProxy::OnAcquireDataResponse(const AAFwk::WantParams &wantParams, i
     MessageOption option;
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write interface token failed", __FUNCTION__);
         return;
     }
 
@@ -181,7 +181,7 @@ void FormHostProxy::OnAcquireDataResponse(const AAFwk::WantParams &wantParams, i
         reply,
         option);
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
+        HILOG_ERROR("[%{public}s]SendRequest:%{public}d failed", __FUNCTION__, error);
     }
 }
 
@@ -213,7 +213,7 @@ int  FormHostProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &par
 bool  FormHostProxy::WriteInterfaceToken(MessageParcel &data)
 {
     if (!data.WriteInterfaceToken(FormHostProxy::GetDescriptor())) {
-        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write interface token failed", __FUNCTION__);
         return false;
     }
     return true;
@@ -226,7 +226,7 @@ void FormHostProxy::OnShareFormResponse(int64_t requestCode, int32_t result)
     MessageOption option;
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write interface token failed", __FUNCTION__);
         return;
     }
 
@@ -246,7 +246,7 @@ void FormHostProxy::OnShareFormResponse(int64_t requestCode, int32_t result)
         reply,
         option);
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
+        HILOG_ERROR("[%{public}s]SendRequest:%{public}d failed", __FUNCTION__, error);
     }
 }
 
@@ -257,17 +257,17 @@ void FormHostProxy::OnError(int32_t errorCode, const std::string &errorMsg)
     MessageOption option(MessageOption::TF_ASYNC);
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write interface token failed", __FUNCTION__);
         return;
     }
 
     if (!data.WriteInt32(errorCode)) {
-        HILOG_ERROR("[%{public}s] write ErrorCode failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write ErrorCode failed", __FUNCTION__);
         return;
     }
 
     if (!data.WriteString16(Str8ToStr16(errorMsg))) {
-        HILOG_ERROR("[%{public}s] fail write errorMsg", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]fail write errorMsg", __FUNCTION__);
         return;
     }
 
@@ -275,7 +275,7 @@ void FormHostProxy::OnError(int32_t errorCode, const std::string &errorMsg)
         IFormHost::Message::FORM_HOST_ON_ERROR,
         data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
+        HILOG_ERROR("[%{public}s]SendRequest:%{public}d failed", __FUNCTION__, error);
     }
 }
 
@@ -286,29 +286,29 @@ void FormHostProxy::OnError(int32_t errorCode, const std::string &errorMsg, std:
     MessageOption option(MessageOption::TF_ASYNC);
  
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write interface token failed", __FUNCTION__);
         return;
     }
  
     if (!data.WriteInt32(errorCode)) {
-        HILOG_ERROR("[%{public}s] write ErrorCode failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write ErrorCode failed", __FUNCTION__);
         return;
     }
  
     if (!data.WriteString16(Str8ToStr16(errorMsg))) {
-        HILOG_ERROR("[%{public}s] fail write errorMsg", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]fail write errorMsg", __FUNCTION__);
         return;
     }
  
     if (!data.WriteInt64Vector(formIds)) {
-        HILOG_ERROR("[%{public}s] write formIds failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write formIds failed", __FUNCTION__);
     }
  
     int error = SendTransactCmd(
         IFormHost::Message::FORM_HOST_ON_ERROR_FORMS,
         data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
+        HILOG_ERROR("[%{public}s]SendRequest:%{public}d failed", __FUNCTION__, error);
     }
 }
 
@@ -334,12 +334,12 @@ void FormHostProxy::OnRecycleForm(const int64_t &formId)
     MessageOption option(MessageOption::TF_ASYNC);
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write interface token failed", __FUNCTION__);
         return;
     }
 
     if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("[%{public}s] write formId failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write formId failed", __FUNCTION__);
         return;
     }
 
@@ -350,7 +350,7 @@ void FormHostProxy::OnRecycleForm(const int64_t &formId)
         reply,
         option);
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
+        HILOG_ERROR("[%{public}s]SendRequest:%{public}d failed", __FUNCTION__, error);
     }
 }
 
@@ -360,17 +360,17 @@ void FormHostProxy::OnEnableForm(const std::vector<int64_t> &formIds, const bool
     MessageOption option(MessageOption::TF_ASYNC);
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write interface token failed", __FUNCTION__);
         return;
     }
 
     if (!data.WriteInt64Vector(formIds)) {
-        HILOG_ERROR("[%{public}s] fail write formIds", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]fail write formIds", __FUNCTION__);
         return;
     }
 
     if (!data.WriteBool(enable)) {
-        HILOG_ERROR("[%{public}s] write formId failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write formId failed", __FUNCTION__);
         return;
     }
 
@@ -379,7 +379,7 @@ void FormHostProxy::OnEnableForm(const std::vector<int64_t> &formIds, const bool
         IFormHost::Message::FORM_HOST_ON_ENABLE_FORM,
         data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
+        HILOG_ERROR("[%{public}s]SendRequest:%{public}d failed", __FUNCTION__, error);
     }
 }
 
@@ -388,17 +388,17 @@ void FormHostProxy::OnLockForm(const std::vector<int64_t> &formIds, const bool l
     MessageParcel data;
     
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write interface token failed", __FUNCTION__);
         return;
     }
 
     if (!data.WriteInt64Vector(formIds)) {
-        HILOG_ERROR("[%{public}s] fail write formIds", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]fail write formIds", __FUNCTION__);
         return;
     }
 
     if (!data.WriteBool(lock)) {
-        HILOG_ERROR("[%{public}s] write formId failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write formId failed", __FUNCTION__);
         return;
     }
 
@@ -408,24 +408,24 @@ void FormHostProxy::OnLockForm(const std::vector<int64_t> &formIds, const bool l
         IFormHost::Message::FORM_HOST_ON_LOCK_FORM,
         data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
+        HILOG_ERROR("[%{public}s]SendRequest:%{public}d failed", __FUNCTION__, error);
     }
 }
 
 void FormHostProxy::OnDueControlForm(
     const std::vector<int64_t> &formIds, const bool isDisablePolicy, const bool isControl)
 {
-    HILOG_INFO("[%{public}s] start", __FUNCTION__);
+    HILOG_INFO("[%{public}s]start", __FUNCTION__);
     MessageParcel data;
     MessageOption option(MessageOption::TF_ASYNC);
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write interface token failed", __FUNCTION__);
         return;
     }
 
     if (!data.WriteInt64Vector(formIds)) {
-        HILOG_ERROR("[%{public}s] fail write formIds", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]fail write formIds", __FUNCTION__);
         return;
     }
 
@@ -442,22 +442,22 @@ void FormHostProxy::OnDueControlForm(
     MessageParcel reply;
     int error = SendTransactCmd(IFormHost::Message::FORM_HOST_ON_DUE_CONTROL_FORM, data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
+        HILOG_ERROR("[%{public}s]SendRequest:%{public}d failed", __FUNCTION__, error);
     }
 }
 
 void FormHostProxy::OnCheckForm(const std::vector<int64_t> &formIds)
 {
-    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
     MessageParcel data;
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]write interface token failed", __FUNCTION__);
         return;
     }
 
     if (!data.WriteInt64Vector(formIds)) {
-        HILOG_ERROR("[%{public}s] fail write formIds", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]fail write formIds", __FUNCTION__);
         return;
     }
 
@@ -465,7 +465,7 @@ void FormHostProxy::OnCheckForm(const std::vector<int64_t> &formIds)
     MessageParcel reply;
     int error = SendTransactCmd(IFormHost::Message::FORM_HOST_ON_CHECK_FORM, data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
+        HILOG_ERROR("[%{public}s]SendRequest:%{public}d failed", __FUNCTION__, error);
     }
 }
 }  // namespace AppExecFwk

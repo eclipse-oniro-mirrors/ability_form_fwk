@@ -164,7 +164,7 @@ bool FormCacheMgr::InnerGetImageData(
         std::vector<uint8_t> blob;
         int32_t size = 0;
         if (!GetImgCacheFromDb(rowId, blob, size)) {
-            HILOG_ERROR("[%{public}s] GetImgCacheFromDb failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]GetImgCacheFromDb failed", __FUNCTION__);
             return false;
         }
 
@@ -193,7 +193,7 @@ bool FormCacheMgr::InnerGetImageData(
 
 bool FormCacheMgr::AddData(int64_t formId, const FormProviderData &formProviderData)
 {
-    HILOG_INFO("[%{public}s] formId:%{public}" PRId64, __FUNCTION__, formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formId);
     std::lock_guard<std::mutex> lock(cacheMutex_);
 
     FormCache formCache;
@@ -252,7 +252,7 @@ bool FormCacheMgr::AddImgData(
     if (HasContent(formCache.imgCache)) {
         nlohmann::json imgCacheObj = SafeJsonParse(formCache.imgCache);
         if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
-            HILOG_ERROR("[%{public}s] parse data failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]parse data failed", __FUNCTION__);
             return false;
         }
         // delete old images
@@ -278,7 +278,7 @@ bool FormCacheMgr::AddCacheData(
     if (HasContent(newDataStr)) {
         newDataObj = SafeJsonParse(newDataStr);
         if (newDataObj.is_discarded() || !newDataObj.is_object()) {
-            HILOG_ERROR("[%{public}s] parse data failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]parse data failed", __FUNCTION__);
             return false;
         }
 
@@ -298,7 +298,7 @@ bool FormCacheMgr::AddCacheData(
 
     nlohmann::json dataCacheObj = SafeJsonParse(formCache.dataCache);
     if (dataCacheObj.is_discarded() || !dataCacheObj.is_object()) {
-        HILOG_ERROR("[%{public}s] parse data failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]parse data failed", __FUNCTION__);
         return false;
     }
 
@@ -381,7 +381,7 @@ bool FormCacheMgr::GetImageDataFromAshmem(
 
 bool FormCacheMgr::DeleteData(const int64_t formId)
 {
-    HILOG_INFO("[%{public}s] formId:%{public}" PRId64, __FUNCTION__, formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formId);
     bool isNeedDeleteImgCache = true;
     nlohmann::json imgCacheObj;
     {
@@ -449,7 +449,7 @@ bool FormCacheMgr::GetDataCacheFromDb(int64_t formId, FormCache &formCache) cons
 
     int ret = absSharedResultSet->GoToFirstRow();
     if (ret != NativeRdb::E_OK) {
-        HILOG_ERROR("[%{public}s] GoToFirstRow failed,ret:%{public}d", __FUNCTION__, ret);
+        HILOG_ERROR("[%{public}s]GoToFirstRow failed,ret:%{public}d", __FUNCTION__, ret);
         return false;
     }
 
@@ -502,7 +502,7 @@ bool FormCacheMgr::GetImgCacheFromDb(
     absRdbPredicates.EqualTo(IMAGE_ID, std::to_string(rowId));
     auto absSharedResultSet = FormRdbDataMgr::GetInstance().QueryDataByStep(absRdbPredicates);
     if (absSharedResultSet == nullptr) {
-        HILOG_ERROR("[%{public}s] GetImgCacheFromDb failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]GetImgCacheFromDb failed", __FUNCTION__);
         return false;
     }
 
@@ -513,7 +513,7 @@ bool FormCacheMgr::GetImgCacheFromDb(
     });
     int ret = absSharedResultSet->GoToFirstRow();
     if (ret != NativeRdb::E_OK) {
-        HILOG_ERROR("[%{public}s] GoToFirstRow failed,ret:%{public}d", __FUNCTION__, ret);
+        HILOG_ERROR("[%{public}s]GoToFirstRow failed,ret:%{public}d", __FUNCTION__, ret);
         return false;
     }
 
@@ -589,7 +589,7 @@ bool FormCacheMgr::IsDirtyDataCleaned() const
         }
     });
     if (!absSharedResultSet->HasBlock()) {
-        HILOG_ERROR("[%{public}s] absSharedResultSet has no block", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]absSharedResultSet has no block", __FUNCTION__);
         return false;
     }
     if (absSharedResultSet->GoToFirstRow() != NativeRdb::E_OK) {
@@ -633,7 +633,7 @@ bool FormCacheMgr::GetFormCacheIds(std::unordered_set<int64_t> &formIds)
         }
     });
     if (!absSharedResultSet->HasBlock()) {
-        HILOG_ERROR("[%{public}s] absSharedResultSet has no block", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]absSharedResultSet has no block", __FUNCTION__);
         return false;
     }
     while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK) {
@@ -671,7 +671,7 @@ bool FormCacheMgr::GetReferencedImgIds(std::unordered_set<int64_t> &referencedId
         }
     });
     if (!absSharedResultSet->HasBlock()) {
-        HILOG_ERROR("[%{public}s] absSharedResultSet has no block", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]absSharedResultSet has no block", __FUNCTION__);
         return false;
     }
     while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK) {
@@ -707,7 +707,7 @@ bool FormCacheMgr::GetAllImgIds(std::vector<int64_t> &imgIds) const
         }
     });
     if (!absSharedResultSet->HasBlock()) {
-        HILOG_ERROR("[%{public}s] absSharedResultSet has no block", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]absSharedResultSet has no block", __FUNCTION__);
         return false;
     }
     while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK) {

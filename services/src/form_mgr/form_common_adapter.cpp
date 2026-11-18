@@ -226,7 +226,7 @@ ErrCode FormCommonAdapter::GetBundleInfo(const AAFwk::Want &want, BundleInfo &bu
     std::string abilityName = want.GetElement().GetAbilityName();
     std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
     if (bundleName.empty() || abilityName.empty() || moduleName.empty()) {
-        HILOG_ERROR("[%{public}s] invalid bundleName or abilityName or moduleName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid bundleName or abilityName or moduleName", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -262,7 +262,7 @@ ErrCode FormCommonAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formIn
     std::string abilityName = want.GetElement().GetAbilityName();
     std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
     if (bundleName.empty() || abilityName.empty() || moduleName.empty()) {
-        HILOG_ERROR("[%{public}s] invalid bundleName or abilityName or moduleName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid bundleName or abilityName or moduleName", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -271,17 +271,17 @@ ErrCode FormCommonAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formIn
     ErrCode errCode = formInfoMgr_->GetFormsInfoByModule(bundleName, moduleName,
         formInfos, userId);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("[%{public}s] GetFormsInfoByModule,get formConfigInfo failed,userId:%{public}d", __FUNCTION__, userId);
+        HILOG_ERROR("[%{public}s]GetFormsInfoByModule,get formConfigInfo failed,userId:%{public}d", __FUNCTION__, userId);
         return errCode;
     }
 
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
     if (!MatchFormInfo(formInfos, abilityName, formName, moduleName, formInfo)) {
-        HILOG_ERROR("[%{public}s] fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d", __FUNCTION__,
+        HILOG_ERROR("[%{public}s]fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d", __FUNCTION__,
             abilityName.c_str(), formName.c_str(), userId);
         return ERR_APPEXECFWK_FORM_NOT_SUPPORTED;
     }
-    HILOG_INFO("[%{public}s] GetFormInfo end", __FUNCTION__);
+    HILOG_INFO("[%{public}s]GetFormInfo end", __FUNCTION__);
     return ERR_OK;
 }
 
@@ -428,7 +428,7 @@ void FormCommonAdapter::SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo
 {
     auto hapPath = hapModuleInfo.hapPath;
     auto moduleName = hapModuleInfo.moduleName;
-    HILOG_INFO("module [%{public}s] packageName is %{public}s,hap path is %{public}s", moduleName.c_str(),
+    HILOG_INFO("module [%{public}s]packageName is %{public}s,hap path is %{public}s", moduleName.c_str(),
         hapModuleInfo.packageName.c_str(), FormFileUtil::GetMaskedPath(hapPath).c_str());
     if (hapPath.find(Constants::ABS_CODE_PATH) != std::string::npos) {
         hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH),
@@ -492,7 +492,7 @@ ErrCode FormCommonAdapter::GetFormInfoByFormRecord(const FormRecord &record, For
 {
     HILOG_DEBUG("GetFormInfoByFormRecord called");
     if (record.bundleName.empty() || record.abilityName.empty() || record.moduleName.empty()) {
-        HILOG_ERROR("[%{public}s] invalid bundleName or abilityName or moduleName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid bundleName or abilityName or moduleName", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::vector<FormInfo> formInfos {};
@@ -500,18 +500,18 @@ ErrCode FormCommonAdapter::GetFormInfoByFormRecord(const FormRecord &record, For
     ErrCode errCode = formInfoMgr_->GetFormsInfoByModule(record.bundleName, record.moduleName,
         formInfos, userId);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("[%{public}s] GetFormsInfoByModule,get formConfigInfo failed,userId:%{public}d", __FUNCTION__, userId);
+        HILOG_ERROR("[%{public}s]GetFormsInfoByModule,get formConfigInfo failed,userId:%{public}d", __FUNCTION__, userId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     for (const auto &form : formInfos) {
         if (form.abilityName == record.abilityName && form.moduleName == record.moduleName
             && form.name == record.formName) {
             formInfo = form;
-            HILOG_INFO("[%{public}s] GetFormInfo end", __FUNCTION__);
+            HILOG_INFO("[%{public}s]GetFormInfo end", __FUNCTION__);
             return ERR_OK;
         }
     }
-    HILOG_ERROR("[%{public}s] fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d", __FUNCTION__,
+    HILOG_ERROR("[%{public}s]fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d", __FUNCTION__,
         record.abilityName.c_str(), record.formName.c_str(), userId);
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
@@ -553,7 +553,7 @@ std::unordered_map<std::string, std::vector<sptr<IRemoteObject>>> FormCommonAdap
 
 void FormCommonAdapter::CleanResource(const wptr<IRemoteObject> &remote)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     // Clean the formObservers_.
     auto object = remote.promote();
@@ -591,7 +591,7 @@ void FormCommonAdapter::CleanResource(const wptr<IRemoteObject> &remote)
 void FormCommonAdapter::SetDeathRecipient(const sptr<IRemoteObject> &callerToken,
     const sptr<IRemoteObject::DeathRecipient> &deathRecipient)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (callerToken == nullptr || deathRecipient == nullptr) {
         HILOG_ERROR("empty callerToken or deathRecipient");
         return;
@@ -795,7 +795,7 @@ ErrCode FormCommonAdapter::AddFormTimer(const FormRecord &formRecord)
 
 bool FormCommonAdapter::GetValidFormUpdateDuration(const int64_t formId, int64_t &updateDuration) const
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     FormRecord formRecord;
     if (!formDataMgr_->GetFormRecord(formId, formRecord)) {
         HILOG_ERROR("not exist such form:%{public}" PRId64 ".", formId);
@@ -828,7 +828,7 @@ bool FormCommonAdapter::GetValidFormUpdateDuration(const int64_t formId, int64_t
 
 void FormCommonAdapter::UpdateFormCloudUpdateDuration(const std::string &bundleName)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string additionalInfo;
     if (FormBmsHelper::GetInstance().GetAdditionalInfo(bundleName, additionalInfo) != ERR_OK) {
         HILOG_ERROR("fail get additionalInfo");

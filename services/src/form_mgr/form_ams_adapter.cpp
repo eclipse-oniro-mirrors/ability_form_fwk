@@ -25,11 +25,11 @@ namespace OHOS {
 namespace AppExecFwk {
 FormAmsAdapter::FormAmsAdapter()
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 }
 FormAmsAdapter::~FormAmsAdapter()
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 }
 
 ErrCode FormAmsAdapter::StartUIAbilityByFms(const int32_t uid, const Want &want)

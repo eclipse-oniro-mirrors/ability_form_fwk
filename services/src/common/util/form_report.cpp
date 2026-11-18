@@ -182,7 +182,7 @@ bool FormReport::HasFormId(int64_t formId)
 void FormReport::HandleAddFormStatistic(int64_t formId)
 {
     if (formId <= 0) {
-        HILOG_ERROR("[%{public}s] invalid formId:%{public}" PRId64, __FUNCTION__, formId);
+        HILOG_ERROR("[%{public}s]invalid formId:%{public}" PRId64, __FUNCTION__, formId);
         return;
     }
     std::lock_guard<std::mutex> guard(formReport_);
@@ -191,7 +191,7 @@ void FormReport::HandleAddFormStatistic(int64_t formId)
         return;
     }
     if (formStatisticMap_.count(formId) == 0) {
-        HILOG_INFO("[%{public}s] invalid formId:%{public}" PRId64, __FUNCTION__, formId);
+        HILOG_INFO("[%{public}s]invalid formId:%{public}" PRId64, __FUNCTION__, formId);
         return;
     }
     auto &record = formStatisticMap_[formId];

@@ -215,12 +215,12 @@ bool ParseInfoFromJsonStr(const char *data, T &t)
             t = static_cast<T>(value);
             return true;
         }
-        HILOG_ERROR("[%{public}s] json type mismatch", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]json type mismatch", __FUNCTION__);
         return false;
     } else {
         auto *valuePtr = jsonObject.get_ptr<T *>();
         if (valuePtr == nullptr) {
-            HILOG_ERROR("[%{public}s] json type mismatch", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]json type mismatch", __FUNCTION__);
             return false;
         }
         t = *valuePtr;

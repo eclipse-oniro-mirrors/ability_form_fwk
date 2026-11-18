@@ -67,7 +67,7 @@ int FormDebugAdapter::DumpStorageFormInfos(std::string &formInfos) const
 
 int FormDebugAdapter::DumpTemporaryFormInfos(std::string &formInfos) const
 {
-    HILOG_INFO("[%{public}s] call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::vector<FormRecord> formRecordInfos;
     if (!FormDataMgr::GetInstance().GetTempFormRecord(formRecordInfos)) {
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
@@ -78,7 +78,7 @@ int FormDebugAdapter::DumpTemporaryFormInfos(std::string &formInfos) const
 
 int FormDebugAdapter::DumpStaticBundleFormInfos(std::string &formInfos) const
 {
-    HILOG_INFO("[%{public}s] call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::vector<FormInfo> bundleFormInfos;
     int32_t userId = FormUtil::GetCurrentAccountId();
     if (FormInfoMgr::GetInstance().GetAllFormsInfo(bundleFormInfos, userId) != ERR_OK) {
@@ -91,7 +91,7 @@ int FormDebugAdapter::DumpStaticBundleFormInfos(std::string &formInfos) const
 
 int FormDebugAdapter::DumpFormInfoByBundleName(const std::string &bundleName, std::string &formInfos) const
 {
-    HILOG_INFO("[%{public}s] call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::vector<FormRecord> formRecordInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formRecordInfos)) {
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
@@ -115,7 +115,7 @@ int FormDebugAdapter::DumpFormInfoByBundleName(const std::string &bundleName, st
 
 int FormDebugAdapter::DumpFormInfoByFormId(const std::int64_t formId, std::string &formInfo) const
 {
-    HILOG_INFO("[%{public}s] call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int reply = ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     FormRecord formRecord;
     if (FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
@@ -152,7 +152,7 @@ int FormDebugAdapter::DumpFormInfoByFormId(const std::int64_t formId, std::strin
 
 int FormDebugAdapter::DumpFormTimerByFormId(const std::int64_t formId, std::string &isTimingService) const
 {
-    HILOG_INFO("[%{public}s] call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     FormTimer formTimer;
     UpdateAtItem updateAtItem;
     DynamicRefreshItem dynamicItem;
@@ -203,7 +203,7 @@ int FormDebugAdapter::DumpHasFormVisible(const std::string &bundleInfo, std::str
 
 int FormDebugAdapter::DumpFormRunningFormInfos(std::string &runningFormInfosResult) const
 {
-    HILOG_INFO("[%{public}s] call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::vector<RunningFormInfo> runningFormInfos;
     int32_t userId = FormUtil::GetCurrentAccountId();
     auto ret = FormQueryAdapter::GetInstance().GetRunningFormInfos(true, runningFormInfos, userId);

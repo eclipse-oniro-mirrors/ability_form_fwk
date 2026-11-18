@@ -49,7 +49,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
 
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
-        HILOG_ERROR("[%{public}s] not exist such form:%{public}" PRId64 ".", __FUNCTION__, formId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64 ".", __FUNCTION__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
@@ -82,7 +82,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         formDataProxyRecordMap_[formId] = formDataProxyRecord;
     }
     if (!FormDataMgr::GetInstance().GetFormVisible(formId)) {
-        HILOG_INFO("[%{public}s] form is invisible,disable subscribe.formId:%{public}" PRId64, __FUNCTION__, formId);
+        HILOG_INFO("[%{public}s]form is invisible,disable subscribe.formId:%{public}" PRId64, __FUNCTION__, formId);
         DisableSubscribeFormData({ formId });
     }
     return ERR_OK;
@@ -194,7 +194,7 @@ void FormDataProxyMgr::RetrySubscribeProxy(int64_t formId, const std::vector<For
     auto delaySubsProxyTask = [formId, formDataProxies, tokenId, want, leftRetryTimes]() {
         FormRecord record;
         if (!FormDataMgr::GetInstance().GetFormRecord(formId, record)) {
-            HILOG_ERROR("[%{public}s] not exist such form:%{public}" PRId64, __FUNCTION__, formId);
+            HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64, __FUNCTION__, formId);
             return;
         }
 
@@ -209,7 +209,7 @@ void FormDataProxyMgr::RetrySubscribeProxy(int64_t formId, const std::vector<For
                 FormDataProxyMgr::GetInstance().formDataProxyRecordMap_[formId] = formDataProxyRecord;
             }
             if (!FormDataMgr::GetInstance().GetFormVisible(formId)) {
-                HILOG_INFO("[%{public}s] form is invisible,disable subscribe.formId:%{public}" PRId64, __FUNCTION__, formId);
+                HILOG_INFO("[%{public}s]form is invisible,disable subscribe.formId:%{public}" PRId64, __FUNCTION__, formId);
                 FormDataProxyMgr::GetInstance().DisableSubscribeFormData({ formId });
             }
             return;

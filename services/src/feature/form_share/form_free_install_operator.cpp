@@ -64,7 +64,7 @@ int32_t FormFreeInstallOperator::StartFreeInstall(const std::string &bundleName,
 
 void FormFreeInstallOperator::OnInstallFinished(int32_t resultCode, const int32_t userId)
 {
-    HILOG_DEBUG("[%{public}s] resultCode:%{public}d", __FUNCTION__, resultCode);
+    HILOG_DEBUG("[%{public}s]resultCode:%{public}d", __FUNCTION__, resultCode);
     if (serialQueue_ == nullptr) {
         return;
     }
@@ -84,7 +84,7 @@ FreeInstallStatusCallBack::FreeInstallStatusCallBack(
 
 void FreeInstallStatusCallBack::OnInstallFinished(int32_t resultCode, const Want &want, int32_t userId)
 {
-    HILOG_DEBUG("[%{public}s] resultCode:%{public}d", __FUNCTION__, resultCode);
+    HILOG_DEBUG("[%{public}s]resultCode:%{public}d", __FUNCTION__, resultCode);
 
     auto freeInstallOperator = formFreeInstallOperator_.lock();
     if (freeInstallOperator == nullptr) {

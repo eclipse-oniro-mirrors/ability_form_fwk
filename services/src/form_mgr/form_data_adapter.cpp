@@ -99,12 +99,12 @@ ErrCode FormDataAdapter::ValidateAndGetFormRecord(
     const int64_t formId, int64_t &matchedFormId, FormRecord &formRecord)
 {
     if (formId <= 0) {
-        HILOG_ERROR("[%{public}s] invalid formId", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid formId", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
-        HILOG_ERROR("[%{public}s] not exist such form:%{public}" PRId64, __FUNCTION__, matchedFormId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64, __FUNCTION__, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     return ERR_OK;
@@ -265,7 +265,7 @@ int FormDataAdapter::RequestForm(const int64_t formId,
     data.callerToken = callerToken;
     data.want = updateFormWant;
     bool needAcquireProviderData = FormCacheMgr::GetInstance().NeedAcquireProviderData(formId);
-    HILOG_INFO("[%{public}s] formId:%{public}" PRId64 ", isNeedAddForm:%{public}d, needAcquireProviderData:%{public}d, "
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", isNeedAddForm:%{public}d, needAcquireProviderData:%{public}d, "
         "needRefresh:%{public}d.", __FUNCTION__, formId, isNeedAddForm, needAcquireProviderData, record.needRefresh);
     if (isNeedAddForm && (needAcquireProviderData || record.needRefresh)) {
         ErrCode errCode = AcquireProviderFormInfoByFormRecord(record, addFormWant.GetParams());
@@ -295,7 +295,7 @@ ErrCode FormDataAdapter::UpdateFormSize(const int64_t formId,
     FormRecord record;
     bool result = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     if (!result) {
-        HILOG_ERROR("[%{public}s] not exist such form:%{public}" PRId64 "", __FUNCTION__, formId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64 "", __FUNCTION__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     FormInfo formInfo;
@@ -333,7 +333,7 @@ int FormDataAdapter::DisableUpdateForm(const std::vector<int64_t> &formIds,
 ErrCode FormDataAdapter::HandleUpdateFormFlag(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (formIds.empty() || callerToken == nullptr) {
         HILOG_ERROR("invalid param");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -384,17 +384,17 @@ ErrCode FormDataAdapter::BatchRefreshForms(const int32_t formRefreshType)
 
 int FormDataAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextTime)
 {
-    HILOG_INFO("[%{public}s] formId:%{public}" PRId64 ", nextTime:%{public}" PRId64, __FUNCTION__, formId, nextTime);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", nextTime:%{public}" PRId64, __FUNCTION__, formId, nextTime);
 
     if (formId <= 0) {
-        HILOG_ERROR("[%{public}s] invalid formId", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid formId", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
-        HILOG_ERROR("[%{public}s] not found in formRecord", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]not found in formRecord", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
@@ -430,7 +430,7 @@ void FormDataAdapter::UpdateFormRenderParam(const int64_t formId, const sptr<IRe
         formUpgradeInfo.transparencyColor.clear();
         FormDataMgr::GetInstance().DelHostTransparentFormColor(formId);
     }
-    HILOG_INFO("[%{public}s] FormId:%{public}" PRId64 " curTransparencyColor: %{public}s, cacheTransparencyColor: %{public}s", __FUNCTION__,
+    HILOG_INFO("[%{public}s]FormId:%{public}" PRId64 " curTransparencyColor: %{public}s, cacheTransparencyColor: %{public}s", __FUNCTION__,
         formId, curTransparencyColor.c_str(), cacheTransparencyColor.c_str());
     FormDataMgr::GetInstance().UpdateFormUpgradeInfo(formId, formUpgradeInfo);
 
@@ -493,7 +493,7 @@ ErrCode FormDataAdapter::AcquireProviderFormInfoByFormRecord(const FormRecord &f
     FormInfo formInfo;
     errCode = FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecord, formInfo);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("[%{public}s] get formInfo failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get formInfo failed", __FUNCTION__);
         return errCode;
     }
 
@@ -542,7 +542,7 @@ ErrCode FormDataAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     FormRecord record;
     bool result = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     if (!result) {
-        HILOG_ERROR("[%{public}s] not exist such form:%{public}" PRId64 "", __FUNCTION__, formId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64 "", __FUNCTION__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
@@ -560,13 +560,13 @@ ErrCode FormDataAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         HILOG_ERROR("formId not greater than 0");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    HILOG_INFO("[%{public}s] formId:%{public}" PRId64, __FUNCTION__, formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formId);
     // New acquire request: pre-clear any pending retry for this form (superseded).
     FormProviderErrorHandlerFactory::GetAcquireHandler()->RemoveRetryPolicy(formId);
 
     FormRecord record;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId, record)) {
-        HILOG_ERROR("[%{public}s] not found in formRecord", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]not found in formRecord", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
@@ -648,7 +648,7 @@ void FormDataAdapter::ClearReconnectNum(int64_t formId)
 
 ErrCode FormDataAdapter::ReloadForms(int32_t &reloadNum, const std::vector<FormRecord> &refreshForms)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     pid_t callingPid = IPCSkeleton::GetCallingPid();
     if (!CheckUIAbilityContext(callingPid)) {
         HILOG_ERROR("check uiAbility failed");
@@ -706,7 +706,7 @@ bool FormDataAdapter::IsDeleteCacheInUpgradeScene(const FormRecord &record)
     FormInfo formInfo;
     ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByRecord(record, formInfo);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("[%{public}s] get formInfo failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get formInfo failed", __FUNCTION__);
         return true;
     }
     return FormInfoMgr::GetInstance().IsDeleteCacheInUpgradeScene(formInfo);
@@ -802,7 +802,7 @@ ErrCode FormDataAdapter::UpdateFormByCondition(int32_t type, int32_t userId)
 
 void FormDataAdapter::DelayRefreshFormsOnAppUpgrade(const std::vector<FormRecord> &updatedForms, const Want &want)
 {
-    HILOG_INFO("[%{public}s] start", __FUNCTION__);
+    HILOG_INFO("[%{public}s]start", __FUNCTION__);
     auto delayRefreshForms = [updatedForms, want]() {
         for (const auto &updatedForm : updatedForms) {
             FormDataAdapter::GetInstance().UpdateFormRenderParamsAfterReload(updatedForm.formId);
@@ -819,12 +819,12 @@ void FormDataAdapter::DelayRefreshFormsOnAppUpgrade(const std::vector<FormRecord
         }
     };
     FormMgrQueue::GetInstance().ScheduleTask(PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME, delayRefreshForms);
-    HILOG_INFO("[%{public}s] end", __FUNCTION__);
+    HILOG_INFO("[%{public}s]end", __FUNCTION__);
 }
 
 void FormDataAdapter::PostEnterpriseAppInstallFailedRetryTask(const FormRecord &record, const Want &want)
 {
-    HILOG_INFO("[%{public}s] start", __FUNCTION__);
+    HILOG_INFO("[%{public}s]start", __FUNCTION__);
     auto refreshForm = [record, want]() {
         RefreshData data {};
         data.formId = record.formId;
@@ -834,7 +834,7 @@ void FormDataAdapter::PostEnterpriseAppInstallFailedRetryTask(const FormRecord &
         FormRefreshMgr::GetInstance().RequestRefresh(data, TYPE_APP_UPGRADE);
     };
     FormMgrQueue::GetInstance().ScheduleTask(ENTERPRISE_APP_INSTALL_FAILED_DELAY_TIME, refreshForm);
-    HILOG_INFO("[%{public}s] end", __FUNCTION__);
+    HILOG_INFO("[%{public}s]end", __FUNCTION__);
 }
 
 void FormDataAdapter::UpdateReUpdateFormMap(const int64_t formId)
@@ -869,7 +869,7 @@ void FormDataAdapter::UpdateFormRenderParamsAfterReload(const int64_t formId)
     FormUpgradeInfo formUpgradeInfo;
     bool hasFormRecord = FormDataMgr::GetInstance().GetFormUpgradeInfo(formId, formUpgradeInfo);
     if (!hasFormRecord) {
-        HILOG_ERROR("[%{public}s] FormId:%{public}" PRId64 " form record not found.", __FUNCTION__, formId);
+        HILOG_ERROR("[%{public}s]FormId:%{public}" PRId64 " form record not found.", __FUNCTION__, formId);
         return;
     }
     std::string transparencyColor = formUpgradeInfo.transparencyColor;

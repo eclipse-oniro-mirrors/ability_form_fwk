@@ -241,13 +241,13 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
     // only check module
     for (const auto& item : modulesFromCfg_) {
         if (item == moduleName) {
-            HILOG_DEBUG("[%{public}s] load moduleName= %{public}s", __FUNCTION__, moduleName);
+            HILOG_DEBUG("[%{public}s]load moduleName= %{public}s", __FUNCTION__, moduleName);
             return true;
         }
     }
     for (const auto& item : MODULE_ALLOW_LIST) {
         if (std::strcmp(item, moduleName) == 0) {
-            HILOG_DEBUG("[%{public}s] load moduleName= %{public}s", __FUNCTION__, moduleName);
+            HILOG_DEBUG("[%{public}s]load moduleName= %{public}s", __FUNCTION__, moduleName);
             return true;
         }
     }

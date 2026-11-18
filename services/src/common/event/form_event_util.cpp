@@ -279,7 +279,7 @@ void FormEventUtil::HandleFormHostDataCleared(const int uid)
 bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRecord,
     const std::vector<FormInfo> &targetForms, const BundleInfo &bundleInfo)
 {
-    HILOG_INFO("[%{public}s] start", __FUNCTION__);
+    HILOG_INFO("[%{public}s]start", __FUNCTION__);
     if (targetForms.empty()) {
         HILOG_ERROR("empty targetForms");
         return false;
@@ -309,7 +309,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
     FormInfo updatedForm;
     bool bGetForm = FormDataMgr::GetInstance().GetUpdatedForm(formRecord, targetForms, updatedForm);
     if (!bGetForm) {
-        HILOG_INFO("[%{public}s] no updated form", __FUNCTION__);
+        HILOG_INFO("[%{public}s]no updated form", __FUNCTION__);
         return false;
     }
     HILOG_INFO("form is still exist,form:%{public}s,formId:%{public}" PRId64, formRecord.formName.c_str(), formId);
@@ -334,10 +334,10 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
 bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRecord,
     const BundlePackInfo &bundlePackInfo, const BundleInfo &bundleInfo)
 {
-    HILOG_INFO("[%{public}s] start", __FUNCTION__);
+    HILOG_INFO("[%{public}s]start", __FUNCTION__);
     AbilityFormInfo packForm;
     if (!FormDataMgr::GetInstance().GetPackageForm(formRecord, bundlePackInfo, packForm)) {
-        HILOG_INFO("[%{public}s] no updated form", __FUNCTION__);
+        HILOG_INFO("[%{public}s]no updated form", __FUNCTION__);
         return false;
     }
 
@@ -401,7 +401,7 @@ void FormEventUtil::BatchDeleteNoHostTempForms(const int uid, std::map<FormIdKey
         int result = FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, moduleName,
             formIds, userId);
         if (result != ERR_OK) {
-            HILOG_ERROR("[%{public}s] NotifyProviderFormsBatchDelete fail bundle:%{public}s ability:%{public}s", __FUNCTION__,
+            HILOG_ERROR("[%{public}s]NotifyProviderFormsBatchDelete fail bundle:%{public}s ability:%{public}s", __FUNCTION__,
                 bundleName.c_str(), abilityName.c_str());
             for (int64_t formId : formIds) {
                 FormDataMgr::GetInstance().AddFormUserUid(formId, uid);
@@ -421,7 +421,7 @@ void FormEventUtil::BatchDeleteNoHostTempForms(const int uid, std::map<FormIdKey
 void FormEventUtil::GetTimerCfg(const bool updateEnabled,
     const int updateDuration, const std::string &configUpdateAt, FormTimerCfg& cfg)
 {
-    HILOG_INFO("[%{public}s] start", __FUNCTION__);
+    HILOG_INFO("[%{public}s]start", __FUNCTION__);
     if (!updateEnabled) {
         HILOG_INFO("update disable");
         return;
@@ -448,18 +448,18 @@ void FormEventUtil::GetTimerCfg(const bool updateEnabled,
         HILOG_INFO("update at timer:%{public}s", configUpdateAt.c_str());
         std::vector<std::string> temp = FormUtil::StringSplit(configUpdateAt, Constants::TIME_DELIMETER);
         if (temp.size() != Constants::UPDATE_AT_CONFIG_COUNT) {
-            HILOG_ERROR("[%{public}s] invalid config", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid config", __FUNCTION__);
             return;
         }
         int hour = 0;
         int min = 0;
         if (!FormUtil::ConvertStringToInt(temp[0], hour) || !FormUtil::ConvertStringToInt(temp[1], min)) {
-            HILOG_ERROR("[%{public}s] invalid time format", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid time format", __FUNCTION__);
             return;
         }
         if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME || min >
             Constants::MAX_MINUTE) {
-            HILOG_ERROR("[%{public}s] invalid time", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid time", __FUNCTION__);
             return;
         }
 
@@ -477,25 +477,25 @@ void FormEventUtil::SetTimerCfgByMultUpdate(const std::string &configMultUpdateA
     }
     std::vector<std::string> timeList = FormUtil::StringSplit(configMultUpdateAt, Constants::TIMES_DELIMETER);
     if (timeList.size() > Constants::UPDATE_AT_CONFIG_MAX_COUNT) {
-        HILOG_ERROR("[%{public}s] invalid config", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid config", __FUNCTION__);
         return;
     }
     std::vector<std::vector<int>> updateAtTimes;
     for (const auto &time: timeList) {
         std::vector<std::string> temp = FormUtil::StringSplit(time, Constants::TIME_DELIMETER);
         if (temp.size() != Constants::UPDATE_AT_CONFIG_COUNT) {
-            HILOG_ERROR("[%{public}s] invalid config", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid config", __FUNCTION__);
             continue;
         }
         int hour = 0;
         int min = 0;
         if (!FormUtil::ConvertStringToInt(temp[0], hour) || !FormUtil::ConvertStringToInt(temp[1], min)) {
-            HILOG_ERROR("[%{public}s] invalid time format", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid time format", __FUNCTION__);
             continue;
         }
         if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME || min >
             Constants::MAX_MINUTE) {
-            HILOG_ERROR("[%{public}s] invalid time", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid time", __FUNCTION__);
             continue;
         }
         std::vector<int> newElement = {hour, min};
@@ -513,12 +513,12 @@ void FormEventUtil::HandleAddMultiUpdateTimes(const int64_t formId,
     std::vector<std::vector<int>> updateAtTimes = timerCfg.updateAtTimes;
     if (updateAtTimes.size() > 0) {
         for (const auto &time: updateAtTimes) {
-            HILOG_INFO("[%{public}s] add at timer:%{public}d,%{public}d", __FUNCTION__, time[0], time[1]);
+            HILOG_INFO("[%{public}s]add at timer:%{public}d,%{public}d", __FUNCTION__, time[0], time[1]);
             FormTimerMgr::GetInstance().AddFormTimer(formId,
                 time[0], time[1], record.providerUserId);
         }
     } else {
-        HILOG_INFO("[%{public}s] add at timer:%{public}d,%{public}d", __FUNCTION__, timerCfg.updateAtHour, timerCfg.updateAtMin);
+        HILOG_INFO("[%{public}s]add at timer:%{public}d,%{public}d", __FUNCTION__, timerCfg.updateAtHour, timerCfg.updateAtMin);
         FormTimerMgr::GetInstance().AddFormTimer(formId, timerCfg.updateAtHour,
             timerCfg.updateAtMin, record.providerUserId);
     }
@@ -547,7 +547,7 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
             HILOG_INFO("add interval timer:%{public}" PRId64, timerCfg.updateDuration);
             int64_t updateDuration = timerCfg.updateDuration;
             if (!FormMgrAdapterFacade::GetInstance().GetValidFormUpdateDuration(formId, updateDuration)) {
-                HILOG_WARN("[%{public}s] Get updateDuration failed,uses local configuration", __FUNCTION__);
+                HILOG_WARN("[%{public}s]Get updateDuration failed,uses local configuration", __FUNCTION__);
             }
             FormTimerMgr::GetInstance().AddFormTimer(formId, updateDuration, record.providerUserId);
         } else {
@@ -568,7 +568,7 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
     if (type == TYPE_INTERVAL_CHANGE || type == TYPE_ATTIME_TO_INTERVAL) {
         int64_t updateDuration = timerCfg.updateDuration;
         if (!FormMgrAdapterFacade::GetInstance().GetValidFormUpdateDuration(formId, updateDuration)) {
-            HILOG_WARN("[%{public}s] Get updateDuration failed,uses local configuration", __FUNCTION__);
+            HILOG_WARN("[%{public}s]Get updateDuration failed,uses local configuration", __FUNCTION__);
         }
         newTimerCfg.updateDuration = updateDuration;
     }
@@ -607,7 +607,7 @@ UpdateType FormEventUtil::GetUpdateType(const FormRecord &record, const FormTime
 
 void FormEventUtil::ReCreateForm(const int64_t formId)
 {
-    HILOG_INFO("[%{public}s] formId:%{public}" PRId64, __FUNCTION__, formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formId);
     FormRecord record;
     bool isGetForm = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     if (!isGetForm) {
@@ -650,7 +650,7 @@ void FormEventUtil::BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, 
         int result = FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, moduleName,
             formIds, userId);
         if (result != ERR_OK) {
-            HILOG_ERROR("[%{public}s] NotifyProviderFormsBatchDelete fail bundle:%{public}s ability:%{public}s", __FUNCTION__,
+            HILOG_ERROR("[%{public}s]NotifyProviderFormsBatchDelete fail bundle:%{public}s ability:%{public}s", __FUNCTION__,
                 bundleName.c_str(), abilityName.c_str());
             for (int64_t formId : formIds) {
                 FormDBInfo dbInfo;
@@ -701,7 +701,7 @@ bool FormEventUtil::HandleAdditionalInfoChanged(const std::string &bundleName)
         }
         int64_t updateDuration = formRecord.updateDuration;
         if (!FormMgrAdapterFacade::GetInstance().GetValidFormUpdateDuration(formRecord.formId, updateDuration)) {
-            HILOG_WARN("[%{public}s] Get updateDuration failed,uses local configuration", __FUNCTION__);
+            HILOG_WARN("[%{public}s]Get updateDuration failed,uses local configuration", __FUNCTION__);
         }
 
         FormTimerCfg timerCfg;
@@ -718,7 +718,7 @@ void FormEventUtil::UpdateMultiUpdateTime(std::string multiScheduledUpdateTime, 
     std::vector<std::string> timeList = FormUtil::StringSplit(multiScheduledUpdateTime,
         Constants::TIMES_DELIMETER);
     if (timeList.size() > Constants::UPDATE_AT_CONFIG_MAX_COUNT) {
-        HILOG_ERROR("[%{public}s] invalid config", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid config", __FUNCTION__);
         return;
     }
 
@@ -727,18 +727,18 @@ void FormEventUtil::UpdateMultiUpdateTime(std::string multiScheduledUpdateTime, 
         HILOG_INFO("UpdateFormRecord add  updateAtTimes");
         std::vector<std::string> temp = FormUtil::StringSplit(time, Constants::TIME_DELIMETER);
         if (temp.size() != Constants::UPDATE_AT_CONFIG_COUNT) {
-            HILOG_ERROR("[%{public}s] invalid config", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid config", __FUNCTION__);
             continue;
         }
         int hour = 0;
         int min = 0;
         if (!FormUtil::ConvertStringToInt(temp[0], hour) || !FormUtil::ConvertStringToInt(temp[1], min)) {
-            HILOG_ERROR("[%{public}s] invalid time format", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid time format", __FUNCTION__);
             continue;
         }
         if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME || min >
             Constants::MAX_MINUTE) {
-            HILOG_ERROR("[%{public}s] invalid time", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid time", __FUNCTION__);
             continue;
         }
         std::vector<int> newElement = {hour, min};
@@ -776,7 +776,7 @@ void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formR
     FormDataMgr::GetInstance().GetFormUpgradeInfo(formRecord.formId, oldFormUpgradeInfo);
     oldFormUpgradeInfo.enableBlurBackground = formInfo.enableBlurBackground;
     formRecord.formUpgradeInfo = oldFormUpgradeInfo;
-    HILOG_DEBUG("[%{public}s] formId:%{public}" PRId64 "", __FUNCTION__, formRecord.formId);
+    HILOG_DEBUG("[%{public}s]formId:%{public}" PRId64 "", __FUNCTION__, formRecord.formId);
     bool wasAccountForm = FormDataMgr::IsAccountConditionForm(formRecord);
     formRecord.conditionUpdate = formInfo.conditionUpdate;
     bool isAccountForm = FormDataMgr::IsAccountConditionForm(formRecord);
@@ -808,7 +808,7 @@ void FormEventUtil::UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord
     if (!multiScheduledUpdateTime_.empty()) {
         UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
     }
-    HILOG_DEBUG("[%{public}s] formId:%{public}" PRId64 "", __FUNCTION__, formRecord.formId);
+    HILOG_DEBUG("[%{public}s]formId:%{public}" PRId64 "", __FUNCTION__, formRecord.formId);
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
 }
 

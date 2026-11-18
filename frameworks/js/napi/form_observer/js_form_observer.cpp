@@ -50,7 +50,7 @@ public:
 
     static void Finalizer(napi_env env, void *data, void *hint)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         std::unique_ptr<JsFormObserver>(static_cast<JsFormObserver*>(data));
     }
 
@@ -120,7 +120,7 @@ private:
 
     napi_value OnRegisterFormAddObserver(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (CheckParamNum(env, argc, ARGS_TWO, ARGS_THREE) == false) {
             return CreateJsUndefined(env);
         }
@@ -128,7 +128,7 @@ private:
         std::string bundleName("");
         if (argc == ARGS_THREE) {
             if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-                HILOG_ERROR("[%{public}s] Convert type failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]Convert type failed", __FUNCTION__);
                 NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return CreateJsUndefined(env);
             }
@@ -137,7 +137,7 @@ private:
         }
 
         if (!AppExecFwk::IsTypeForNapiValue(env, argv[argc - 1], napi_function)) {
-            HILOG_ERROR("[%{public}s] invalid lastParam", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid lastParam", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<formInfo.RunningFormInfo>");
             return CreateJsUndefined(env);
         }
@@ -159,7 +159,7 @@ private:
 
     napi_value OnRegisterFormRemoveObserver(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (CheckParamNum(env, argc, ARGS_TWO, ARGS_THREE) == false) {
             return CreateJsUndefined(env);
         }
@@ -167,7 +167,7 @@ private:
         std::string bundleName("");
         if (argc == ARGS_THREE) {
             if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-                HILOG_ERROR("[%{public}s] Convert type failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]Convert type failed", __FUNCTION__);
                 NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return CreateJsUndefined(env);
             }
@@ -176,7 +176,7 @@ private:
         }
 
         if (!AppExecFwk::IsTypeForNapiValue(env, argv[argc - 1], napi_function)) {
-            HILOG_ERROR("[%{public}s] invalid lastParam", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid lastParam", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<formInfo.RunningFormInfo>");
             return CreateJsUndefined(env);
         }
@@ -199,7 +199,7 @@ private:
 
     napi_value OnRegisterFormObserver(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (!CheckCallerIsSystemApp()) {
             HILOG_ERROR("The app not system-app,can't use system-api");
             NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
@@ -208,7 +208,7 @@ private:
 
         std::string type;
         if (!ConvertFromJsValue(env, argv[PARAM0], type)) {
-            HILOG_ERROR("[%{public}s] Convert type failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]Convert type failed", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "type",
                 "formAdd, formRemove, notifyVisible, notifyInvisible, router, message, call.");
             return CreateJsUndefined(env);
@@ -225,7 +225,7 @@ private:
         } else if (type == "router" || type == "message" || type == "call") {
             return OnRegisterClickEventCallback(env, argc, argv, type);
         } else {
-            HILOG_ERROR("[%{public}s] args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "type",
                 "formAdd, formRemove, notifyVisible, notifyInvisible, router, message, call.");
             return CreateJsUndefined(env);
@@ -234,7 +234,7 @@ private:
 
     napi_value OnRegisterFormIsVisibleObserver(napi_env env, size_t argc, napi_value *argv, bool isVisibility)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (CheckParamNum(env, argc, ARGS_TWO, ARGS_THREE) == false) {
             return CreateJsUndefined(env);
         }
@@ -247,24 +247,24 @@ private:
         } else if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
             // There are three or more arguments, and the type of argument2 is string.
             if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-                HILOG_ERROR("[%{public}s] invalid secondParam", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]invalid secondParam", __FUNCTION__);
                 NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return CreateJsUndefined(env);
             }
             if (bundleName.empty()) {
-                HILOG_ERROR("[%{public}s] empty bundleName", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]empty bundleName", __FUNCTION__);
                 NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return CreateJsUndefined(env);
             }
             funcPos = PARAM2;
         } else {
-            HILOG_ERROR("[%{public}s] invalid secondParam", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid secondParam", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "param 2", "type");
             return CreateJsUndefined(env);
         }
 
         if (!AppExecFwk::IsTypeForNapiValue(env, argv[funcPos], napi_function)) {
-            HILOG_ERROR("[%{public}s] invalid lastParam", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid lastParam", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<Array<RunningFormInfo>>");
             return CreateJsUndefined(env);
         }
@@ -323,7 +323,7 @@ private:
                 DelFormNotifyVisibleCallbackByBundle(bundleName, isVisibility, argv[funcPos], formObserver_);
             return CreateJsUndefined(env);
         }
-        HILOG_INFO("[%{public}s] SubEvent op=off_all kit=FormKit event=%{public}s", __FUNCTION__,
+        HILOG_INFO("[%{public}s]SubEvent op=off_all kit=FormKit event=%{public}s", __FUNCTION__,
             isVisibility ? "notifyVisible" : "notifyInvisible");
         // If there is only one argument.
         JsFormStateObserver::GetInstance()->
@@ -348,11 +348,11 @@ private:
                 NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return CreateJsUndefined(env);
             }
-            HILOG_INFO("[%{public}s] SubEvent op=off_all kit=FormKit event=formRemove", __FUNCTION__);
+            HILOG_INFO("[%{public}s]SubEvent op=off_all kit=FormKit event=formRemove", __FUNCTION__);
             JsFormStateObserver::GetInstance()->ClearFormRemoveCallbackByBundle(bundleName);
             return CreateJsUndefined(env);
         } else {
-            HILOG_ERROR("[%{public}s] The second param is ineffective", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]The second param is ineffective", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "callback or bundleName",
                 "Callback<formInfo.RunningFormInfo> or string");
             return CreateJsUndefined(env);
@@ -367,7 +367,7 @@ private:
             return CreateJsUndefined(env);
         }
         if (!AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
-            HILOG_ERROR("[%{public}s] The second param is ineffective", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]The second param is ineffective", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
             return CreateJsUndefined(env);
         }
@@ -378,7 +378,7 @@ private:
         }
         std::string bundleName;
         if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-            HILOG_ERROR("[%{public}s] Convert bundleName failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]Convert bundleName failed", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
             return CreateJsUndefined(env);
         }
@@ -388,14 +388,14 @@ private:
 
     napi_value OnUnregisterFormRemoveObserver(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (CheckParamNum(env, argc, ARGS_ONE, ARGS_THREE) == false) {
             return CreateJsUndefined(env);
         }
 
         if (argc == ARGS_ONE) {
             // If there is only one argument, all listening will be cancelled.
-            HILOG_INFO("[%{public}s] SubEvent op=off_all kit=FormKit event=formRemove", __FUNCTION__);
+            HILOG_INFO("[%{public}s]SubEvent op=off_all kit=FormKit event=formRemove", __FUNCTION__);
             JsFormStateObserver::GetInstance()->ClearFormRemoveCallbackByBundle("all");
             return CreateJsUndefined(env);
         } else if (argc == ARGS_TWO) {
@@ -418,15 +418,15 @@ private:
         } else if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
             std::string bundleName;
             if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-                HILOG_ERROR("[%{public}s] Convert bundleName failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]Convert bundleName failed", __FUNCTION__);
                 NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return CreateJsUndefined(env);
             }
-            HILOG_INFO("[%{public}s] SubEvent op=off_all kit=FormKit event=formAdd", __FUNCTION__);
+            HILOG_INFO("[%{public}s]SubEvent op=off_all kit=FormKit event=formAdd", __FUNCTION__);
             JsFormStateObserver::GetInstance()->ClearFormAddCallbackByBundle(bundleName);
             return CreateJsUndefined(env);
         } else {
-            HILOG_ERROR("[%{public}s] invalid secondParam", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid secondParam", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "callback or bundleName",
                 "Callback<formInfo.RunningFormInfo> or string");
             return CreateJsUndefined(env);
@@ -441,18 +441,18 @@ private:
             return CreateJsUndefined(env);
         }
         if (!AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
-            HILOG_ERROR("[%{public}s] invalid secondParam", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid secondParam", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
             return CreateJsUndefined(env);
         }
         if (!AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_function)) {
-            HILOG_ERROR("[%{public}s] invalid thirdParam", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid thirdParam", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<formInfo.RunningFormInfo>");
             return CreateJsUndefined(env);
         }
         std::string bundleName;
         if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-            HILOG_ERROR("[%{public}s] Convert bundleName failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]Convert bundleName failed", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
             return CreateJsUndefined(env);
         }
@@ -462,14 +462,14 @@ private:
 
     napi_value OnUnregisterFormAddObserver(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (CheckParamNum(env, argc, ARGS_ONE, ARGS_THREE) == false) {
             return CreateJsUndefined(env);
         }
 
         if (argc == ARGS_ONE) {
             // If there is only one argument, full listening will be cancelled.
-            HILOG_INFO("[%{public}s] SubEvent op=off_all kit=FormKit event=formAdd", __FUNCTION__);
+            HILOG_INFO("[%{public}s]SubEvent op=off_all kit=FormKit event=formAdd", __FUNCTION__);
             JsFormStateObserver::GetInstance()->ClearFormAddCallbackByBundle("all");
             return CreateJsUndefined(env);
         } else if (argc == ARGS_TWO) {
@@ -482,7 +482,7 @@ private:
 
     napi_value OnUnregisterFormObserver(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (!CheckCallerIsSystemApp()) {
             HILOG_ERROR("The application not system-app,can't use system-api");
             NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
@@ -509,7 +509,7 @@ private:
         } else if (type == "router" || type == "message" || type == "call") {
             return OnUnregisterClickEventCallback(env, argc, argv, type);
         } else {
-            HILOG_ERROR("[%{public}s] args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "type",
                 "args[0] should be formAdd, formRemove,"
                 "notifyVisible, notifyInvisible, router, message, call");
@@ -520,22 +520,22 @@ private:
     bool ParseGetRunningFormInfosOneParam(const napi_env &env, const napi_value *argv, std::string &bundleName,
         bool &hasBundleName, bool &isUnusedIncluded)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_string)) {
             if (!ConvertFromJsValue(env, argv[PARAM0], bundleName)) {
-                HILOG_ERROR("[%{public}s] Convert bundleName failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]Convert bundleName failed", __FUNCTION__);
                 NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return false;
             }
             if (bundleName.empty()) {
-                HILOG_ERROR("[%{public}s] empty bundleName", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]empty bundleName", __FUNCTION__);
                 NapiFormUtil::ThrowParamError(env, "bundleName is empty.");
                 return false;
             }
             hasBundleName = true;
         } else if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_boolean)) {
             if (!ConvertFromJsValue(env, argv[PARAM0], isUnusedIncluded)) {
-                HILOG_ERROR("[%{public}s] Convert isUnusedIncluded failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]Convert isUnusedIncluded failed", __FUNCTION__);
                 NapiFormUtil::ThrowParamTypeError(env, "isUnusedIncluded", "bool");
                 return false;
             }
@@ -550,14 +550,14 @@ private:
     bool ParseGetRunningFormInfosParams(const napi_env &env, const napi_value *argv, std::string &bundleName,
         bool &isUnusedIncluded, int startPos)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (!ConvertFromJsValue(env, argv[startPos], isUnusedIncluded)) {
-            HILOG_ERROR("[%{public}s] Convert isUnusedIncluded failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]Convert isUnusedIncluded failed", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "isUnusedIncluded", "bool");
             return false;
         }
         if (!ConvertFromJsValue(env, argv[startPos + 1], bundleName)) {
-            HILOG_ERROR("[%{public}s] Convert bundleName failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]Convert bundleName failed", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
             return false;
         }
@@ -567,18 +567,18 @@ private:
     bool ParseGetRunningFormInfosTwoParams(const napi_env &env, const napi_value *argv, std::string &bundleName,
         bool &hasBundleName, bool &isUnusedIncluded)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_function)) {
             if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
                 if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-                    HILOG_ERROR("[%{public}s] Convert bundleName failed", __FUNCTION__);
+                    HILOG_ERROR("[%{public}s]Convert bundleName failed", __FUNCTION__);
                     NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
                     return false;
                 }
                 hasBundleName = true;
             } else if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_boolean)) {
                 if (!ConvertFromJsValue(env, argv[PARAM1], isUnusedIncluded)) {
-                    HILOG_ERROR("[%{public}s] Convert isUnusedIncluded failed", __FUNCTION__);
+                    HILOG_ERROR("[%{public}s]Convert isUnusedIncluded failed", __FUNCTION__);
                     NapiFormUtil::ThrowParamTypeError(env, "isUnusedIncluded", "bool");
                     return false;
                 }
@@ -598,7 +598,7 @@ private:
 
     napi_value OnGetRunningFormInfos(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (CheckParamNum(env, argc, ARGS_ZERO, ARGS_THREE) == false) {
             return CreateJsUndefined(env);
         }
@@ -644,7 +644,7 @@ private:
 
     napi_value OnGetFormInstancesByFilter(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (CheckParamNum(env, argc, ARGS_ONE, ARGS_THREE) == false) {
             return CreateJsUndefined(env);
         }
@@ -661,7 +661,7 @@ private:
             return CreateJsUndefined(env);
         }
         if (argc == ARGS_TWO && !AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
-            HILOG_ERROR("[%{public}s] invalid secondParam", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid secondParam", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<string>");
             return CreateJsUndefined(env);
         }
@@ -689,7 +689,7 @@ private:
 
     napi_value OnGetFormInstanceById(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (CheckParamNum(env, argc, ARGS_ONE, ARGS_THREE) == false) {
             return CreateJsUndefined(env);
         }
@@ -705,14 +705,14 @@ private:
         if ((argc == ARGS_TWO || argc == ARGS_THREE) &&
             !AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
             if (!ConvertFromJsValue(env, argv[PARAM1], isUnusedIncluded)) {
-                HILOG_ERROR("[%{public}s] Convert isUnusedIncluded failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]Convert isUnusedIncluded failed", __FUNCTION__);
                 NapiFormUtil::ThrowParamTypeError(env, "isUnusedIncluded", "bool");
                 return CreateJsUndefined(env);
             }
             convertArgc++;
         }
         if (argc == ARGS_THREE && !AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_function)) {
-            HILOG_ERROR("[%{public}s] invalid thirdParam", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid thirdParam", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<string>");
             return CreateJsUndefined(env);
         }
@@ -742,9 +742,9 @@ private:
     napi_value OnRegisterClickEventCallback(
         napi_env env, size_t argc, napi_value *argv, const std::string &type)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (argc < ARGS_TWO) {
-            HILOG_ERROR("[%{public}s] invalid argc", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid argc", __FUNCTION__);
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
             return CreateJsUndefined(env);
         }
@@ -757,7 +757,7 @@ private:
                 return CreateJsUndefined(env);
             }
             if (!AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_function)) {
-                HILOG_ERROR("[%{public}s] invalid thirdParam", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]invalid thirdParam", __FUNCTION__);
                 NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<formInfo.RunningFormInfo>");
                 return CreateJsUndefined(env);
             }
@@ -766,7 +766,7 @@ private:
             return CreateJsUndefined(env);
         }
         if (!AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
-            HILOG_ERROR("[%{public}s] invalid secondParam", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid secondParam", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<formInfo.RunningFormInfo>");
             return CreateJsUndefined(env);
         }
@@ -778,45 +778,45 @@ private:
     napi_value OnUnregisterClickEventCallback(
         napi_env env, size_t argc, napi_value *argv, const std::string &type)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         std::string bundleName(EMPTY_BUNDLE);
         napi_value callback = nullptr;
         if (argc < ARGS_ONE) {
-            HILOG_ERROR("[%{public}s] invalid argc", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid argc", __FUNCTION__);
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
             return CreateJsUndefined(env);
         }
         if (argc == ARGS_ONE) {
-            HILOG_INFO("[%{public}s] SubEvent op=off_all kit=FormKit event=%{public}s", __FUNCTION__, type.c_str());
+            HILOG_INFO("[%{public}s]SubEvent op=off_all kit=FormKit event=%{public}s", __FUNCTION__, type.c_str());
             JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, EMPTY_BUNDLE);
             return CreateJsUndefined(env);
         }
         if (argc == ARGS_TWO) {
             if (!AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
-                HILOG_DEBUG("[%{public}s] secondParam bundlename not string", __FUNCTION__);
-                HILOG_INFO("[%{public}s] SubEvent op=off_all kit=FormKit event=%{public}s", __FUNCTION__, type.c_str());
+                HILOG_DEBUG("[%{public}s]secondParam bundlename not string", __FUNCTION__);
+                HILOG_INFO("[%{public}s]SubEvent op=off_all kit=FormKit event=%{public}s", __FUNCTION__, type.c_str());
                 JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, EMPTY_BUNDLE);
                 return CreateJsUndefined(env);
             } else if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-                HILOG_ERROR("[%{public}s] Convert bundleName failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]Convert bundleName failed", __FUNCTION__);
                 NapiFormUtil::ThrowParamError(env, "Failed to convert bundleName.");
                 return CreateJsUndefined(env);
             }
-            HILOG_INFO("[%{public}s] SubEvent op=off_all kit=FormKit event=%{public}s", __FUNCTION__, type.c_str());
+            HILOG_INFO("[%{public}s]SubEvent op=off_all kit=FormKit event=%{public}s", __FUNCTION__, type.c_str());
             JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, bundleName);
             return CreateJsUndefined(env);
         }
         if (!AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
-            HILOG_DEBUG("[%{public}s] secondParam bundlename not string", __FUNCTION__);
+            HILOG_DEBUG("[%{public}s]secondParam bundlename not string", __FUNCTION__);
         } else if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-            HILOG_ERROR("[%{public}s] Convert bundleName failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]Convert bundleName failed", __FUNCTION__);
             NapiFormUtil::ThrowParamError(env, "Failed to convert bundleName.");
             return CreateJsUndefined(env);
         }
         if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_null) ||
             AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_undefined)) {
             HILOG_DEBUG("null or undefined thirdParam");
-            HILOG_INFO("[%{public}s] SubEvent op=off_all kit=FormKit event=%{public}s", __FUNCTION__, type.c_str());
+            HILOG_INFO("[%{public}s]SubEvent op=off_all kit=FormKit event=%{public}s", __FUNCTION__, type.c_str());
             JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, bundleName);
             return CreateJsUndefined(env);
         } else if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_function)) {
@@ -825,7 +825,7 @@ private:
             JsFormStateObserver::GetInstance()->ClearFormClickCallback(type, bundleName, callback);
             return CreateJsUndefined(env);
         } else {
-            HILOG_ERROR("[%{public}s] invalid thirdParam", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid thirdParam", __FUNCTION__);
             NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<formInfo.RunningFormInfo>");
             return CreateJsUndefined(env);
         }
@@ -835,7 +835,7 @@ private:
 
 napi_value JsFormObserverInit(napi_env env, napi_value exportObj)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::unique_ptr<JsFormObserver> jsFormObserver = std::make_unique<JsFormObserver>();
     napi_wrap(env, exportObj, jsFormObserver.release(), JsFormObserver::Finalizer, nullptr, nullptr);
 

@@ -28,7 +28,7 @@ void FormRouterProxyMgr::SetDeathRecipient(const sptr<IRemoteObject> &callerToke
     const sptr<IRemoteObject::DeathRecipient> &deathRecipient)
 {
 #ifndef WATCH_API_DISABLE
-    HILOG_DEBUG("[%{public}s] Start", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]Start", __FUNCTION__);
     std::lock_guard<std::mutex> lock(deathRecipientsMutex_);
     auto iter = deathRecipients_.find(callerToken);
     if (iter == deathRecipients_.end()) {
@@ -51,7 +51,7 @@ ErrCode FormRouterProxyMgr::SetFormRouterProxy(const std::vector<int64_t> &formI
         HILOG_ERROR("callerToken is null");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
     for (const auto &formId : formIds) {
         auto iter = formRouterProxyMap_.find(formId);
@@ -76,7 +76,7 @@ ErrCode FormRouterProxyMgr::SetFormRouterProxy(const std::vector<int64_t> &formI
 
 ErrCode FormRouterProxyMgr::RemoveFormRouterProxy(const std::vector<int64_t> &formIds)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
     for (int64_t formId : formIds) {
         auto formRouterProxys = formRouterProxyMap_.find(formId);
@@ -91,14 +91,14 @@ ErrCode FormRouterProxyMgr::RemoveFormRouterProxy(const std::vector<int64_t> &fo
 
 bool FormRouterProxyMgr::HasRouterProxy(int64_t formId)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
     return formRouterProxyMap_.find(formId) != formRouterProxyMap_.end();
 }
 
 void FormRouterProxyMgr::OnFormRouterEvent(int64_t formId, const Want &want)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
     auto it = formRouterProxyMap_.find(formId);
     if (it == formRouterProxyMap_.end() || it->second == nullptr) {
@@ -110,7 +110,7 @@ void FormRouterProxyMgr::OnFormRouterEvent(int64_t formId, const Want &want)
 
 void FormRouterProxyMgr::CleanResource(const wptr<IRemoteObject> &remote)
 {
-    HILOG_DEBUG("[%{public}s] Start", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]Start", __FUNCTION__);
 
     // Clean the formRouterProxyMap_.
     auto object = remote.promote();

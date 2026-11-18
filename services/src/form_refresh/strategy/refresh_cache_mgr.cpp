@@ -72,7 +72,7 @@ void RefreshCacheMgr::AddFlagByHealthyControl(const int64_t formId, bool isAskFo
 
 void RefreshCacheMgr::ConsumeHealthyControlFlag(std::vector<FormRecord>::iterator &record, const int32_t userId)
 {
-    HILOG_INFO("[%{public}s] formId:%{public}" PRId64  ",isRefresh: %{public}d ,isUpdate: %{public}d", __FUNCTION__, record->formId,
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64  ",isRefresh: %{public}d ,isUpdate: %{public}d", __FUNCTION__, record->formId,
         record->isRefreshDuringDisableForm, record->isUpdateDuringDisableForm);
     if (record->isRefreshDuringDisableForm) {
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(record->formId, false);
@@ -120,7 +120,7 @@ void RefreshCacheMgr::ConsumeInvisibleFlag(const std::vector<FormRecord> &visibl
     bool isActiveUser = FormUtil::IsActiveUser(userId);
     for (const auto &record : visibleFormRecords) {
         const int64_t formId = record.formId;
-        HILOG_INFO("[%{public}s] formId:%{public}" PRId64", userId:%{public}d, isTimerRefresh:%{public}d, isHostRefresh:%{public}d,"
+        HILOG_INFO("[%{public}s]formId:%{public}" PRId64", userId:%{public}d, isTimerRefresh:%{public}d, isHostRefresh:%{public}d,"
             " isReminderAgentRefresh:%{public}d", __FUNCTION__,
             formId, userId, record.isTimerRefresh, record.isHostRefresh, record.isReminderAgentRefresh);
         Want want;
@@ -256,7 +256,7 @@ void RefreshCacheMgr::ConsumeAddUnfinishFlag(const int64_t formId, const int32_t
         return;
     }
 
-    HILOG_INFO("[%{public}s] formId:%{public}" PRId64", isHostRefresh:%{public}d", __FUNCTION__, formId, record.isHostRefresh);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64", isHostRefresh:%{public}d", __FUNCTION__, formId, record.isHostRefresh);
     Want want;
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     if (record.isHostRefresh && record.refreshWantMap.find(formId) != record.refreshWantMap.end()) {

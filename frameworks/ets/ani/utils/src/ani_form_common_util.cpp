@@ -56,7 +56,7 @@ constexpr const char *TRIGGER_TYPE_CLASS_NAME = "@ohos.app.form.formInfo.formInf
 ani_class GetAniClass(ani_env *env, const char *className)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return nullptr;
     }
     ani_status status = ANI_OK;
@@ -71,30 +71,30 @@ ani_class GetAniClass(ani_env *env, const char *className)
 bool CreateRunningFormInfoEnum(ani_env *env,
     const AppExecFwk::RunningFormInfo &runningFormInfo, ani_object &infoObject)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return false;
     }
     ani_status status = ANI_ERROR;
     ani_enum_item visibilityType {};
     if (!AniEnumConvertUtil::EnumConvert_NativeToEts(env,
         ENUMNAME_VISIBILITYTYPE, runningFormInfo.formVisiblity, visibilityType)) {
-        HILOG_ERROR("[%{public}s] visibilityType convert failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]visibilityType convert failed", __FUNCTION__);
         return false;
     }
     if ((status = env->Object_SetPropertyByName_Ref(infoObject, "visibilityType", visibilityType)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] visibilityType failed status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]visibilityType failed status:%{public}d", __FUNCTION__, status);
         return false;
     }
     ani_enum_item formUsageState {};
     if (!AniEnumConvertUtil::EnumConvert_NativeToEts(env,
         ENUMNAME_FORMUSAGESTATE, runningFormInfo.formUsageState, formUsageState)) {
-        HILOG_ERROR("[%{public}s] formUsageState convert failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]formUsageState convert failed", __FUNCTION__);
         return false;
     }
     if ((status = env->Object_SetPropertyByName_Ref(infoObject, "formUsageState", formUsageState)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] formUsageState failed status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]formUsageState failed status:%{public}d", __FUNCTION__, status);
         return false;
     }
     ani_enum_item formLocation {};
@@ -113,13 +113,13 @@ bool CreateRunningFormInfoEnum(ani_env *env,
 void SetStringProperty(ani_env *env, ani_object obj, const char *propName, const std::string &value)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return;
     }
     ani_string anistr{};
     ani_status status = env->String_NewUTF8(value.c_str(), value.size(), &anistr);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] String_NewUTF8 failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]String_NewUTF8 failed,status:%{public}d", __FUNCTION__, status);
         return;
     }
     env->Object_SetPropertyByName_Ref(obj, propName, anistr);
@@ -128,7 +128,7 @@ void SetStringProperty(ani_env *env, ani_object obj, const char *propName, const
 ani_object CreateInt(ani_env *env, int32_t value)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return nullptr;
     }
 
@@ -139,19 +139,19 @@ ani_object CreateInt(ani_env *env, int32_t value)
 
     status = env->FindClass(CLASSNAME_INT, &cls);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] FindClass failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]FindClass failed,status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
     status = env->Class_FindMethod(cls, "<ctor>", "i:", &ctor);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Class_FindMethod failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Class_FindMethod failed,status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
     status = env->Object_New(cls, ctor, &object, value);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Object_New failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Object_New failed,status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
@@ -161,7 +161,7 @@ ani_object CreateInt(ani_env *env, int32_t value)
 bool AniParseInt32(ani_env *env, const ani_ref &aniInt, int32_t &out)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return false;
     }
 
@@ -182,18 +182,18 @@ ani_array CreateAniArrayIntFromStdVector(ani_env *env, const std::vector<int32_t
     ani_array array = nullptr;
     ani_ref undefined_ref;
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return nullptr;
     }
 
     if (env->GetUndefined(&undefined_ref) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] GetUndefined failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]GetUndefined failed", __FUNCTION__);
         return array;
     }
 
     if (!vec.empty()) {
         if (env->Array_New(vec.size(), undefined_ref, &array) != ANI_OK) {
-            HILOG_ERROR("[%{public}s] Array_New failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]Array_New failed", __FUNCTION__);
             return array;
         }
         ani_size index = 0;
@@ -201,7 +201,7 @@ ani_array CreateAniArrayIntFromStdVector(ani_env *env, const std::vector<int32_t
             ani_object valueAni = CreateInt(env, value);
             ani_status status = env->Array_Set(array, index, valueAni);
             if (status != ANI_OK) {
-                HILOG_ERROR("[%{public}s] Array_Set failed,status code:%{public}d", __FUNCTION__, status);
+                HILOG_ERROR("[%{public}s]Array_Set failed,status code:%{public}d", __FUNCTION__, status);
                 break;
             }
             index++;
@@ -226,7 +226,7 @@ bool CreateRecordObject(ani_env *env, ani_class recordCls, ani_object &recordObj
 
     status = env->Object_New(recordCls, ctorMethod, &recordObject);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Object_New failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Object_New failed,status:%{public}d", __FUNCTION__, status);
         return false;
     }
     return true;
@@ -236,7 +236,7 @@ bool CreateFormCustomizeDataRecord(ani_env *env, ani_object &recordObject,
     const std::vector<AppExecFwk::FormCustomizeData> &customizeData)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return false;
     }
 
@@ -288,7 +288,7 @@ bool CreateFormCustomizeDataRecord(ani_env *env, ani_object &recordObject,
 ani_enum_item CreateSceneAnimationTriggerType(ani_env *env, AppExecFwk::SceneAnimationTriggerType triggerType)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return nullptr;
     }
     if (static_cast<int32_t>(triggerType) <= 0) {
@@ -310,7 +310,7 @@ ani_enum_item CreateSceneAnimationTriggerType(ani_env *env, AppExecFwk::SceneAni
     ani_enum_item item;
     status = env->Enum_GetEnumItemByIndex(triggerTypeEnum, static_cast<ani_size>(triggerTypeValue - 1), &item);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Cannot get enum item", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Cannot get enum item", __FUNCTION__);
         return nullptr;
     }
     return item;
@@ -325,16 +325,16 @@ ani_array CreateTriggerTypesAniArray(ani_env *env,
         return array;
     }
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return array;
     }
     ani_ref undefined_ref;
     if (env->GetUndefined(&undefined_ref) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] GetUndefined failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]GetUndefined failed", __FUNCTION__);
         return array;
     }
     if (env->Array_New(triggerTypes.size(), undefined_ref, &array) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Array_New failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Array_New failed", __FUNCTION__);
         return array;
     }
     ani_size index = 0;
@@ -342,7 +342,7 @@ ani_array CreateTriggerTypesAniArray(ani_env *env,
         ani_enum_item valueAni = CreateSceneAnimationTriggerType(env, triggerType);
         ani_status status = env->Array_Set(array, index, static_cast<ani_ref>(valueAni));
         if (status != ANI_OK) {
-            HILOG_ERROR("[%{public}s] Array_Set failed,status code:%{public}d", __FUNCTION__, status);
+            HILOG_ERROR("[%{public}s]Array_Set failed,status code:%{public}d", __FUNCTION__, status);
             break;
         }
         index++;
@@ -353,7 +353,7 @@ ani_array CreateTriggerTypesAniArray(ani_env *env,
 void SetFormInfoArrayProperties(ani_env *env, ani_object formInfoAni, const AppExecFwk::FormInfo &formInfo)
 {
     if (env == nullptr || formInfoAni == nullptr) {
-        HILOG_ERROR("[%{public}s] invalid param", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid param", __FUNCTION__);
         return;
     }
     // Set array properties
@@ -380,7 +380,7 @@ void SetFormInfoFunInteractionParams(ani_env *env, ani_object formInfoAni,
     const AppExecFwk::FormFunInteractionParams &funInteractionParams)
 {
     if (env == nullptr || formInfoAni == nullptr) {
-        HILOG_ERROR("[%{public}s] invalid param", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid param", __FUNCTION__);
         return;
     }
     ani_object funInteractionParamsAni = FormAniUtil::CreateAniObject(env, ETS_FUNINTERACTIONPARAMS_NAME);
@@ -400,7 +400,7 @@ void SetFormInfoSceneAnimationParams(ani_env *env, ani_object formInfoAni,
     const AppExecFwk::FormSceneAnimationParams &formSceneAnimationParams)
 {
     if (env == nullptr || formInfoAni == nullptr) {
-        HILOG_ERROR("[%{public}s] invalid param", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid param", __FUNCTION__);
         return;
     }
     ani_object sceneAnimationParamsAni = FormAniUtil::CreateAniObject(env, ETS_SCENEANIMATIONPARAMS_NAME);
@@ -421,7 +421,7 @@ void SetFormInfoSceneAnimationParams(ani_env *env, ani_object formInfoAni,
 ani_object WrapBusinessError(ani_env *env, const std::string &msg)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return nullptr;
     }
 
@@ -434,7 +434,7 @@ ani_object WrapBusinessError(ani_env *env, const std::string &msg)
 
     status = env->String_NewUTF8(msg.c_str(), msg.size(), &aniMsg);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] String_NewUTF8 failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]String_NewUTF8 failed,status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
@@ -446,19 +446,19 @@ ani_object WrapBusinessError(ani_env *env, const std::string &msg)
 
     status = env->FindClass(CLASSNAME_ERROR, &cls);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] FindClass failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]FindClass failed,status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
     status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{escompat.ErrorOptions}:", &method);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Class_FindMethod failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Class_FindMethod failed,status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
     status = env->Object_New(cls, method, &obj, aniMsg, undefRef);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Object_New failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Object_New failed,status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
@@ -468,7 +468,7 @@ ani_object WrapBusinessError(ani_env *env, const std::string &msg)
 ani_object CreateBusinessError(ani_env *env, ani_int code, const std::string& msg)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return nullptr;
     }
     ani_class cls {};
@@ -508,7 +508,7 @@ namespace FormAniUtil {
 ani_object CreateAniObject(ani_env* env, const char *className)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return nullptr;
     }
     ani_class cls = nullptr;
@@ -534,14 +534,14 @@ ani_object CreateAniObject(ani_env* env, const char *className)
 bool SetPropertyStringByName(ani_env* env, ani_object object, const char *name, std::string string)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return false;
     }
     ani_status status = ANI_ERROR;
     ani_string aniString = nullptr;
     status = env->String_NewUTF8(string.c_str(), string.size(), &aniString);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] String_NewUTF8 failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]String_NewUTF8 failed,status:%{public}d", __FUNCTION__, status);
         return false;
     }
     if ((status = env->Object_SetPropertyByName_Ref(object, name, aniString)) != ANI_OK) {
@@ -554,13 +554,13 @@ bool SetPropertyStringByName(ani_env* env, ani_object object, const char *name, 
 void SetPropertyBoolByName(ani_env *env, ani_object object, const char *name, bool value)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
     ani_object obj = CreateBool(env, static_cast<ani_boolean>(value));
     ani_status status = ANI_ERROR;
     if ((status = env->Object_SetPropertyByName_Ref(object, name, reinterpret_cast<ani_ref>(obj))) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return;
     }
 }
@@ -568,12 +568,12 @@ void SetPropertyBoolByName(ani_env *env, ani_object object, const char *name, bo
 void SetPropertyBoolByNameValue(ani_env *env, ani_object object, const char *name, bool value)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
     ani_status status = ANI_ERROR;
     if ((status = env->Object_SetPropertyByName_Boolean(object, name, static_cast<ani_boolean>(value))) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return;
     }
 }
@@ -581,13 +581,13 @@ void SetPropertyBoolByNameValue(ani_env *env, ani_object object, const char *nam
 void SetPropertyDoubleByName(ani_env *env, ani_object object, const char *name, double value)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
 
     ani_status status = ANI_ERROR;
     if ((status = env->Object_SetPropertyByName_Double(object, name, value)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return;
     }
     return;
@@ -596,7 +596,7 @@ void SetPropertyDoubleByName(ani_env *env, ani_object object, const char *name, 
 bool SetPropertyIntByName(ani_env *env, ani_object object, const char *name, int32_t value)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return false;
     }
     if (object == nullptr || name == nullptr) {
@@ -605,7 +605,7 @@ bool SetPropertyIntByName(ani_env *env, ani_object object, const char *name, int
     }
     ani_status status = ANI_ERROR;
     if ((status = env->Object_SetPropertyByName_Int(object, name, value)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Object_SetFieldByName_Int status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Object_SetFieldByName_Int status:%{public}d", __FUNCTION__, status);
         return false;
     }
     return true;
@@ -619,7 +619,7 @@ void SetPropertyByName(ani_env *env, ani_object object, const char *name, ani_ob
     }
     ani_status status = ANI_ERROR;
     if ((status = env->Object_SetPropertyByName_Ref(object, name, value)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Object_SetFieldByName_Int status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Object_SetFieldByName_Int status:%{public}d", __FUNCTION__, status);
         return;
     }
 }
@@ -627,18 +627,18 @@ void SetPropertyByName(ani_env *env, ani_object object, const char *name, ani_ob
 bool GetStdString(ani_env *env, ani_string str, std::string &value)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return false;
     }
     ani_status status = ANI_ERROR;
     ani_size sz = 0;
     if ((status = env->String_GetUTF8Size(str, &sz)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return false;
     }
     value.resize(sz + 1);
     if ((status = env->String_GetUTF8SubString(str, 0, sz, value.data(), value.size(), &sz)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return false;
     }
     value.resize(sz);
@@ -681,13 +681,13 @@ std::string AniStringToStdString(ani_env *env, ani_string aniStr)
 ani_string GetAniString(ani_env *env, const std::string &str)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return nullptr;
     }
     ani_string aniStr = nullptr;
     ani_status status = env->String_NewUTF8(str.c_str(), str.size(), &aniStr);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     return aniStr;
@@ -696,14 +696,14 @@ ani_string GetAniString(ani_env *env, const std::string &str)
 bool GetPropertyIntObject(ani_env *env, ani_object param, const char *name, int32_t &value)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return false;
     }
 
     ani_status status = ANI_ERROR;
     ani_int res = 0;
     if ((status = env->Object_GetPropertyByName_Int(param, name, &res)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return false;
     }
     value = res;
@@ -713,14 +713,14 @@ bool GetPropertyIntObject(ani_env *env, ani_object param, const char *name, int3
 bool GetPropertyDoubleObject(ani_env *env, ani_object param, const char *name, double &value)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return false;
     }
 
     ani_status status = ANI_ERROR;
     ani_double res = 0.0;
     if ((status = env->Object_GetPropertyByName_Double(param, name, &res)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return false;
     }
     value = static_cast<double>(res);
@@ -730,18 +730,18 @@ bool GetPropertyDoubleObject(ani_env *env, ani_object param, const char *name, d
 bool GetPropertyBoolByName(ani_env *env, ani_object object, const char *name, bool &value)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return false;
     }
     ani_status status = ANI_ERROR;
     ani_ref field = nullptr;
     if ((status = env->Object_GetPropertyByName_Ref(object, name, &field)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return false;
     }
     ani_boolean isUndefined = ANI_TRUE;
     if ((status = env->Reference_IsUndefined(field, &isUndefined)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return false;
     }
     if (isUndefined) {
@@ -751,7 +751,7 @@ bool GetPropertyBoolByName(ani_env *env, ani_object object, const char *name, bo
     ani_boolean aniValue = ANI_FALSE;
     if ((status = env->Object_CallMethodByName_Boolean(
         reinterpret_cast<ani_object>(field), "toBoolean", nullptr, &aniValue)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return false;
     }
     value = static_cast<bool>(aniValue);
@@ -810,18 +810,18 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
 bool AsyncCallback(ani_env *env, const char *className, ani_object call, ani_object error, ani_object result)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return false;
     }
     ani_class clsCall = nullptr;
     ani_status status = env->FindClass(className, &clsCall);
     if (status!= ANI_OK || clsCall == nullptr) {
-        HILOG_ERROR("[%{public}s] FindClass status:%{public}d,or null clsCall", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]FindClass status:%{public}d,or null clsCall", __FUNCTION__, status);
         return false;
     }
     ani_method method = nullptr;
     if ((status = env->Class_FindMethod(clsCall, "invoke", nullptr, &method)) != ANI_OK || method == nullptr) {
-        HILOG_ERROR("[%{public}s] Class_FindMethod status:%{public}d,or null method", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Class_FindMethod status:%{public}d,or null method", __FUNCTION__, status);
         return false;
     }
     if (error == nullptr) {
@@ -835,7 +835,7 @@ bool AsyncCallback(ani_env *env, const char *className, ani_object call, ani_obj
         result = reinterpret_cast<ani_object>(undefinedRef);
     }
     if ((status = env->Object_CallMethod_Void(call, method, error, result)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Object_CallMethod_Void status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Object_CallMethod_Void status:%{public}d", __FUNCTION__, status);
         return false;
     }
     return true;
@@ -844,22 +844,22 @@ bool AsyncCallback(ani_env *env, const char *className, ani_object call, ani_obj
 bool Callback(ani_env *env, ani_object call, ani_object result, const char *name)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return false;
     }
     ani_class clsCall = nullptr;
     ani_status status = env->FindClass(name, &clsCall);
     if (status!= ANI_OK || clsCall == nullptr) {
-        HILOG_ERROR("[%{public}s] FindClass status:%{public}d,or null clsCall", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]FindClass status:%{public}d,or null clsCall", __FUNCTION__, status);
         return false;
     }
     ani_method method = nullptr;
     if ((status = env->Class_FindMethod(clsCall, "invoke", nullptr, &method)) != ANI_OK || method == nullptr) {
-        HILOG_ERROR("[%{public}s] Class_FindMethod status:%{public}d,or null method", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Class_FindMethod status:%{public}d,or null method", __FUNCTION__, status);
         return false;
     }
     if ((status = env->Object_CallMethod_Void(call, method, result)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Object_CallMethod_Void status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Object_CallMethod_Void status:%{public}d", __FUNCTION__, status);
         return false;
     }
     return true;
@@ -867,42 +867,42 @@ bool Callback(ani_env *env, ani_object call, ani_object result, const char *name
 
 ani_object CreateFormInstances(ani_env *env, const std::vector<AppExecFwk::FormInstance> &formInstances)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return nullptr;
     }
     ani_class arrayCls = nullptr;
     ani_status status = ANI_OK;
     status = env->FindClass(CLASSNAME_ARRAY, &arrayCls);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] FindClass failed status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]FindClass failed status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
     ani_method arrayCtor;
     status = env->Class_FindMethod(arrayCls, "<ctor>", "i:", &arrayCtor);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] find ctor failed status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]find ctor failed status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
     ani_object arrayObj = nullptr;
     status = env->Object_New(arrayCls, arrayCtor, &arrayObj, formInstances.size());
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Object_New array status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Object_New array status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     ani_size index = 0;
     for (auto &iter : formInstances) {
         ani_object aniInfo = CreateFormInstance(env, iter);
         if (aniInfo == nullptr) {
-            HILOG_WARN("[%{public}s] null aniInfo", __FUNCTION__);
+            HILOG_WARN("[%{public}s]null aniInfo", __FUNCTION__);
             break;
         }
         status = env->Object_CallMethodByName_Void(arrayObj, ANI_SETTER_MARKER, ANI_SET_SIGNATURE, index, aniInfo);
         if (status != ANI_OK) {
-            HILOG_WARN("[%{public}s] Object_CallMethodByName_Void failed status:%{public}d", __FUNCTION__, status);
+            HILOG_WARN("[%{public}s]Object_CallMethodByName_Void failed status:%{public}d", __FUNCTION__, status);
             break;
         }
         index++;
@@ -912,9 +912,9 @@ ani_object CreateFormInstances(ani_env *env, const std::vector<AppExecFwk::FormI
 
 ani_object CreateFormInstance(ani_env *env, const AppExecFwk::FormInstance &formInstance)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return nullptr;
     }
     ani_class infoClass = nullptr;
@@ -922,15 +922,15 @@ ani_object CreateFormInstance(ani_env *env, const AppExecFwk::FormInstance &form
     ani_method method = nullptr;
     ani_object infoObject = nullptr;
     if ((status = env->FindClass(CLASSNAME_RUNNING_FORM_INFO, &infoClass)) != ANI_OK || infoClass == nullptr) {
-        HILOG_ERROR("[%{public}s] FindClass status:%{public}d or null infoClass", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]FindClass status:%{public}d or null infoClass", __FUNCTION__, status);
         return nullptr;
     }
     if ((status = env->Class_FindMethod(infoClass, "<ctor>", ":", &method)) != ANI_OK || method == nullptr) {
-        HILOG_ERROR("[%{public}s] Class_FindMethod status:%{public}d or null method", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Class_FindMethod status:%{public}d or null method", __FUNCTION__, status);
         return nullptr;
     }
     if ((status = env->Object_New(infoClass, method, &infoObject)) != ANI_OK || infoObject == nullptr) {
-        HILOG_ERROR("[%{public}s] Object_New status:%{public}d or null infoObject", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Object_New status:%{public}d or null infoObject", __FUNCTION__, status);
         return nullptr;
     }
     std::string formStr = std::to_string(formInstance.formId);
@@ -948,21 +948,21 @@ ani_object CreateFormInstance(ani_env *env, const AppExecFwk::FormInstance &form
     ani_enum_item visibilityType {};
     if (!AniEnumConvertUtil::EnumConvert_NativeToEts(env, ENUMNAME_VISIBILITYTYPE,
         formInstance.formVisiblity, visibilityType)) {
-        HILOG_ERROR("[%{public}s] visibilityType convert failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]visibilityType convert failed", __FUNCTION__);
         return nullptr;
     }
     if ((status = env->Object_SetPropertyByName_Ref(infoObject, "visibilityType", visibilityType)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] visibilityType failed status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]visibilityType failed status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     ani_enum_item formUsageState {};
     if (!AniEnumConvertUtil::EnumConvert_NativeToEts(env, ENUMNAME_FORMUSAGESTATE,
         formInstance.formUsageState, formUsageState)) {
-        HILOG_ERROR("[%{public}s] formUsageState convert failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]formUsageState convert failed", __FUNCTION__);
         return nullptr;
     }
     if ((status = env->Object_SetPropertyByName_Ref(infoObject, "formUsageState", formUsageState)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] formUsageState failed status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]formUsageState failed status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     return infoObject;
@@ -970,42 +970,42 @@ ani_object CreateFormInstance(ani_env *env, const AppExecFwk::FormInstance &form
 
 ani_object CreateRunningFormInfos(ani_env *env, const std::vector<AppExecFwk::RunningFormInfo> &runningFormInfos)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return nullptr;
     }
     ani_class arrayCls = nullptr;
     ani_status status = ANI_OK;
     status = env->FindClass(CLASSNAME_ARRAY, &arrayCls);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] FindClass failed status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]FindClass failed status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
     ani_method arrayCtor;
     status = env->Class_FindMethod(arrayCls, "<ctor>", "i:", &arrayCtor);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] find ctor failed status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]find ctor failed status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
     ani_object arrayObj = nullptr;
     status = env->Object_New(arrayCls, arrayCtor, &arrayObj, runningFormInfos.size());
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Object_New array status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Object_New array status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     ani_size index = 0;
     for (auto &iter : runningFormInfos) {
         ani_object aniInfo = CreateRunningFormInfo(env, iter);
         if (aniInfo == nullptr) {
-            HILOG_WARN("[%{public}s] null aniInfo", __FUNCTION__);
+            HILOG_WARN("[%{public}s]null aniInfo", __FUNCTION__);
             return nullptr;
         }
         status = env->Object_CallMethodByName_Void(arrayObj, ANI_SETTER_MARKER, ANI_SET_SIGNATURE, index, aniInfo);
         if (status != ANI_OK) {
-            HILOG_WARN("[%{public}s] Object_CallMethodByName_Void failed status:%{public}d", __FUNCTION__, status);
+            HILOG_WARN("[%{public}s]Object_CallMethodByName_Void failed status:%{public}d", __FUNCTION__, status);
             return nullptr;
         }
         index++;
@@ -1015,9 +1015,9 @@ ani_object CreateRunningFormInfos(ani_env *env, const std::vector<AppExecFwk::Ru
 
 ani_object CreateRunningFormInfo(ani_env *env, const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return nullptr;
     }
     ani_class infoClass = nullptr;
@@ -1025,15 +1025,15 @@ ani_object CreateRunningFormInfo(ani_env *env, const AppExecFwk::RunningFormInfo
     ani_method method = nullptr;
     ani_object infoObject = nullptr;
     if ((status = env->FindClass(CLASSNAME_RUNNING_FORM_INFO, &infoClass)) != ANI_OK || infoClass == nullptr) {
-        HILOG_ERROR("[%{public}s] FindClass status:%{public}d or null infoClass", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]FindClass status:%{public}d or null infoClass", __FUNCTION__, status);
         return nullptr;
     }
     if ((status = env->Class_FindMethod(infoClass, "<ctor>", ":", &method)) != ANI_OK || method == nullptr) {
-        HILOG_ERROR("[%{public}s] Class_FindMethod status:%{public}d or null method", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Class_FindMethod status:%{public}d or null method", __FUNCTION__, status);
         return nullptr;
     }
     if ((status = env->Object_New(infoClass, method, &infoObject)) != ANI_OK || infoObject == nullptr) {
-        HILOG_ERROR("[%{public}s] Object_New status:%{public}d or null infoObject", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Object_New status:%{public}d or null infoObject", __FUNCTION__, status);
         return nullptr;
     }
     std::string formStr = std::to_string(runningFormInfo.formId);
@@ -1059,7 +1059,7 @@ ani_object CreateRunningFormInfo(ani_env *env, const AppExecFwk::RunningFormInfo
 bool GetStringProperty(ani_env *env, ani_object param, const char *name, std::string &value)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return false;
     }
 
@@ -1068,11 +1068,11 @@ bool GetStringProperty(ani_env *env, ani_object param, const char *name, std::st
     ani_status status = ANI_ERROR;
 
     if ((status = env->Object_GetPropertyByName_Ref(param, name, &obj)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] get %{public}s status:%{public}d", __FUNCTION__, name, status);
+        HILOG_ERROR("[%{public}s]get %{public}s status:%{public}d", __FUNCTION__, name, status);
         return false;
     }
     if ((status = env->Reference_IsUndefined(obj, &isUndefined)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] get %{public}s status:%{public}d", __FUNCTION__, name, status);
+        HILOG_ERROR("[%{public}s]get %{public}s status:%{public}d", __FUNCTION__, name, status);
         return false;
     }
     if (isUndefined) {
@@ -1088,7 +1088,7 @@ bool GetStringProperty(ani_env *env, ani_object param, const char *name, std::st
 
 bool ParseProviderFilter(ani_env *env, ani_object aniProviderFilter, AppExecFwk::FormInstancesFilter &filter)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (env == nullptr || aniProviderFilter == nullptr) {
         HILOG_ERROR("env or aniProviderFilter is null");
         return false;
@@ -1128,23 +1128,23 @@ ani_env *GetEnvFromVm(ani_vm *vm)
 ani_object CreateBool(ani_env *env, ani_boolean value)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return nullptr;
     }
     ani_status status = ANI_ERROR;
     ani_class cls = nullptr;
     if ((status = env->FindClass(CLASSNAME_BOOL, &cls)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     ani_method ctor = nullptr;
     if ((status = env->Class_FindMethod(cls, "<ctor>", "z:", &ctor)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     ani_object obj = nullptr;
     if ((status = env->Object_New(cls, ctor, &obj, value)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     return obj;
@@ -1153,7 +1153,7 @@ ani_object CreateBool(ani_env *env, ani_boolean value)
 ani_object CreateInt(ani_env *env, ani_int value)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return nullptr;
     }
 
@@ -1164,19 +1164,19 @@ ani_object CreateInt(ani_env *env, ani_int value)
 
     status = env->FindClass("std.core.Int", &cls);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] FindClass failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]FindClass failed,status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
     status = env->Class_FindMethod(cls, "<ctor>", "i:", &ctor);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Class_FindMethod failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Class_FindMethod failed,status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
     status = env->Object_New(cls, ctor, &object, value);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Object_New failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Object_New failed,status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
@@ -1215,7 +1215,7 @@ ani_object CreateFormStateInfo(ani_env *env, int32_t state, Want want)
     ani_object returnObject = FormAniUtil::CreateAniObject(
         env, AppExecFwk::Constants::FORM_STATE_INFO_INNER_CLASS_NAME);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return nullptr;
     }
 
@@ -1238,7 +1238,7 @@ ani_object CreateFormStateInfo(ani_env *env, int32_t state, Want want)
     ani_enum_item item;
     status = env->Enum_GetEnumItemByIndex(formState, static_cast<ani_size>(static_cast<int>(state) + 1), &item);
     if (status != ANI_OK) {
-        HILOG_INFO("[%{public}s] Cannot get enum item", __FUNCTION__);
+        HILOG_INFO("[%{public}s]Cannot get enum item", __FUNCTION__);
         return nullptr;
     }
 
@@ -1265,7 +1265,7 @@ ani_object CreateFormStateInfo(ani_env *env, int32_t state, Want want)
 ani_object GetAniArray(ani_env *env, size_t array_size)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return nullptr;
     }
     ani_class arrayCls = GetAniClass(env, CLASSNAME_ARRAY);
@@ -1291,9 +1291,9 @@ ani_object GetAniArray(ani_env *env, size_t array_size)
 
 ani_object NewRecordClass(ani_env *env)
 {
-    HILOG_INFO("[%{public}s] Call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]Call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return nullptr;
     }
     ani_object recordObj = {};
@@ -1319,14 +1319,14 @@ ani_object NewRecordClass(ani_env *env)
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return nullptr;
     }
-    HILOG_INFO("[%{public}s] End", __FUNCTION__);
+    HILOG_INFO("[%{public}s]End", __FUNCTION__);
     return recordObj;
 }
 
 ani_status GetEnumValueInt(ani_env *env, ani_object obj, ani_int &enumValue)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return ANI_ERROR;
     }
     HILOG_INFO("Call GetEnumValueInt");
@@ -1370,7 +1370,7 @@ ani_status GetEnumValueInt(ani_env *env, ani_object obj, ani_int &enumValue)
 bool AniParseIntArray(ani_env *env, const ani_array &array, std::vector<int32_t> &out)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return false;
     }
     ani_size size;
@@ -1411,11 +1411,11 @@ bool InvokeCallback(ani_env *env, ani_object obj, ani_object arg)
 bool IsRefUndefined(ani_env *env, ani_object obj)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return false;
     }
     if (obj == nullptr) {
-        HILOG_ERROR("[%{public}s] obj is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]obj is nullptr", __FUNCTION__);
         return false;
     }
     ani_boolean isUndefined = false;
@@ -1433,7 +1433,7 @@ bool VectorHasNegativeValue(const std::vector<int>& vec)
 int64_t FormIdAniStrtoInt64(ani_env *env, const ani_string &formId)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return INVALID_FORMID;
     }
     HILOG_INFO("Call FormIdAniStrtoInt64");
@@ -1468,7 +1468,7 @@ int64_t SystemTimeMillis() noexcept
 void CheckIfRefValidOrThrow(ani_env *env, ani_object obj)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return;
     }
 
@@ -1484,13 +1484,13 @@ void ExtractProxyVector(ani_env *env, std::vector<AppExecFwk::FormDataProxy> &fo
     ani_ref proxiesArrayRef)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return;
     }
     size_t formDataProxiesArrayLen = 0;
     ani_status status = env->Array_GetLength(static_cast<ani_array>(proxiesArrayRef), &formDataProxiesArrayLen);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Array_GetLength failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Array_GetLength failed,status:%{public}d", __FUNCTION__, status);
         return;
     }
 
@@ -1527,12 +1527,12 @@ void InvokeAsyncWithBusinessError(ani_env *env, ani_object obj, int32_t internal
     auto extErrCode = AppExecFwk::FormErrors::GetInstance().QueryExternalErrorCode(internalErrorCode);
     auto errMsg = AppExecFwk::FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(extErrCode);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return;
     }
 
     if (obj == nullptr) {
-        HILOG_ERROR("[%{public}s] obj is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]obj is nullptr", __FUNCTION__);
         if (internalErrorCode != ERR_OK) {
             AbilityRuntime::EtsErrorUtil::ThrowError(env, extErrCode, errMsg);
         }
@@ -1562,7 +1562,7 @@ void InvokeAsyncWithBusinessError(ani_env *env, ani_object obj, int32_t internal
 void PrepareExceptionAndThrow(ani_env *env, int32_t internalErrorCode)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return;
     }
     auto extErrCode = AppExecFwk::FormErrors::GetInstance().QueryExternalErrorCode(internalErrorCode);
@@ -1573,7 +1573,7 @@ void PrepareExceptionAndThrow(ani_env *env, int32_t internalErrorCode)
 void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::FormInfo &formInfo)
 {
     if (env == nullptr || formInfoAni == nullptr) {
-        HILOG_ERROR("[%{public}s] invalid param", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid param", __FUNCTION__);
         return;
     }
     // Set nullable boolean properties
@@ -1618,15 +1618,15 @@ void SetFormInfoFields(ani_env *env, ani_object formInfoAni, const AppExecFwk::F
 
 void SetRecordKeyValue(ani_env *env, ani_object &recordObject, std::string &key, ani_object &value)
 {
-    HILOG_DEBUG("[%{public}s] Call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]Call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return;
     }
     ani_class recordCls;
     ani_status status = env->FindClass(CLASSNAME_RECORD, &recordCls);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] FindClass failed status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]FindClass failed status:%{public}d", __FUNCTION__, status);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return;
     }
@@ -1642,7 +1642,7 @@ void SetRecordKeyValue(ani_env *env, ani_object &recordObject, std::string &key,
     ani_string ani_key {};
     status = env->String_NewUTF8(key.c_str(), key.length(), &ani_key);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] String_NewUTF8 failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]String_NewUTF8 failed,status:%{public}d", __FUNCTION__, status);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return;
     }
@@ -1653,13 +1653,13 @@ void SetRecordKeyValue(ani_env *env, ani_object &recordObject, std::string &key,
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return;
     }
-    HILOG_INFO("[%{public}s] End", __FUNCTION__);
+    HILOG_INFO("[%{public}s]End", __FUNCTION__);
 }
 
 void SetRunningFormInfoFields(ani_env *env, ani_object formInfoAni, AppExecFwk::RunningFormInfo &formInfo)
 {
     if (env == nullptr || formInfoAni == nullptr) {
-        HILOG_ERROR("[%{public}s] invalid param", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid param", __FUNCTION__);
         return;
     }
     // Set basic integer properties
@@ -1684,7 +1684,7 @@ void SetRunningFormInfoFields(ani_env *env, ani_object formInfoAni, AppExecFwk::
 bool ConvertStringArrayToInt64Vector(ani_env *env, const ani_object arrayObj, std::vector<int64_t> &int64Vector)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return false;
     }
@@ -1692,7 +1692,7 @@ bool ConvertStringArrayToInt64Vector(ani_env *env, const ani_object arrayObj, st
     ani_size arrayLength = 0;
     ani_status status = env->Array_GetLength(reinterpret_cast<ani_array>(arrayObj), &arrayLength);
     if (status != ANI_OK) {
-        HILOG_ERROR("[%{public}s] Array_GetLength failed,status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]Array_GetLength failed,status:%{public}d", __FUNCTION__, status);
         PrepareExceptionAndThrow(env, static_cast<int>(ERR_APPEXECFWK_FORM_INVALID_PARAM));
         return false;
     }

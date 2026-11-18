@@ -46,11 +46,11 @@ public:
     {
         HILOG_INFO("RegisterFormObserver Call");
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
             return;
         }
         if (IsUndefined(env, reinterpret_cast<ani_ref>(callback))) {
-            HILOG_ERROR("[%{public}s] callback is undefined", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]callback is undefined", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamError(env, "callback is required");
             return;
         }
@@ -61,7 +61,7 @@ public:
         }
         std::string type;
         if (!FormAniUtil::GetStdString(env, aniType, type)) {
-            HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamTypeError(env, "type",
                 "formAdd, formRemove, notifyVisible, notifyInvisible, router, message, call.");
             return;
@@ -77,7 +77,7 @@ public:
         } else if (type == "router" || type == "message" || type == "call") {
             OnRegisterClickEventCallback(env, type, aniHostBundleName, callback);
         } else {
-            HILOG_ERROR("[%{public}s] args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamTypeError(env, "type",
                 "formAdd, formRemove, notifyVisible, notifyInvisible, router, message, call.");
             return;
@@ -89,7 +89,7 @@ public:
     {
         HILOG_INFO("UnregisterFormObserver Call");
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
             return;
         }
         if (!FormAniUtil::CheckCallerIsSystemApp()) {
@@ -99,7 +99,7 @@ public:
         }
         std::string type;
         if (!FormAniUtil::GetStdString(env, aniType, type)) {
-            HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamTypeError(env, "type",
                 "formAdd, formRemove, notifyVisible, notifyInvisible or notifyInvisible.");
             return;
@@ -116,7 +116,7 @@ public:
         } else if (type == "router" || type == "message" || type == "call") {
             return OnUnregisterClickEventCallback(env, type, aniHostBundleName, callback);
         } else {
-            HILOG_ERROR("[%{public}s] args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]args[0] not formAdd,formRemove,notifyVisible,notifyInvisible,router,message,call", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamTypeError(env, "type",
                 "args[0] should be formAdd, formRemove,"
                 "notifyVisible, notifyInvisible, router, message, call");
@@ -127,25 +127,25 @@ public:
     static void GetRunningFormInfoById(ani_env *env, ani_string formId,
         ani_boolean aniIsUnusedIncluded, ani_object callback)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
             return;
         }
         if (IsUndefined(env, reinterpret_cast<ani_ref>(callback))) {
-            HILOG_ERROR("[%{public}s] callback is undefined", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]callback is undefined", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamError(env, "callback is required");
             return;
         }
         std::string stdFormId = "";
         if (!FormAniUtil::GetStdString(env, formId, stdFormId)) {
-            HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
             return;
         }
         int64_t formIdInt = -1;
         if (!FormAniUtil::ConvertStringToInt64(stdFormId, formIdInt)) {
-            HILOG_ERROR("[%{public}s] formId ConvertStringToInt64 failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]formId ConvertStringToInt64 failed", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
             return;
         }
@@ -172,19 +172,19 @@ public:
     static void GetRunningFormInfos(ani_env *env, ani_string hostBundleName,
         ani_boolean aniIsUnusedIncluded, ani_object callback)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
             return;
         }
         if (IsUndefined(env, reinterpret_cast<ani_ref>(callback))) {
-            HILOG_ERROR("[%{public}s] callback is undefined", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]callback is undefined", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamError(env, "callback is required");
             return;
         }
         std::string stdBundleName = "";
         if (!FormAniUtil::GetStdString(env, hostBundleName, stdBundleName)) {
-            HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamError(env, "bundleName is empty.");
             return;
         }
@@ -200,7 +200,7 @@ public:
         }
         ani_object aniArrayFormInfos = FormAniUtil::CreateRunningFormInfos(env, runningFormInfos);
         if (aniArrayFormInfos == nullptr) {
-            HILOG_ERROR("[%{public}s] GetRunningFormInfos failed ret=%{public}d", __FUNCTION__, ret);
+            HILOG_ERROR("[%{public}s]GetRunningFormInfos failed ret=%{public}d", __FUNCTION__, ret);
             return;
         }
         FormAniUtil::AsyncCallback(env, OBSERVER_CLASSNAME_ASYNC_CALLBACK_WRAPPER, callback,
@@ -211,13 +211,13 @@ public:
     static void GetRunningFormInfosNotBundlename(ani_env *env, ani_boolean aniIsUnusedIncludedValue,
         ani_object callback)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
             return;
         }
         if (IsUndefined(env, reinterpret_cast<ani_ref>(callback))) {
-            HILOG_ERROR("[%{public}s] callback is undefined", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]callback is undefined", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamError(env, "callback is required");
             return;
         }
@@ -225,14 +225,14 @@ public:
         std::vector<AppExecFwk::RunningFormInfo> runningFormInfos;
         ErrCode ret = FormMgr::GetInstance().GetRunningFormInfos(isUnusedIncluded, runningFormInfos);
         if (ret != ERR_OK) {
-            HILOG_ERROR("[%{public}s] GetRunningFormInfos failed ret=%{public}d", __FUNCTION__, ret);
+            HILOG_ERROR("[%{public}s]GetRunningFormInfos failed ret=%{public}d", __FUNCTION__, ret);
             FormAniUtil::AsyncCallback(env, OBSERVER_CLASSNAME_ASYNC_CALLBACK_WRAPPER,
                 callback, EtsFormErrorUtil::CreateErrorByInternalErrorCode(env, ret), nullptr);
             return;
         }
         ani_object aniArrayFormInfos = FormAniUtil::CreateRunningFormInfos(env, runningFormInfos);
         if (aniArrayFormInfos == nullptr) {
-            HILOG_ERROR("[%{public}s] GetRunningFormInfos failed ret=%{public}d", __FUNCTION__, ret);
+            HILOG_ERROR("[%{public}s]GetRunningFormInfos failed ret=%{public}d", __FUNCTION__, ret);
             return;
         }
         FormAniUtil::AsyncCallback(env, OBSERVER_CLASSNAME_ASYNC_CALLBACK_WRAPPER, callback,
@@ -242,9 +242,9 @@ public:
 
     static void GetRunningFormInfosByFilter(ani_env *env, ani_object aniFormProviderFilter, ani_object callback)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
             return;
         }
         if (IsUndefined(env, reinterpret_cast<ani_ref>(aniFormProviderFilter))) {
@@ -253,13 +253,13 @@ public:
             return;
         }
         if (IsUndefined(env, reinterpret_cast<ani_ref>(callback))) {
-            HILOG_ERROR("[%{public}s] callback is undefined", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]callback is undefined", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamError(env, "callback is required");
             return;
         }
         AppExecFwk::FormInstancesFilter filter;
         if (!FormAniUtil::ParseProviderFilter(env, aniFormProviderFilter, filter)) {
-            HILOG_ERROR("[%{public}s] Input params parse failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]Input params parse failed", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamTypeError(env, "formProviderFilter", "object");
             return;
         }
@@ -273,7 +273,7 @@ public:
         }
         ani_object aniArrayFormInfos = FormAniUtil::CreateFormInstances(env, *formInstances);
         if (aniArrayFormInfos == nullptr) {
-            HILOG_ERROR("[%{public}s] GetRunningFormInfos failed ret=%{public}d", __FUNCTION__, ret);
+            HILOG_ERROR("[%{public}s]GetRunningFormInfos failed ret=%{public}d", __FUNCTION__, ret);
             return;
         }
         FormAniUtil::AsyncCallback(env, OBSERVER_CLASSNAME_ASYNC_CALLBACK_WRAPPER, callback,
@@ -284,19 +284,19 @@ public:
     static void CheckFormIDParam(ani_env *env, ani_string formId)
     {
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
             return;
         }
         std::string stdFormId = "";
         if (!FormAniUtil::GetStdString(env, formId, stdFormId)) {
-            HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
             return;
         }
         HILOG_INFO("stdFormId %{public}s", stdFormId.c_str());
         int64_t formIdInt = -1;
         if (!FormAniUtil::ConvertStringToInt64(stdFormId, formIdInt)) {
-            HILOG_ERROR("[%{public}s] formId ConvertStringToInt64 failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]formId ConvertStringToInt64 failed", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
             return;
         }
@@ -305,12 +305,12 @@ public:
     static void CheckHostBundleNameParam(ani_env *env, ani_string hostBundleName)
     {
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
             return;
         }
         std::string stdBundleName = "";
         if (!FormAniUtil::GetStdString(env, hostBundleName, stdBundleName)) {
-            HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamError(env, "bundleName is empty.");
             return;
         }
@@ -319,12 +319,12 @@ public:
     static void CheckformProviderFilterParam(ani_env *env, ani_object aniFormProviderFilter)
     {
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
             return;
         }
         AppExecFwk::FormInstancesFilter filter;
         if (!FormAniUtil::ParseProviderFilter(env, aniFormProviderFilter, filter)) {
-            HILOG_ERROR("[%{public}s] Input params parse failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]Input params parse failed", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamTypeError(env, "formProviderFilter", "object");
         }
     }
@@ -334,7 +334,7 @@ private:
     static bool IsUndefined(ani_env* env, ani_ref ref)
     {
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
             return false;
         }
         ani_status status = ANI_ERROR;
@@ -348,14 +348,14 @@ private:
 
     static void OnRegisterFormAddObserver(ani_env* env, ani_string aniHostBundleName, ani_object callback)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
             return;
         }
         std::string bundleName = "";
         if (!FormAniUtil::GetStdString(env, aniHostBundleName, bundleName)) {
-            HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamTypeError(env, "bundleName", "string");
             return;
         }
@@ -369,7 +369,7 @@ private:
         }
         ani_vm* aniVM = nullptr;
         if (env->GetVM(&aniVM) != ANI_OK) {
-            HILOG_ERROR("[%{public}s] get aniVM failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]get aniVM failed", __FUNCTION__);
             return;
         }
         if (!EtsFormStateObserver::GetInstance()->RegisterFormAddCallback(aniVM, bundleName, callback)) {
@@ -380,14 +380,14 @@ private:
 
     static void OnRegisterFormRemoveObserver(ani_env* env, ani_string aniHostBundleName, ani_object callback)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
             return;
         }
         std::string bundleName = "";
         if (!FormAniUtil::GetStdString(env, aniHostBundleName, bundleName)) {
-            HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamTypeError(env, "bundleName", "string");
             return;
         }
@@ -401,7 +401,7 @@ private:
         }
         ani_vm* aniVM = nullptr;
         if (env->GetVM(&aniVM) != ANI_OK) {
-            HILOG_ERROR("[%{public}s] get aniVM failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]get aniVM failed", __FUNCTION__);
             return;
         }
         if (!EtsFormStateObserver::GetInstance()->RegisterFormRemoveCallback(aniVM, bundleName, callback)) {
@@ -414,15 +414,15 @@ private:
     static void OnRegisterFormIsVisibleObserver(ani_env* env, ani_string aniHostBundleName,
         ani_object callback, bool isVisibility)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         std::string bundleName = "";
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
             return;
         }
         if (!IsUndefined(env, reinterpret_cast<ani_ref>(aniHostBundleName))) {
             if (!FormAniUtil::GetStdString(env, aniHostBundleName, bundleName) || bundleName.empty()) {
-                HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
                 EtsFormErrorUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return;
             }
@@ -430,7 +430,7 @@ private:
         sptr<EtsFormStateObserver> formObserver = EtsFormStateObserver::GetInstance();
         ani_vm* aniVM = nullptr;
         if (env->GetVM(&aniVM) != ANI_OK) {
-            HILOG_ERROR("[%{public}s] get aniVM failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]get aniVM failed", __FUNCTION__);
             return;
         }
         formObserver->RegisterFormInstanceCallback(
@@ -440,20 +440,20 @@ private:
     static void OnRegisterClickEventCallback(ani_env* env, const std::string &type,
         ani_string aniHostBundleName, ani_object callback)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
             return;
         }
         std::string bundleName = "";
         if (!FormAniUtil::GetStdString(env, aniHostBundleName, bundleName)) {
-            HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamTypeError(env, "bundleName", "string");
             return;
         }
         ani_vm* aniVM = nullptr;
         if (env->GetVM(&aniVM) != ANI_OK) {
-            HILOG_ERROR("[%{public}s] get aniVM failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]get aniVM failed", __FUNCTION__);
             return;
         }
         EtsFormStateObserver::GetInstance()->RegisterClickEventCallback(aniVM, bundleName, callback, type);
@@ -461,9 +461,9 @@ private:
 
     static void OnUnregisterFormAddObserver(ani_env* env, ani_string aniHostBundleName, ani_object callback)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
             return;
         }
         bool isBundleNameUndefined = IsUndefined(env, reinterpret_cast<ani_ref>(aniHostBundleName));
@@ -479,7 +479,7 @@ private:
         if (!isBundleNameUndefined && isCallbackUndefined) {
             std::string bundleName = "";
             if (!FormAniUtil::GetStdString(env, aniHostBundleName, bundleName)) {
-                HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
                 EtsFormErrorUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return;
             }
@@ -489,7 +489,7 @@ private:
         if (!isBundleNameUndefined && !isCallbackUndefined) {
             std::string bundleName = "";
             if (!FormAniUtil::GetStdString(env, aniHostBundleName, bundleName)) {
-                HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
                 EtsFormErrorUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return;
             }
@@ -500,9 +500,9 @@ private:
 
     static void OnUnregisterFormRemoveObserver(ani_env* env, ani_string aniHostBundleName, ani_object callback)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
             return;
         }
         bool isBundleNameUndefined = IsUndefined(env, reinterpret_cast<ani_ref>(aniHostBundleName));
@@ -518,7 +518,7 @@ private:
         if (!isBundleNameUndefined && isCallbackUndefined) {
             std::string bundleName = "";
             if (!FormAniUtil::GetStdString(env, aniHostBundleName, bundleName)) {
-                HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
                 EtsFormErrorUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return;
             }
@@ -528,7 +528,7 @@ private:
         if (!isBundleNameUndefined && !isCallbackUndefined) {
             std::string bundleName = "";
             if (!FormAniUtil::GetStdString(env, aniHostBundleName, bundleName)) {
-                HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
                 EtsFormErrorUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return;
             }
@@ -540,9 +540,9 @@ private:
     static void OnUnregisterFormIsVisibleObserver(ani_env* env, ani_string aniHostBundleName,
         ani_object callback, bool isVisibility)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
             return;
         }
         bool isBundleNameUndefined = IsUndefined(env, reinterpret_cast<ani_ref>(aniHostBundleName));
@@ -564,7 +564,7 @@ private:
         if (!isBundleNameUndefined && isCallbackUndefined) {
             std::string bundleName = "";
             if (!FormAniUtil::GetStdString(env, aniHostBundleName, bundleName) || bundleName.empty()) {
-                HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
                 EtsFormErrorUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return;
             }
@@ -574,7 +574,7 @@ private:
         if (!isBundleNameUndefined && !isCallbackUndefined) {
             std::string bundleName = "";
             if (!FormAniUtil::GetStdString(env, aniHostBundleName, bundleName) || bundleName.empty()) {
-                HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
                 EtsFormErrorUtil::ThrowParamTypeError(env, "bundleName", "string");
                 return;
             }
@@ -586,9 +586,9 @@ private:
     static void OnUnregisterClickEventCallback(ani_env* env, const std::string &type,
         ani_string aniHostBundleName, ani_object callback)
     {
-        HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+        HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
         if (env == nullptr) {
-            HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
             return;
         }
         bool isBundleNameUndefined = IsUndefined(env, reinterpret_cast<ani_ref>(aniHostBundleName));
@@ -604,7 +604,7 @@ private:
         if (!isBundleNameUndefined && isCallbackUndefined) {
             std::string bundleName = "";
             if (!FormAniUtil::GetStdString(env, aniHostBundleName, bundleName)) {
-                HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
                 return;
             }
             EtsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, bundleName);
@@ -613,7 +613,7 @@ private:
         if (!isBundleNameUndefined && !isCallbackUndefined) {
             std::string bundleName = "";
             if (!FormAniUtil::GetStdString(env, aniHostBundleName, bundleName)) {
-                HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
                 return;
             }
             EtsFormStateObserver::GetInstance()->ClearFormClickCallback(type, bundleName, callback);
@@ -626,7 +626,7 @@ void EtsFormObserverInit(ani_env* env)
 {
     HILOG_INFO("EtsFormObserverInit Call");
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
     ani_status status = ANI_ERROR;

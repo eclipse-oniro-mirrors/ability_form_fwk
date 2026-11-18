@@ -96,7 +96,7 @@ void FormAbilityConnection::ProcessFreeInstall(const AppExecFwk::ElementName &el
 
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId_, formRecord)) {
-        HILOG_ERROR("[%{public}s] not exist such form:%{public}" PRId64, __FUNCTION__, formId_);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64, __FUNCTION__, formId_);
         return;
     }
 
@@ -174,7 +174,7 @@ bool FormAbilityConnection::onFormAppConnect()
 
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId_, formRecord)) {
-        HILOG_ERROR("[%{public}s] not exist such form:%{public}" PRId64, __FUNCTION__, formId_);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64, __FUNCTION__, formId_);
         return false;
     }
     std::vector<AppExecFwk::RunningProcessInfo> infos;

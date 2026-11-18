@@ -172,7 +172,7 @@ void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventTy
 {
     std::string name = ConvertEventName(eventName);
     if (name == INVALIDEVENTNAME) {
-        HILOG_ERROR("[%{public}s] invalid eventName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid eventName", __FUNCTION__);
         return;
     }
 
@@ -202,7 +202,7 @@ void FormEventReport::SendSecondFormEvent(const FormEventName &eventName, HiSysE
 {
     std::string name = ConvertEventName(eventName);
     if (name == INVALIDEVENTNAME) {
-        HILOG_ERROR("[%{public}s] invalid eventName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid eventName", __FUNCTION__);
         return;
     }
 
@@ -245,7 +245,7 @@ void FormEventReport::SendThirdFormEvent(const FormEventName &eventName, HiSysEv
 {
     std::string name = ConvertEventName(eventName);
     if (name == INVALIDEVENTNAME) {
-        HILOG_ERROR("[%{public}s] invalid eventName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid eventName", __FUNCTION__);
         return;
     }
 
@@ -267,7 +267,7 @@ void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, HiSysE
 {
     std::string name = ConvertEventName(eventName);
     if (name == INVALIDEVENTNAME) {
-        HILOG_ERROR("[%{public}s] invalid eventName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid eventName", __FUNCTION__);
         return;
     }
     FormHiSysEventBuilder builder;
@@ -287,7 +287,7 @@ void FormEventReport::SendFormRefreshCountEvent(const FormEventName &eventName, 
 {
     std::string name = ConvertEventName(eventName);
     if (name == INVALIDEVENTNAME) {
-        HILOG_ERROR("[%{public}s] invalid eventName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid eventName", __FUNCTION__);
         return;
     }
     if (eventName == FormEventName::UPDATE_FORM_REFRESH_TIMES) {
@@ -328,7 +328,7 @@ void FormEventReport::SendFourthFormEvent(const FormEventName &eventName, HiSysE
 {
     std::string name = ConvertEventName(eventName);
     if (name == INVALIDEVENTNAME) {
-        HILOG_ERROR("[%{public}s] invalid eventName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid eventName", __FUNCTION__);
         return;
     }
     FormHiSysEventBuilder builder;
@@ -367,7 +367,7 @@ void FormEventReport::SendFirstAddFormEvent(const FormEventName &eventName, HiSy
 {
     std::string name = ConvertEventName(eventName);
     if (name == INVALIDEVENTNAME) {
-        HILOG_ERROR("[%{public}s] invalid eventName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid eventName", __FUNCTION__);
         return;
     }
     if (eventName == FormEventName::FIRST_ADD_FORM_DURATION) {
@@ -391,7 +391,7 @@ void FormEventReport::SendFirstUpdateFormEvent(const FormEventName &eventName, H
 {
     std::string name = ConvertEventName(eventName);
     if (name == INVALIDEVENTNAME) {
-        HILOG_ERROR("[%{public}s] invalid eventName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid eventName", __FUNCTION__);
         return;
     }
     if (eventName == FormEventName::FIRST_UPDATE_FORM_DURATION) {
@@ -409,7 +409,7 @@ void FormEventReport::SendConditonUpdateFormEvent(const FormEventName &eventName
 {
     std::string name = ConvertEventName(eventName);
     if (name == INVALIDEVENTNAME) {
-        HILOG_ERROR("[%{public}s] invalid eventName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid eventName", __FUNCTION__);
         return;
     }
     if (eventName == FormEventName::CONDITION_UPDATE_FORM) {
@@ -455,7 +455,7 @@ void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, int64_
 {
     std::string name = ConvertEventName(eventName);
     if (name == INVALIDEVENTNAME) {
-        HILOG_ERROR("[%{public}s] invalid eventName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid eventName", __FUNCTION__);
         return;
     }
     FormHiSysEventBuilder builder;
@@ -500,7 +500,7 @@ void FormEventReport::SendFRSStatusEvent(
     const std::vector<int32_t> &formCountList,
     const std::vector<int64_t> &occurrenceTimeList)
 {
-    HILOG_INFO("[%{public}s] call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     FormHiSysEventBuilder builder;
     builder.InsertParam(EVENT_KEY_OCCURRENCE_TIME, occurrenceTimeList);
     builder.InsertParam(EVENT_KEY_FORM_COUNT, formCountList);
@@ -511,7 +511,7 @@ void FormEventReport::SendFRSStatusEvent(
 
 void FormEventReport::SendFormAbnormalEvent(const FormAbnormalReportParams &params)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     FormHiSysEventBuilder builder;
     builder.InsertParam(EVENT_KEY_BUNDLE_NAME, params.bundleNames);
@@ -529,7 +529,7 @@ void FormEventReport::SendFormFwkUEEvent(const FormEventName &eventName, const F
 {
     const std::string name = ConvertEventName(eventName);
     if (name == INVALIDEVENTNAME) {
-        HILOG_ERROR("[%{public}s] invalid eventName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid eventName", __FUNCTION__);
         return;
     }
 

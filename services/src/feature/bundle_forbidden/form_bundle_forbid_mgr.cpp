@@ -57,12 +57,12 @@ bool FormBundleForbidMgr::Init()
 bool FormBundleForbidMgr::IsBundleForbidden(const std::string &bundleName)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("[%{public}s] invalid bundleName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid bundleName", __FUNCTION__);
         return false;
     }
 
     if (!Init()) {
-        HILOG_ERROR("[%{public}s] Form bundle forbid mgr not init", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Form bundle forbid mgr not init", __FUNCTION__);
         return false;
     }
 
@@ -74,12 +74,12 @@ bool FormBundleForbidMgr::IsBundleForbidden(const std::string &bundleName)
 void FormBundleForbidMgr::SetBundleForbiddenStatus(const std::string &bundleName, bool isForbidden)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("[%{public}s] invalid bundleName", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid bundleName", __FUNCTION__);
         return;
     }
 
     if (!Init()) {
-        HILOG_ERROR("[%{public}s] Form bundle forbid mgr not init", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Form bundle forbid mgr not init", __FUNCTION__);
         return;
     }
 

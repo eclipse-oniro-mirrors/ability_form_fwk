@@ -157,7 +157,7 @@ std::string HandlerDumper::GetDumpInfo()
 std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(
     const std::string &bundleName, const std::string &uid, bool needMonitored, sptr<IFormSupply> client)
 {
-    HILOG_INFO("[%{public}s] bundleName is %{public}s,uid is %{public}s", __FUNCTION__, bundleName.c_str(), uid.c_str());
+    HILOG_INFO("[%{public}s]bundleName is %{public}s,uid is %{public}s", __FUNCTION__, bundleName.c_str(), uid.c_str());
     std::shared_ptr<FormRenderRecord> renderRecord = std::make_shared<FormRenderRecord>(bundleName, uid, client);
     if (!renderRecord) {
         HILOG_ERROR("Create FormRenderRecord failed");
@@ -175,7 +175,7 @@ FormRenderRecord::FormRenderRecord(
     const std::string &bundleName, const std::string &uid, const sptr<IFormSupply> client) : bundleName_(bundleName),
     uid_(uid), formSupplyClient_(client), formImperativeFwkCntMap_(FORM_IMPERATIVE_MAP)
 {
-    HILOG_INFO("[%{public}s] bundleName is %{public}s,uid is %{public}s", __FUNCTION__, bundleName.c_str(), uid.c_str());
+    HILOG_INFO("[%{public}s]bundleName is %{public}s,uid is %{public}s", __FUNCTION__, bundleName.c_str(), uid.c_str());
     threadState_ = std::make_unique<ThreadState>(CHECK_THREAD_TIME);
     formSupplyClient_ = client;
 }
@@ -214,14 +214,14 @@ void FormRenderRecord::DeleteRendererGroup(int64_t formId)
 {
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
-        HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
         return;
     }
 
     auto task = [weak = weak_from_this(), formId]() {
         auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null renderRecord", __FUNCTION__);
             return;
         }
 
@@ -264,7 +264,7 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName, bool ne
         auto task = [thisWeakPtr]() {
             auto renderRecord = thisWeakPtr.lock();
             if (renderRecord == nullptr) {
-                HILOG_ERROR("[%{public}s] null renderRecord", __FUNCTION__);
+                HILOG_ERROR("[%{public}s]null renderRecord", __FUNCTION__);
                 return;
             }
             renderRecord->jsThreadId_ = getproctid();
@@ -308,7 +308,7 @@ void FormRenderRecord::OnRenderingBlock(const std::string &bundleName)
     sptr<IFormSupply> formSupplyClient = GetFormSupplyClient();
 
     if (formSupplyClient == nullptr) {
-        HILOG_ERROR("[%{public}s] null formSupplyClient", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null formSupplyClient", __FUNCTION__);
         return;
     }
 
@@ -320,7 +320,7 @@ void FormRenderRecord::OnNotifyRefreshForm(const int64_t &formId)
     sptr<IFormSupply> formSupplyClient = GetFormSupplyClient();
 
     if (formSupplyClient == nullptr) {
-        HILOG_ERROR("[%{public}s] null formSupplyClient", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null formSupplyClient", __FUNCTION__);
         return;
     }
 
@@ -368,7 +368,7 @@ TaskState FormRenderRecord::RunTask()
     auto checkTask = [thisWeakPtr] () {
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null renderRecord", __FUNCTION__);
             return;
         }
 
@@ -435,14 +435,14 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     {
         // Some resources need to be initialized in a JS thread
         if (GetEventHandler(true, formJsInfo.isDynamic) == nullptr) {
-            HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
             return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
         }
         std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
 
         sptr<IFormSupply> formSupplyClient = GetFormSupplyClient();
         if (formSupplyClient == nullptr) {
-            HILOG_ERROR("[%{public}s] null formSupplyClient", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null formSupplyClient", __FUNCTION__);
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
 
@@ -461,7 +461,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             renderRecord->HandleUpdateRenderRecord(formJsInfo, want, formSupplyClient, renderType);
         };
         if (eventHandler == nullptr) {
-            HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
             return RENDER_FORM_FAILED;
         }
         if (renderType == Constants::RENDER_FORM) {
@@ -496,7 +496,7 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
     HILOG_INFO("Delete some resources formId:%{public}" PRId64 ",%{public}s", formId, compId.c_str());
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
-        HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
         DeleteFormRequest(formId, compId);
         RecordFormVisibility(formId, false);
         return;
@@ -505,7 +505,7 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
     auto task = [weak = weak_from_this(), formId, compId, &isRenderGroupEmpty]() {
         auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null renderRecord", __FUNCTION__);
             return;
         }
 
@@ -577,7 +577,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
 
     runtime_ = std::make_shared<JsFormRuntime>();
     if (runtime_ == nullptr) {
-        HILOG_ERROR("[%{public}s] Create runtime Failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Create runtime Failed", __FUNCTION__);
         return false;
     }
     if (!runtime_->Init(options)) {
@@ -588,7 +588,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     RegisterResolveBufferCallback();
     bool ret = runtime_->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName, formJsInfo.jsFormCodePath);
     if (!ret) {
-        HILOG_ERROR("[%{public}s] InsertHapPath Failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]InsertHapPath Failed", __FUNCTION__);
     }
 
     std::string target = Constants::TEMPLATE_FORM_IMPERATIVE_FWK_NONE;
@@ -637,7 +637,7 @@ bool FormRenderRecord::UpdateRuntime(const FormJsInfo &formJsInfo)
     }
     bool ret = runtime_->InsertHapPath(formJsInfo.bundleName, formJsInfo.moduleName, formJsInfo.jsFormCodePath);
     if (!ret) {
-        HILOG_ERROR("[%{public}s] InsertHapPath Failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]InsertHapPath Failed", __FUNCTION__);
     }
 
     AddFormImperativeFwkCnt(formJsInfo);
@@ -810,7 +810,7 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
 {
     auto context = std::make_shared<AbilityRuntime::ContextImpl>();
     if (context == nullptr) {
-        HILOG_ERROR("[%{public}s] Create context failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Create context failed", __FUNCTION__);
         return nullptr;
     }
 
@@ -874,7 +874,7 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::CreateFormRendererGrou
     }
     auto formRendererGroup = Ace::FormRendererGroup::Create(context, runtime, eventHandler);
     if (formRendererGroup == nullptr) {
-        HILOG_ERROR("[%{public}s] Create formRendererGroup failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Create formRendererGroup failed", __FUNCTION__);
         return nullptr;
     }
     return formRendererGroup;
@@ -883,7 +883,7 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::CreateFormRendererGrou
 void FormRenderRecord::UpdateFormRequest(const FormJsInfo &formJsInfo, const Want &want)
 {
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
-    HILOG_DEBUG("[%{public}s] renderType is %{public}d", __FUNCTION__, renderType);
+    HILOG_DEBUG("[%{public}s]renderType is %{public}d", __FUNCTION__, renderType);
     if (renderType == Constants::RENDER_FORM) {
         AddFormRequest(formJsInfo, want);
         return;
@@ -917,7 +917,7 @@ bool FormRenderRecord::BeforeHandleUpdateForm(const FormJsInfo &formJsInfo)
     MarkThreadAlive();
     if (runtime_ == nullptr) {
         if (!CreateRuntime(formJsInfo)) {
-            HILOG_ERROR("[%{public}s] Create runtime failed", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]Create runtime failed", __FUNCTION__);
             return false;
         }
     } else {
@@ -929,7 +929,7 @@ bool FormRenderRecord::BeforeHandleUpdateForm(const FormJsInfo &formJsInfo)
 int32_t FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want &want)
 {
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
-    HILOG_DEBUG("[%{public}s] renderType is %{public}d", __FUNCTION__, renderType);
+    HILOG_DEBUG("[%{public}s]renderType is %{public}d", __FUNCTION__, renderType);
     if (renderType == Constants::RENDER_FORM) {
         AddRenderer(formJsInfo, want);
         return ERR_OK;
@@ -973,13 +973,13 @@ void FormRenderRecord::AddRenderer(const FormJsInfo &formJsInfo, const Want &wan
 {
     auto context = GetContext(formJsInfo, want);
     if (context == nullptr) {
-        HILOG_ERROR("[%{public}s] Create Context failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Create Context failed", __FUNCTION__);
         return;
     }
 
     auto formRendererGroup = GetFormRendererGroup(formJsInfo, context, runtime_);
     if (formRendererGroup == nullptr) {
-        HILOG_ERROR("[%{public}s] Create formRendererGroup failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Create formRendererGroup failed", __FUNCTION__);
         return;
     }
     formRendererGroup->AddForm(want, formJsInfo);
@@ -1007,11 +1007,11 @@ bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string 
         std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
         auto search = formRendererGroupMap_.find(formId);
         if (search == formRendererGroupMap_.end()) {
-            HILOG_ERROR("[%{public}s] invalid FormRendererGroup", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid FormRendererGroup", __FUNCTION__);
             return false;
         }
         if (!search->second) {
-            HILOG_ERROR("[%{public}s] FormRendererGroup was found but null", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]FormRendererGroup was found but null", __FUNCTION__);
             return false;
         }
         if (!compId.empty()) {
@@ -1074,7 +1074,7 @@ void FormRenderRecord::DeleteFormRequest(int64_t formId, const std::string &comp
         std::lock_guard<std::mutex> lock(formRequestsMutex_);
         auto iter = formRequests_.find(formId);
         if (iter == formRequests_.end()) {
-            HILOG_ERROR("[%{public}s] invalid request,formId:%{public}" PRId64, __FUNCTION__, formId);
+            HILOG_ERROR("[%{public}s]invalid request,formId:%{public}" PRId64, __FUNCTION__, formId);
             return;
         }
 
@@ -1107,7 +1107,7 @@ void FormRenderRecord::UpdateFormRequestReleaseState(
     std::lock_guard<std::mutex> lock(formRequestsMutex_);
     auto iter = formRequests_.find(formId);
     if (iter == formRequests_.end()) {
-        HILOG_ERROR("[%{public}s] invalid request,formId:%{public}" PRId64, __FUNCTION__, formId);
+        HILOG_ERROR("[%{public}s]invalid request,formId:%{public}" PRId64, __FUNCTION__, formId);
         return;
     }
 
@@ -1127,14 +1127,14 @@ void FormRenderRecord::ReleaseRenderer(
         std::to_string(formId).c_str(), compId.c_str());
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
-        HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
         return;
     }
 
     auto task = [weak = weak_from_this(), formId, compId, &isRenderGroupEmpty]() {
         auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null renderRecord", __FUNCTION__);
             return;
         }
 
@@ -1170,7 +1170,7 @@ bool FormRenderRecord::HandleReleaseRendererInJsThread(
         }
 
         if (!search->second) {
-            HILOG_ERROR("[%{public}s] null rendererGroup", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null rendererGroup", __FUNCTION__);
             return false;
         }
 
@@ -1192,7 +1192,7 @@ void FormRenderRecord::Release()
     {
         std::lock_guard<std::mutex> lock(eventHandlerMutex_);
         if (eventHandler_ == nullptr) {
-            HILOG_INFO("[%{public}s] null eventHandler", __FUNCTION__);
+            HILOG_INFO("[%{public}s]null eventHandler", __FUNCTION__);
             return;
         }
         eventHandler = eventHandler_;
@@ -1203,7 +1203,7 @@ void FormRenderRecord::Release()
     auto syncTask = [weak = weak_from_this()]() {
         auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null renderRecord", __FUNCTION__);
             return;
         }
         renderRecord->HandleDestroyInJsThread();
@@ -1233,7 +1233,7 @@ void FormRenderRecord::RecoverFormsByConfigUpdate(std::vector<int64_t> &formIds,
     const sptr<IFormSupply> &formSupplyClient)
 {
     if (formSupplyClient == nullptr) {
-        HILOG_ERROR("[%{public}s] null formSupplyClient", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null formSupplyClient", __FUNCTION__);
         return;
     }
 
@@ -1248,7 +1248,7 @@ void FormRenderRecord::RecoverFormsByConfigUpdate(std::vector<int64_t> &formIds,
 void FormRenderRecord::ReAddAllRecycledForms(const sptr<IFormSupply> &formSupplyClient)
 {
     if (GetEventHandler(false, true) == nullptr) {
-        HILOG_ERROR("[%{public}s] CheckEventHandler failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]CheckEventHandler failed", __FUNCTION__);
         return;
     }
 
@@ -1295,7 +1295,7 @@ int32_t FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &form
 {
     HILOG_INFO("ReAdd recycled forms start");
     if (GetEventHandler(false, true) == nullptr) {
-        HILOG_ERROR("[%{public}s] CheckEventHandler failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]CheckEventHandler failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
     }
 
@@ -1307,7 +1307,7 @@ int32_t FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &form
         bool isNeedUpdate = false;
         auto lastReleasedFormRequest = formRequests.begin();
         for (auto iter = formRequests.begin(); iter != formRequests.end(); ++iter) {
-            HILOG_INFO("[%{public}s] formId:%{public}" PRId64 ", compId: %{public}s, hasRelease: %{public}d.", __FUNCTION__,
+            HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", compId: %{public}s, hasRelease: %{public}d.", __FUNCTION__,
                 form.formId, iter->first.c_str(), iter->second.hasRelease);
             if (!iter->second.hasRelease) {
                 continue;
@@ -1362,7 +1362,7 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJ
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
         if (GetEventHandler(true, true) == nullptr) {
-            HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
             return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
         }
 
@@ -1378,7 +1378,7 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJ
         HILOG_DEBUG("HandleReloadFormRecord begin");
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null renderRecord", __FUNCTION__);
             return;
         }
         renderRecord->HandleReloadFormRecord(std::move(ids), want);
@@ -1391,7 +1391,7 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
 {
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
-        HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
         return false;
     }
     HILOG_INFO("restart runtime");
@@ -1400,7 +1400,7 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
     auto task = [weak = weak_from_this(), &releasedFormIds]() {
         auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null renderRecord", __FUNCTION__);
             return;
         }
         FormMemoryGuard memoryGuard;
@@ -1428,7 +1428,7 @@ void FormRenderRecord::HandleReleaseAllRendererInJsThread(std::vector<int64_t> &
     MarkThreadAlive();
     for (const auto& iter : formRendererGroupMap_) {
         if (!iter.second) {
-            HILOG_ERROR("[%{public}s] null rendererGroup", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null rendererGroup", __FUNCTION__);
             continue;
         }
         int64_t formId = iter.first;
@@ -1448,7 +1448,7 @@ void FormRenderRecord::HandleReleaseAllRendererInJsThread(std::vector<int64_t> &
 int32_t FormRenderRecord::ReAddAllReleasedForms(const std::vector<int64_t> &recoverableFormIds)
 {
     if (GetEventHandler(true, true) == nullptr) {
-        HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
     }
     std::unordered_set<int64_t> recoverable(recoverableFormIds.begin(), recoverableFormIds.end());
@@ -1502,14 +1502,14 @@ int32_t FormRenderRecord::OnUnlock()
         HILOG_DEBUG("HandleOnUnlock begin");
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null renderRecord", __FUNCTION__);
             return;
         }
         renderRecord->HandleOnUnlock();
     };
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
-        HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
         return RENDER_FORM_FAILED;
     }
     eventHandler->PostTask(task, "OnUnlock");
@@ -1539,16 +1539,16 @@ int32_t FormRenderRecord::HandleOnUnlock()
 
 int32_t FormRenderRecord::SetRenderGroupEnableFlag(const int64_t formId, bool isEnable)
 {
-    HILOG_INFO("[%{public}s] formId:%{public}" PRId64 ",isEnable:%{public}d", __FUNCTION__, formId, isEnable);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ",isEnable:%{public}d", __FUNCTION__, formId, isEnable);
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
-        HILOG_ERROR("[%{public}s] null eventHandler formId:%{public}" PRId64, __FUNCTION__, formId);
+        HILOG_ERROR("[%{public}s]null eventHandler formId:%{public}" PRId64, __FUNCTION__, formId);
         return SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED;
     }
     auto task = [thisWeakPtr = weak_from_this(), formId, isEnable]() {
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord formId:%{public}" PRId64, __FUNCTION__, formId);
+            HILOG_ERROR("[%{public}s]null renderRecord formId:%{public}" PRId64, __FUNCTION__, formId);
             return;
         }
 
@@ -1561,17 +1561,17 @@ int32_t FormRenderRecord::SetRenderGroupEnableFlag(const int64_t formId, bool is
 
 int32_t FormRenderRecord::HandleSetRenderGroupEnableFlag(const int64_t formId, bool isEnable)
 {
-    HILOG_INFO("[%{public}s] formId:%{public}" PRId64, __FUNCTION__, formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formId);
     MarkThreadAlive();
 
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     auto search = formRendererGroupMap_.find(formId);
     if (search == formRendererGroupMap_.end()) {
-        HILOG_ERROR("[%{public}s] invalid FormRendererGroup formId:%{public}" PRId64, __FUNCTION__, formId);
+        HILOG_ERROR("[%{public}s]invalid FormRendererGroup formId:%{public}" PRId64, __FUNCTION__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
     }
     if (!search->second) {
-        HILOG_ERROR("[%{public}s] FormRendererGroup was found but null", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]FormRendererGroup was found but null", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
     }
     search->second->SetRenderGroupEnableFlag(isEnable);
@@ -1580,17 +1580,17 @@ int32_t FormRenderRecord::HandleSetRenderGroupEnableFlag(const int64_t formId, b
 
 int32_t FormRenderRecord::SetVisibleChange(const int64_t &formId, bool isVisible)
 {
-    HILOG_INFO("[%{public}s] formId:%{public}s", __FUNCTION__, std::to_string(formId).c_str());
+    HILOG_INFO("[%{public}s]formId:%{public}s", __FUNCTION__, std::to_string(formId).c_str());
     RecordFormVisibility(formId, isVisible);
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
-        HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
         return SET_VISIBLE_CHANGE_FAILED;
     }
     auto task = [thisWeakPtr = weak_from_this(), formId, isVisible]() {
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null renderRecord", __FUNCTION__);
             return;
         }
 
@@ -1603,17 +1603,17 @@ int32_t FormRenderRecord::SetVisibleChange(const int64_t &formId, bool isVisible
 
 int32_t FormRenderRecord::HandleSetVisibleChange(const int64_t &formId, bool isVisible)
 {
-    HILOG_INFO("[%{public}s] formId:%{public}s", __FUNCTION__, std::to_string(formId).c_str());
+    HILOG_INFO("[%{public}s]formId:%{public}s", __FUNCTION__, std::to_string(formId).c_str());
     MarkThreadAlive();
 
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     auto search = formRendererGroupMap_.find(formId);
     if (search == formRendererGroupMap_.end()) {
-        HILOG_ERROR("[%{public}s] invalid FormRendererGroup", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid FormRendererGroup", __FUNCTION__);
         return SET_VISIBLE_CHANGE_FAILED;
     }
     if (!search->second) {
-        HILOG_ERROR("[%{public}s] FormRendererGroup was found but null", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]FormRendererGroup was found but null", __FUNCTION__);
         return SET_VISIBLE_CHANGE_FAILED;
     }
     search->second->SetVisibleChange(isVisible);
@@ -1625,7 +1625,7 @@ int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<FormJsInfo> &
     HILOG_INFO("Reload record in js thread");
     MarkThreadAlive();
     if (runtime_ == nullptr) {
-        HILOG_ERROR("[%{public}s] null runtime_", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null runtime_", __FUNCTION__);
         return RELOAD_FORM_FAILED;
     }
     if (runtime_->GetLanguage() == AbilityRuntime::Runtime::Language::JS) {
@@ -1637,7 +1637,7 @@ int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<FormJsInfo> &
     for (auto form : formJsInfos) {
         auto search = formRendererGroupMap_.find(form.formId);
         if (search == formRendererGroupMap_.end()) {
-            HILOG_ERROR("[%{public}s] invalid FormRendererGroup", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]invalid FormRendererGroup", __FUNCTION__);
             continue;
         }
         auto group = search->second;
@@ -1669,7 +1669,7 @@ void FormRenderRecord::UpdateConfiguration(
     auto eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
         if (GetEventHandler(true, true) == nullptr) {
-            HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
             return;
         }
 
@@ -1681,7 +1681,7 @@ void FormRenderRecord::UpdateConfiguration(
     auto task = [thisWeakPtr, config]() {
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null renderRecord", __FUNCTION__);
             return;
         }
         renderRecord->HandleUpdateConfiguration(config);
@@ -1712,7 +1712,7 @@ void FormRenderRecord::FormRenderGC()
 {
     auto eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
-        HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
         return;
     }
 
@@ -1720,7 +1720,7 @@ void FormRenderRecord::FormRenderGC()
     auto task = [thisWeakPtr]() {
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null renderRecord", __FUNCTION__);
             return;
         }
         renderRecord->HandleFormRenderGC();
@@ -1732,7 +1732,7 @@ void FormRenderRecord::HandleFormRenderGC()
 {
     HILOG_INFO("HandleFormRenderGC");
     if (runtime_ == nullptr) {
-        HILOG_ERROR("[%{public}s] null runtime_", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null runtime_", __FUNCTION__);
         return;
     }
     panda::JSNApi::HintGC((static_cast<AbilityRuntime::JsRuntime&>(*runtime_)).GetEcmaVm(),
@@ -1744,14 +1744,14 @@ int32_t FormRenderRecord::RecycleForm(const int64_t &formId, std::string &status
     HILOG_INFO("RecycleForm begin,formId:%{public}s", std::to_string(formId).c_str());
     int32_t result = ERR_APPEXECFWK_FORM_COMMON_CODE;
     if (GetEventHandler(true, true) == nullptr) {
-        HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_EVENT_HANDLER_NULL;
     }
 
     auto task = [thisWeakPtr = weak_from_this(), formId, &statusData, &result]() {
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null renderRecord", __FUNCTION__);
             return;
         }
 
@@ -1774,11 +1774,11 @@ int32_t FormRenderRecord::HandleRecycleForm(const int64_t &formId, std::string &
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     auto search = formRendererGroupMap_.find(formId);
     if (search == formRendererGroupMap_.end()) {
-        HILOG_ERROR("[%{public}s] invalid FormRendererGroup", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]invalid FormRendererGroup", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
     }
     if (!search->second) {
-        HILOG_ERROR("[%{public}s] FormRendererGroup was found but null", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]FormRendererGroup was found but null", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
     }
 
@@ -1792,14 +1792,14 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo, const std::s
     auto formId = formJsInfo.formId;
     HILOG_INFO("RecoverForm begin,formId:%{public}s", std::to_string(formId).c_str());
     if (GetEventHandler(true, true) == nullptr) {
-        HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
         return RENDER_FORM_FAILED;
     }
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
 
     sptr<IFormSupply> formSupplyClient = GetFormSupplyClient();
     if (formSupplyClient == nullptr) {
-        HILOG_ERROR("[%{public}s] null formSupplyClient", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null formSupplyClient", __FUNCTION__);
         return RENDER_FORM_FAILED;
     }
 
@@ -1819,7 +1819,7 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo, const std::s
             FormFsmEvent::RECOVER_FORM_DONE, eventId, formSupplyClient);
     };
     if (eventHandler == nullptr) {
-        HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
         return RENDER_FORM_FAILED;
     }
     eventHandler->PostTask(task, "RecoverForm");
@@ -1838,7 +1838,7 @@ void FormRenderRecord::HandleRecoverForm(const FormJsInfo &formJsInfo,
         return;
     }
     if (formRequests.empty()) {
-        HILOG_ERROR("[%{public}s] empty formRequests", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]empty formRequests", __FUNCTION__);
         return;
     }
 
@@ -1946,13 +1946,13 @@ bool FormRenderRecord::RecoverRenderer(const std::vector<Ace::FormRequest> &grou
     auto currentRequest = groupRequests[currentRequestIndex];
     auto context = GetContext(currentRequest.formJsInfo, currentRequest.want);
     if (context == nullptr) {
-        HILOG_ERROR("[%{public}s] Create Context failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Create Context failed", __FUNCTION__);
         return false;
     }
 
     auto formRendererGroup = GetFormRendererGroup(currentRequest.formJsInfo, context, runtime_);
     if (formRendererGroup == nullptr) {
-        HILOG_ERROR("[%{public}s] Create formRendererGroup failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Create formRendererGroup failed", __FUNCTION__);
         return false;
     }
     bool isVisible = IsFormVisible(currentRequest.formJsInfo.formId);
@@ -1984,7 +1984,7 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t formId, const FormSu
             return;
         }
         if (iter->second.empty()) {
-            HILOG_ERROR("[%{public}s] empty formRequests", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]empty formRequests", __FUNCTION__);
             return;
         }
 
@@ -2013,7 +2013,7 @@ void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t formId, const FormSu
 void FormRenderRecord::ReAddStaticRecycledForms(const int64_t formId, const FormJsInfo &formJsInfo)
 {
     if (GetEventHandler(true, true) == nullptr) {
-        HILOG_ERROR("[%{public}s] null eventHandler", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null eventHandler", __FUNCTION__);
         return;
     }
 
@@ -2165,13 +2165,13 @@ void FormRenderRecord::RegisterUncatchableErrorHandler()
 {
     auto nativeEnginePtr = (static_cast<AbilityRuntime::JsRuntime &>(*runtime_)).GetNativeEnginePointer();
     if (nativeEnginePtr == nullptr) {
-        HILOG_ERROR("[%{public}s] null nativeEnginePtr", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null nativeEnginePtr", __FUNCTION__);
         return;
     }
     auto uncatchableTask = [weak = weak_from_this()](panda::TryCatch &trycatch) {
         auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null renderRecord", __FUNCTION__);
             return;
         }
         auto exception = trycatch.GetAndClearException();
@@ -2186,7 +2186,7 @@ void FormRenderRecord::RegisterUncatchableErrorHandler()
 void FormRenderRecord::RegisterResolveBufferCallback()
 {
     if (runtime_ == nullptr) {
-        HILOG_ERROR("[%{public}s] null runtime_", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null runtime_", __FUNCTION__);
         return;
     }
     auto vm = runtime_->GetEcmaVm();
@@ -2349,7 +2349,7 @@ void FormRenderRecord::GetRuntimeMemory(std::string &bundleName, uint64_t &runti
         auto &jsRuntime = static_cast<AbilityRuntime::JsRuntime &>(*(renderRecord->runtime_));
         auto nativeEnginePtr = jsRuntime.GetNativeEnginePointer();
         if (nativeEnginePtr == nullptr) {
-            HILOG_ERROR("[%{public}s] null nativeEnginePtr", __FUNCTION__);
+            HILOG_ERROR("[%{public}s]null nativeEnginePtr", __FUNCTION__);
             return;
         }
 
@@ -2370,13 +2370,13 @@ int32_t FormRenderRecord::SetRenderGroupParams(const int64_t formId, const Want 
     HILOG_INFO("SetRenderGroupParams,formId:%{public}" PRId64, formId);
     std::shared_ptr<EventHandler> eventHandler = GetEventHandler();
     if (eventHandler == nullptr) {
-        HILOG_ERROR("[%{public}s] null eventHandler formId:%{public}" PRId64, __FUNCTION__, formId);
+        HILOG_ERROR("[%{public}s]null eventHandler formId:%{public}" PRId64, __FUNCTION__, formId);
         return SET_RENDERGROUPENABLEFLAG_CHANGE_FAILED;
     }
     auto task = [thisWeakPtr = weak_from_this(), formId, want]() {
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("[%{public}s] null renderRecord formId:%{public}" PRId64, __FUNCTION__, formId);
+            HILOG_ERROR("[%{public}s]null renderRecord formId:%{public}" PRId64, __FUNCTION__, formId);
             return;
         }
 
@@ -2414,11 +2414,11 @@ int32_t FormRenderRecord::HandleSetRenderGroupParams(const int64_t formId, const
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     auto search = formRendererGroupMap_.find(formId);
     if (search == formRendererGroupMap_.end()) {
-        HILOG_ERROR("[%{public}s] invalid FormRendererGroup formId:%{public}" PRId64, __FUNCTION__, formId);
+        HILOG_ERROR("[%{public}s]invalid FormRendererGroup formId:%{public}" PRId64, __FUNCTION__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
     }
     if (!search->second) {
-        HILOG_ERROR("[%{public}s] FormRendererGroup was found but null", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]FormRendererGroup was found but null", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_RENDERER_GROUP;
     }
     search->second->SetUiContentParams(want);

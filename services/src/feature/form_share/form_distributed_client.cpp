@@ -30,7 +30,7 @@ const std::u16string DMS_PROXY_INTERFACE_TOKEN = u"ohos.distributedschedule.acce
 }
 void FormDistributedClient::GetDmsServiceProxy()
 {
-    HILOG_DEBUG("[%{public}s] SHAREFORM::func call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]SHAREFORM::func call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(dmsProxyMutex_);
     if (dmsProxy_ != nullptr) {
         HILOG_DEBUG("dms proxy already get");
@@ -48,7 +48,7 @@ void FormDistributedClient::GetDmsServiceProxy()
 int32_t FormDistributedClient::ShareForm(
     const std::string &remoteDeviceId, const FormShareInfo &formShareInfo)
 {
-    HILOG_DEBUG("[%{public}s] SHAREFORM::func call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]SHAREFORM::func call", __FUNCTION__);
     if (remoteDeviceId.empty()) {
         HILOG_ERROR("input deviceId failed");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;

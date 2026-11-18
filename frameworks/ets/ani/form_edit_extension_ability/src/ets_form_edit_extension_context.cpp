@@ -46,7 +46,7 @@ using namespace OHOS::AppExecFwk;
 EtsFormEditExtensionContext* EtsFormEditExtensionContext::GetEtsFormEditExtensionContext(ani_env *env, ani_object obj)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return nullptr;
     }
 
@@ -54,7 +54,7 @@ EtsFormEditExtensionContext* EtsFormEditExtensionContext::GetEtsFormEditExtensio
     ani_status status = ANI_ERROR;
     ani_long etsContextLong = 0;
     if ((status = env->Object_GetFieldByName_Long(obj, "nativeExtensionContext", &etsContextLong)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     etsContext = reinterpret_cast<EtsFormEditExtensionContext *>(etsContextLong);
@@ -68,9 +68,9 @@ EtsFormEditExtensionContext* EtsFormEditExtensionContext::GetEtsFormEditExtensio
 ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
     ani_env *env, std::shared_ptr<FormEditExtensionContext> context)
 {
-    HILOG_DEBUG("[%{public}s] called", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]called", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return nullptr;
     }
 
@@ -84,17 +84,17 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
     ani_method method = nullptr;
     ani_object contextObj = nullptr;
     if ((status = env->FindClass(FORM_EDIT_EXTENSION_CONTEXT, &cls)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     if ((status = env->Class_FindMethod(cls, "<ctor>", "l:", &method)) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     std::unique_ptr<EtsFormEditExtensionContext> etsContext = std::make_unique<EtsFormEditExtensionContext>(context);
     if ((status = env->Object_New(cls, method, &contextObj, reinterpret_cast<ani_long>(etsContext.release()))) !=
         ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
@@ -107,7 +107,7 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
             reinterpret_cast<void *>(EtsFormEditExtensionContext::SetWindowBackgroundColor) },
     };
     if ((status = env->Class_BindNativeMethods(cls, functions.data(), functions.size())) != ANI_OK) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
@@ -123,7 +123,7 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
         return nullptr;
     }
     if (!EtsFormEditExtensionContext::BindNativePtrCleaner(env)) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         delete workContext;
         return nullptr;
     }
@@ -148,7 +148,7 @@ ani_object EtsFormEditExtensionContext::CreateEtsFormEditExtensionContext(
 bool EtsFormEditExtensionContext::BindNativePtrCleaner(ani_env *env)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] nullptr env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]nullptr env", __FUNCTION__);
         return false;
     }
     ani_class cleanerCls;
@@ -162,7 +162,7 @@ bool EtsFormEditExtensionContext::BindNativePtrCleaner(ani_env *env)
     };
     if ((status = env->Class_BindNativeMethods(cleanerCls, methods.data(), methods.size())) != ANI_OK
         && status != ANI_ALREADY_BINDED) {
-        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return false;
     }
     return true;
@@ -171,7 +171,7 @@ bool EtsFormEditExtensionContext::BindNativePtrCleaner(ani_env *env)
 void EtsFormEditExtensionContext::Clean(ani_env *env, ani_object object)
 {
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] nullptr env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]nullptr env", __FUNCTION__);
         return;
     }
 
@@ -191,15 +191,15 @@ void EtsFormEditExtensionContext::StartSecondPage(ani_env *env, ani_object aniOb
 {
     FormHistogramUtils::ReportHistogramBoolean(
         "Form.EditExtensionContext.startSecondPage", HISTOGRAM_BOOLEAN_SAMPLE);
-    HILOG_INFO("[%{public}s] called", __FUNCTION__);
+    HILOG_INFO("[%{public}s]called", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
 
     auto etsContext = GetEtsFormEditExtensionContext(env, aniObj);
     if (etsContext == nullptr) {
-        HILOG_ERROR("[%{public}s] null etsContext", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null etsContext", __FUNCTION__);
         return;
     }
     etsContext->OnStartSecondPage(env, aniWant, callback);
@@ -208,14 +208,14 @@ void EtsFormEditExtensionContext::StartSecondPage(ani_env *env, ani_object aniOb
 
 void EtsFormEditExtensionContext::OnStartSecondPage(ani_env *env, ani_object aniWant, ani_object callback)
 {
-    HILOG_INFO("[%{public}s] called", __FUNCTION__);
+    HILOG_INFO("[%{public}s]called", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
 
     if (context_.lock() == nullptr) {
-        HILOG_ERROR("[%{public}s] Context is released", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Context is released", __FUNCTION__);
         EtsErrorUtil::ThrowError(env,
             static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR), ERR_MSG_INTERNAL_ERROR);
         return;
@@ -225,7 +225,7 @@ void EtsFormEditExtensionContext::OnStartSecondPage(ani_env *env, ani_object ani
 
     auto contextPtr = context_.lock();
     if (!contextPtr) {
-        HILOG_ERROR("[%{public}s] Context is released", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Context is released", __FUNCTION__);
         AsyncCallback(env, callback,
             EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR)),
             nullptr);
@@ -235,7 +235,7 @@ void EtsFormEditExtensionContext::OnStartSecondPage(ani_env *env, ani_object ani
     int resultCode = 0;
     ani_object abilityResult = AppExecFwk::WrapAbilityResult(env, resultCode, want);
     if (abilityResult == nullptr) {
-        HILOG_ERROR("[%{public}s] Wrap abilityResult failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Wrap abilityResult failed", __FUNCTION__);
         AsyncCallback(env, callback,
             EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR)),
             nullptr);
@@ -249,15 +249,15 @@ void EtsFormEditExtensionContext::OnStartSecondPage(ani_env *env, ani_object ani
 void EtsFormEditExtensionContext::StartUIAbility(ani_env *env, ani_object aniObj,
     ani_object aniWant, ani_object callback)
 {
-    HILOG_INFO("[%{public}s] called", __FUNCTION__);
+    HILOG_INFO("[%{public}s]called", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
 
     auto etsContext = GetEtsFormEditExtensionContext(env, aniObj);
     if (etsContext == nullptr) {
-        HILOG_ERROR("[%{public}s] null etsContext", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null etsContext", __FUNCTION__);
         return;
     }
     etsContext->OnStartUIAbility(env, aniWant, callback);
@@ -265,14 +265,14 @@ void EtsFormEditExtensionContext::StartUIAbility(ani_env *env, ani_object aniObj
 
 void EtsFormEditExtensionContext::OnStartUIAbility(ani_env *env, ani_object aniWant, ani_object callback)
 {
-    HILOG_INFO("[%{public}s] called", __FUNCTION__);
+    HILOG_INFO("[%{public}s]called", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
 
     if (context_.lock() == nullptr) {
-        HILOG_ERROR("[%{public}s] Context is released", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Context is released", __FUNCTION__);
         EtsErrorUtil::ThrowError(env,
             static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR), ERR_MSG_INTERNAL_ERROR);
         return;
@@ -282,7 +282,7 @@ void EtsFormEditExtensionContext::OnStartUIAbility(ani_env *env, ani_object aniW
 
     auto contextPtr = context_.lock();
     if (!contextPtr) {
-        HILOG_ERROR("[%{public}s] Context is released", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Context is released", __FUNCTION__);
         AsyncCallback(env, callback,
             EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR)),
             nullptr);
@@ -292,7 +292,7 @@ void EtsFormEditExtensionContext::OnStartUIAbility(ani_env *env, ani_object aniW
     int resultCode = 0;
     ani_object abilityResult = AppExecFwk::WrapAbilityResult(env, resultCode, want);
     if (abilityResult == nullptr) {
-        HILOG_ERROR("[%{public}s] Wrap abilityResult failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Wrap abilityResult failed", __FUNCTION__);
         AsyncCallback(env, callback,
             EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INTERNAL_ERROR)),
             nullptr);
@@ -311,15 +311,15 @@ bool EtsFormEditExtensionContext::AsyncCallback(ani_env *env, ani_object call, a
 
 void EtsFormEditExtensionContext::SetWindowBackgroundColor(ani_env *env, ani_object aniObj, ani_string color)
 {
-    HILOG_INFO("[%{public}s] called", __FUNCTION__);
+    HILOG_INFO("[%{public}s]called", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
 
     auto etsContext = GetEtsFormEditExtensionContext(env, aniObj);
     if (etsContext == nullptr) {
-        HILOG_ERROR("[%{public}s] null etsContext", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null etsContext", __FUNCTION__);
         EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
         return;
     }
@@ -329,14 +329,14 @@ void EtsFormEditExtensionContext::SetWindowBackgroundColor(ani_env *env, ani_obj
 
 void EtsFormEditExtensionContext::OnSetWindowBackgroundColor(ani_env *env, const std::string &color)
 {
-    HILOG_INFO("[%{public}s] called", __FUNCTION__);
+    HILOG_INFO("[%{public}s]called", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
     auto contextPtr = context_.lock();
     if (!contextPtr) {
-        HILOG_ERROR("[%{public}s] Context is released", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]Context is released", __FUNCTION__);
         EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_IPC_ERROR);
         return;
     }

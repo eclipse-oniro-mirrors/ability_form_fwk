@@ -65,11 +65,11 @@ FormShareMgr::~FormShareMgr()
 int32_t FormShareMgr::ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,
     int64_t requestCode)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     FormRecord formRecord;
     bool isFormRecExist = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!isFormRecExist) {
-        HILOG_ERROR("[%{public}s] form share info get formRecord failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]form share info get formRecord failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
 
@@ -108,10 +108,10 @@ int32_t FormShareMgr::ShareForm(int64_t formId, const std::string &deviceId, con
 
 int32_t FormShareMgr::RecvFormShareInfoFromRemote(const FormShareInfo &info, const int32_t userId)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("[%{public}s] null serialQueue_", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null serialQueue_", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -125,7 +125,7 @@ int32_t FormShareMgr::RecvFormShareInfoFromRemote(const FormShareInfo &info, con
 
 int32_t FormShareMgr::HandleRecvFormShareInfoFromRemoteTask(const FormShareInfo &info, const int32_t userId)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     if (!CheckFormShareInfo(info)) {
         HILOG_ERROR("form share info check failed");
@@ -136,11 +136,11 @@ int32_t FormShareMgr::HandleRecvFormShareInfoFromRemoteTask(const FormShareInfo 
     ExtensionAbilityInfo extensionAbilityInfo;
     if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
         ACTION_SHARE_FORM, userId, abilityInfo, extensionAbilityInfo)) {
-        HILOG_ERROR("[%{public}s] get ability info by action failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get ability info by action failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_FORM_USER_NOT_EXIST;
     }
     if (abilityInfo.name.empty() && extensionAbilityInfo.name.empty()) {
-        HILOG_ERROR("[%{public}s] formUser not exist", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]formUser not exist", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_FORM_USER_NOT_EXIST;
     }
 
@@ -185,7 +185,7 @@ int32_t FormShareMgr::CheckFormPackage(const FormShareInfo &info, const std::str
     }
 
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("[%{public}s] null serialQueue_", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null serialQueue_", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -209,7 +209,7 @@ int32_t FormShareMgr::CheckFormPackage(const FormShareInfo &info, const std::str
 
     auto ret = freeInstallOperator->StartFreeInstall(info.bundleName, info.moduleName, info.abilityName, userId);
     if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s] free install failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]free install failed", __FUNCTION__);
         RemoveFormShareInfo(formShareInfoKey);
         FinishFreeInstallTask(freeInstallOperator);
         return ERR_APPEXECFWK_FORM_FREE_INSTALL_FAILED;
@@ -260,12 +260,12 @@ std::string FormShareMgr::MakeFormShareInfoKey(const Want &want)
 
 void FormShareMgr::StartFormUser(const FormShareInfo &info, const int32_t userId)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     AbilityInfo abilityInfo;
     ExtensionAbilityInfo extensionAbilityInfo;
     if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
         ACTION_SHARE_FORM, userId, abilityInfo, extensionAbilityInfo)) {
-        HILOG_ERROR("[%{public}s] get ability info by action failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get ability info by action failed", __FUNCTION__);
         return;
     }
 
@@ -275,7 +275,7 @@ void FormShareMgr::StartFormUser(const FormShareInfo &info, const int32_t userId
     } else if (!extensionAbilityInfo.name.empty()) {
         want.SetElementName(extensionAbilityInfo.bundleName, extensionAbilityInfo.name);
     } else {
-        HILOG_ERROR("[%{public}s] formUser not exist", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]formUser not exist", __FUNCTION__);
         return;
     }
 
@@ -297,7 +297,7 @@ void FormShareMgr::StartFormUser(const FormShareInfo &info, const int32_t userId
 bool FormShareMgr::IsExistFormPackage(const std::string &bundleName, const std::string &moduleName,
     const int32_t userId)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     BundleInfo bundleInfo;
     if (!FormBmsHelper::GetInstance().GetBundleInfo(bundleName, userId, bundleInfo)) {
         HILOG_ERROR("get bundle info failed");
@@ -317,7 +317,7 @@ bool FormShareMgr::IsExistFormPackage(const std::string &bundleName, const std::
 
 void FormShareMgr::RemoveFormShareInfo(const std::string &formShareInfoKey)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     {
         std::unique_lock<std::shared_mutex> guard(eventMapMutex_);
         int64_t eventId = 0;
@@ -344,7 +344,7 @@ void FormShareMgr::RemoveFormShareInfo(const std::string &formShareInfoKey)
 
 void FormShareMgr::FinishFreeInstallTask(const std::shared_ptr<FormFreeInstallOperator> &freeInstallOperator)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::unique_lock<std::shared_mutex> guard(freeInstallMapMutex_);
 
     int64_t eventId = 0;
@@ -366,12 +366,12 @@ void FormShareMgr::FinishFreeInstallTask(const std::shared_ptr<FormFreeInstallOp
 void FormShareMgr::OnInstallFinished(const std::shared_ptr<FormFreeInstallOperator> &freeInstallOperator,
     int32_t resultCode, const std::string &formShareInfoKey, const int32_t userId)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     FinishFreeInstallTask(freeInstallOperator);
 
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("[%{public}s] free install failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]free install failed", __FUNCTION__);
         RemoveFormShareInfo(formShareInfoKey);
         return;
     }
@@ -395,7 +395,7 @@ void FormShareMgr::OnInstallFinished(const std::shared_ptr<FormFreeInstallOperat
 
 void FormShareMgr::HandleFormShareInfoTimeout(int64_t eventId)
 {
-    HILOG_DEBUG("[%{public}s] eventId:%{public}" PRId64 "", __FUNCTION__, eventId);
+    HILOG_DEBUG("[%{public}s]eventId:%{public}" PRId64 "", __FUNCTION__, eventId);
 
     std::string formShareInfoKey;
     {
@@ -415,7 +415,7 @@ void FormShareMgr::HandleFormShareInfoTimeout(int64_t eventId)
 
 void FormShareMgr::HandleFreeInstallTimeout(int64_t eventId)
 {
-    HILOG_DEBUG("[%{public}s] eventId:%{public}" PRId64 "", __FUNCTION__, eventId);
+    HILOG_DEBUG("[%{public}s]eventId:%{public}" PRId64 "", __FUNCTION__, eventId);
     std::string formShareInfoKey;
     {
         std::unique_lock<std::shared_mutex> guard(freeInstallMapMutex_);
@@ -437,7 +437,7 @@ void FormShareMgr::HandleFreeInstallTimeout(int64_t eventId)
 
 void FormShareMgr::AddProviderData(const Want &want, WantParams &wantParams)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto formShareInfoKey = MakeFormShareInfoKey(want);
     std::string deviceId;
@@ -479,7 +479,7 @@ void FormShareMgr::AddProviderData(const Want &want, WantParams &wantParams)
 void FormShareMgr::AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
     const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int64_t requestCode = static_cast<int64_t>(want.GetLongParam(Constants::FORM_SHARE_REQUEST_CODE, 0));
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
@@ -504,12 +504,12 @@ void FormShareMgr::AcquireShareFormData(int64_t formId, const std::string &remot
 void FormShareMgr::HandleProviderShareData(int64_t formId, const std::string &remoteDeviceId,
     const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     FormRecord formRecord;
     bool isFormRecExist = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!isFormRecExist) {
-        HILOG_ERROR("[%{public}s] form share info get formRecord failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]form share info get formRecord failed", __FUNCTION__);
         SendResponse(requestCode, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
         return;
     }
@@ -569,7 +569,7 @@ void FormShareMgr::SendResponse(int64_t requestCode, int32_t result)
 
 bool FormShareMgr::IsShareForm(const Want &want)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     auto formShareInfoKey = MakeFormShareInfoKey(want);
     HILOG_DEBUG("formShareInfoKey:%{public}s", formShareInfoKey.c_str());
 
@@ -584,7 +584,7 @@ bool FormShareMgr::IsShareForm(const Want &want)
 
 void FormShareMgr::OnEventTimeoutResponse(int64_t msg, int64_t eventId)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     switch (msg) {
         case MSG::FORM_SHARE_INFO_DELAY_MSG: {
             HandleFormShareInfoTimeout(eventId);

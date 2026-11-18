@@ -41,7 +41,7 @@ int FormObserverAdapter::RegisterFormAddObserverByBundle(const std::string &bund
     const sptr<IRemoteObject> &callerToken)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_DEBUG("[%{public}s] call,bundleName:%{public}s", __FUNCTION__, bundleName.c_str());
+    HILOG_DEBUG("[%{public}s]call,bundleName:%{public}s", __FUNCTION__, bundleName.c_str());
     return FormObserverRecord::GetInstance().SetFormAddObserver(bundleName, callerToken);
 }
 
@@ -49,21 +49,21 @@ int FormObserverAdapter::RegisterFormRemoveObserverByBundle(const std::string &b
     const sptr<IRemoteObject> &callerToken)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_DEBUG("[%{public}s] call,bundleName:%{public}s", __FUNCTION__, bundleName.c_str());
+    HILOG_DEBUG("[%{public}s]call,bundleName:%{public}s", __FUNCTION__, bundleName.c_str());
     return FormObserverRecord::GetInstance().SetFormRemoveObserver(bundleName, callerToken);
 }
 
 int FormObserverAdapter::RegisterAddObserver(const std::string &bundleName,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     return FormCommonAdapter::GetInstance().RegisterAddObserver(bundleName, callerToken);
 }
 
 int FormObserverAdapter::RegisterRemoveObserver(const std::string &bundleName,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     return FormCommonAdapter::GetInstance().RegisterRemoveObserver(bundleName, callerToken);
 }
 
@@ -75,9 +75,9 @@ void FormObserverAdapter::CleanResource(const wptr<IRemoteObject> &remote)
 ErrCode FormObserverAdapter::RegisterClickEventObserver(const std::string &bundleName,
     const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (observer == nullptr) {
-        HILOG_ERROR("[%{public}s] null CallerToken", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null CallerToken", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     return FormObserverRecord::GetInstance().SetFormEventObserver(bundleName, formEventType, observer);
@@ -86,9 +86,9 @@ ErrCode FormObserverAdapter::RegisterClickEventObserver(const std::string &bundl
 ErrCode FormObserverAdapter::UnregisterClickEventObserver(const std::string &bundleName,
     const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (observer == nullptr) {
-        HILOG_ERROR("[%{public}s] null CallerToken", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]null CallerToken", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     return FormObserverRecord::GetInstance().RemoveFormEventObserver(bundleName, formEventType, observer);

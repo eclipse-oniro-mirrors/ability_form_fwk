@@ -34,9 +34,9 @@ FormObserverTaskMgr::~FormObserverTaskMgr() {}
 void FormObserverTaskMgr::PostAddTaskToHost(const std::string bundleName,
     const sptr<IRemoteObject> &remoteObject, const RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (remoteObject == nullptr) {
-        HILOG_ERROR("[%{public}s] remoteObject is null", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]remoteObject is null", __FUNCTION__);
         return;
     }
 
@@ -55,9 +55,9 @@ void FormObserverTaskMgr::PostAddTaskToHost(const std::string bundleName,
 void FormObserverTaskMgr::PostRemoveTaskToHost(const std::string bundleName,
     const sptr<IRemoteObject> &remoteObject, const RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (remoteObject == nullptr) {
-        HILOG_ERROR("[%{public}s] remoteObject is null", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]remoteObject is null", __FUNCTION__);
         return;
     }
 
@@ -78,9 +78,9 @@ void FormObserverTaskMgr::PostFormClickEventToHost(
     const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &remoteObject,
     const RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (remoteObject == nullptr) {
-        HILOG_ERROR("[%{public}s] remoteObject is null", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]remoteObject is null", __FUNCTION__);
         return;
     }
 
@@ -96,7 +96,7 @@ void FormObserverTaskMgr::PostFormClickEventToHost(
 */
 void FormObserverTaskMgr::PostBatchRefreshForms(const int32_t formRefreshType)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
  
     auto batchRefreshForms = [formRefreshType]() {
         return FormMgrAdapterFacade::GetInstance().BatchRefreshForms(formRefreshType);
@@ -110,49 +110,49 @@ void FormObserverTaskMgr::PostBatchRefreshForms(const int32_t formRefreshType)
 */
 void FormObserverTaskMgr::PostBatchConfigurationUpdateForms(const AppExecFwk::Configuration& configuration)
 {
-    HILOG_INFO("[%{public}s] Call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]Call", __FUNCTION__);
  
     auto batchConfigurationUpdate = [configuration]() {
         return FormMgrAdapterFacade::GetInstance().BatchNotifyFormsConfigurationUpdate(configuration);
     };
     FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, batchConfigurationUpdate);
-    HILOG_INFO("[%{public}s] end", __FUNCTION__);
+    HILOG_INFO("[%{public}s]end", __FUNCTION__);
 }
  
 void FormObserverTaskMgr::FormAdd(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
     const RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
 
     sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
         iface_cast<AbilityRuntime::IJsFormStateObserver>(remoteObject);
     if (remoteJsFormStateObserver == nullptr) {
-        HILOG_ERROR("[%{public}s] get jsFormStateObserverProxy failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get jsFormStateObserverProxy failed", __FUNCTION__);
         return;
     }
     remoteJsFormStateObserver->OnAddForm(bundleName, runningFormInfo);
-    HILOG_DEBUG("[%{public}s] end", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]end", __FUNCTION__);
 }
 
 void FormObserverTaskMgr::FormRemove(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
     const RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
 
     sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
         iface_cast<AbilityRuntime::IJsFormStateObserver>(remoteObject);
     if (remoteJsFormStateObserver == nullptr) {
-        HILOG_ERROR("[%{public}s] get jsFormStateObserverProxy failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get jsFormStateObserverProxy failed", __FUNCTION__);
         return;
     }
     remoteJsFormStateObserver->OnRemoveForm(bundleName, runningFormInfo);
-    HILOG_DEBUG("[%{public}s] end", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]end", __FUNCTION__);
 }
 
 void FormObserverTaskMgr::FormClickEvent(const std::string &bundleName, const std::string &formEventType,
     const sptr<IRemoteObject> &remoteObject, const RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
 
     sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
         iface_cast<AbilityRuntime::IJsFormStateObserver>(remoteObject);
@@ -162,7 +162,7 @@ void FormObserverTaskMgr::FormClickEvent(const std::string &bundleName, const st
     }
 
     remoteJsFormStateObserver->OnFormClickEvent(bundleName, formEventType, runningFormInfo);
-    HILOG_DEBUG("[%{public}s] end", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]end", __FUNCTION__);
 }
 
 void FormObserverTaskMgr::PostBatchColorModeUpdateForms(int32_t userId,
@@ -174,7 +174,7 @@ void FormObserverTaskMgr::PostBatchColorModeUpdateForms(int32_t userId,
         return FormMgrAdapterFacade::GetInstance().BatchNotifyFormsColorModeUpdate(userId, configuration);
     };
     FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, batchColorModeUpdate);
-    HILOG_INFO("[%{public}s] end", __FUNCTION__);
+    HILOG_INFO("[%{public}s]end", __FUNCTION__);
 }
 
 } // namespace AppExecFwk

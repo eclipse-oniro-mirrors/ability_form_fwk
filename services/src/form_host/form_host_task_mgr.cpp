@@ -39,7 +39,7 @@ FormHostTaskMgr::~FormHostTaskMgr() {}
 void FormHostTaskMgr::PostAcquireTaskToHost(const int64_t formId, const FormRecord &record,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto acquireTaskToHostFunc = [formId, record, remoteObject]() {
         FormHostTaskMgr::GetInstance().AcquireTaskToHost(formId, record, remoteObject);
@@ -58,7 +58,7 @@ void FormHostTaskMgr::PostAcquireTaskToHost(const int64_t formId, const FormReco
 void FormHostTaskMgr::PostUpdateTaskToHost(const int64_t formId, const FormRecord &record,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto updateTaskToHostFunc = [formId, record, remoteObject]() {
         FormHostTaskMgr::GetInstance().UpdateTaskToHost(formId, record, remoteObject);
@@ -74,7 +74,7 @@ void FormHostTaskMgr::PostUpdateTaskToHost(const int64_t formId, const FormRecor
 void FormHostTaskMgr::PostUninstallTaskToHost(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto uninstallFunc = [formIds, remoteObject]() {
         FormHostTaskMgr::GetInstance().FormUninstall(formIds, remoteObject);
@@ -91,7 +91,7 @@ void FormHostTaskMgr::PostUninstallTaskToHost(const std::vector<int64_t> &formId
 void FormHostTaskMgr::PostAcquireStateTaskToHost(AppExecFwk::FormState state, const AAFwk::Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto acquireStateFunc = [state, want, remoteObject]() {
         FormHostTaskMgr::GetInstance().AcquireStateBack(state, want, remoteObject);
@@ -108,7 +108,7 @@ void FormHostTaskMgr::PostAcquireStateTaskToHost(AppExecFwk::FormState state, co
 void FormHostTaskMgr::PostAcquireDataTaskToHost(const AAFwk::WantParams &wantParams,
     int64_t requestCode, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto acquireTaskToHostFunc = [wantParams, requestCode, remoteObject]() {
         FormHostTaskMgr::GetInstance().AcquireFormDataBack(wantParams, requestCode, remoteObject);
@@ -125,7 +125,7 @@ void FormHostTaskMgr::PostAcquireDataTaskToHost(const AAFwk::WantParams &wantPar
 void FormHostTaskMgr::PostEnableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool enable,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto enableFormsTaskToHostFunc = [formIds, enable, remoteObject]() {
         FormHostTaskMgr::GetInstance().EnableFormsTaskToHost(formIds, enable, remoteObject);
@@ -142,7 +142,7 @@ void FormHostTaskMgr::PostEnableFormsTaskToHost(const std::vector<int64_t> &form
 void FormHostTaskMgr::PostLockFormsTaskToHost(const std::vector<int64_t> &formIds, const bool lock,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto lockFormsTaskToHostFunc = [formIds, lock, remoteObject]() {
         FormHostTaskMgr::GetInstance().LockFormsTaskToHost(formIds, lock, remoteObject);
@@ -156,7 +156,7 @@ void FormHostTaskMgr::PostLockFormsTaskToHost(const std::vector<int64_t> &formId
  */
 void FormHostTaskMgr::PostFrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto task = [remoteObject]() {
         FormHostTaskMgr::GetInstance().FrsDiedTaskToHost(remoteObject);
@@ -186,7 +186,7 @@ void FormHostTaskMgr::PostConnectFRSFailedTaskToHost(int64_t formId, int32_t err
  */
 void FormHostTaskMgr::PostHostDiedTask(const sptr<IRemoteObject> &remoteHost)
 {
-    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto postTaskFunc = [remoteHost]() {
         FormHostTaskMgr::GetInstance().HostDied(remoteHost);
@@ -205,11 +205,11 @@ void FormHostTaskMgr::PostHostDiedTask(const sptr<IRemoteObject> &remoteHost)
 void FormHostTaskMgr::AcquireTaskToHost(const int64_t formId, const FormRecord &record,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("[%{public}s] formId:%{public}" PRId64, __FUNCTION__, formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formId);
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
-        HILOG_ERROR("[%{public}s] get formHostProxy failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get formHostProxy failed", __FUNCTION__);
         return;
     }
 
@@ -230,18 +230,18 @@ void FormHostTaskMgr::AcquireTaskToHost(const int64_t formId, const FormRecord &
 void FormHostTaskMgr::UpdateTaskToHost(const int64_t formId, const FormRecord &record,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
-        HILOG_ERROR("[%{public}s] get formHostProxy failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get formHostProxy failed", __FUNCTION__);
         return;
     }
 
     FormJsInfo formJsInfo;
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, record, formJsInfo);
     remoteFormHost->OnUpdate(formJsInfo);
-    HILOG_DEBUG("[%{public}s] end", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]end", __FUNCTION__);
 }
 
 /**
@@ -252,16 +252,16 @@ void FormHostTaskMgr::UpdateTaskToHost(const int64_t formId, const FormRecord &r
 void FormHostTaskMgr::FormUninstall(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
-        HILOG_ERROR("[%{public}s] get formHostProxy failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get formHostProxy failed", __FUNCTION__);
         return;
     }
 
     remoteFormHost->OnUninstall(formIds);
-    HILOG_DEBUG("[%{public}s] end", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]end", __FUNCTION__);
 }
 
 /**
@@ -273,16 +273,16 @@ void FormHostTaskMgr::FormUninstall(const std::vector<int64_t> &formIds,
 void FormHostTaskMgr::AcquireStateBack(AppExecFwk::FormState state, const AAFwk::Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
-        HILOG_ERROR("[%{public}s] get formHostProxy failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get formHostProxy failed", __FUNCTION__);
         return;
     }
 
     remoteFormHost->OnAcquireState(state, want);
-    HILOG_DEBUG("[%{public}s] end", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]end", __FUNCTION__);
 }
 
 /**
@@ -294,66 +294,66 @@ void FormHostTaskMgr::AcquireStateBack(AppExecFwk::FormState state, const AAFwk:
 void FormHostTaskMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams,
     int64_t requestCode, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
-        HILOG_ERROR("[%{public}s] get formHostProxy failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get formHostProxy failed", __FUNCTION__);
         return;
     }
 
     remoteFormHost->OnAcquireDataResponse(wantParams, requestCode);
-    HILOG_DEBUG("[%{public}s] end", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]end", __FUNCTION__);
 }
 
 void FormHostTaskMgr::EnableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool enable,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
-        HILOG_ERROR("[%{public}s] get formHostProxy failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get formHostProxy failed", __FUNCTION__);
         return;
     }
 
     remoteFormHost->OnEnableForm(formIds, enable);
-    HILOG_DEBUG("[%{public}s] end", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]end", __FUNCTION__);
 }
 
 void FormHostTaskMgr::LockFormsTaskToHost(const std::vector<int64_t> &formIds, const bool lock,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
 
     HILOG_INFO("LockFormsTaskToHost start");
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
-        HILOG_ERROR("[%{public}s] get formHostProxy failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get formHostProxy failed", __FUNCTION__);
         return;
     }
 
     remoteFormHost->OnLockForm(formIds, lock);
-    HILOG_DEBUG("[%{public}s] end", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]end", __FUNCTION__);
 }
 
 void FormHostTaskMgr::FrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
-        HILOG_ERROR("[%{public}s] get formHostProxy failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get formHostProxy failed", __FUNCTION__);
         return;
     }
 
     remoteFormHost->OnError(ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, "FormRenderService is dead.");
-    HILOG_DEBUG("[%{public}s] end", __FUNCTION__);
+    HILOG_DEBUG("[%{public}s]end", __FUNCTION__);
 }
 
 void FormHostTaskMgr::ConnectFRSFailedTaskToHost(int64_t formId, int32_t errorCode)
 {
-    HILOG_WARN("[%{public}s] formId:%{public}" PRId64 ", errorCode:%{public}d", __FUNCTION__, formId, errorCode);
+    HILOG_WARN("[%{public}s]formId:%{public}" PRId64 ", errorCode:%{public}d", __FUNCTION__, formId, errorCode);
     std::vector<int64_t> formIds{formId};
 
     std::vector<sptr<IRemoteObject>> formHostObjs;
@@ -383,7 +383,7 @@ void FormHostTaskMgr::HostDied(const sptr<IRemoteObject> &remoteHost)
 void FormHostTaskMgr::PostDueControlFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisablePolicy,
     const bool isControl, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("[%{public}s] call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     auto func = [formIds, isDisablePolicy, isControl, remoteObject]() {
         FormHostTaskMgr::GetInstance().DueControlFormsTaskToHost(formIds, isDisablePolicy, isControl, remoteObject);
     };
@@ -393,10 +393,10 @@ void FormHostTaskMgr::PostDueControlFormsTaskToHost(const std::vector<int64_t> &
 void FormHostTaskMgr::DueControlFormsTaskToHost(const std::vector<int64_t> &formIds, const bool isDisablePolicy,
     const bool isControl, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("[%{public}s] call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
-        HILOG_ERROR("[%{public}s] get formHostProxy failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get formHostProxy failed", __FUNCTION__);
         return;
     }
 
@@ -415,10 +415,10 @@ void FormHostTaskMgr::PostCheckFormsTaskToHost(
 
 void FormHostTaskMgr::CheckFormsTaskToHost(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("[%{public}s] call", __FUNCTION__);
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
-        HILOG_ERROR("[%{public}s] get formHostProxy failed", __FUNCTION__);
+        HILOG_ERROR("[%{public}s]get formHostProxy failed", __FUNCTION__);
         return;
     }
     remoteFormHost->OnCheckForm(formIds);
