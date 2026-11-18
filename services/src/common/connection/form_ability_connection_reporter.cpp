@@ -43,12 +43,12 @@ public:
 
 FormAbilityConnectionReporter::FormAbilityConnectionReporter()
 {
-    HILOG_INFO("Call");
+    HILOG_INFO("[%{public}s] Call", __FUNCTION__);
 }
 
 FormAbilityConnectionReporter::~FormAbilityConnectionReporter()
 {
-    HILOG_INFO("Call");
+    HILOG_INFO("[%{public}s] Call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(appManagerMutex_);
     if (appManager_ != nullptr && appMgrDeath_ != nullptr) {
         appManager_->AsObject()->RemoveDeathRecipient(appMgrDeath_);
@@ -58,7 +58,7 @@ FormAbilityConnectionReporter::~FormAbilityConnectionReporter()
 void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::string &bundleName, int32_t userId)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("Invalid bundleName");
+        HILOG_ERROR("[%{public}s] Invalid bundleName", __FUNCTION__);
         return;
     }
     std::lock_guard<std::mutex> lock(formConnectionInfoMapMutex_);
@@ -88,7 +88,7 @@ void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::strin
 void FormAbilityConnectionReporter::ReportFormAbilityDisconnection(const std::string &bundleName)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("Invalid bundleName");
+        HILOG_ERROR("[%{public}s] Invalid bundleName", __FUNCTION__);
         return;
     }
     std::lock_guard<std::mutex> lock(formConnectionInfoMapMutex_);
@@ -156,7 +156,7 @@ sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnectionReporter::GetAppMgr()
 
 void FormAbilityConnectionReporter::ClearAppMgr()
 {
-    HILOG_INFO("Call");
+    HILOG_INFO("[%{public}s] Call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(appManagerMutex_);
     appManager_ = nullptr;
     appMgrDeath_ = nullptr;

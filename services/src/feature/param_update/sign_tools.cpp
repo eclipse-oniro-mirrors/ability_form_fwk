@@ -119,7 +119,7 @@ std::string SignTools::GetfileStream(const std::string &filepath)
     std::string fileString;
     char canonicalPath[PATH_MAX] = { '\0' };
     if (realpath(filepath.c_str(), canonicalPath) == nullptr) {
-        HILOG_ERROR("canonicalPath is null");
+        HILOG_ERROR("[%{public}s] canonicalPath is null", __FUNCTION__);
         return fileString;
     }
     canonicalPath[PATH_MAX - 1] = '\0';
@@ -156,7 +156,7 @@ int SignTools::ForEachFileSegment(const std::string &fpath, std::function<void(c
 {
     char canonicalPath[PATH_MAX] = { '\0' };
     if (realpath(fpath.c_str(), canonicalPath) == nullptr) {
-        HILOG_ERROR("canonicalPath is null");
+        HILOG_ERROR("[%{public}s] canonicalPath is null", __FUNCTION__);
         return errno;
     }
     canonicalPath[PATH_MAX - 1] = '\0';

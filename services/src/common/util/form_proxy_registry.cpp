@@ -93,7 +93,7 @@ ErrCode FormProxyRegistry::GetAll(std::vector<sptr<IRemoteObject>> &proxies)
         proxies.push_back(pair.second);
     }
     if (proxies.empty()) {
-        HILOG_ERROR("%{public}s:no proxies registered", tag_.c_str());
+        HILOG_ERROR("[%{public}s] %{public}s:no proxies registered", __FUNCTION__, tag_.c_str());
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
     return ERR_OK;
@@ -106,7 +106,7 @@ ErrCode FormProxyRegistry::GetAllWithKeys(std::vector<std::pair<int32_t, sptr<IR
         entries.push_back({pair.first, pair.second});
     }
     if (entries.empty()) {
-        HILOG_ERROR("%{public}s:no proxies registered", tag_.c_str());
+        HILOG_ERROR("[%{public}s] %{public}s:no proxies registered", __FUNCTION__, tag_.c_str());
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
     return ERR_OK;

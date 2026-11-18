@@ -62,7 +62,7 @@ enum class ActivationState : int32_t {
 bool CheckUIAbilityContext(ani_env *env, ani_object etsContext)
 {
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return false;
     }
     auto context = OHOS::AbilityRuntime::GetStageModeContext(env, etsContext);
@@ -82,30 +82,30 @@ bool CheckUIAbilityContext(ani_env *env, ani_object etsContext)
 
 ani_object WrapRectInner(ani_env *env, ani_object rectobject, const AppExecFwk::Rect &rect)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     if (env == nullptr || rectobject == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return nullptr;
     }
     ani_status status = ANI_ERROR;
     status = env->Object_SetPropertyByName_Double(rectobject, PROVIDER_RECT_LEFT, rect.left);
     if (status != ANI_OK) {
-        HILOG_ERROR("set exitCode failed status:%{public}d", status);
+        HILOG_ERROR("[%{public}s] set exitCode failed status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     status = env->Object_SetPropertyByName_Double(rectobject, PROVIDER_RECT_TOP, rect.top);
     if (status != ANI_OK) {
-        HILOG_ERROR("set exitCode failed status:%{public}d", status);
+        HILOG_ERROR("[%{public}s] set exitCode failed status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     status = env->Object_SetPropertyByName_Double(rectobject, PROVIDER_RECT_WIDTH, rect.width);
     if (status != ANI_OK) {
-        HILOG_ERROR("set exitCode failed status:%{public}d", status);
+        HILOG_ERROR("[%{public}s] set exitCode failed status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     status = env->Object_SetPropertyByName_Double(rectobject, PROVIDER_RECT_HEIGHT, rect.height);
     if (status != ANI_OK) {
-        HILOG_ERROR("set exitCode failed status:%{public}d", status);
+        HILOG_ERROR("[%{public}s] set exitCode failed status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     return rectobject;
@@ -113,7 +113,7 @@ ani_object WrapRectInner(ani_env *env, ani_object rectobject, const AppExecFwk::
 
 bool ConvertFormOverflowInfo(ani_env *env, ani_object aniOverflowInfo, AppExecFwk::OverflowInfo* overflowInfo)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (env == nullptr || aniOverflowInfo == nullptr) {
         HILOG_ERROR("env or aniOverflowInfo is nullptr");
         return false;
@@ -163,9 +163,9 @@ bool ConvertFormOverflowInfo(ani_env *env, ani_object aniOverflowInfo, AppExecFw
 
 ani_object CreateFormRect(ani_env *env, const AppExecFwk::Rect &rect)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return nullptr;
     }
     ani_class rectClass = nullptr;
@@ -191,19 +191,19 @@ ani_object CreateFormRect(ani_env *env, const AppExecFwk::Rect &rect)
 void CheckFormIDParam(ani_env *env, ani_string formId)
 {
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
         return;
     }
     std::string stdFormId = "";
     if (!FormAniUtil::GetStdString(env, formId, stdFormId)) {
-        HILOG_ERROR("GetStdString failed");
+        HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
         EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
         return;
     }
     HILOG_INFO("stdFormId %{public}s", stdFormId.c_str());
     int64_t formIdInt = -1;
     if (!FormAniUtil::ConvertStringToInt64(stdFormId, formIdInt)) {
-        HILOG_ERROR("formId ConvertStringToInt64 failed");
+        HILOG_ERROR("[%{public}s] formId ConvertStringToInt64 failed", __FUNCTION__);
         EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
         return;
     }
@@ -212,16 +212,16 @@ void CheckFormIDParam(ani_env *env, ani_string formId)
 void CheckOverflowInfoParam(ani_env *env, ani_object aniOverflowInfo)
 {
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
         return;
     }
     AppExecFwk::OverflowInfo* overflowInfo = new (std::nothrow) AppExecFwk::OverflowInfo {};
     if (overflowInfo == nullptr) {
-        HILOG_ERROR("Failed to new overflowInfo");
+        HILOG_ERROR("[%{public}s] Failed to new overflowInfo", __FUNCTION__);
         return;
     }
     if (!ConvertFormOverflowInfo(env, aniOverflowInfo, overflowInfo)) {
-        HILOG_ERROR("convert overflowInfo failed");
+        HILOG_ERROR("[%{public}s] convert overflowInfo failed", __FUNCTION__);
         delete overflowInfo;
         EtsFormErrorUtil::ThrowParamError(env, "The overflowInfo is invalid");
         return;
@@ -232,9 +232,9 @@ void CheckOverflowInfoParam(ani_env *env, ani_object aniOverflowInfo)
 
 void SetFormNextRefreshTime([[maybe_unused]] ani_env *env, ani_string formId, ani_int minute, ani_object callback)
 {
-    HILOG_DEBUG("Call");
+    HILOG_DEBUG("[%{public}s] Call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     if (IsRefUndefined(env, formId)) {
@@ -250,15 +250,15 @@ void SetFormNextRefreshTime([[maybe_unused]] ani_env *env, ani_string formId, an
         return;
     }
     InvokeAsyncWithBusinessError(env, callback, ERR_OK, nullptr);
-    HILOG_DEBUG("End");
+    HILOG_DEBUG("[%{public}s] End", __FUNCTION__);
 }
 
 void UpdateForm([[maybe_unused]] ani_env *env, ani_string formId, ani_string dataObjStr, ani_object callback,
     ani_object proxies)
 {
-    HILOG_DEBUG("Call");
+    HILOG_DEBUG("[%{public}s] Call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     if (IsRefUndefined(env, formId) || IsRefUndefined(env, dataObjStr)) {
@@ -278,14 +278,14 @@ void UpdateForm([[maybe_unused]] ani_env *env, ani_string formId, ani_string dat
         HILOG_ERROR("UpdateForm failed.Return code:%{public}d", static_cast<int>(ret));
     }
     InvokeAsyncWithBusinessError(env, callback, ret, nullptr);
-    HILOG_DEBUG("End");
+    HILOG_DEBUG("[%{public}s] End", __FUNCTION__);
 }
 
 void GetFormsInfo([[maybe_unused]] ani_env *env, ani_object callback, ani_object filter)
 {
-    HILOG_DEBUG("Call");
+    HILOG_DEBUG("[%{public}s] Call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     FormInfoFilter formInfoFilter;
@@ -309,7 +309,7 @@ void GetFormsInfo([[maybe_unused]] ani_env *env, ani_object callback, ani_object
 
     ani_object formInfosArray = GetAniArray(env, formInfos.size());
     if (formInfosArray == nullptr) {
-        HILOG_ERROR("GetAniArray failed");
+        HILOG_ERROR("[%{public}s] GetAniArray failed", __FUNCTION__);
         InvokeAsyncWithBusinessError(env, callback, ERR_APPEXECFWK_FORM_COMMON_CODE, nullptr);
         return;
     }
@@ -318,7 +318,7 @@ void GetFormsInfo([[maybe_unused]] ani_env *env, ani_object callback, ani_object
     for (auto &formInfo : formInfos) {
         ani_object formInfoAni = CreateAniObject(env, FORM_INFO_INNER_CLASS_NAME);
         if (formInfoAni == nullptr) {
-            HILOG_ERROR("CreateAniObject failed");
+            HILOG_ERROR("[%{public}s] CreateAniObject failed", __FUNCTION__);
             InvokeAsyncWithBusinessError(env, callback, ERR_APPEXECFWK_FORM_COMMON_CODE, nullptr);
             return;
         }
@@ -326,7 +326,7 @@ void GetFormsInfo([[maybe_unused]] ani_env *env, ani_object callback, ani_object
         ani_status status = env->Object_CallMethodByName_Void(formInfosArray, ANI_SETTER_MARKER,
             PROVIDER_SET_SIGNATURE, index, formInfoAni);
         if (status != ANI_OK) {
-            HILOG_ERROR("Object_CallMethodByName_Void failed,error code:%{public}d", static_cast<int>(status));
+            HILOG_ERROR("[%{public}s] Object_CallMethodByName_Void failed,error code:%{public}d", __FUNCTION__, static_cast<int>(status));
             InvokeAsyncWithBusinessError(env, callback, ERR_APPEXECFWK_FORM_COMMON_CODE, nullptr);
             return;
         }
@@ -334,16 +334,16 @@ void GetFormsInfo([[maybe_unused]] ani_env *env, ani_object callback, ani_object
     }
 
     InvokeAsyncWithBusinessError(env, callback, ret, formInfosArray);
-    HILOG_DEBUG("End");
+    HILOG_DEBUG("[%{public}s] End", __FUNCTION__);
 }
 
 void OpenFormEditAbility([[maybe_unused]] ani_env *env, ani_string abilityName,
     ani_string formId, ani_boolean isMainPage)
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Provider.openFormEditAbility", HISTOGRAM_BOOLEAN_SAMPLE);
-    HILOG_DEBUG("Call");
+    HILOG_DEBUG("[%{public}s] Call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     CheckIfRefValidOrThrow(env, abilityName);
@@ -352,7 +352,7 @@ void OpenFormEditAbility([[maybe_unused]] ani_env *env, ani_string abilityName,
     int64_t formIdNum = FormIdAniStrtoInt64(env, formId);
     std::string stdAbilityName = AniStringToStdString(env, abilityName);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     if (stdAbilityName.empty()) {
@@ -367,15 +367,15 @@ void OpenFormEditAbility([[maybe_unused]] ani_env *env, ani_string abilityName,
         PrepareExceptionAndThrow(env, ret);
     }
 
-    HILOG_DEBUG("End");
+    HILOG_DEBUG("[%{public}s] End", __FUNCTION__);
 }
 
 void CloseFormEditAbility(ani_env *env, ani_boolean isMainPage)
 {
-    HILOG_DEBUG("Call");
+    HILOG_DEBUG("[%{public}s] Call", __FUNCTION__);
     auto ret = FormMgr::GetInstance().CloseFormEditAbility(isMainPage);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     if (ret != ERR_OK) {
@@ -383,17 +383,17 @@ void CloseFormEditAbility(ani_env *env, ani_boolean isMainPage)
         PrepareExceptionAndThrow(env, ret);
     }
 
-    HILOG_DEBUG("End");
+    HILOG_DEBUG("[%{public}s] End", __FUNCTION__);
 }
 
 void OpenFormManager([[maybe_unused]] ani_env *env, ani_object wantObj)
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Provider.openFormManager", HISTOGRAM_BOOLEAN_SAMPLE);
-    HILOG_DEBUG("Call");
+    HILOG_DEBUG("[%{public}s] Call", __FUNCTION__);
     CheckIfRefValidOrThrow(env, wantObj);
     Want want;
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     if (!AppExecFwk::UnwrapWant(env, wantObj, want)) {
@@ -419,18 +419,18 @@ void OpenFormManager([[maybe_unused]] ani_env *env, ani_object wantObj)
         return;
     }
 
-    HILOG_DEBUG("End");
+    HILOG_DEBUG("[%{public}s] End", __FUNCTION__);
 }
 
 void IsRequestPublishFormSupported(ani_env *env, ani_object callback)
 {
-    HILOG_INFO("Call");
+    HILOG_INFO("[%{public}s] Call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     if (!FormAniUtil::CheckCallerIsSystemApp()) {
-        HILOG_ERROR("The app not system-app,can't use system-api");
+        HILOG_ERROR("[%{public}s] The app not system-app,can't use system-api", __FUNCTION__);
         EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
         return;
     }
@@ -448,20 +448,20 @@ void IsRequestPublishFormSupported(ani_env *env, ani_object callback)
 
 void GetFormRect(ani_env *env, ani_string formId, ani_object callback)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     std::string stdFormId = "";
     if (!FormAniUtil::GetStdString(env, formId, stdFormId)) {
-        HILOG_ERROR("GetStdString failed");
+        HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
         EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
         return;
     }
     int64_t formIdInt = -1;
     if (!FormAniUtil::ConvertStringToInt64(stdFormId, formIdInt)) {
-        HILOG_ERROR("formId ConvertStringToInt64 failed");
+        HILOG_ERROR("[%{public}s] formId ConvertStringToInt64 failed", __FUNCTION__);
         EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
         return;
     }
@@ -488,26 +488,26 @@ void GetFormRect(ani_env *env, ani_string formId, ani_object callback)
 void CancelOverflow(ani_env *env, ani_string formId, ani_object callback)
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Provider.cancelOverflow", HISTOGRAM_BOOLEAN_SAMPLE);
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     std::string stdFormId = "";
     if (!FormAniUtil::GetStdString(env, formId, stdFormId)) {
-        HILOG_ERROR("GetStdString failed");
+        HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
         EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
         return;
     }
     int64_t formIdInt = -1;
     if (!FormAniUtil::ConvertStringToInt64(stdFormId, formIdInt)) {
-        HILOG_ERROR("formId ConvertStringToInt64 failed");
+        HILOG_ERROR("[%{public}s] formId ConvertStringToInt64 failed", __FUNCTION__);
         EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
         return;
     }
     AppExecFwk::OverflowInfo* overflowInfo = new (std::nothrow) AppExecFwk::OverflowInfo {};
     if (overflowInfo == nullptr) {
-        HILOG_ERROR("Failed to new overflowInfo");
+        HILOG_ERROR("[%{public}s] Failed to new overflowInfo", __FUNCTION__);
         return;
     }
     ErrCode ret = FormMgr::GetInstance().RequestOverflow(formIdInt, *overflowInfo, false);
@@ -525,30 +525,30 @@ void RequestOverflow(ani_env *env, ani_string formId,
     ani_object aniOverflowInfo, ani_object callback)
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Provider.requestOverflow", HISTOGRAM_BOOLEAN_SAMPLE);
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     std::string stdFormId = "";
     if (!FormAniUtil::GetStdString(env, formId, stdFormId)) {
-        HILOG_ERROR("GetStdString failed");
+        HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
         EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
         return;
     }
     int64_t formIdInt = -1;
     if (!FormAniUtil::ConvertStringToInt64(stdFormId, formIdInt)) {
-        HILOG_ERROR("formId ConvertStringToInt64 failed");
+        HILOG_ERROR("[%{public}s] formId ConvertStringToInt64 failed", __FUNCTION__);
         EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
         return;
     }
     AppExecFwk::OverflowInfo* overflowInfo = new (std::nothrow) AppExecFwk::OverflowInfo {};
     if (overflowInfo == nullptr) {
-        HILOG_ERROR("Failed to new overflowInfo");
+        HILOG_ERROR("[%{public}s] Failed to new overflowInfo", __FUNCTION__);
         return;
     }
     if (!ConvertFormOverflowInfo(env, aniOverflowInfo, overflowInfo)) {
-        HILOG_ERROR("convert overflowInfo failed");
+        HILOG_ERROR("[%{public}s] convert overflowInfo failed", __FUNCTION__);
         delete overflowInfo;
         EtsFormErrorUtil::ThrowParamError(env, "The overflowInfo is invalid");
         return;
@@ -568,20 +568,20 @@ void RequestOverflow(ani_env *env, ani_string formId,
 void DeactivateSceneAnimation(ani_env *env, ani_string formId, ani_object callback)
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Provider.deactivateSceneAnimation", HISTOGRAM_BOOLEAN_SAMPLE);
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     std::string stdFormId = "";
     if (!FormAniUtil::GetStdString(env, formId, stdFormId)) {
-        HILOG_ERROR("GetStdString failed");
+        HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
         EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
         return;
     }
     int64_t formIdInt = -1;
     if (!FormAniUtil::ConvertStringToInt64(stdFormId, formIdInt)) {
-        HILOG_ERROR("formId ConvertStringToInt64 failed");
+        HILOG_ERROR("[%{public}s] formId ConvertStringToInt64 failed", __FUNCTION__);
         EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
         return;
     }
@@ -600,20 +600,20 @@ void DeactivateSceneAnimation(ani_env *env, ani_string formId, ani_object callba
 void ActivateSceneAnimation(ani_env *env, ani_string formId, ani_object callback)
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Provider.activateSceneAnimation", HISTOGRAM_BOOLEAN_SAMPLE);
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     std::string stdFormId = "";
     if (!FormAniUtil::GetStdString(env, formId, stdFormId)) {
-        HILOG_ERROR("GetStdString failed");
+        HILOG_ERROR("[%{public}s] GetStdString failed", __FUNCTION__);
         EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
         return;
     }
     int64_t formIdInt = -1;
     if (!FormAniUtil::ConvertStringToInt64(stdFormId, formIdInt)) {
-        HILOG_ERROR("formId ConvertStringToInt64 failed");
+        HILOG_ERROR("[%{public}s] formId ConvertStringToInt64 failed", __FUNCTION__);
         EtsFormErrorUtil::ThrowParamError(env, "The formId is invalid");
         return;
     }
@@ -632,9 +632,9 @@ void ActivateSceneAnimation(ani_env *env, ani_string formId, ani_object callback
 void OpenFormManagerCrossBundle(ani_env *env, ani_object aniWant)
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Provider.openFormManagerCrossBundle", HISTOGRAM_BOOLEAN_SAMPLE);
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     Want want;
@@ -664,9 +664,9 @@ void RequestPublishForm(ani_env *env, ani_object wantObj, ani_object callback, a
     ani_string dataObjStr, ani_object proxies)
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Provider.requestPublishForm", HISTOGRAM_BOOLEAN_SAMPLE);
-    HILOG_DEBUG("Call");
+    HILOG_DEBUG("[%{public}s] Call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
     if (IsRefUndefined(env, wantObj)) {
@@ -712,16 +712,16 @@ void RequestPublishForm(ani_env *env, ani_object wantObj, ani_object callback, a
         InvokeAsyncWithBusinessError(env, callback, ERR_APPEXECFWK_FORM_COMMON_CODE, nullptr);
         return;
     }
-    HILOG_INFO("End");
+    HILOG_INFO("[%{public}s] End", __FUNCTION__);
     InvokeAsyncWithBusinessError(env, callback, ret, formIdAniStr);
 }
 
 void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Provider.getPublishedFormInfos", HISTOGRAM_BOOLEAN_SAMPLE);
-    HILOG_DEBUG("Call");
+    HILOG_DEBUG("[%{public}s] Call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
 
@@ -735,7 +735,7 @@ void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
 
     ani_object formInfosArray = GetAniArray(env, formInfos.size());
     if (formInfosArray == nullptr) {
-        HILOG_ERROR("GetAniArray failed");
+        HILOG_ERROR("[%{public}s] GetAniArray failed", __FUNCTION__);
         InvokeAsyncWithBusinessError(env, callback,
             static_cast<int32_t>(ERR_APPEXECFWK_FORM_COMMON_CODE), nullptr);
         return;
@@ -744,7 +744,7 @@ void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
     for (auto &formInfo : formInfos) {
         ani_object runningFormInfoAni = CreateAniObject(env, RUNNING_FORM_INFO_INNER_CLASS_NAME);
         if (runningFormInfoAni == nullptr) {
-            HILOG_ERROR("CreateAniObject failed");
+            HILOG_ERROR("[%{public}s] CreateAniObject failed", __FUNCTION__);
             ani_ref undefinedRef = nullptr;
             env->GetUndefined(&undefinedRef);
             runningFormInfoAni = reinterpret_cast<ani_object>(undefinedRef);
@@ -754,20 +754,20 @@ void GetPublishedFormInfos([[maybe_unused]] ani_env *env, ani_object callback)
         ani_status status = env->Object_CallMethodByName_Void(
             formInfosArray, ANI_SETTER_MARKER, PROVIDER_SET_SIGNATURE, index, runningFormInfoAni);
         if (status != ANI_OK) {
-            HILOG_ERROR("Object_CallMethodByName_Void failed,error code:%{public}d", static_cast<int>(status));
+            HILOG_ERROR("[%{public}s] Object_CallMethodByName_Void failed,error code:%{public}d", __FUNCTION__, static_cast<int>(status));
         }
         index++;
     }
     InvokeAsyncWithBusinessError(env, callback, ret, formInfosArray);
-    HILOG_DEBUG("End");
+    HILOG_DEBUG("[%{public}s] End", __FUNCTION__);
 }
 
 void GetPublishedFormInfoById(ani_env* env, ani_string formId, ani_object callback)
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Provider.getPublishedFormInfoById", HISTOGRAM_BOOLEAN_SAMPLE);
-    HILOG_DEBUG("Call");
+    HILOG_DEBUG("[%{public}s] Call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
 
@@ -790,16 +790,16 @@ void GetPublishedFormInfoById(ani_env* env, ani_string formId, ani_object callba
     SetRunningFormInfoFields(env, formInfoObj, formInfo);
     InvokeAsyncWithBusinessError(env, callback, ret, formInfoObj);
 
-    HILOG_DEBUG("End");
+    HILOG_DEBUG("[%{public}s] End", __FUNCTION__);
 }
 
 
 void ReloadForms(ani_env* env, ani_object etsContext, ani_string moduleName, ani_string abilityName,
     ani_string formName, ani_object callback)
 {
-    HILOG_DEBUG("Call");
+    HILOG_DEBUG("[%{public}s] Call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
 
@@ -821,14 +821,14 @@ void ReloadForms(ani_env* env, ani_object etsContext, ani_string moduleName, ani
     ani_object etsReloadNum = CreateInt(env, reloadNum);
     InvokeAsyncWithBusinessError(env, callback, ret, etsReloadNum);
 
-    HILOG_DEBUG("End");
+    HILOG_DEBUG("[%{public}s] End", __FUNCTION__);
 }
 
 void ReloadAllForms(ani_env* env, ani_object etsContext, ani_object callback)
 {
-    HILOG_DEBUG("Call");
+    HILOG_DEBUG("[%{public}s] Call", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return;
     }
 
@@ -852,14 +852,14 @@ void ReloadAllForms(ani_env* env, ani_object etsContext, ani_object callback)
     }
     InvokeAsyncWithBusinessError(env, callback, ret, etsReloadNum);
 
-    HILOG_DEBUG("End");
+    HILOG_DEBUG("[%{public}s] End", __FUNCTION__);
 }
 
 void RegisterPublishFormCrossBundleControl(ani_env* env, ani_object callback)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (!FormAniUtil::CheckCallerIsSystemApp()) {
-        HILOG_ERROR("The app not system-app,can't use system-api");
+        HILOG_ERROR("[%{public}s] The app not system-app,can't use system-api", __FUNCTION__);
         EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
         return;
     }
@@ -871,7 +871,7 @@ void RegisterPublishFormCrossBundleControl(ani_env* env, ani_object callback)
     auto result = AppExecFwk::FormMgr::GetInstance().RegisterPublishFormCrossBundleControl(
         EtsFormProviderProxyMgr::GetInstance());
     if (result != ERR_OK) {
-        HILOG_ERROR("failed,retcode:%{public}d", result);
+        HILOG_ERROR("[%{public}s] failed,retcode:%{public}d", __FUNCTION__, result);
         if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY && result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS) {
             result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
         }
@@ -883,15 +883,15 @@ void RegisterPublishFormCrossBundleControl(ani_env* env, ani_object callback)
 
 void UnregisterPublishFormCrossBundleControl(ani_env* env, ani_object callback)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (!FormAniUtil::CheckCallerIsSystemApp()) {
-        HILOG_ERROR("The app not system-app,can't use system-api");
+        HILOG_ERROR("[%{public}s] The app not system-app,can't use system-api", __FUNCTION__);
         EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
         return;
     }
     auto result = AppExecFwk::FormMgr::GetInstance().UnregisterPublishFormCrossBundleControl();
     if (result != ERR_OK) {
-        HILOG_ERROR("failed,retcode:%{public}d", result);
+        HILOG_ERROR("[%{public}s] failed,retcode:%{public}d", __FUNCTION__, result);
         if (result != ERR_APPEXECFWK_FORM_PERMISSION_DENY && result != ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS) {
             result = ERR_APPEXECFWK_TEMPLATE_FORM_IPC_CONNECTION_FAILED;
         }
@@ -910,11 +910,11 @@ sptr<EtsFormProviderProxyMgr> EtsFormProviderProxyMgr::GetInstance()
 void EtsFormProviderProxyMgr::RegisterPublishFormCrossBundleControl(ani_env *env, ani_object callback)
 {
     std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     ani_status status = ANI_ERROR;
     if (crossBundleControlCallback_ != nullptr) {
         if ((status = env->GlobalReference_Delete(crossBundleControlCallback_)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Delete status:%{public}d", status);
+            HILOG_ERROR("[%{public}s] GlobalReference_Delete status:%{public}d", __FUNCTION__, status);
             return;
         }
         crossBundleControlCallback_ = nullptr;
@@ -927,7 +927,7 @@ void EtsFormProviderProxyMgr::RegisterPublishFormCrossBundleControl(ani_env *env
     if (env->GetVM(&aniVM) != ANI_OK) {
         HILOG_ERROR("get aniVM failed");
         if ((status = env->GlobalReference_Delete(crossBundleControlCallback_)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Delete status:%{public}d", status);
+            HILOG_ERROR("[%{public}s] GlobalReference_Delete status:%{public}d", __FUNCTION__, status);
             return;
         }
         crossBundleControlCallback_ = nullptr;
@@ -939,10 +939,10 @@ void EtsFormProviderProxyMgr::RegisterPublishFormCrossBundleControl(ani_env *env
 void EtsFormProviderProxyMgr::UnregisterPublishFormCrossBundleControl()
 {
     std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     ani_env* env = GetCrossBundleControlEnv();
     if (env == nullptr) {
-        HILOG_ERROR("env is null");
+        HILOG_ERROR("[%{public}s] env is null", __FUNCTION__);
         return;
     }
     ani_status status = ANI_ERROR;
@@ -959,7 +959,7 @@ ErrCode EtsFormProviderProxyMgr::PublishFormCrossBundleControl(
     const AppExecFwk::PublishFormCrossBundleInfo &bundleInfo, bool &isCanOpen)
 {
     std::lock_guard<std::mutex> lock(crossBundleControlMutex_);
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     std::shared_ptr<PublishFormCrossBundleControlParam> dataParam =
         std::make_shared<PublishFormCrossBundleControlParam>();
     dataParam->bundleInfo = bundleInfo;
@@ -976,14 +976,14 @@ ErrCode EtsFormProviderProxyMgr::PublishFormCrossBundleControl(
 void EtsFormProviderProxyMgr::PublishFormCrossBundleControlInner(
     std::shared_ptr<PublishFormCrossBundleControlParam> dataParam)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (dataParam == nullptr) {
         HILOG_ERROR("dataParam is null");
         return;
     }
     ani_env* env = GetCrossBundleControlEnv();
     if (env == nullptr) {
-        HILOG_ERROR("env is null");
+        HILOG_ERROR("[%{public}s] env is null", __FUNCTION__);
         return;
     }
     ani_class cls = nullptr;
@@ -1098,7 +1098,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     ani_namespace spc;
 
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s] env is nullptr", __FUNCTION__);
         return ANI_ERROR;
     }
 

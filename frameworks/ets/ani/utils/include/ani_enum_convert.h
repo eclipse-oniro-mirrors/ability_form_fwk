@@ -27,12 +27,12 @@ namespace AniEnumConvertUtil {
     ani_size sz {};
     ani_status status = ANI_ERROR;
     if ((status = env->String_GetUTF8Size(str, &sz)) != ANI_OK) {
-        HILOG_ERROR("status :%{public}d", status);
+        HILOG_ERROR("[%{public}s] status :%{public}d", __FUNCTION__, status);
         return false;
     }
     res.resize(sz + 1);
     if ((status = env->String_GetUTF8SubString(str, 0, sz, res.data(), res.size(), &sz)) != ANI_OK) {
-        HILOG_ERROR("status :%{public}d", status);
+        HILOG_ERROR("[%{public}s] status :%{public}d", __FUNCTION__, status);
         return false;
     }
     res.resize(sz);

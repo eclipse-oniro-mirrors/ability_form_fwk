@@ -98,7 +98,7 @@ void FormSysEventReceiver::HandleScreenUnlocked(int32_t userId)
 void FormSysEventReceiver::HandleUserUnlocked(int32_t userId)
 {
     if (userId == -1) {
-        HILOG_ERROR("invalid userId:-1");
+        HILOG_ERROR("[%{public}s] invalid userId:-1", __FUNCTION__);
         return;
     }
 
@@ -165,7 +165,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
 void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
 {
     if (userId == -1) {
-        HILOG_ERROR("invalid userId:-1");
+        HILOG_ERROR("[%{public}s] invalid userId:-1", __FUNCTION__);
         return;
     }
     FormMgrQueue::GetInstance().ScheduleTask(0, [userId]() {

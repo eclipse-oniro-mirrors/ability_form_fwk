@@ -57,7 +57,7 @@ ErrCode FormInfoRdbStorageMgr::LoadFormInfos(std::vector<std::pair<std::string, 
     std::unordered_map<std::string, std::string> value;
     ErrCode result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, FORM_INFO_PREFIX, value);
     if (result != ERR_OK) {
-        HILOG_ERROR("get entries error");
+        HILOG_ERROR("[%{public}s] get entries error", __FUNCTION__);
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
             FORM_INFO_PREFIX, static_cast<int32_t>(CallDbFailedErrorType::LOAD_DATABASE_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -77,7 +77,7 @@ ErrCode FormInfoRdbStorageMgr::LoadFormInfos(std::vector<std::pair<std::string, 
 ErrCode FormInfoRdbStorageMgr::RemoveBundleFormInfos(const std::string &bundleName)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("empty bundleName");
+        HILOG_ERROR("[%{public}s] empty bundleName", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -95,7 +95,7 @@ ErrCode FormInfoRdbStorageMgr::RemoveBundleFormInfos(const std::string &bundleNa
 ErrCode FormInfoRdbStorageMgr::UpdateBundleFormInfos(const std::string &bundleName, const std::string &formInfoStorages)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("empty bundleName");
+        HILOG_ERROR("[%{public}s] empty bundleName", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -155,12 +155,12 @@ void FormInfoRdbStorageMgr::SaveEntries(
 
 ErrCode FormInfoRdbStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFormInfos)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     ErrCode result;
     std::unordered_map<std::string, std::string> value;
     result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, FORM_ID_PREFIX, value);
     if (result != ERR_OK) {
-        HILOG_ERROR("get entries error");
+        HILOG_ERROR("[%{public}s] get entries error", __FUNCTION__);
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, 0, Constants::FORM_RDB_TABLE_NAME,
             FORM_ID_PREFIX, static_cast<int32_t>(CallDbFailedErrorType::LOAD_DATABASE_FAILED), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -173,7 +173,7 @@ ErrCode FormInfoRdbStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFor
 
 ErrCode FormInfoRdbStorageMgr::SaveStorageFormData(const InnerFormInfo &innerFormInfo)
 {
-    HILOG_DEBUG("formId[%{public}" PRId64 "]", innerFormInfo.GetFormId());
+    HILOG_DEBUG("[%{public}s] formId[%{public}" PRId64 "]", __FUNCTION__, innerFormInfo.GetFormId());
     std::string formId = std::to_string(innerFormInfo.GetFormId());
     std::string key = std::string().append(FORM_ID_PREFIX).append(formId);
     std::string value = innerFormInfo.ToString();
@@ -189,7 +189,7 @@ ErrCode FormInfoRdbStorageMgr::SaveStorageFormData(const InnerFormInfo &innerFor
 
 ErrCode FormInfoRdbStorageMgr::ModifyStorageFormData(const InnerFormInfo &innerFormInfo)
 {
-    HILOG_DEBUG("formId[%{public}" PRId64 "]", innerFormInfo.GetFormId());
+    HILOG_DEBUG("[%{public}s] formId[%{public}" PRId64 "]", __FUNCTION__, innerFormInfo.GetFormId());
     std::string formId = std::to_string(innerFormInfo.GetFormId());
     ErrCode ret = DeleteStorageFormData(formId);
     if (ret == ERR_OK) {
@@ -226,7 +226,7 @@ ErrCode FormInfoRdbStorageMgr::DeleteStorageFormData(const std::string &formId)
 
 ErrCode FormInfoRdbStorageMgr::LoadStatusData(const std::string &formId, std::string &statusData)
 {
-    HILOG_DEBUG("formId is %{public}s", formId.c_str());
+    HILOG_DEBUG("[%{public}s] formId is %{public}s", __FUNCTION__, formId.c_str());
     if (formId.empty()) {
         HILOG_ERROR("empty formId");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -247,7 +247,7 @@ ErrCode FormInfoRdbStorageMgr::LoadStatusData(const std::string &formId, std::st
 
 ErrCode FormInfoRdbStorageMgr::UpdateStatusData(const std::string &formId, const std::string &statusData)
 {
-    HILOG_DEBUG("formId is %{public}s", formId.c_str());
+    HILOG_DEBUG("[%{public}s] formId is %{public}s", __FUNCTION__, formId.c_str());
     if (formId.empty() || statusData.empty()) {
         HILOG_ERROR("empty formId or statusData");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -266,7 +266,7 @@ ErrCode FormInfoRdbStorageMgr::UpdateStatusData(const std::string &formId, const
 
 ErrCode FormInfoRdbStorageMgr::GetFormVersionCode(std::string &versionCode)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     ErrCode result = FormRdbDataMgr::GetInstance().QueryData(
         Constants::FORM_RDB_TABLE_NAME, FORM_VERSION_KEY, versionCode);
     if (result != ERR_OK) {
@@ -293,7 +293,7 @@ ErrCode FormInfoRdbStorageMgr::UpdateFormVersionCode()
 
 ErrCode FormInfoRdbStorageMgr::GetMultiAppFormVersionCode(const std::string &bundleName, std::string &versionCode)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     std::string key = MULTI_APP_FORM_VERSION_PREFIX + bundleName;
     ErrCode result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, key, versionCode);
     if (result != ERR_OK) {

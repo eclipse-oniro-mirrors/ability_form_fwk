@@ -40,10 +40,10 @@ constexpr const char *RECEIVE_UPDATE_PERMISSION = "ohos.permission.RECEIVE_UPDAT
 
 ParamCommonEvent::ParamCommonEvent()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     handleEventFunc_[CFG_UPDATED_ACTION] = &ParamCommonEvent::HandleParamUpdate;
     for (auto it = handleEventFunc_.begin(); it != handleEventFunc_.end(); ++it) {
-        HILOG_INFO("Add event:%{public}s", it->first.c_str());
+        HILOG_INFO("[%{public}s] Add event:%{public}s", __FUNCTION__, it->first.c_str());
         eventHandles_.emplace(it->first, std::bind(it->second, this, std::placeholders::_1));
     }
 }
@@ -55,14 +55,14 @@ ParamCommonEvent::~ParamCommonEvent()
 
 void ParamCommonEvent::SubscriberEvent()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (subscriber_) {
         HILOG_WARN("Common Event is already subscribered");
         return;
     }
     EventFwk::MatchingSkills matchingSkills;
     for (auto &event : handleEventFunc_) {
-        HILOG_INFO("Add event:%{public}s", event.first.c_str());
+        HILOG_INFO("[%{public}s] Add event:%{public}s", __FUNCTION__, event.first.c_str());
         matchingSkills.AddEvent(event.first);
     }
     EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
@@ -86,7 +86,7 @@ void ParamCommonEvent::SubscriberEvent()
 
 void ParamCommonEvent::UnSubscriberEvent()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (subscriber_) {
         EventFwk::CommonEventManager::UnSubscribeCommonEvent(subscriber_);
         subscriber_ = nullptr;

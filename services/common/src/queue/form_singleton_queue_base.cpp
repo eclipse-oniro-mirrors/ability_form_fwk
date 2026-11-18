@@ -37,11 +37,11 @@ FormSingletonQueueBase::~FormSingletonQueueBase()
 bool FormSingletonQueueBase::ScheduleTask(uint64_t ms, std::function<void()> func, TaskQos qos)
 {
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("null serialQueue_");
+        HILOG_ERROR("[%{public}s] null serialQueue_", __FUNCTION__);
         return false;
     }
     if (strategy_ == nullptr) {
-        HILOG_ERROR("null strategy_");
+        HILOG_ERROR("[%{public}s] null strategy_", __FUNCTION__);
         return false;
     }
     return serialQueue_->ScheduleTask(ms, strategy_->Wrap(std::move(func)), qos);
@@ -51,11 +51,11 @@ bool FormSingletonQueueBase::ScheduleDelayTask(
     const TaskKey &taskKey, uint64_t ms, std::function<void()> func, TaskQos qos)
 {
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("null serialQueue_");
+        HILOG_ERROR("[%{public}s] null serialQueue_", __FUNCTION__);
         return false;
     }
     if (strategy_ == nullptr) {
-        HILOG_ERROR("null strategy_");
+        HILOG_ERROR("[%{public}s] null strategy_", __FUNCTION__);
         return false;
     }
     return serialQueue_->ScheduleDelayTask(taskKey, ms, strategy_->Wrap(std::move(func)), qos);
@@ -64,7 +64,7 @@ bool FormSingletonQueueBase::ScheduleDelayTask(
 bool FormSingletonQueueBase::CancelDelayTask(const TaskKey &taskKey)
 {
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("null serialQueue_");
+        HILOG_ERROR("[%{public}s] null serialQueue_", __FUNCTION__);
         return false;
     }
     return serialQueue_->CancelDelayTask(taskKey);

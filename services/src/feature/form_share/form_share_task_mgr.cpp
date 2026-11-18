@@ -29,7 +29,7 @@ FormShareTaskMgr::~FormShareTaskMgr() {}
 void FormShareTaskMgr::PostShareAcquireTask(int64_t formId, const std::string &remoteDeviceId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("[%{public}s] start", __FUNCTION__);
 
     auto acquireShareProviderFormInfoFunc = [formId, remoteDeviceId, want, remoteObject]() {
         FormShareTaskMgr::GetInstance().AcquireShareFormData(formId, remoteDeviceId, want, remoteObject);
@@ -39,18 +39,18 @@ void FormShareTaskMgr::PostShareAcquireTask(int64_t formId, const std::string &r
         int64_t requestCode = static_cast<int64_t>(want.GetLongParam(Constants::FORM_SHARE_REQUEST_CODE, 0));
         PostFormShareSendResponse(requestCode, ERR_APPEXECFWK_FORM_COMMON_CODE);
     }
-    HILOG_INFO("end");
+    HILOG_INFO("[%{public}s] end", __FUNCTION__);
 }
 
 void FormShareTaskMgr::PostFormShareSendResponse(int64_t formShareRequestCode, int32_t result)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("[%{public}s] start", __FUNCTION__);
 
     auto formShareSendResponseFunc = [formShareRequestCode, result]() {
         FormShareTaskMgr::GetInstance().FormShareSendResponse(formShareRequestCode, result);
     };
     FormMgrQueue::GetInstance().ScheduleTask(FORM_TASK_DELAY_TIME, formShareSendResponseFunc);
-    HILOG_INFO("end");
+    HILOG_INFO("[%{public}s] end", __FUNCTION__);
 }
 
 void FormShareTaskMgr::AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
@@ -58,7 +58,7 @@ void FormShareTaskMgr::AcquireShareFormData(int64_t formId, const std::string &r
 {
     auto formShareMgr = DelayedSingleton<FormShareMgr>::GetInstance();
     if (formShareMgr == nullptr) {
-        HILOG_ERROR("null formShareMgr");
+        HILOG_ERROR("[%{public}s] null formShareMgr", __FUNCTION__);
         return;
     }
     formShareMgr->AcquireShareFormData(formId, remoteDeviceId, want, remoteObject);
@@ -68,7 +68,7 @@ void FormShareTaskMgr::FormShareSendResponse(int64_t formShareRequestCode, int32
 {
     auto formShareMgr = DelayedSingleton<FormShareMgr>::GetInstance();
     if (formShareMgr == nullptr) {
-        HILOG_ERROR("null formShareMgr");
+        HILOG_ERROR("[%{public}s] null formShareMgr", __FUNCTION__);
         return;
     }
     formShareMgr->SendResponse(formShareRequestCode, result);

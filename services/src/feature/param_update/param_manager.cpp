@@ -56,13 +56,13 @@ void ParamManager::InitParam()
     std::string presetVersion = ParamReader::GetInstance().GetPathVersion(PARAM_PRESET_PATH);
     long long presetVersionNum;
     if (!VersionStrToNumber(presetVersion, presetVersionNum)) {
-        HILOG_ERROR("path version error:%{public}s", presetVersion.c_str());
+        HILOG_ERROR("[%{public}s] path version error:%{public}s", __FUNCTION__, presetVersion.c_str());
         return;
     }
     std::string pathVersion = ParamReader::GetInstance().GetPathVersion(Constants::FORM_MGR_CONFIG_DIR);
     long long pathVersionNum;
     if (!VersionStrToNumber(pathVersion, pathVersionNum)) {
-        HILOG_ERROR("path version error:%{public}s", pathVersion.c_str());
+        HILOG_ERROR("[%{public}s] path version error:%{public}s", __FUNCTION__, pathVersion.c_str());
         return;
     }
     HILOG_INFO("presetVersion:%{public}s  pathVersion:%{public}s", presetVersion.c_str(), pathVersion.c_str());

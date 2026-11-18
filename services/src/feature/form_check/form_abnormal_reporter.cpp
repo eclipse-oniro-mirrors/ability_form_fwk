@@ -76,7 +76,7 @@ void FormAbnormalReporter::CheckForms()
     for (const int64_t &formId : formIdSet) {
         bool found = formDataMgr.GetFormRecord(formId, formRecord);
         if (!found) {
-            HILOG_WARN("form not found,formId:%{public}" PRId64, formId);
+            HILOG_WARN("[%{public}s] form not found,formId:%{public}" PRId64, __FUNCTION__, formId);
             continue;
         }
         if (formRecord.isSystemApp || !formRecord.transparencyEnabled) {
@@ -138,7 +138,7 @@ void FormAbnormalReporter::MarkUpdateRender(int64_t formId)
     FormRecord formRecord;
     bool found = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!found) {
-        HILOG_WARN("form not found,formId:%{public}" PRId64, formId);
+        HILOG_WARN("[%{public}s] form not found,formId:%{public}" PRId64, __FUNCTION__, formId);
         return;
     }
     if (formRecord.isSystemApp || !formRecord.transparencyEnabled) {

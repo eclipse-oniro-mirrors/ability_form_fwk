@@ -87,15 +87,15 @@ bool ParamReader::VerifyCertSfFile()
         return false;
     }
     std::string sha256Digest = GetManifestSha256Digest();
-    HILOG_INFO("sha256Digest:%{public}s", sha256Digest.c_str());
+    HILOG_INFO("[%{public}s] sha256Digest:%{public}s", __FUNCTION__, sha256Digest.c_str());
     if (sha256Digest.empty()) {
-        HILOG_ERROR("sha256Digest is empty");
+        HILOG_ERROR("[%{public}s] sha256Digest is empty", __FUNCTION__);
         return false;
     }
     std::string calSha256Digest = CalcFileSha256Digest(MANIFEST_MF_FILE);
-    HILOG_INFO("calSha256Digest:%{public}s", calSha256Digest.c_str());
+    HILOG_INFO("[%{public}s] calSha256Digest:%{public}s", __FUNCTION__, calSha256Digest.c_str());
     if (calSha256Digest.empty()) {
-        HILOG_ERROR("calSha256Digest is empty");
+        HILOG_ERROR("[%{public}s] calSha256Digest is empty", __FUNCTION__);
         return false;
     }
     return sha256Digest == calSha256Digest;
@@ -105,15 +105,15 @@ bool ParamReader::VerifyParamFile(const std::string &fileName)
 {
     HILOG_INFO("VerifyParamFile ,fileName:%{public}s", fileName.c_str());
     std::string sha256Digest = GetSha256Digest(fileName);
-    HILOG_INFO("sha256Digest:%{public}s", sha256Digest.c_str());
+    HILOG_INFO("[%{public}s] sha256Digest:%{public}s", __FUNCTION__, sha256Digest.c_str());
     if (sha256Digest.empty()) {
-        HILOG_ERROR("sha256Digest is empty");
+        HILOG_ERROR("[%{public}s] sha256Digest is empty", __FUNCTION__);
         return false;
     }
     std::string calSha256Digest = CalcFileSha256Digest(fileName);
-    HILOG_INFO("calSha256Digest:%{public}s", calSha256Digest.c_str());
+    HILOG_INFO("[%{public}s] calSha256Digest:%{public}s", __FUNCTION__, calSha256Digest.c_str());
     if (calSha256Digest.empty()) {
-        HILOG_ERROR("calSha256Digest is empty");
+        HILOG_ERROR("[%{public}s] calSha256Digest is empty", __FUNCTION__);
         return false;
     }
     return sha256Digest == calSha256Digest;

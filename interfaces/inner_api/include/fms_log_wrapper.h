@@ -55,20 +55,12 @@
 #define FMS_LOG_TAG "FormManagerService"
 #endif
 
-#ifndef FMS_FUNC_FMT
-#define FMS_FUNC_FMT "[%{public}s:%{public}d]"
-#endif
-
 #ifndef FMS_FUNC_FMT_BRIEF
 #define FMS_FUNC_FMT_BRIEF "[%{public}s:%{public}d]"
 #endif
 
 #ifndef FMS_FILE_NAME
 #define FMS_FILE_NAME (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
-#endif
-
-#ifndef FMS_FUNC_INFO
-#define FMS_FUNC_INFO __FUNCTION__, __LINE__
 #endif
 
 #ifndef FMS_FUNC_INFO_BRIEF
@@ -83,7 +75,7 @@
 #define FMS_PRINT_LOG(level, fmt, ...)                                   \
     do {                                                                 \
         ((void)HILOG_IMPL(LOG_CORE, level, FMS_LOG_DOMAIN,               \
-        FMS_FILE_NAME, FMS_FUNC_FMT fmt, FMS_FUNC_INFO, ##__VA_ARGS__)); \
+        FMS_FILE_NAME, fmt, ##__VA_ARGS__));                            \
     } while (0)
 
 #define HILOG_DEBUG(fmt, ...) FMS_PRINT_LOG(LOG_DEBUG, fmt, ##__VA_ARGS__)

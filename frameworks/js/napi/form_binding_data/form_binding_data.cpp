@@ -30,7 +30,7 @@ public:
 
     static void Finalizer(napi_env env, void* data, void* hint)
     {
-        HILOG_INFO("call");
+        HILOG_INFO("[%{public}s] call", __FUNCTION__);
         std::unique_ptr<FormBindingData>(static_cast<FormBindingData*>(data));
     }
 
@@ -45,7 +45,7 @@ private:
 
 napi_value FormBindingData::OnCreateFormBindingData(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     std::string formDataStr;
     if (argc > 0) {
         napi_value nativeValue = nullptr;
@@ -88,7 +88,7 @@ napi_value FormBindingData::OnCreateFormBindingData(napi_env env, size_t argc, n
 
 napi_value FormBindingDataInit(napi_env env, napi_value exportObj)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
 
     auto formProviderData = std::make_shared<AppExecFwk::FormProviderData>();
     auto formBindingData = std::make_unique<FormBindingData>(formProviderData);

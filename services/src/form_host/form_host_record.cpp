@@ -151,7 +151,7 @@ void FormHostRecord::OnAcquire(int64_t id, const FormRecord &record)
 {
     HILOG_DEBUG("FormHostRecord OnAcquire");
     if (formHostCallback_ == nullptr) {
-        HILOG_ERROR("null formHostCallback_");
+        HILOG_ERROR("[%{public}s] null formHostCallback_", __FUNCTION__);
         return;
     }
     formHostCallback_->OnAcquired(id, record, formHostClient_);
@@ -164,9 +164,9 @@ void FormHostRecord::OnAcquire(int64_t id, const FormRecord &record)
  */
 void FormHostRecord::OnUpdate(int64_t id, const FormRecord &record)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("[%{public}s] start", __FUNCTION__);
     if (formHostCallback_ == nullptr) {
-        HILOG_ERROR("null formHostCallback_");
+        HILOG_ERROR("[%{public}s] null formHostCallback_", __FUNCTION__);
         return;
     }
     formHostCallback_->OnUpdate(id, record, formHostClient_);
@@ -178,9 +178,9 @@ void FormHostRecord::OnUpdate(int64_t id, const FormRecord &record)
  */
 void FormHostRecord::OnFormUninstalled(std::vector<int64_t> &formIds)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("[%{public}s] start", __FUNCTION__);
     if (formHostCallback_ == nullptr) {
-        HILOG_ERROR("null formHostCallback_");
+        HILOG_ERROR("[%{public}s] null formHostCallback_", __FUNCTION__);
         return;
     }
     formHostCallback_->OnUninstall(formIds, formHostClient_);
@@ -194,9 +194,9 @@ void FormHostRecord::OnFormUninstalled(std::vector<int64_t> &formIds)
  */
 void FormHostRecord::OnAcquireState(AppExecFwk::FormState state, const AAFwk::Want &want)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("[%{public}s] start", __FUNCTION__);
     if (formHostCallback_ == nullptr) {
-        HILOG_ERROR("null formHostCallback_");
+        HILOG_ERROR("[%{public}s] null formHostCallback_", __FUNCTION__);
         return;
     }
     formHostCallback_->OnAcquireState(state, want, formHostClient_);
@@ -204,9 +204,9 @@ void FormHostRecord::OnAcquireState(AppExecFwk::FormState state, const AAFwk::Wa
 
 void FormHostRecord::OnAcquireFormData(const AAFwk::WantParams &wantParams, int64_t requestCode)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("[%{public}s] start", __FUNCTION__);
     if (formHostCallback_ == nullptr) {
-        HILOG_ERROR("null formHostCallback_");
+        HILOG_ERROR("[%{public}s] null formHostCallback_", __FUNCTION__);
         return;
     }
     formHostCallback_->OnAcquireFormData(wantParams, requestCode, formHostClient_);
@@ -331,13 +331,13 @@ int32_t FormHostRecord::GetFormsCount() const
 
 void FormHostRecord::OnRecycleForms(const std::vector<int64_t> &formIds, const Want &want) const
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
     if (formIds.empty()) {
-        HILOG_ERROR("empty formIds");
+        HILOG_ERROR("[%{public}s] empty formIds", __FUNCTION__);
         return;
     }
     if (formHostCallback_ == nullptr) {
-        HILOG_ERROR("null formHostCallback_");
+        HILOG_ERROR("[%{public}s] null formHostCallback_", __FUNCTION__);
         return;
     }
     formHostCallback_->OnRecycleForms(formIds, want, formHostClient_);
@@ -345,13 +345,13 @@ void FormHostRecord::OnRecycleForms(const std::vector<int64_t> &formIds, const W
 
 void FormHostRecord::OnEnableForms(const std::vector<int64_t> &formIds, const bool enable)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
     if (formIds.empty()) {
-        HILOG_ERROR("empty formIds");
+        HILOG_ERROR("[%{public}s] empty formIds", __FUNCTION__);
         return;
     }
     if (formHostCallback_ == nullptr) {
-        HILOG_ERROR("null formHostCallback_");
+        HILOG_ERROR("[%{public}s] null formHostCallback_", __FUNCTION__);
         return;
     }
     formHostCallback_->OnEnableForms(formIds, enable, formHostClient_);
@@ -359,13 +359,13 @@ void FormHostRecord::OnEnableForms(const std::vector<int64_t> &formIds, const bo
 
 void FormHostRecord::OnLockForms(const std::vector<int64_t> &formIds, const bool lock)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
     if (formIds.empty()) {
-        HILOG_ERROR("empty formIds");
+        HILOG_ERROR("[%{public}s] empty formIds", __FUNCTION__);
         return;
     }
     if (formHostCallback_ == nullptr) {
-        HILOG_ERROR("null formHostCallback_");
+        HILOG_ERROR("[%{public}s] null formHostCallback_", __FUNCTION__);
         return;
     }
     formHostCallback_->OnLockForms(formIds, lock, formHostClient_);
@@ -373,13 +373,13 @@ void FormHostRecord::OnLockForms(const std::vector<int64_t> &formIds, const bool
 
 void FormHostRecord::OnCheckForms(const std::vector<int64_t> &formIds)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
     if (formIds.empty()) {
-        HILOG_ERROR("empty formIds");
+        HILOG_ERROR("[%{public}s] empty formIds", __FUNCTION__);
         return;
     }
     if (formHostCallback_ == nullptr) {
-        HILOG_ERROR("null formHostCallback_");
+        HILOG_ERROR("[%{public}s] null formHostCallback_", __FUNCTION__);
         return;
     }
     formHostCallback_->OnCheckForms(formIds, formHostClient_);
@@ -395,13 +395,13 @@ void FormHostRecord::GetForms(std::vector<int64_t> &formIds)
 void FormHostRecord::OnDueControlForms(
     const std::vector<int64_t> &formIds, const bool isDisablePolicy, const bool isControl)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("[%{public}s] start", __FUNCTION__);
     if (formIds.empty()) {
-        HILOG_ERROR("empty formIds");
+        HILOG_ERROR("[%{public}s] empty formIds", __FUNCTION__);
         return;
     }
     if (formHostCallback_ == nullptr) {
-        HILOG_ERROR("null formHostCallback_");
+        HILOG_ERROR("[%{public}s] null formHostCallback_", __FUNCTION__);
         return;
     }
     formHostCallback_->OnDueControlForms(formIds, isDisablePolicy, isControl, formHostClient_);

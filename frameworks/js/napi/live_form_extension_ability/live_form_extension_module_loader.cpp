@@ -24,13 +24,13 @@ LiveFormExtensionModuleLoader::~LiveFormExtensionModuleLoader() = default;
 
 Extension *LiveFormExtensionModuleLoader::Create(const std::unique_ptr<Runtime> &runtime) const
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s] called", __FUNCTION__);
     return LiveFormExtension::Create(runtime);
 }
 
 std::map<std::string, std::string> LiveFormExtensionModuleLoader::GetParams()
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s] called", __FUNCTION__);
     std::map<std::string, std::string> params;
     // type means extension type in ExtensionAbilityType of
     // extension_ability_info.h, 30 means liveFormExtension.

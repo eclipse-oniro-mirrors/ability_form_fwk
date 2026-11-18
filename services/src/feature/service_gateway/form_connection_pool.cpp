@@ -333,7 +333,7 @@ ErrCode FormConnectionPool::SendFrame(const std::string &peerNetworkId, FormCdMs
         std::lock_guard<std::mutex> lock(mutex_);
         auto it = connections_.find(peerNetworkId);
         if (it == connections_.end() || it->second.state != ConnState::READY) {
-            HILOG_ERROR("connection not ready for peer:%{public}s", peerNetworkId.c_str());
+            HILOG_ERROR("[%{public}s] connection not ready for peer:%{public}s", __FUNCTION__, peerNetworkId.c_str());
             return ERR_APPEXECFWK_FORM_CD_SOFTBUS_UNAVAILABLE;
         }
         if (static_cast<uint8_t>(msgType) < FORM_CD_MSG_RESPONSE_BASE) {
@@ -349,7 +349,7 @@ ErrCode FormConnectionPool::SendFrame(const std::string &peerNetworkId, FormCdMs
 
     int32_t ret = SendBytes(fd, frame.data(), static_cast<uint32_t>(frame.size()));
     if (ret != 0) {
-        HILOG_ERROR("SendBytes failed fd=%{public}d ret=%{public}d", fd, ret);
+        HILOG_ERROR("[%{public}s] SendBytes failed fd=%{public}d ret=%{public}d", __FUNCTION__, fd, ret);
         HandleSendFailure(peerNetworkId);
         return ERR_APPEXECFWK_FORM_CD_SOFTBUS_UNAVAILABLE;
     }
@@ -371,7 +371,7 @@ ErrCode FormConnectionPool::SendRawFrame(const std::string &peerNetworkId, const
         std::lock_guard<std::mutex> lock(mutex_);
         auto it = connections_.find(peerNetworkId);
         if (it == connections_.end() || it->second.state != ConnState::READY) {
-            HILOG_ERROR("connection not ready for peer:%{public}s", peerNetworkId.c_str());
+            HILOG_ERROR("[%{public}s] connection not ready for peer:%{public}s", __FUNCTION__, peerNetworkId.c_str());
             return ERR_APPEXECFWK_FORM_CD_SOFTBUS_UNAVAILABLE;
         }
         fd = it->second.fd;
@@ -379,7 +379,7 @@ ErrCode FormConnectionPool::SendRawFrame(const std::string &peerNetworkId, const
 
     int32_t ret = SendBytes(fd, frame.data(), static_cast<uint32_t>(frame.size()));
     if (ret != 0) {
-        HILOG_ERROR("SendBytes failed fd=%{public}d ret=%{public}d", fd, ret);
+        HILOG_ERROR("[%{public}s] SendBytes failed fd=%{public}d ret=%{public}d", __FUNCTION__, fd, ret);
         HandleSendFailure(peerNetworkId);
         return ERR_APPEXECFWK_FORM_CD_SOFTBUS_UNAVAILABLE;
     }

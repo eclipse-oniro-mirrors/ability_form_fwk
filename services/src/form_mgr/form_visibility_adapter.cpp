@@ -151,7 +151,7 @@ ErrCode FormVisibilityAdapter::NotifyWhetherVisibleForms(const std::vector<int64
 
 bool FormVisibilityAdapter::HasFormVisible(const uint32_t tokenId)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     Security::AccessToken::HapTokenInfo hapTokenInfo;
     int ret = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapTokenInfo);
     if (ret != Security::AccessToken::AccessTokenKitRet::RET_SUCCESS) {
@@ -336,20 +336,20 @@ void FormVisibilityAdapter::FilterFormInstanceMapsByVisibleType(
         while (instanceIter != formInstances.end()) {
             FormRecord record;
             if (!FormDataMgr::GetInstance().GetFormRecord(instanceIter->formId, record)) {
-                HILOG_WARN("get formRecord failed!formId:%{public}" PRId64 ".", instanceIter->formId);
+                HILOG_WARN("[%{public}s] get formRecord failed!formId:%{public}" PRId64 ".", __FUNCTION__, instanceIter->formId);
                 ++instanceIter;
                 continue;
             }
             if (record.formVisibleNotifyState != formVisibleType) {
-                HILOG_INFO("erase formId:%{public}" PRId64 ", formVisibleNotifyState:%{public}d",
+                HILOG_INFO("[%{public}s] erase formId:%{public}" PRId64 ", formVisibleNotifyState:%{public}d", __FUNCTION__,
                     instanceIter->formId, record.formVisibleNotifyState);
                 restoreFormRecords[record.formId] = record;
                 instanceIter = formInstances.erase(instanceIter);
                 continue;
             }
             if (!record.isNeedNotify) {
-                HILOG_INFO("erase formId:%{public}" PRId64
-                    ", isNeedNotify:%{public}d, formVisibleNotifyState:%{public}d",
+                HILOG_INFO("[%{public}s] erase formId:%{public}" PRId64
+                    ", isNeedNotify:%{public}d, formVisibleNotifyState:%{public}d", __FUNCTION__,
                     instanceIter->formId, record.isNeedNotify, record.formVisibleNotifyState);
                 instanceIter = formInstances.erase(instanceIter);
                 continue;
@@ -376,20 +376,20 @@ void FormVisibilityAdapter::FilterEventMapsByVisibleType(
         while (formItr != formIds.end()) {
             FormRecord record;
             if (!FormDataMgr::GetInstance().GetFormRecord(*formItr, record)) {
-                HILOG_WARN("get formRecord failed!formId:%{public}" PRId64 ".", *formItr);
+                HILOG_WARN("[%{public}s] get formRecord failed!formId:%{public}" PRId64 ".", __FUNCTION__, *formItr);
                 ++formItr;
                 continue;
             }
             if (record.formVisibleNotifyState != formVisibleType) {
-                HILOG_INFO("erase formId:%{public}" PRId64 ", formVisibleNotifyState:%{public}d",
+                HILOG_INFO("[%{public}s] erase formId:%{public}" PRId64 ", formVisibleNotifyState:%{public}d", __FUNCTION__,
                     *formItr, record.formVisibleNotifyState);
                 restoreFormRecords[record.formId] = record;
                 formItr = formIds.erase(formItr);
                 continue;
             }
             if (!record.isNeedNotify) {
-                HILOG_INFO("erase formId:%{public}" PRId64
-                    ", isNeedNotify:%{public}d, formVisibleNotifyState %{public}d",
+                HILOG_INFO("[%{public}s] erase formId:%{public}" PRId64
+                    ", isNeedNotify:%{public}d, formVisibleNotifyState %{public}d", __FUNCTION__,
                     *formItr, record.isNeedNotify, record.formVisibleNotifyState);
                 formItr = formIds.erase(formItr);
                 continue;
@@ -442,9 +442,9 @@ bool FormVisibilityAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormI
         return false;
     }
 
-    HILOG_INFO("formId:%{public}" PRId64 ",needRefresh:%{public}d,formVisibleType:%{public}d,"
+    HILOG_INFO("[%{public}s] formId:%{public}" PRId64 ",needRefresh:%{public}d,formVisibleType:%{public}d,"
         "isTimerRefresh:%{public}d,refreshWantMapSize:%{public}d,isHostRefresh:%{public}d,"
-        "isReminderAgentRefresh:%{public}d", matchedFormId,
+        "isReminderAgentRefresh:%{public}d", __FUNCTION__, matchedFormId,
         formRecord.needRefresh, static_cast<int32_t>(formVisibleType), formRecord.isTimerRefresh,
         static_cast<int32_t>(formRecord.refreshWantMap.size()), formRecord.isHostRefresh,
         formRecord.isReminderAgentRefresh);
@@ -495,7 +495,7 @@ bool FormVisibilityAdapter::CreateHandleEventMap(const int64_t matchedFormId, co
 ErrCode FormVisibilityAdapter::HandleEventNotify(const std::string &providerKey,
     const std::vector<int64_t> &formIdsByProvider, const int32_t formVisibleType)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     size_t position = providerKey.find(Constants::NAME_DELIMITER);
     if (position == std::string::npos) {
         HILOG_ERROR("No first delimiter found");
@@ -565,7 +565,7 @@ int FormVisibilityAdapter::NotifyFormsEnableUpdate(const std::vector<int64_t> &f
 ErrCode FormVisibilityAdapter::HandleUpdateFormFlag(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     if (formIds.empty() || callerToken == nullptr) {
         HILOG_ERROR("invalid param");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -587,7 +587,7 @@ ErrCode FormVisibilityAdapter::HandleUpdateFormFlag(const std::vector<int64_t> &
 
 int32_t FormVisibilityAdapter::SetFormsRecyclable(const std::vector<int64_t> &formIds)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     FormRecord record;
     std::vector<int64_t> validFormIds;
     int callingUid = IPCSkeleton::GetCallingUid();
@@ -599,35 +599,35 @@ int32_t FormVisibilityAdapter::SetFormsRecyclable(const std::vector<int64_t> &fo
 
         int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
         if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
-            HILOG_WARN("form %{public}" PRId64 " not exist", formId);
+            HILOG_WARN("[%{public}s] form %{public}" PRId64 " not exist", __FUNCTION__, formId);
             continue;
         }
         if (record.formTempFlag) {
-            HILOG_WARN("form %{public}" PRId64 " is temp form", formId);
+            HILOG_WARN("[%{public}s] form %{public}" PRId64 " is temp form", __FUNCTION__, formId);
             continue;
         }
         if (!record.isDynamic) {
-            HILOG_WARN("form %{public}" PRId64 " is static form", formId);
+            HILOG_WARN("[%{public}s] form %{public}" PRId64 " is static form", __FUNCTION__, formId);
             continue;
         }
         if (record.uiSyntax != FormType::ETS) {
-            HILOG_WARN("form %{public}" PRId64 " not ETS form", formId);
+            HILOG_WARN("[%{public}s] form %{public}" PRId64 " not ETS form", __FUNCTION__, formId);
             continue;
         }
         if (record.lowMemoryRecycleStatus != LowMemoryRecycleStatus::NON_RECYCLABLE) {
-            HILOG_WARN("form %{public}" PRId64 " is already RECYCLABLE or RECYCLED", formId);
+            HILOG_WARN("[%{public}s] form %{public}" PRId64 " is already RECYCLABLE or RECYCLED", __FUNCTION__, formId);
             continue;
         }
         if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
             record.formUserUids.end()) {
-            HILOG_WARN("form %{public}" PRId64 " not owned by %{public}d", formId, callingUid);
+            HILOG_WARN("[%{public}s] form %{public}" PRId64 " not owned by %{public}d", __FUNCTION__, formId, callingUid);
             continue;
         }
 
         record.lowMemoryRecycleStatus = LowMemoryRecycleStatus::RECYCLABLE;
         FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
         validFormIds.emplace_back(matchedFormId);
-        HILOG_INFO("formId:%{public}" PRId64 " recyclable", formId);
+        HILOG_INFO("[%{public}s] formId:%{public}" PRId64 " recyclable", __FUNCTION__, formId);
     }
 
     if (validFormIds.empty()) {
@@ -659,7 +659,7 @@ int32_t FormVisibilityAdapter::NotifyFormLocked(const int64_t &formId, bool isLo
 
     formRecord.protectForm = isLocked;
 
-    HILOG_INFO("formId:%{public}" PRId64 ", isLocked:%{public}d", formId, isLocked);
+    HILOG_INFO("[%{public}s] formId:%{public}" PRId64 ", isLocked:%{public}d", __FUNCTION__, formId, isLocked);
     FormExemptLockMgr::GetInstance().SetExemptLockStatus(formId, !isLocked);
     FormDataMgr::GetInstance().SetFormProtect(formId, isLocked);
     std::vector<FormRecord> formRecords;

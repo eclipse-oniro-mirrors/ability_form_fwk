@@ -170,7 +170,7 @@ void FormStatusMgr::AddTaskToQueueUnique(const int64_t formId, const FormFsmEven
     while (!formEventQueue->IsEventQueueEmpty()) {
         FormEventTaskInfo eventTaskInfo{};
         if (!formEventQueue->PopFormEvent(eventTaskInfo)) {
-            HILOG_INFO("formEventQueue is empty");
+            HILOG_INFO("[%{public}s] formEventQueue is empty", __FUNCTION__);
             break;
         }
         if (eventTaskInfo.getFormEvent() == FormFsmEvent::RENDER_FORM ||
@@ -184,7 +184,7 @@ void FormStatusMgr::AddTaskToQueueUnique(const int64_t formId, const FormFsmEven
         temptaskInfoQueue.pop();
         formEventQueue->PushFormEvent(eventTaskInfo);
     }
-    HILOG_INFO("formEventQueue event size %{public}d", static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
+    HILOG_INFO("[%{public}s] formEventQueue event size %{public}d", __FUNCTION__, static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
 
     FormDataMgr::GetInstance().UpdateFormRecordSetIsExistRecycleTask(formId, false);
 }
@@ -217,25 +217,25 @@ void FormStatusMgr::AddTaskToQueueDelete(const int64_t formId, const FormFsmEven
     while (!formEventQueue->IsEventQueueEmpty()) {
         FormEventTaskInfo eventTaskInfo{};
         if (!formEventQueue->PopFormEvent(eventTaskInfo)) {
-            HILOG_INFO("formEventQueue is empty");
+            HILOG_INFO("[%{public}s] formEventQueue is empty", __FUNCTION__);
             break;
         }
     }
     formEventQueue->PushFormEvent(taskInfo);
-    HILOG_INFO("formEventQueue event size %{public}d", static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
+    HILOG_INFO("[%{public}s] formEventQueue event size %{public}d", __FUNCTION__, static_cast<int32_t>(formEventQueue->GetEventQueueSize()));
 }
 
 void FormStatusMgr::ProcessTaskFromQueue(const int64_t formId)
 {
     if (!HasFormEventQueue(formId)) {
-        HILOG_DEBUG("formEventQueue is empty,not process");
+        HILOG_DEBUG("[%{public}s] formEventQueue is empty,not process", __FUNCTION__);
         return;
     }
     std::shared_ptr<FormEventQueue> formEventQueue = GetFormEventQueue(formId);
 
     FormEventTaskInfo eventTaskInfo{};
     if (!formEventQueue->PopFormEvent(eventTaskInfo)) {
-        HILOG_DEBUG("formEventQueue is empty,not process");
+        HILOG_DEBUG("[%{public}s] formEventQueue is empty,not process", __FUNCTION__);
         return;
     }
 
@@ -305,7 +305,7 @@ void FormStatusMgr::DeleteFormEventQueue(const int64_t formId)
     std::unique_lock<std::shared_mutex> lock(formEventQueueMutex_);
     auto iter = formEventQueueMap_.find(formId);
     if (iter != formEventQueueMap_.end()) {
-        HILOG_INFO("formId:%{public}" PRId64 ". ", formId);
+        HILOG_INFO("[%{public}s] formId:%{public}" PRId64 ". ", __FUNCTION__, formId);
         formEventQueueMap_.erase(iter);
     }
 }
@@ -318,7 +318,7 @@ std::string FormStatusMgr::GetFormEventId(const int64_t formId)
         return "";
     }
 
-    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s.", formId, (formEventIdMap_[formId]).c_str());
+    HILOG_INFO("[%{public}s] formId:%{public}" PRId64 ", eventId:%{public}s.", __FUNCTION__, formId, (formEventIdMap_[formId]).c_str());
     return formEventIdMap_[formId];
 }
 
@@ -326,7 +326,7 @@ void FormStatusMgr::SetFormEventId(const int64_t formId)
 {
     int64_t eventId = FormUtil::GetCurrentNanosecond();
     std::string tidString = std::to_string(eventId);
-    HILOG_INFO("formId:%{public}" PRId64 ", eventId:%{public}s.", formId, tidString.c_str());
+    HILOG_INFO("[%{public}s] formId:%{public}" PRId64 ", eventId:%{public}s.", __FUNCTION__, formId, tidString.c_str());
     std::unique_lock<std::shared_mutex> lock(formEventIdMapMutex_);
     if (formEventIdMap_.find(formId) == formEventIdMap_.end()) {
         formEventIdMap_.emplace(formId, std::to_string(eventId));
@@ -340,7 +340,7 @@ void FormStatusMgr::DeleteFormEventId(const int64_t formId)
     std::unique_lock<std::shared_mutex> lock(formEventIdMapMutex_);
     auto iter = formEventIdMap_.find(formId);
     if (iter != formEventIdMap_.end()) {
-        HILOG_INFO("formId:%{public}" PRId64 ". ", formId);
+        HILOG_INFO("[%{public}s] formId:%{public}" PRId64 ". ", __FUNCTION__, formId);
         formEventIdMap_.erase(iter);
     }
 }

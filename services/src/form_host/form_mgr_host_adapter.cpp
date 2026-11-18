@@ -23,12 +23,12 @@ namespace OHOS {
 namespace AppExecFwk {
 FormMgrHostAdapter::FormMgrHostAdapter()
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
 }
 
 FormMgrHostAdapter::~FormMgrHostAdapter()
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
 }
 
 void FormMgrHostAdapter::GetFormIdsByFormLocation(

@@ -27,11 +27,11 @@ namespace OHOS {
 namespace AppExecFwk {
 FormEditService::FormEditService()
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
 }
 FormEditService::~FormEditService()
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
 }
 
 ErrCode FormEditService::CloseFormEditAbility(const int32_t uid, bool isMainPage)

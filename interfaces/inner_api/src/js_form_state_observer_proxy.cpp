@@ -31,17 +31,17 @@ int32_t JsFormStateObserverProxy::OnAddForm(const std::string &bundleName,
     MessageOption option(MessageOption::TF_ASYNC);
 
     if (!data.WriteInterfaceToken(AbilityRuntime::IJsFormStateObserver::GetDescriptor())) {
-        HILOG_ERROR("write interface token failed");
+        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteString(bundleName)) {
-        HILOG_ERROR("write bundleName failed");
+        HILOG_ERROR("[%{public}s] write bundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteParcelable(&runningFormInfo)) {
-        HILOG_ERROR("write runningFormInfo failed");
+        HILOG_ERROR("[%{public}s] write runningFormInfo failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -51,7 +51,7 @@ int32_t JsFormStateObserverProxy::OnAddForm(const std::string &bundleName,
         reply,
         option);
     if (error != ERR_OK) {
-        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
     }
     return error;
 }
@@ -64,17 +64,17 @@ int32_t JsFormStateObserverProxy::OnRemoveForm(const std::string &bundleName,
     MessageOption option(MessageOption::TF_ASYNC);
 
     if (!data.WriteInterfaceToken(AbilityRuntime::IJsFormStateObserver::GetDescriptor())) {
-        HILOG_ERROR("write interface token failed");
+        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteString(bundleName)) {
-        HILOG_ERROR("write bundleName failed");
+        HILOG_ERROR("[%{public}s] write bundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteParcelable(&runningFormInfo)) {
-        HILOG_ERROR("write runningFormInfo failed");
+        HILOG_ERROR("[%{public}s] write runningFormInfo failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -84,7 +84,7 @@ int32_t JsFormStateObserverProxy::OnRemoveForm(const std::string &bundleName,
         reply,
         option);
     if (error != ERR_OK) {
-        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
     }
     return error;
 }
@@ -98,16 +98,16 @@ int32_t JsFormStateObserverProxy::NotifyWhetherFormsVisible(const AppExecFwk::Fo
     MessageOption option(MessageOption::TF_ASYNC);
 
     if (!data.WriteInterfaceToken(AbilityRuntime::IJsFormStateObserver::GetDescriptor())) {
-        HILOG_ERROR("write interface token failed");
+        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t formVisiblityTypeInt = static_cast<int32_t>(formVisiblityType);
     if (!data.WriteInt32(formVisiblityTypeInt)) {
-        HILOG_ERROR("fail write formVisiblityType");
+        HILOG_ERROR("[%{public}s] fail write formVisiblityType", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteString(bundleName)) {
-        HILOG_ERROR("fail write formVisiblityType");
+        HILOG_ERROR("[%{public}s] fail write formVisiblityType", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     HILOG_DEBUG("NotifyWhetherFormsVisible formInstances size %{public}zu size", formInstances.size());
@@ -157,12 +157,12 @@ int32_t JsFormStateObserverProxy::OnFormClickEvent(
     MessageOption option(MessageOption::TF_ASYNC);
 
     if (!data.WriteInterfaceToken(AbilityRuntime::IJsFormStateObserver::GetDescriptor())) {
-        HILOG_ERROR("write interface token failed");
+        HILOG_ERROR("[%{public}s] write interface token failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteString(bundleName)) {
-        HILOG_ERROR("write bundleName failed");
+        HILOG_ERROR("[%{public}s] write bundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -172,7 +172,7 @@ int32_t JsFormStateObserverProxy::OnFormClickEvent(
     }
 
     if (!data.WriteParcelable(&runningFormInfo)) {
-        HILOG_ERROR("write runningFormInfo failed");
+        HILOG_ERROR("[%{public}s] write runningFormInfo failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -184,7 +184,7 @@ int32_t JsFormStateObserverProxy::OnFormClickEvent(
     int32_t error = remote->SendRequest(
         static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_FORM_CLICK), data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        HILOG_ERROR("[%{public}s] SendRequest:%{public}d failed", __FUNCTION__, error);
     }
     return error;
 }

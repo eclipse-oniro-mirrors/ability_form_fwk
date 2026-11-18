@@ -65,15 +65,15 @@ int32_t OnGetFormsInfo(const CFormFilter& cfilter, CArrCFormInfo* cArrformInfo)
 
 int32_t OnSetFormNextRefreshTime(char* cFormId, int32_t time)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     if (cFormId == nullptr) {
-        HILOG_ERROR("input param is nullptr");
+        HILOG_ERROR("[%{public}s] input param is nullptr", __FUNCTION__);
         return ERR_FORM_EXTERNAL_PARAM_INVALID;
     }
     int64_t formId = 0;
     std::string strFormId = std::string(cFormId);
     if (!ConvertStringToInt64(strFormId, formId)) {
-        HILOG_ERROR("convert form string failed");
+        HILOG_ERROR("[%{public}s] convert form string failed", __FUNCTION__);
         return ERR_FORM_EXTERNAL_PARAM_INVALID;
     }
     int32_t ret = FormMgr::GetInstance().SetNextRefreshTime(formId, time);
@@ -86,15 +86,15 @@ int32_t OnSetFormNextRefreshTime(char* cFormId, int32_t time)
 
 int32_t OnUpdateForm(char* cFormId, const CFormBindingData& cFormBindingData)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     if (cFormId == nullptr) {
-        HILOG_ERROR("input param is nullptr");
+        HILOG_ERROR("[%{public}s] input param is nullptr", __FUNCTION__);
         return ERR_FORM_EXTERNAL_PARAM_INVALID;
     }
     int64_t formId = 0;
     std::string strFormId = std::string(cFormId);
     if (!ConvertStringToInt64(strFormId, formId)) {
-        HILOG_ERROR("convert form string failed");
+        HILOG_ERROR("[%{public}s] convert form string failed", __FUNCTION__);
         return ERR_FORM_EXTERNAL_PARAM_INVALID;
     }
     auto formProviderData = std::make_shared<OHOS::AppExecFwk::FormProviderData>();
@@ -128,7 +128,7 @@ extern "C" {
 CJ_EXPORT int32_t FFIFormProviderGetFormsInfo(CFormFilter cfilter, CArrCFormInfo* cArrformInfo)
 {
     if (cfilter.moduleName == nullptr || cArrformInfo == nullptr) {
-        HILOG_ERROR("input param is nullptr");
+        HILOG_ERROR("[%{public}s] input param is nullptr", __FUNCTION__);
         return ERR_FORM_EXTERNAL_PARAM_INVALID;
     }
     return OnGetFormsInfo(cfilter, cArrformInfo);
@@ -137,7 +137,7 @@ CJ_EXPORT int32_t FFIFormProviderGetFormsInfo(CFormFilter cfilter, CArrCFormInfo
 CJ_EXPORT void FFIFormProviderFreeCArrCFormInfo(CArrCFormInfo* cArrformInfo)
 {
     if (cArrformInfo == nullptr) {
-        HILOG_ERROR("input param is nullptr");
+        HILOG_ERROR("[%{public}s] input param is nullptr", __FUNCTION__);
         return;
     }
     FreeCArrCFormInfo(cArrformInfo);
@@ -146,7 +146,7 @@ CJ_EXPORT void FFIFormProviderFreeCArrCFormInfo(CArrCFormInfo* cArrformInfo)
 CJ_EXPORT int32_t FFIFormProviderSetFormNextRefreshTime(char* cFormId, int32_t time)
 {
     if (cFormId == nullptr) {
-        HILOG_ERROR("input param is nullptr");
+        HILOG_ERROR("[%{public}s] input param is nullptr", __FUNCTION__);
         return ERR_FORM_EXTERNAL_PARAM_INVALID;
     }
     return OnSetFormNextRefreshTime(cFormId, time);
@@ -155,7 +155,7 @@ CJ_EXPORT int32_t FFIFormProviderSetFormNextRefreshTime(char* cFormId, int32_t t
 CJ_EXPORT int32_t FFIFormProviderUpdateForm(char* cFormId, CFormBindingData cFormBindingData)
 {
     if (cFormId == nullptr) {
-        HILOG_ERROR("input param is nullptr");
+        HILOG_ERROR("[%{public}s] input param is nullptr", __FUNCTION__);
         return ERR_FORM_EXTERNAL_PARAM_INVALID;
     }
     return OnUpdateForm(cFormId, cFormBindingData);

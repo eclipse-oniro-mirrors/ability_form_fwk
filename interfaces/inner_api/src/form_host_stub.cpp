@@ -90,7 +90,7 @@ int FormHostStub::HandleAcquired(MessageParcel &data, MessageParcel &reply)
 {
     std::unique_ptr<FormJsInfo> formInfo(data.ReadParcelable<FormJsInfo>());
     if (!formInfo) {
-        HILOG_ERROR("ReadParcelable<FormJsInfo> failed");
+        HILOG_ERROR("[%{public}s] ReadParcelable<FormJsInfo> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -113,7 +113,7 @@ int FormHostStub::HandleOnUpdate(MessageParcel &data, MessageParcel &reply)
 {
     std::unique_ptr<FormJsInfo> formInfo(data.ReadParcelable<FormJsInfo>());
     if (!formInfo) {
-        HILOG_ERROR("ReadParcelable<FormJsInfo> failed");
+        HILOG_ERROR("[%{public}s] ReadParcelable<FormJsInfo> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     OnUpdate(*formInfo);
@@ -164,7 +164,7 @@ int32_t FormHostStub::HandleOnShareFormResponse(MessageParcel &data, MessageParc
 {
     int64_t requestCode = 0;
     if (!data.ReadInt64(requestCode)) {
-        HILOG_ERROR("read requestCode failed");
+        HILOG_ERROR("[%{public}s] read requestCode failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = 0;
@@ -198,7 +198,7 @@ int32_t FormHostStub::HandleOnAcquireDataResponse(MessageParcel &data, MessagePa
 
     int64_t requestCode = 0;
     if (!data.ReadInt64(requestCode)) {
-        HILOG_ERROR("read requestCode failed");
+        HILOG_ERROR("[%{public}s] read requestCode failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -220,12 +220,12 @@ int32_t FormHostStub::HandleOnEnableForm(MessageParcel &data, MessageParcel &rep
     std::vector<int64_t> formIds;
     bool ret = data.ReadInt64Vector(&formIds);
     if (!ret) {
-        HILOG_ERROR("fail ReadInt64Vector<formIds>");
+        HILOG_ERROR("[%{public}s] fail ReadInt64Vector<formIds>", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool enable = false;
     if (!data.ReadBool(enable)) {
-        HILOG_ERROR("read enable failed");
+        HILOG_ERROR("[%{public}s] read enable failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     OnEnableForm(formIds, enable);
@@ -238,12 +238,12 @@ int32_t FormHostStub::HandleOnLockForm(MessageParcel &data, MessageParcel &reply
     std::vector<int64_t> formIds;
     bool ret = data.ReadInt64Vector(&formIds);
     if (!ret) {
-        HILOG_ERROR("fail ReadInt64Vector<formIds>");
+        HILOG_ERROR("[%{public}s] fail ReadInt64Vector<formIds>", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool enable = false;
     if (!data.ReadBool(enable)) {
-        HILOG_ERROR("read enable failed");
+        HILOG_ERROR("[%{public}s] read enable failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     OnLockForm(formIds, enable);
@@ -267,11 +267,11 @@ int32_t FormHostStub::HandleOnErrorForms(MessageParcel &data, MessageParcel &rep
     std::vector<int64_t> formIds;
     bool ret = data.ReadInt64Vector(&formIds);
     if (!ret) {
-        HILOG_ERROR("fail ReadInt64Vector<formIds>");
+        HILOG_ERROR("[%{public}s] fail ReadInt64Vector<formIds>", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formIds.size() > Constants::ONE_HOST_MAX_FORM_SIZE) {
-        HILOG_ERROR("formIds size exceeds max size");
+        HILOG_ERROR("[%{public}s] formIds size exceeds max size", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     OnError(errorCode, errorMsg, formIds);
@@ -281,15 +281,15 @@ int32_t FormHostStub::HandleOnErrorForms(MessageParcel &data, MessageParcel &rep
 
 int32_t FormHostStub::HandleOnDueControlForm(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("[%{public}s] start", __FUNCTION__);
     std::vector<int64_t> formIds;
     bool ret = data.ReadInt64Vector(&formIds);
     if (!ret) {
-        HILOG_ERROR("fail ReadInt64Vector<formIds>");
+        HILOG_ERROR("[%{public}s] fail ReadInt64Vector<formIds>", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formIds.size() > Constants::ONE_HOST_MAX_FORM_SIZE) {
-        HILOG_ERROR("formIds size exceeds max size");
+        HILOG_ERROR("[%{public}s] formIds size exceeds max size", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool isDisablePolicy = false;
@@ -309,15 +309,15 @@ int32_t FormHostStub::HandleOnDueControlForm(MessageParcel &data, MessageParcel 
 
 int32_t FormHostStub::HandleOnCheckForm(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("[%{public}s] start", __FUNCTION__);
     std::vector<int64_t> formIds;
     bool ret = data.ReadInt64Vector(&formIds);
     if (!ret) {
-        HILOG_ERROR("fail ReadInt64Vector<formIds>");
+        HILOG_ERROR("[%{public}s] fail ReadInt64Vector<formIds>", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formIds.size() > Constants::ONE_HOST_MAX_FORM_SIZE) {
-        HILOG_ERROR("formIds size exceeds max size");
+        HILOG_ERROR("[%{public}s] formIds size exceeds max size", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     OnCheckForm(formIds);

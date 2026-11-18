@@ -72,12 +72,12 @@ bool FormBundleLockMgr::IsBundleLock(const std::string &bundleName, const int32_
     }
 
     if (bundleName.empty()) {
-        HILOG_ERROR("invalid bundleName");
+        HILOG_ERROR("[%{public}s] invalid bundleName", __FUNCTION__);
         return false;
     }
 
     if (!Init()) {
-        HILOG_ERROR("Form bundle lock mgr not init");
+        HILOG_ERROR("[%{public}s] Form bundle lock mgr not init", __FUNCTION__);
         return false;
     }
 
@@ -89,12 +89,12 @@ bool FormBundleLockMgr::IsBundleLock(const std::string &bundleName, const int32_
 void FormBundleLockMgr::SetBundleLockStatus(const std::string &bundleName, bool isLock)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("invalid bundleName");
+        HILOG_ERROR("[%{public}s] invalid bundleName", __FUNCTION__);
         return;
     }
 
     if (!Init()) {
-        HILOG_ERROR("Form bundle lock mgr not init");
+        HILOG_ERROR("[%{public}s] Form bundle lock mgr not init", __FUNCTION__);
         return;
     }
 
@@ -121,7 +121,7 @@ bool FormBundleLockMgr::IsBundleProtect(const std::string &bundleName, const int
     }
 
     if (bundleName.empty()) {
-        HILOG_ERROR("invalid bundleName");
+        HILOG_ERROR("[%{public}s] invalid bundleName", __FUNCTION__);
         return false;
     }
 
@@ -139,7 +139,7 @@ bool FormBundleLockMgr::IsBundleProtect(const std::string &bundleName, const int
 void FormBundleLockMgr::SetBundleProtectStatus(const std::string &bundleName, bool isProtect)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("invalid bundleName");
+        HILOG_ERROR("[%{public}s] invalid bundleName", __FUNCTION__);
         return;
     }
 

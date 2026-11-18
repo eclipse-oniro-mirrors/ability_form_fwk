@@ -50,7 +50,7 @@ int32_t FormRenderStatusMgr::PostFormEvent(
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
 
-    HILOG_INFO("formId:%{public}" PRId64 ", status is %{public}s, event is %{public}s, nextStatus is %{public}s.",
+    HILOG_INFO("[%{public}s] formId:%{public}" PRId64 ", status is %{public}s, event is %{public}s, nextStatus is %{public}s.", __FUNCTION__,
         formId,
         FormStatusPrint::FormStatusToString(status).c_str(),
         FormStatusPrint::FormEventToString(event).c_str(),
@@ -93,7 +93,7 @@ int32_t FormRenderStatusMgr::ProcessTaskDelete(const int64_t formId)
 
 int32_t FormRenderStatusMgr::PrintTaskInfo(const int64_t formId, const FormFsmEvent event, const FormFsmStatus status)
 {
-    HILOG_ERROR("formId:%{public}" PRId64 ", status is %{public}s, event is %{public}s.",
+    HILOG_ERROR("[%{public}s] formId:%{public}" PRId64 ", status is %{public}s, event is %{public}s.", __FUNCTION__,
         formId,
         FormStatusPrint::FormStatusToString(status).c_str(),
         FormStatusPrint::FormEventToString(event).c_str());

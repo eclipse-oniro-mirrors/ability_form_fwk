@@ -32,7 +32,7 @@ namespace {
 bool ReadStringField(Parcel &parcel, const char *fieldName, std::string &out, std::u16string &tmp)
 {
     if (!parcel.ReadString16(tmp)) {
-        HILOG_ERROR("read %{public}s failed", fieldName);
+        HILOG_ERROR("[%{public}s] read %{public}s failed", __FUNCTION__, fieldName);
         return false;
     }
     out = Str16ToStr8(tmp);
@@ -42,7 +42,7 @@ bool ReadStringField(Parcel &parcel, const char *fieldName, std::string &out, st
 bool ReadInt32Field(Parcel &parcel, const char *fieldName, int32_t &out)
 {
     if (!parcel.ReadInt32(out)) {
-        HILOG_ERROR("read %{public}s failed", fieldName);
+        HILOG_ERROR("[%{public}s] read %{public}s failed", __FUNCTION__, fieldName);
         return false;
     }
     return true;
@@ -51,7 +51,7 @@ bool ReadInt32Field(Parcel &parcel, const char *fieldName, int32_t &out)
 bool ReadBoolField(Parcel &parcel, const char *fieldName, bool &out)
 {
     if (!parcel.ReadBool(out)) {
-        HILOG_ERROR("read %{public}s failed", fieldName);
+        HILOG_ERROR("[%{public}s] read %{public}s failed", __FUNCTION__, fieldName);
         return false;
     }
     return true;
@@ -60,7 +60,7 @@ bool ReadBoolField(Parcel &parcel, const char *fieldName, bool &out)
 bool ReadUint32Field(Parcel &parcel, const char *fieldName, uint32_t &out)
 {
     if (!parcel.ReadUint32(out)) {
-        HILOG_ERROR("read %{public}s failed", fieldName);
+        HILOG_ERROR("[%{public}s] read %{public}s failed", __FUNCTION__, fieldName);
         return false;
     }
     return true;
@@ -247,7 +247,7 @@ bool FormJsInfo::WriteAshmemFormData(Parcel &parcel, int32_t size, const char *d
     }
     void *ptr = ::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (ptr == MAP_FAILED) {
-        HILOG_ERROR("mmap failed,errno:%{public}d", errno);
+        HILOG_ERROR("[%{public}s] mmap failed,errno:%{public}d", __FUNCTION__, errno);
         fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return false;
     }
@@ -335,7 +335,7 @@ bool FormJsInfo::ReadAshmemFormData(Parcel &parcel, int32_t formDataLength, std:
     }
     void *ptr = ::mmap(nullptr, formDataLength, PROT_READ, MAP_SHARED, fd, 0);
     if (ptr == MAP_FAILED) {
-        HILOG_ERROR("mmap failed,errno:%{public}d", errno);
+        HILOG_ERROR("[%{public}s] mmap failed,errno:%{public}d", __FUNCTION__, errno);
         fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return false;
     }
@@ -367,12 +367,12 @@ bool FormJsInfo::WriteObjects(Parcel &parcel) const
 
 bool FormJsInfo::WriteImageData(Parcel &parcel) const
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     auto imageDateState = formProviderData.GetImageDataState();
     if (!parcel.WriteInt32(imageDateState)) {
         return false;
     }
-    HILOG_DEBUG("imageDateState is %{public}d", imageDateState);
+    HILOG_DEBUG("[%{public}s] imageDateState is %{public}d", __FUNCTION__, imageDateState);
     switch (imageDateState) {
         case FormProviderData::IMAGE_DATA_STATE_ADDED: {
             auto sharedImageMap = formProviderData.GetImageDataMap();
@@ -381,7 +381,7 @@ bool FormJsInfo::WriteImageData(Parcel &parcel) const
                 return false;
             }
             if (size > IMAGE_DATA_THRESHOLD) {
-                HILOG_ERROR("unexpected image number %{public}zu", size);
+                HILOG_ERROR("[%{public}s] unexpected image number %{public}zu", __FUNCTION__, size);
                 return false;
             }
             for (const auto &entry : sharedImageMap) {
@@ -399,23 +399,23 @@ bool FormJsInfo::WriteImageData(Parcel &parcel) const
         case FormProviderData::IMAGE_DATA_STATE_REMOVED:
             break;
         default: {
-            HILOG_WARN("unexpected imageDateState %{public}d", imageDateState);
+            HILOG_WARN("[%{public}s] unexpected imageDateState %{public}d", __FUNCTION__, imageDateState);
             break;
         }
     }
-    HILOG_DEBUG("end");
+    HILOG_DEBUG("[%{public}s] end", __FUNCTION__);
     return true;
 }
 
 void FormJsInfo::ReadImageData(Parcel &parcel)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     int32_t imageDateState = 0;
     if (!parcel.ReadInt32(imageDateState)) {
         HILOG_ERROR("read imageDataState failed");
         return;
     }
-    HILOG_DEBUG("imageDateState is %{public}d", imageDateState);
+    HILOG_DEBUG("[%{public}s] imageDateState is %{public}d", __FUNCTION__, imageDateState);
     switch (imageDateState) {
         case FormProviderData::IMAGE_DATA_STATE_ADDED:
             ReadAddedImages(parcel);
@@ -425,10 +425,10 @@ void FormJsInfo::ReadImageData(Parcel &parcel)
         case FormProviderData::IMAGE_DATA_STATE_REMOVED:
             break;
         default:
-            HILOG_WARN("unexpected imageDateState %{public}d", imageDateState);
+            HILOG_WARN("[%{public}s] unexpected imageDateState %{public}d", __FUNCTION__, imageDateState);
             break;
     }
-    HILOG_DEBUG("end");
+    HILOG_DEBUG("[%{public}s] end", __FUNCTION__);
 }
 
 void FormJsInfo::ReadAddedImages(Parcel &parcel)
@@ -470,14 +470,14 @@ bool FormJsInfo::ReadSingleImage(Parcel &parcel)
 
 bool FormJsInfo::ConvertRawImageData()
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     if (!formProviderData.ConvertRawImageData()) {
         return false;
     }
     auto sharedImageMap = formProviderData.GetImageDataMap();
     auto size = sharedImageMap.size();
     if (size > IMAGE_DATA_THRESHOLD) {
-        HILOG_ERROR("unexpected image number %{public}zu", size);
+        HILOG_ERROR("[%{public}s] unexpected image number %{public}zu", __FUNCTION__, size);
         return false;
     }
     for (const auto &entry : sharedImageMap) {
@@ -488,7 +488,7 @@ bool FormJsInfo::ConvertRawImageData()
 
 bool FormJsInfo::WritePkgNameMap(Parcel &parcel) const
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     std::vector<std::string> keys;
     std::vector<std::string> values;
 
@@ -510,7 +510,7 @@ bool FormJsInfo::WritePkgNameMap(Parcel &parcel) const
 
 void FormJsInfo::ReadPkgNameMap(Parcel &parcel)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     std::vector<std::string> keys;
     std::vector<std::string> values;
     if (!parcel.ReadStringVector(&keys)) {

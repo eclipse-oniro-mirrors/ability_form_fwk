@@ -87,13 +87,13 @@ int FormProviderStub::HandleAcquireProviderFormInfo(MessageParcel &data, Message
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s] ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s] get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -111,18 +111,18 @@ int FormProviderStub::HandleNotifyFormDelete(MessageParcel &data, MessageParcel 
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s] read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<FormReqInfo> failed");
+        HILOG_ERROR("[%{public}s] ReadParcelable<FormReqInfo> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s] get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -143,13 +143,13 @@ int FormProviderStub::HandleNotifyFormsDelete(MessageParcel &data, MessageParcel
     if (ret) {
         std::unique_ptr<Want> want(data.ReadParcelable<Want>());
         if (!want) {
-            HILOG_ERROR("ReadParcelable<FormReqInfo> failed");
+            HILOG_ERROR("[%{public}s] ReadParcelable<FormReqInfo> failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
 
         sptr<IRemoteObject> client = data.ReadRemoteObject();
         if (client == nullptr) {
-            HILOG_ERROR("get remote object failed");
+            HILOG_ERROR("[%{public}s] get remote object failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
 
@@ -170,19 +170,19 @@ int FormProviderStub::HandleNotifyFormUpdate(MessageParcel &data, MessageParcel 
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s] read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s] ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s] get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -210,13 +210,13 @@ int FormProviderStub::HandleEventNotify(MessageParcel &data, MessageParcel &repl
 
         std::unique_ptr<Want> want(data.ReadParcelable<Want>());
         if (!want) {
-            HILOG_ERROR("ReadParcelable<Want> failed");
+            HILOG_ERROR("[%{public}s] ReadParcelable<Want> failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
 
         sptr<IRemoteObject> client = data.ReadRemoteObject();
         if (client == nullptr) {
-            HILOG_ERROR("get remote object failed");
+            HILOG_ERROR("[%{public}s] get remote object failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
 
@@ -238,19 +238,19 @@ int FormProviderStub::HandleNotifyFormCastTempForm(MessageParcel &data, MessageP
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s] read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s] ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s] get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -268,16 +268,16 @@ int FormProviderStub::HandleNotifyFormCastTempForm(MessageParcel &data, MessageP
 int FormProviderStub::HandleNotifyConfigurationUpdate(MessageParcel &data, MessageParcel &reply)
 {
     std::unique_ptr<AppExecFwk::Configuration> configuration(data.ReadParcelable<AppExecFwk::Configuration>());
-    HILOG_INFO("Call");
+    HILOG_INFO("[%{public}s] Call", __FUNCTION__);
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s] ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s] get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -304,7 +304,7 @@ int FormProviderStub::HandleFireFormEvent(MessageParcel &data, MessageParcel &re
 
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s] get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -322,18 +322,18 @@ int FormProviderStub::HandleAcquireState(MessageParcel &data, MessageParcel &rep
 {
     std::unique_ptr<Want> wantArg(data.ReadParcelable<Want>());
     if (!wantArg) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s] ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::string provider = data.ReadString();
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s] ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s] get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = AcquireState(*wantArg, provider, *want, client);
@@ -347,14 +347,14 @@ int32_t FormProviderStub::HandleAcquireShareFormData(MessageParcel &data, Messag
     auto remoteDeviceId = data.ReadString();
     auto remoteObj = data.ReadRemoteObject();
     if (remoteObj == nullptr) {
-        HILOG_ERROR("get remoteObject failed");
+        HILOG_ERROR("[%{public}s] get remoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     auto requestCode = data.ReadInt64();
     auto result = AcquireShareFormData(formId, remoteDeviceId, remoteObj, requestCode);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s] write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -366,14 +366,14 @@ int32_t FormProviderStub::HandleAcquireFormData(MessageParcel &data, MessageParc
     auto formId = data.ReadInt64();
     auto remoteObj = data.ReadRemoteObject();
     if (remoteObj == nullptr) {
-        HILOG_ERROR("get remoteObject failed");
+        HILOG_ERROR("[%{public}s] get remoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     auto requestCode = data.ReadInt64();
     auto result = AcquireFormData(formId, remoteObj, requestCode);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s] write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -385,17 +385,17 @@ int32_t FormProviderStub::HandleNotifyFormLocationUpdate(MessageParcel &data, Me
     auto formId = data.ReadInt64();
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s] ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto remoteObj = data.ReadRemoteObject();
     if (remoteObj == nullptr) {
-        HILOG_ERROR("get remoteObject failed");
+        HILOG_ERROR("[%{public}s] get remoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto result = NotifyFormLocationUpdate(formId, *want, remoteObj);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s] write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
  
@@ -404,7 +404,7 @@ int32_t FormProviderStub::HandleNotifyFormLocationUpdate(MessageParcel &data, Me
 
 int32_t FormProviderStub::HandleNotifySizeChanged(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("Call");
+    HILOG_INFO("[%{public}s] Call", __FUNCTION__);
     int64_t formId = data.ReadInt64();
     int32_t newDimension = data.ReadInt32();
     std::unique_ptr<Rect> newRect(data.ReadParcelable<Rect>());
@@ -414,17 +414,17 @@ int32_t FormProviderStub::HandleNotifySizeChanged(MessageParcel &data, MessagePa
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s] ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto remoteObj = data.ReadRemoteObject();
     if (remoteObj == nullptr) {
-        HILOG_ERROR("get remoteObject failed");
+        HILOG_ERROR("[%{public}s] get remoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto result = NotifySizeChanged(formId, newDimension, *newRect, *want, remoteObj);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s] write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;

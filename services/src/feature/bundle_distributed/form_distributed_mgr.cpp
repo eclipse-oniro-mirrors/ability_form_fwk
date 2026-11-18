@@ -112,7 +112,7 @@ bool FormDistributedMgr::Init()
 bool FormDistributedMgr::IsBundleDistributed(const std::string &bundleName, int32_t userId)
 {
     if (bundleName.empty() || userId == Constants::INVALID_USER_ID) {
-        HILOG_ERROR("invalid bundleName or userId,userId:%{public}d", userId);
+        HILOG_ERROR("[%{public}s] invalid bundleName or userId,userId:%{public}d", __FUNCTION__, userId);
         return false;
     }
 
@@ -135,7 +135,7 @@ void FormDistributedMgr::SetBundleDistributedStatus(
     }
 
     if (!isInitialized_.load(std::memory_order_acquire) && !Init()) {
-        HILOG_ERROR("Form bundle distributed mgr not init");
+        HILOG_ERROR("[%{public}s] Form bundle distributed mgr not init", __FUNCTION__);
         return;
     }
 
@@ -157,7 +157,7 @@ bool FormDistributedMgr::IsBundleDistributedInit()
 {
     std::unique_lock<std::shared_mutex> lock(bundleDistributedMapMutex_);
     if (!isInitialized_.load(std::memory_order_acquire) && !Init()) {
-        HILOG_ERROR("Form bundle distributed mgr not init");
+        HILOG_ERROR("[%{public}s] Form bundle distributed mgr not init", __FUNCTION__);
         return false;
     }
     return true;
@@ -180,7 +180,7 @@ void FormDistributedMgr::AlterTableAddColumn()
 std::string FormDistributedMgr::GetUiModuleName(const std::string &bundleName, int32_t userId)
 {
     if (bundleName.empty() || userId == Constants::INVALID_USER_ID) {
-        HILOG_ERROR("invalid bundleName or userId,userId:%{public}d", userId);
+        HILOG_ERROR("[%{public}s] invalid bundleName or userId,userId:%{public}d", __FUNCTION__, userId);
         return "";
     }
 

@@ -55,9 +55,9 @@ sptr<FormHostClient> FormHostClient::GetInstance()
 void FormHostClient::AddForm(std::shared_ptr<FormCallbackInterface> formCallback, const FormJsInfo &formJsInfo)
 {
     auto formId = formJsInfo.formId;
-    HILOG_INFO("formId:%{public}" PRId64, formId);
+    HILOG_INFO("[%{public}s] formId:%{public}" PRId64, __FUNCTION__, formId);
     if (formId <= 0 || formCallback == nullptr) {
-        HILOG_ERROR("invalid formId or formCallback");
+        HILOG_ERROR("[%{public}s] invalid formId or formCallback", __FUNCTION__);
         return;
     }
     std::lock_guard<std::mutex> lock(callbackMutex_);
@@ -84,15 +84,15 @@ void FormHostClient::AddForm(std::shared_ptr<FormCallbackInterface> formCallback
  */
 void FormHostClient::RemoveForm(std::shared_ptr<FormCallbackInterface> formCallback, const int64_t formId)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formId);
+    HILOG_INFO("[%{public}s] formId:%{public}" PRId64, __FUNCTION__, formId);
     if (formId <= 0 || formCallback == nullptr) {
-        HILOG_ERROR("invalid formId or formCallback");
+        HILOG_ERROR("[%{public}s] invalid formId or formCallback", __FUNCTION__);
         return;
     }
     std::lock_guard<std::mutex> lock(callbackMutex_);
     auto iter = formCallbackMap_.find(formId);
     if (iter == formCallbackMap_.end()) {
-        HILOG_ERROR("not find formId:%{public}s", std::to_string(formId).c_str());
+        HILOG_ERROR("[%{public}s] not find formId:%{public}s", __FUNCTION__, std::to_string(formId).c_str());
         return;
     }
     iter->second.erase(formCallback);
@@ -111,7 +111,7 @@ void FormHostClient::RemoveForm(std::shared_ptr<FormCallbackInterface> formCallb
  */
 bool FormHostClient::ContainsForm(int64_t formId)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(callbackMutex_);
     return formCallbackMap_.find(formId) != formCallbackMap_.end();
 }
@@ -126,7 +126,7 @@ bool FormHostClient::ContainsForm(int64_t formId)
 bool FormHostClient::AddFormState(const std::shared_ptr<FormStateCallbackInterface> &formStateCallback,
                                   const AAFwk::Want &want)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     std::string bundleName = want.GetElement().GetBundleName();
     std::string abilityName = want.GetElement().GetAbilityName();
     const std::string doubleColon = "::";
@@ -144,13 +144,13 @@ bool FormHostClient::AddFormState(const std::shared_ptr<FormStateCallbackInterfa
     } else {
         iter->second.insert(formStateCallback);
     }
-    HILOG_INFO("done");
+    HILOG_INFO("[%{public}s] done", __FUNCTION__);
     return true;
 }
 
 void FormHostClient::RemoveFormState(const AAFwk::Want &want)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     std::string bundleName = want.GetElement().GetBundleName();
     std::string abilityName = want.GetElement().GetAbilityName();
     const std::string doubleColon = "::";
@@ -164,7 +164,7 @@ void FormHostClient::RemoveFormState(const AAFwk::Want &want)
     if (iter != formStateCallbackMap_.end()) {
         formStateCallbackMap_.erase(key);
     }
-    HILOG_INFO("end");
+    HILOG_INFO("[%{public}s] end", __FUNCTION__);
 }
 
 bool FormHostClient::RegisterUninstallCallback(UninstallCallback callback)
@@ -177,7 +177,7 @@ bool FormHostClient::RegisterUninstallCallback(UninstallCallback callback)
 void FormHostClient::OnAcquired(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &token)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     if (token != nullptr) {
         HILOG_DEBUG("save token to form remote mgr");
         FormCallerMgr::GetInstance().AddFormHostCaller(formJsInfo, token);
@@ -194,7 +194,7 @@ void FormHostClient::OnAcquired(const FormJsInfo &formJsInfo, const sptr<IRemote
 void FormHostClient::OnUpdate(const FormJsInfo &formJsInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     UpdateForm(formJsInfo);
 }
 
@@ -207,7 +207,7 @@ void FormHostClient::OnUpdate(const FormJsInfo &formJsInfo)
 void FormHostClient::OnUninstall(const std::vector<int64_t> &formIds)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (formIds.empty()) {
         HILOG_ERROR("empty formIds");
         return;
@@ -223,19 +223,19 @@ void FormHostClient::OnUninstall(const std::vector<int64_t> &formIds)
     }
     for (auto &formId : formIds) {
         if (formId < 0) {
-            HILOG_ERROR("the passed form id can't be negative");
+            HILOG_ERROR("[%{public}s] the passed form id can't be negative", __FUNCTION__);
             continue;
         }
         std::lock_guard<std::mutex> lock(callbackMutex_);
         auto iter = formCallbackMap_.find(formId);
         if (iter == formCallbackMap_.end()) {
-            HILOG_ERROR("not find formId:%{public}s", std::to_string(formId).c_str());
+            HILOG_ERROR("[%{public}s] not find formId:%{public}s", __FUNCTION__, std::to_string(formId).c_str());
             continue;
         }
         for (const auto& callback : iter->second) {
             HILOG_ERROR("uninstall formId:%{public}s", std::to_string(formId).c_str());
             if (callback == nullptr) {
-                HILOG_ERROR("null FormCallback");
+                HILOG_ERROR("[%{public}s] null FormCallback", __FUNCTION__);
                 continue;
             }
             callback->ProcessFormUninstall(formId);
@@ -274,25 +274,25 @@ void FormHostClient::OnAcquireState(FormState state, const AAFwk::Want &want)
     }
     for (const auto &callback : callbackSet) {
         if (callback == nullptr) {
-            HILOG_ERROR("null FormCallback");
+            HILOG_ERROR("[%{public}s] null FormCallback", __FUNCTION__);
             continue;
         }
         callback->ProcessAcquireState(state);
     }
-    HILOG_INFO("done");
+    HILOG_INFO("[%{public}s] done", __FUNCTION__);
 }
 
 bool FormHostClient::AddShareFormCallback(const std::shared_ptr<ShareFormCallBack> &shareFormCallback,
     int64_t requestCode)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(shareFormCallbackMutex_);
     auto iter = shareFormCallbackMap_.find(requestCode);
     if (iter == shareFormCallbackMap_.end()) {
         shareFormCallbackMap_.emplace(requestCode, shareFormCallback);
     }
-    HILOG_DEBUG("done");
+    HILOG_DEBUG("[%{public}s] done", __FUNCTION__);
     return true;
 }
 
@@ -300,13 +300,13 @@ bool FormHostClient::AddAcqiureFormDataCallback(const std::shared_ptr<FormDataCa
     int64_t requestCode)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(AcquireDataCallbackMutex_);
     auto iter = acquireDataCallbackMap_.find(requestCode);
     if (iter == acquireDataCallbackMap_.end()) {
         acquireDataCallbackMap_.emplace(requestCode, acquireFormDataTask);
     }
-    HILOG_DEBUG("done");
+    HILOG_DEBUG("[%{public}s] done", __FUNCTION__);
     return true;
 }
 
@@ -314,7 +314,7 @@ void FormHostClient::OnAcquireDataResponse(const AAFwk::WantParams &wantParams, 
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     if (requestCode <= 0) {
-        HILOG_ERROR("invalid requestCode:%{public}" PRId64, requestCode);
+        HILOG_ERROR("[%{public}s] invalid requestCode:%{public}" PRId64, __FUNCTION__, requestCode);
         return;
     }
     std::shared_ptr<FormDataCallbackInterface> callback;
@@ -332,7 +332,7 @@ void FormHostClient::OnAcquireDataResponse(const AAFwk::WantParams &wantParams, 
     if (callback) {
         callback->ProcessAcquireFormData(wantParams);
     }
-    HILOG_DEBUG("done");
+    HILOG_DEBUG("[%{public}s] done", __FUNCTION__);
 }
 
 void FormHostClient::OnShareFormResponse(int64_t requestCode, int32_t result)
@@ -340,7 +340,7 @@ void FormHostClient::OnShareFormResponse(int64_t requestCode, int32_t result)
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("result:%{public}d", result);
     if (requestCode <= 0) {
-        HILOG_ERROR("invalid requestCode:%{public}" PRId64, requestCode);
+        HILOG_ERROR("[%{public}s] invalid requestCode:%{public}" PRId64, __FUNCTION__, requestCode);
         return;
     }
     std::lock_guard<std::mutex> lock(shareFormCallbackMutex_);
@@ -354,7 +354,7 @@ void FormHostClient::OnShareFormResponse(int64_t requestCode, int32_t result)
         iter->second->ProcessShareFormResponse(result);
     }
     shareFormCallbackMap_.erase(requestCode);
-    HILOG_DEBUG("done");
+    HILOG_DEBUG("[%{public}s] done", __FUNCTION__);
 }
 
 void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg)
@@ -369,17 +369,17 @@ void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg)
         int64_t formId = *formIdIter;
         auto callbackMapIter = formCallbackMap_.find(formId);
         if (callbackMapIter == formCallbackMap_.end()) {
-            HILOG_ERROR("Can't find form:%{public}" PRId64 " remove it", formId);
+            HILOG_ERROR("[%{public}s] Can't find form:%{public}" PRId64 " remove it", __FUNCTION__, formId);
             formIdIter = etsFormIds_.erase(formIdIter);
             continue;
         }
         ++formIdIter;
 
         const std::set<std::shared_ptr<FormCallbackInterface>> &callbackSet = callbackMapIter->second;
-        HILOG_INFO("callbackSet.size:%{public}zu", callbackSet.size());
+        HILOG_INFO("[%{public}s] callbackSet.size:%{public}zu", __FUNCTION__, callbackSet.size());
         for (const auto &callback : callbackSet) {
             if (callback == nullptr) {
-                HILOG_ERROR("null FormCallback");
+                HILOG_ERROR("[%{public}s] null FormCallback", __FUNCTION__);
                 continue;
             }
             callback->OnError(errorCode, errorMsg);
@@ -389,7 +389,7 @@ void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg)
 
 void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg, std::vector<int64_t> &formIds)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     std::lock_guard<std::mutex> lock(callbackMutex_);
     for (auto formId : formIds) {
@@ -398,16 +398,16 @@ void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg, std
         }
         auto callbackMapIter = formCallbackMap_.find(formId);
         if (callbackMapIter == formCallbackMap_.end()) {
-            HILOG_ERROR("Can't find form:%{public}" PRId64 " remove it", formId);
+            HILOG_ERROR("[%{public}s] Can't find form:%{public}" PRId64 " remove it", __FUNCTION__, formId);
             etsFormIds_.erase(formId);
             continue;
         }
         HILOG_ERROR("Receive error form FMS formId:%{public}s", std::to_string(formId).c_str());
         const std::set<std::shared_ptr<FormCallbackInterface>> &callbackSet = callbackMapIter->second;
-        HILOG_DEBUG("callbackSet.size:%{public}zu", callbackSet.size());
+        HILOG_DEBUG("[%{public}s] callbackSet.size:%{public}zu", __FUNCTION__, callbackSet.size());
         for (const auto &callback : callbackSet) {
             if (callback == nullptr) {
-                HILOG_ERROR("null FormCallback");
+                HILOG_ERROR("[%{public}s] null FormCallback", __FUNCTION__);
                 continue;
             }
             callback->OnError(errorCode, errorMsg);
@@ -417,24 +417,24 @@ void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg, std
 
 void FormHostClient::RemoveShareFormCallback(int64_t requestCode)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(shareFormCallbackMutex_);
     auto iter = shareFormCallbackMap_.find(requestCode);
     if (iter != shareFormCallbackMap_.end()) {
         shareFormCallbackMap_.erase(requestCode);
     }
-    HILOG_INFO("end");
+    HILOG_INFO("[%{public}s] end", __FUNCTION__);
 }
 
 void FormHostClient::RemoveAcquireDataCallback(int64_t requestCode)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s] call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(AcquireDataCallbackMutex_);
     auto iter = acquireDataCallbackMap_.find(requestCode);
     if (iter != acquireDataCallbackMap_.end()) {
         acquireDataCallbackMap_.erase(requestCode);
     }
-    HILOG_INFO("end");
+    HILOG_INFO("[%{public}s] end", __FUNCTION__);
 }
 
 void FormHostClient::UpdateForm(const FormJsInfo &formJsInfo)
@@ -443,7 +443,7 @@ void FormHostClient::UpdateForm(const FormJsInfo &formJsInfo)
     HILOG_DEBUG("call,image number is %{public}zu", formJsInfo.imageDataMap.size());
     int64_t formId = formJsInfo.formId;
     if (formId < 0) {
-        HILOG_ERROR("the passed form id can't be negative");
+        HILOG_ERROR("[%{public}s] the passed form id can't be negative", __FUNCTION__);
         return;
     }
     std::set<std::shared_ptr<FormCallbackInterface>> callbacks;
@@ -451,16 +451,16 @@ void FormHostClient::UpdateForm(const FormJsInfo &formJsInfo)
         std::lock_guard<std::mutex> lock(callbackMutex_);
         auto iter = formCallbackMap_.find(formId);
         if (iter == formCallbackMap_.end()) {
-            HILOG_ERROR("not find formId:%{public}s", std::to_string(formId).c_str());
+            HILOG_ERROR("[%{public}s] not find formId:%{public}s", __FUNCTION__, std::to_string(formId).c_str());
             return;
         }
         callbacks = iter->second;
     }
     for (const auto &callback : callbacks) {
-        HILOG_DEBUG("formId:%{public}" PRId64 ", jspath:%{public}s, data: %{private}s",
+        HILOG_DEBUG("[%{public}s] formId:%{public}" PRId64 ", jspath:%{public}s, data: %{private}s", __FUNCTION__,
             formId, formJsInfo.jsFormCodePath.c_str(), formJsInfo.formData.c_str());
         if (callback == nullptr) {
-            HILOG_ERROR("null FormCallback");
+            HILOG_ERROR("[%{public}s] null FormCallback", __FUNCTION__);
             continue;
         }
         callback->ProcessFormUpdate(formJsInfo);
@@ -473,7 +473,7 @@ void FormHostClient::OnRecycleForm(const int64_t &formId)
     HILOG_DEBUG("formId:%{public}s", std::to_string(formId).c_str());
 
     if (formId < 0) {
-        HILOG_ERROR("the passed form id can't be negative");
+        HILOG_ERROR("[%{public}s] the passed form id can't be negative", __FUNCTION__);
         return;
     }
     std::lock_guard<std::mutex> lock(callbackMutex_);
@@ -484,7 +484,7 @@ void FormHostClient::OnRecycleForm(const int64_t &formId)
     }
     for (const auto &callback : iter->second) {
         if (callback == nullptr) {
-            HILOG_ERROR("null FormCallback");
+            HILOG_ERROR("[%{public}s] null FormCallback", __FUNCTION__);
             continue;
         }
         callback->ProcessRecycleForm();
@@ -493,21 +493,21 @@ void FormHostClient::OnRecycleForm(const int64_t &formId)
 
 void FormHostClient::OnEnableForm(const std::vector<int64_t> &formIds, const bool enable)
 {
-    HILOG_INFO("size:%{public}zu", formIds.size());
+    HILOG_INFO("[%{public}s] size:%{public}zu", __FUNCTION__, formIds.size());
     for (auto &formId : formIds) {
         if (formId < 0) {
-            HILOG_ERROR("the passed form id can't be negative");
+            HILOG_ERROR("[%{public}s] the passed form id can't be negative", __FUNCTION__);
             continue;
         }
         std::lock_guard<std::mutex> lock(callbackMutex_);
         auto iter = formCallbackMap_.find(formId);
         if (iter == formCallbackMap_.end()) {
-            HILOG_ERROR("not find formId:%{public}s", std::to_string(formId).c_str());
+            HILOG_ERROR("[%{public}s] not find formId:%{public}s", __FUNCTION__, std::to_string(formId).c_str());
             continue;
         }
         for (const auto& callback : iter->second) {
             if (!callback) {
-                HILOG_ERROR("null callback");
+                HILOG_ERROR("[%{public}s] null callback", __FUNCTION__);
                 continue;
             }
             callback->ProcessEnableForm(enable);
@@ -517,21 +517,21 @@ void FormHostClient::OnEnableForm(const std::vector<int64_t> &formIds, const boo
 
 void FormHostClient::OnLockForm(const std::vector<int64_t> &formIds, const bool lock)
 {
-    HILOG_INFO("size:%{public}zu", formIds.size());
+    HILOG_INFO("[%{public}s] size:%{public}zu", __FUNCTION__, formIds.size());
     for (auto &formId : formIds) {
         if (formId < 0) {
-            HILOG_ERROR("the passed form id can't be negative");
+            HILOG_ERROR("[%{public}s] the passed form id can't be negative", __FUNCTION__);
             continue;
         }
         std::lock_guard<std::mutex> lockMutex(callbackMutex_);
         auto iter = formCallbackMap_.find(formId);
         if (iter == formCallbackMap_.end()) {
-            HILOG_ERROR("not find formId:%{public}s", std::to_string(formId).c_str());
+            HILOG_ERROR("[%{public}s] not find formId:%{public}s", __FUNCTION__, std::to_string(formId).c_str());
             continue;
         }
         for (const auto& callback : iter->second) {
             if (!callback) {
-                HILOG_ERROR("null callback");
+                HILOG_ERROR("[%{public}s] null callback", __FUNCTION__);
                 continue;
             }
             callback->ProcessLockForm(lock);
@@ -542,10 +542,10 @@ void FormHostClient::OnLockForm(const std::vector<int64_t> &formIds, const bool 
 void FormHostClient::OnDueControlForm(
     const std::vector<int64_t> &formIds, const bool isDisablePolicy, const bool isControl)
 {
-    HILOG_INFO("call,size:%{public}zu", formIds.size());
+    HILOG_INFO("[%{public}s] call,size:%{public}zu", __FUNCTION__, formIds.size());
     for (auto &formId : formIds) {
         if (formId < 0) {
-            HILOG_ERROR("the passed form id can't be negative");
+            HILOG_ERROR("[%{public}s] the passed form id can't be negative", __FUNCTION__);
             continue;
         }
         std::lock_guard<std::mutex> lockMutex(callbackMutex_);
@@ -556,7 +556,7 @@ void FormHostClient::OnDueControlForm(
         }
         for (const auto& callback : iter->second) {
             if (!callback) {
-                HILOG_ERROR("null callback formId:%{public}" PRId64, formId);
+                HILOG_ERROR("[%{public}s] null callback formId:%{public}" PRId64, __FUNCTION__, formId);
                 continue;
             }
             callback->ProcessDueControlForm(isDisablePolicy, isControl);
@@ -566,7 +566,7 @@ void FormHostClient::OnDueControlForm(
 
 void FormHostClient::OnCheckForm(const std::vector<int64_t> &formIds)
 {
-    HILOG_INFO("call,size:%{public}zu", formIds.size());
+    HILOG_INFO("[%{public}s] call,size:%{public}zu", __FUNCTION__, formIds.size());
     for (int64_t formId : formIds) {
         if (formId < 0) {
             HILOG_ERROR("the form id can't be negative");
@@ -580,7 +580,7 @@ void FormHostClient::OnCheckForm(const std::vector<int64_t> &formIds)
         }
         for (const auto &callback : iter->second) {
             if (!callback) {
-                HILOG_ERROR("null callback formId:%{public}" PRId64, formId);
+                HILOG_ERROR("[%{public}s] null callback formId:%{public}" PRId64, __FUNCTION__, formId);
                 continue;
             }
             callback->ProcessCheckForm();

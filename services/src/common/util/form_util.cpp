@@ -214,7 +214,7 @@ int FormUtil::GetCurrentAccountId()
     std::vector<int32_t> activeList;
     ErrCode errCode = DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("QueryActiveOsAccountIds failed");
+        HILOG_ERROR("[%{public}s] QueryActiveOsAccountIds failed", __FUNCTION__);
         return Constants::ANY_USERID;
     }
     if (activeList.empty()) {
@@ -389,7 +389,7 @@ void FormUtil::GetActiveUsers(std::vector<int32_t> &activeList)
 {
     ErrCode errCode = DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("QueryActiveOsAccountIds failed");
+        HILOG_ERROR("[%{public}s] QueryActiveOsAccountIds failed", __FUNCTION__);
         return;
     }
 }

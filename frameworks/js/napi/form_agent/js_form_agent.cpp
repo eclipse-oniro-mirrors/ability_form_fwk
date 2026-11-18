@@ -157,7 +157,7 @@ private:
 
 void JsFormAgent::Finalizer(napi_env env, void *data, void *hint)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     std::unique_ptr<JsFormAgent>(static_cast<JsFormAgent *>(data));
 }
 
@@ -169,9 +169,9 @@ napi_value JsFormAgent::RequestPublishForm(napi_env env, napi_callback_info info
 napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_value* argv)
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Agent.requestPublishForm", HISTOGRAM_BOOLEAN_SAMPLE);
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (env == nullptr || argc < ARGS_SIZE_ONE || argc > ARGS_SIZE_TWO) {
-        HILOG_ERROR("invalid argc");
+        HILOG_ERROR("[%{public}s] invalid argc", __FUNCTION__);
         NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
         return CreateJsUndefined(env);
     }
@@ -235,7 +235,7 @@ napi_value JsFormAgent::RequestPublishFormCrossDevice(napi_env env, napi_callbac
 
 napi_value JsFormAgent::OnGetAvailableFormHostServices(napi_env env, size_t argc, napi_value *argv)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (argc > ARGS_SIZE_ZERO) {
         HILOG_ERROR("invalid argc %{public}zu", argc);
         NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0");
@@ -261,7 +261,7 @@ napi_value JsFormAgent::OnGetAvailableFormHostServices(napi_env env, size_t argc
 
 napi_value JsFormAgent::OnRequestPublishFormCrossDevice(napi_env env, size_t argc, napi_value *argv)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
     if (argc < ARGS_SIZE_TWO) {
         NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
         return CreateJsUndefined(env);
@@ -376,7 +376,7 @@ bool JsFormAgent::ParseUpdateFormCrossBundleParams(napi_env env, size_t argc, na
     std::shared_ptr<UpdateFormCrossBundleCallbackInfo> &callbackInfo, napi_value &lastParam)
 {
     if (env == nullptr || argc < ARGS_SIZE_TWO) {
-        HILOG_ERROR("invalid argc");
+        HILOG_ERROR("[%{public}s] invalid argc", __FUNCTION__);
         NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
         return false;
     }
@@ -409,7 +409,7 @@ bool JsFormAgent::ParseUpdateFormCrossBundleParams(napi_env env, size_t argc, na
 napi_value JsFormAgent::OnUpdateFormCrossBundle(napi_env env, size_t argc, napi_value *argv)
 {
     FormHistogramUtils::ReportHistogramBoolean("Form.Agent.updateFormCrossBundle", HISTOGRAM_BOOLEAN_SAMPLE);
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s] call", __FUNCTION__);
 
     std::shared_ptr<UpdateFormCrossBundleCallbackInfo> asyncCallbackInfo;
     napi_value lastParam = nullptr;

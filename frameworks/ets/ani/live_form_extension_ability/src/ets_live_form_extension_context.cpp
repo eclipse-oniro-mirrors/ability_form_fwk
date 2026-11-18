@@ -64,7 +64,7 @@ using namespace OHOS::AppExecFwk;
 EtsLiveFormExtensionContext* EtsLiveFormExtensionContext::GetEtsLiveFormExtensionContext(ani_env *env, ani_object obj)
 {
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
         return nullptr;
     }
 
@@ -72,7 +72,7 @@ EtsLiveFormExtensionContext* EtsLiveFormExtensionContext::GetEtsLiveFormExtensio
     ani_status status = ANI_ERROR;
     ani_long etsContextLong = 0;
     if ((status = env->Object_GetFieldByName_Long(obj, "nativeEtsContext", &etsContextLong)) != ANI_OK) {
-        HILOG_ERROR("status:%{public}d", status);
+        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     etsContext = reinterpret_cast<EtsLiveFormExtensionContext *>(etsContextLong);
@@ -87,7 +87,7 @@ bool EtsLiveFormExtensionContext::CheckConnectionParam(ani_env *env, ani_object 
     sptr<EtsUIExtensionConnection> &connection, AAFwk::Want &want)
 {
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
         return false;
     }
     ani_type type = nullptr;
@@ -106,7 +106,7 @@ bool EtsLiveFormExtensionContext::CheckConnectionParam(ani_env *env, ani_object 
         return false;
     }
     if (res != ANI_TRUE) {
-        HILOG_ERROR("Failed to CheckConnectionParam");
+        HILOG_ERROR("[%{public}s] Failed to CheckConnectionParam", __FUNCTION__);
         return false;
     }
     connection->SetConnectionRef(connectOptionsObj);
@@ -130,9 +130,9 @@ bool EtsLiveFormExtensionContext::CheckConnectionParam(ani_env *env, ani_object 
 ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
     ani_env *env, std::shared_ptr<LiveFormExtensionContext> context)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s] called", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
         return nullptr;
     }
 
@@ -146,17 +146,17 @@ ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
     ani_method method = nullptr;
     ani_object contextObj = nullptr;
     if ((status = env->FindClass(LIVE_FORM_EXTENSION_CONTEXT, &cls)) != ANI_OK) {
-        HILOG_ERROR("status:%{public}d", status);
+        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     if ((status = env->Class_FindMethod(cls, "<ctor>", "l:", &method)) != ANI_OK) {
-        HILOG_ERROR("status:%{public}d", status);
+        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     std::unique_ptr<EtsLiveFormExtensionContext> etsContext = std::make_unique<EtsLiveFormExtensionContext>(context);
     if ((status = env->Object_New(cls, method, &contextObj, reinterpret_cast<ani_long>(etsContext.release()))) !=
         ANI_OK) {
-        HILOG_ERROR("status:%{public}d", status);
+        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
@@ -169,7 +169,7 @@ ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
             reinterpret_cast<void *>(EtsLiveFormExtensionContext::DisconnectServiceExtensionAbility) },
     };
     if ((status = env->Class_BindNativeMethods(cls, functions.data(), functions.size())) != ANI_OK) {
-        HILOG_ERROR("status:%{public}d", status);
+        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
 
@@ -185,7 +185,7 @@ ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
         return nullptr;
     }
     if (!EtsLiveFormExtensionContext::BindNativePtrCleaner(env)) {
-        HILOG_ERROR("status:%{public}d", status);
+        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
         delete workContext;
         return nullptr;
     }
@@ -210,7 +210,7 @@ ani_object EtsLiveFormExtensionContext::CreateEtsLiveFormExtensionContext(
 bool EtsLiveFormExtensionContext::BindNativePtrCleaner(ani_env *env)
 {
     if (env == nullptr) {
-        HILOG_ERROR("nullptr env");
+        HILOG_ERROR("[%{public}s] nullptr env", __FUNCTION__);
         return false;
     }
     ani_class cleanerCls;
@@ -224,7 +224,7 @@ bool EtsLiveFormExtensionContext::BindNativePtrCleaner(ani_env *env)
     };
     if ((status = env->Class_BindNativeMethods(cleanerCls, methods.data(), methods.size())) != ANI_OK
         && status != ANI_ALREADY_BINDED) {
-        HILOG_ERROR("status:%{public}d", status);
+        HILOG_ERROR("[%{public}s] status:%{public}d", __FUNCTION__, status);
         return false;
     }
     return true;
@@ -233,7 +233,7 @@ bool EtsLiveFormExtensionContext::BindNativePtrCleaner(ani_env *env)
 void EtsLiveFormExtensionContext::Clean(ani_env *env, ani_object object)
 {
     if (env == nullptr) {
-        HILOG_ERROR("nullptr env");
+        HILOG_ERROR("[%{public}s] nullptr env", __FUNCTION__);
         return;
     }
     ani_long ptr = 0;
@@ -250,9 +250,9 @@ void EtsLiveFormExtensionContext::Clean(ani_env *env, ani_object object)
 void EtsLiveFormExtensionContext::StartAbilityByLiveForm(ani_env *env, ani_object aniObj,
     ani_object aniWant, ani_string aniFormId, ani_object callback)
 {
-    HILOG_INFO("called");
+    HILOG_INFO("[%{public}s] called", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
         return;
     }
 
@@ -268,14 +268,14 @@ void EtsLiveFormExtensionContext::StartAbilityByLiveForm(ani_env *env, ani_objec
 void EtsLiveFormExtensionContext::OnStartAbilityByLiveForm(ani_env *env, ani_object aniWant,
     ani_string aniFormId, ani_object callback)
 {
-    HILOG_INFO("called");
+    HILOG_INFO("[%{public}s] called", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s] null env", __FUNCTION__);
         return;
     }
 
     if (context_.lock() == nullptr) {
-        HILOG_ERROR("Context is nullptr");
+        HILOG_ERROR("[%{public}s] Context is nullptr", __FUNCTION__);
         EtsErrorUtil::ThrowError(env,
             static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
             FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
@@ -295,7 +295,7 @@ void EtsLiveFormExtensionContext::OnStartAbilityByLiveForm(ani_env *env, ani_obj
 
     auto contextPtr = context_.lock();
     if (!contextPtr) {
-        HILOG_ERROR("Context is nullptr");
+        HILOG_ERROR("[%{public}s] Context is nullptr", __FUNCTION__);
         AsyncCallback(env, callback,
             EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
             FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)),
@@ -328,7 +328,7 @@ ani_long EtsLiveFormExtensionContext::ConnectServiceExtensionAbility(ani_env *en
 
     auto etsContext = GetEtsLiveFormExtensionContext(env, aniObj);
     if (etsContext == nullptr) {
-        HILOG_ERROR("null etsLiveFormExtensionContext");
+        HILOG_ERROR("[%{public}s] null etsLiveFormExtensionContext", __FUNCTION__);
         EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
         return FAILED_CODE;
     }
@@ -341,7 +341,7 @@ void EtsLiveFormExtensionContext::DisconnectServiceExtensionAbility(ani_env *env
     HILOG_DEBUG("DisconnectServiceExtensionAbility");
     auto etsContext = GetEtsLiveFormExtensionContext(env, aniObj);
     if (etsContext == nullptr) {
-        HILOG_ERROR("null etsLiveFormExtensionContext");
+        HILOG_ERROR("[%{public}s] null etsLiveFormExtensionContext", __FUNCTION__);
         return;
     }
     etsContext->OnDisconnectServiceExtensionAbility(env, aniObj, connectId, callback);
@@ -359,7 +359,7 @@ ani_long EtsLiveFormExtensionContext::OnConnectServiceExtensionAbility(ani_env *
     ani_status status = ANI_ERROR;
     auto context = context_.lock();
     if (context == nullptr) {
-        HILOG_ERROR("Context is nullptr");
+        HILOG_ERROR("[%{public}s] Context is nullptr", __FUNCTION__);
         EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
         return FAILED_CODE;
     }
@@ -377,12 +377,12 @@ ani_long EtsLiveFormExtensionContext::OnConnectServiceExtensionAbility(ani_env *
     }
     sptr<EtsUIExtensionConnection> connection = new (std::nothrow) EtsUIExtensionConnection(etsVm);
     if (connection == nullptr) {
-        HILOG_ERROR("null connection");
+        HILOG_ERROR("[%{public}s] null connection", __FUNCTION__);
         EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
         return FAILED_CODE;
     }
     if (!CheckConnectionParam(env, connectOptionsObj, connection, want)) {
-        HILOG_ERROR("Failed to CheckConnectionParam");
+        HILOG_ERROR("[%{public}s] Failed to CheckConnectionParam", __FUNCTION__);
         EtsFormErrorUtil::ThrowParamError(env, "Failed to CheckConnectionParam");
         return FAILED_CODE;
     }
@@ -410,7 +410,7 @@ void EtsLiveFormExtensionContext::OnDisconnectServiceExtensionAbility(ani_env *e
     ani_object aniObject = nullptr;
     auto context = context_.lock();
     if (context == nullptr) {
-        HILOG_ERROR("Context is nullptr");
+        HILOG_ERROR("[%{public}s] Context is nullptr", __FUNCTION__);
         EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
         AppExecFwk::AsyncCallback(env, callback, aniObject, nullptr);
         return;
@@ -431,7 +431,7 @@ void EtsLiveFormExtensionContext::OnDisconnectServiceExtensionAbility(ani_env *e
         if (!connection) {
             aniObject = EtsFormErrorUtil::CreateError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
             AppExecFwk::AsyncCallback(env, callback, aniObject, nullptr);
-            HILOG_ERROR("null connection");
+            HILOG_ERROR("[%{public}s] null connection", __FUNCTION__);
             return;
         }
 
