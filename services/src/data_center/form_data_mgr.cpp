@@ -2122,14 +2122,22 @@ bool FormDataMgr::CreateFormStateRecord(std::string &provider, const FormItemInf
 }
 
 bool FormDataMgr::CreateFormAcquireDataRecord(int64_t requestCode, const FormItemInfo &info,
-                                              const sptr<IRemoteObject> &callerToken, int callingUid)
+                                              const sptr<IRemoteObject> &callerToken, int callingUid,
+                                              const std::string &providerBundleName)
 {
     std::lock_guard<std::mutex> lock(formAcquireDataRecordMutex_);
     auto iter = formAcquireDataRecord_.find(requestCode);
     if (iter != formAcquireDataRecord_.end()) {
+        // Only the host owning the in-flight record may refresh it; cross-caller overwrite is rejected to keep
+        // the provider binding (used by CheckAcquireDataProvider) trustworthy.
+        if (iter->second.GetCallerUid() != callingUid) {
+            HILOG_ERROR("requestCode already owned by another caller");
+            return false;
+        }
         if (iter->second.GetFormHostClient() != callerToken) {
             iter->second.SetFormHostClient(callerToken);
         }
+        formAcquireDataProvider_.insert_or_assign(requestCode, providerBundleName);
         return true;
     }
 
@@ -2137,6 +2145,7 @@ bool FormDataMgr::CreateFormAcquireDataRecord(int64_t requestCode, const FormIte
     bool isCreated = CreateHostRecord(info, callerToken, callingUid, hostRecord);
     if (isCreated) {
         formAcquireDataRecord_.emplace(requestCode, hostRecord);
+        formAcquireDataProvider_.emplace(requestCode, providerBundleName);
         return true;
     }
 
@@ -2152,6 +2161,17 @@ void FormDataMgr::RemoveFormAcquireDataRecord(int64_t requestCode)
     }
     iter->second.CleanResource();
     formAcquireDataRecord_.erase(iter);
+    formAcquireDataProvider_.erase(requestCode);
+}
+ 
+bool FormDataMgr::CheckAcquireDataProvider(int64_t requestCode, const std::string &callerBundleName)
+{
+    std::lock_guard<std::mutex> lock(formAcquireDataRecordMutex_);
+    auto iter = formAcquireDataProvider_.find(requestCode);
+    if (iter == formAcquireDataProvider_.end()) {
+        return false;
+    }
+    return iter->second == callerBundleName;
 }
 
 ErrCode FormDataMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams, int64_t requestCode)
@@ -2165,6 +2185,7 @@ ErrCode FormDataMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams, in
     iter->second.OnAcquireFormData(wantParams, requestCode);
     iter->second.CleanResource();
     formAcquireDataRecord_.erase(iter);
+    formAcquireDataProvider_.erase(requestCode);
     return ERR_OK;
 }
 

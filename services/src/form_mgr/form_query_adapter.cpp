@@ -275,7 +275,11 @@ int FormQueryAdapter::AcquireFormData(int64_t formId, int64_t requestCode, const
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     FormItemInfo info;
-    FormDataMgr::GetInstance().CreateFormAcquireDataRecord(requestCode, info, callerToken, callingUid);
+    if (!FormDataMgr::GetInstance().CreateFormAcquireDataRecord(requestCode, info, callerToken, callingUid,
+        bundleName)) {
+        HILOG_ERROR("create acquire data record failed, requestCode may be owned by another caller");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     sptr<IAbilityConnection> connection =
         new (std::nothrow) FormAcquireDataConnection(formId, bundleName, abilityName, requestCode, userId);
     if (connection == nullptr) {

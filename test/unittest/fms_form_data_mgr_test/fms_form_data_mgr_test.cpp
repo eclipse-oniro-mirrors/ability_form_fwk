@@ -92,6 +92,8 @@ void FmsFormDataMgrTest::TearDown(void)
         FormDbCache::GetInstance().formDBInfos_.clear();
     }
     formDataMgr_.udidHash_ = 0;
+    formDataMgr_.formAcquireDataRecord_.clear();
+    formDataMgr_.formAcquireDataProvider_.clear();
 }
 
 void FmsFormDataMgrTest::InitFormItemInfo(int64_t formId, FormItemInfo &form_item_info, bool istemp)
@@ -3631,7 +3633,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormAcquireDataRecord_001,
     int64_t requestCode = 0;
     FormItemInfo info;
     int callingUid = 0;
-    bool result = formDataMgr_.CreateFormAcquireDataRecord(requestCode, info, nullptr, callingUid);
+    bool result = formDataMgr_.CreateFormAcquireDataRecord(requestCode, info, nullptr, callingUid,
+        FORM_BUNDLE_NAME);
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormAcquireDataRecord_001 end";
 }
@@ -3639,24 +3642,26 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormAcquireDataRecord_001,
 /**
  * @tc.number: FmsFormDataMgrTest_CreateFormAcquireDataRecord_002
  * @tc.name: CreateFormAcquireDataRecord
- * @tc.desc: Verify that the return value is correct.
+ * @tc.desc: Verify that the record and the provider binding are written atomically.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormAcquireDataRecord_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormAcquireDataRecord_002 start";
-    int64_t requestCode = 0;
+    int64_t requestCode = 200;
     FormItemInfo info;
     int callingUid = 0;
     FormHostRecord formHostRecord;
-    bool result = formDataMgr_.CreateFormAcquireDataRecord(requestCode, info, token_, callingUid);
+    bool result = formDataMgr_.CreateFormAcquireDataRecord(requestCode, info, token_, callingUid,
+        FORM_BUNDLE_NAME);
     EXPECT_EQ(result, true);
+    EXPECT_TRUE(formDataMgr_.CheckAcquireDataProvider(requestCode, FORM_BUNDLE_NAME));
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormAcquireDataRecord_002 end";
 }
 
 /**
  * @tc.number: FmsFormDataMgrTest_CreateFormAcquireDataRecord_003
  * @tc.name: CreateFormAcquireDataRecord
- * @tc.desc: Verify that the return value is correct.
+ * @tc.desc: Verify that the host owning an in-flight record may refresh it.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormAcquireDataRecord_003, TestSize.Level1)
 {
@@ -3666,9 +3671,29 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormAcquireDataRecord_003,
     int callingUid = 0;
     FormHostRecord formHostRecord;
     formDataMgr_.formAcquireDataRecord_.emplace(requestCode, formHostRecord);
-    bool result = formDataMgr_.CreateFormAcquireDataRecord(requestCode, info, nullptr, callingUid);
+    bool result = formDataMgr_.CreateFormAcquireDataRecord(requestCode, info, nullptr, callingUid,
+        FORM_BUNDLE_NAME);
     EXPECT_EQ(result, true);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormAcquireDataRecord_003 end";
+}
+ 
+/**
+ * @tc.number: FmsFormDataMgrTest_CreateFormAcquireDataRecord_004
+ * @tc.name: CreateFormAcquireDataRecord
+ * @tc.desc: Verify that a cross-caller overwrite of an in-flight record is rejected
+ *           and the original provider binding is kept.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormAcquireDataRecord_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormAcquireDataRecord_004 start";
+    int64_t requestCode = 206;
+    FormItemInfo info;
+    EXPECT_TRUE(formDataMgr_.CreateFormAcquireDataRecord(requestCode, info, token_, 100, FORM_BUNDLE_NAME));
+    EXPECT_FALSE(formDataMgr_.CreateFormAcquireDataRecord(requestCode, info, token_, 200,
+        "com.example.attacker"));
+    EXPECT_TRUE(formDataMgr_.CheckAcquireDataProvider(requestCode, FORM_BUNDLE_NAME));
+    EXPECT_FALSE(formDataMgr_.CheckAcquireDataProvider(requestCode, "com.example.attacker"));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormAcquireDataRecord_004 end";
 }
 
 /**
@@ -3701,6 +3726,85 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_AcquireFormDataBack_002, TestSiz
     auto result = formDataMgr_.AcquireFormDataBack(wantParams, requestCode);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_AcquireFormDataBack_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_CreateFormAcquireDataRecord_005
+ * @tc.name: CreateFormAcquireDataRecord
+ * @tc.desc: Verify that the host owning the record may refresh the provider binding.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormAcquireDataRecord_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormAcquireDataRecord_005 start";
+    int64_t requestCode = 201;
+    FormItemInfo info;
+    EXPECT_TRUE(formDataMgr_.CreateFormAcquireDataRecord(requestCode, info, token_, 100, FORM_BUNDLE_NAME));
+    EXPECT_TRUE(formDataMgr_.CreateFormAcquireDataRecord(requestCode, info, token_, 100,
+        "com.test.bundle2"));
+    EXPECT_TRUE(formDataMgr_.CheckAcquireDataProvider(requestCode, "com.test.bundle2"));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormAcquireDataRecord_005 end";
+}
+ 
+/**
+ * @tc.number: FmsFormDataMgrTest_CheckAcquireDataProvider_001
+ * @tc.name: CheckAcquireDataProvider
+ * @tc.desc: Verify that an unbound requestCode is rejected.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckAcquireDataProvider_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckAcquireDataProvider_001 start";
+    int64_t requestCode = 202;
+    EXPECT_FALSE(formDataMgr_.CheckAcquireDataProvider(requestCode, FORM_BUNDLE_NAME));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckAcquireDataProvider_001 end";
+}
+ 
+/**
+ * @tc.number: FmsFormDataMgrTest_CheckAcquireDataProvider_002
+ * @tc.name: CheckAcquireDataProvider
+ * @tc.desc: Verify that a caller which is not the queried provider is rejected.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckAcquireDataProvider_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckAcquireDataProvider_002 start";
+    int64_t requestCode = 203;
+    FormItemInfo info;
+    EXPECT_TRUE(formDataMgr_.CreateFormAcquireDataRecord(requestCode, info, token_, 100, FORM_BUNDLE_NAME));
+    EXPECT_FALSE(formDataMgr_.CheckAcquireDataProvider(requestCode, "com.example.attacker"));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckAcquireDataProvider_002 end";
+}
+ 
+/**
+ * @tc.number: FmsFormDataMgrTest_RemoveFormAcquireDataRecord_001
+ * @tc.name: RemoveFormAcquireDataRecord
+ * @tc.desc: Verify that removing the acquire data record also clears the provider binding.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_RemoveFormAcquireDataRecord_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_RemoveFormAcquireDataRecord_001 start";
+    int64_t requestCode = 204;
+    FormItemInfo info;
+    EXPECT_TRUE(formDataMgr_.CreateFormAcquireDataRecord(requestCode, info, token_, 100, FORM_BUNDLE_NAME));
+    EXPECT_TRUE(formDataMgr_.CheckAcquireDataProvider(requestCode, FORM_BUNDLE_NAME));
+    formDataMgr_.RemoveFormAcquireDataRecord(requestCode);
+    EXPECT_FALSE(formDataMgr_.CheckAcquireDataProvider(requestCode, FORM_BUNDLE_NAME));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_RemoveFormAcquireDataRecord_001 end";
+}
+ 
+/**
+ * @tc.number: FmsFormDataMgrTest_AcquireFormDataBack_003
+ * @tc.name: AcquireFormDataBack
+ * @tc.desc: Verify that delivering data back to the host also clears the provider binding.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_AcquireFormDataBack_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_AcquireFormDataBack_003 start";
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = 205;
+    FormItemInfo info;
+    EXPECT_TRUE(formDataMgr_.CreateFormAcquireDataRecord(requestCode, info, token_, 100, FORM_BUNDLE_NAME));
+    EXPECT_EQ(formDataMgr_.AcquireFormDataBack(wantParams, requestCode), ERR_OK);
+    EXPECT_FALSE(formDataMgr_.CheckAcquireDataProvider(requestCode, FORM_BUNDLE_NAME));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_AcquireFormDataBack_003 end";
 }
 
 /**

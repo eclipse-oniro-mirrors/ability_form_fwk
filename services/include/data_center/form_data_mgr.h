@@ -586,18 +586,28 @@ public:
     void DeleteInvalidPublishForms(int32_t userId, std::string bundleName, std::set<int64_t> &validFormIds);
 
     /**
-     * @brief Create form acquire data host record.
+     * @brief Create form acquire data host record and bind the queried provider atomically.
      * @param requestCode The request code of this acquire form.
      * @param info The form item info.
      * @param callerToken  Caller ability token.
      * @param callingUid The UID of the proxy.
-     * @return Returns true if this function is successfully called; returns false otherwise.
+     * @param providerBundleName The provider bundle queried by this request.
+     * @return Returns true if record and binding are written; returns false otherwise.
      */
     bool CreateFormAcquireDataRecord(int64_t requestCode, const FormItemInfo &info,
-                                     const sptr<IRemoteObject> &callerToken, int callingUid);
+                                     const sptr<IRemoteObject> &callerToken, int callingUid,
+                                     const std::string &providerBundleName);
+ 
+    /**
+     * @brief Check whether the acquire-data result caller is the queried provider.
+     * @param requestCode The request code of this acquire form.
+     * @param callerBundleName The bundle name of the result caller.
+     * @return Returns true if the caller is the queried provider; returns false otherwise.
+     */
+    bool CheckAcquireDataProvider(int64_t requestCode, const std::string &callerBundleName);
 
     /**
-     * @brief Remove the acquire data host record on connection failure.
+     * @brief Remove the acquire data host record and provider binding on connection failure.
      * @param requestCode The request code of this acquire form.
      */
     void RemoveFormAcquireDataRecord(int64_t requestCode);
@@ -1371,6 +1381,7 @@ private:
     std::map<std::string, FormHostRecord> formStateRecord_;
     std::map<std::string, std::vector<sptr<IRemoteObject>>> formAddObservers_;
     std::unordered_map<int64_t, FormHostRecord> formAcquireDataRecord_;
+    std::unordered_map<int64_t, std::string> formAcquireDataProvider_;
     using FormRequestPublishFormInfo = std::pair<Want, std::unique_ptr<FormProviderData>>;
     std::map<int64_t, FormRequestPublishFormInfo> formRequestPublishForms_;
     std::atomic<int64_t> udidHash_ = 0;

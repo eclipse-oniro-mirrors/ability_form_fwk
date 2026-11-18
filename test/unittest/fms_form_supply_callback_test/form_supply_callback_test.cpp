@@ -134,7 +134,7 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0017, TestSize.Lev
 
 /**
  * @tc.name: FormAcquireConnectionTest_0018
- * @tc.desc: Test OnEventHandle function.
+ * @tc.desc: Test OnEventHandle returns NOT_SELF and has zero side effect when connectId is not registered.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0018, TestSize.Level0)
@@ -142,8 +142,9 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0018, TestSize.Lev
     HILOG_INFO("FormAcquireConnectionTest_0018 start");
     Want want;
     want.SetParam(Constants::PROVIDER_FLAG, ERR_APPEXECFWK_PARCEL_ERROR);
+    want.SetParam(Constants::FORM_CONNECT_ID, 0);
     FormSupplyCallback formSupplyCallback;
-    EXPECT_EQ(formSupplyCallback.OnEventHandle(want), ERR_OK);
+    EXPECT_EQ(formSupplyCallback.OnEventHandle(want), ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
 
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0018 end";
 }
@@ -168,7 +169,7 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0019, TestSize.Lev
 
 /**
  * @tc.name: FormAcquireConnectionTest_0020
- * @tc.desc: Test OnAcquireDataResult function.
+ * @tc.desc: Test OnAcquireDataResult returns ERR_OK when caller is the queried provider.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0020, TestSize.Level0)
@@ -177,9 +178,38 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0020, TestSize.Lev
     AAFwk::WantParams wantParams;
     int64_t requestCode = 102;
     FormSupplyCallback formSupplyCallback;
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>("com.example.provider"), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormDataMgr::obj, CheckAcquireDataProvider(requestCode, _))
+        .Times(1)
+        .WillOnce(Return(true));
     EXPECT_EQ(formSupplyCallback.OnAcquireDataResult(wantParams, requestCode), ERR_OK);
 
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0020 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0021
+ * @tc.desc: Test OnAcquireDataResult rejects when caller is not the queried provider.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0021, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0021 start");
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = 103;
+    FormSupplyCallback formSupplyCallback;
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<0>("com.example.attacker"), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormDataMgr::obj, CheckAcquireDataProvider(requestCode, _))
+        .Times(1)
+        .WillOnce(Return(false));
+    EXPECT_EQ(formSupplyCallback.OnAcquireDataResult(wantParams, requestCode),
+        ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+ 
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0021 end";
 }
 
 /**
@@ -214,6 +244,7 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormOnRecycleFormTest_0001, TestSize.Level0)
     int64_t formId = 102;
     Want want;
     FormSupplyCallback formSupplyCallback;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _)).WillRepeatedly(Return(true));
     EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
 
     want.SetParam(Constants::FORM_STATUS_DATA, std::to_string(formId));
@@ -245,6 +276,7 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormOnRecycleFormTest_0002, TestSize.Level0)
     int64_t formId = 102;
     Want want;
     FormSupplyCallback formSupplyCallback;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _)).WillRepeatedly(Return(true));
     want.SetParam(Constants::FORM_STATUS_DATA, std::to_string(formId));
     EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_OK);
 
@@ -707,6 +739,156 @@ HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_OnAcquire_OwnsForm
     EXPECT_EQ(FormSupplyCallback().OnAcquire(formProviderInfo, MakeAcquireWant("100")),
         ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
     GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquire_OwnsForm_004 end";
+}
+
+namespace {
+class TestFormAbilityConnection : public FormAbilityConnection {
+public:
+    void OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject) override {}
+};
+ 
+void EmulateRegisteredConnection(FormSupplyCallback &callback, int32_t connectId)
+{
+    sptr<TestFormAbilityConnection> connection = new (std::nothrow) TestFormAbilityConnection();
+    ASSERT_NE(connection, nullptr);
+    connection->bundleName_ = TEST_OWNER_BUNDLE;
+    callback.connections_.emplace(connectId, connection);
+}
+} // namespace
+ 
+/**
+ * @tc.name: FormAcquireConnectionTest_0023
+ * @tc.desc: OnEventHandle rejects registered connection when GetCallerBundleName fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0023, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0023 start";
+    Want want;
+    int32_t connectId = 301;
+    want.SetParam(Constants::FORM_CONNECT_ID, connectId);
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+    FormSupplyCallback formSupplyCallback;
+    EmulateRegisteredConnection(formSupplyCallback, connectId);
+    EXPECT_EQ(formSupplyCallback.OnEventHandle(want), ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    // Rejection path keeps the connection untouched.
+    EXPECT_EQ(formSupplyCallback.connections_.size(), 1u);
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0023 end";
+}
+ 
+/**
+ * @tc.name: FormAcquireConnectionTest_0024
+ * @tc.desc: OnEventHandle rejects registered connection when caller is not the connection owner.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0024, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0024 start";
+    Want want;
+    int32_t connectId = 302;
+    want.SetParam(Constants::FORM_CONNECT_ID, connectId);
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::string("com.example.attacker")), Return(ERR_OK)));
+    FormSupplyCallback formSupplyCallback;
+    EmulateRegisteredConnection(formSupplyCallback, connectId);
+    EXPECT_EQ(formSupplyCallback.OnEventHandle(want), ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+    // Rejection path keeps the connection untouched.
+    EXPECT_EQ(formSupplyCallback.connections_.size(), 1u);
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0024 end";
+}
+ 
+/**
+ * @tc.name: FormAcquireConnectionTest_0025
+ * @tc.desc: OnEventHandle removes the connection when caller owns it.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0025, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0025 start";
+    Want want;
+    int32_t connectId = 303;
+    want.SetParam(Constants::FORM_CONNECT_ID, connectId);
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(TEST_OWNER_BUNDLE), Return(ERR_OK)));
+    FormSupplyCallback formSupplyCallback;
+    EmulateRegisteredConnection(formSupplyCallback, connectId);
+    EXPECT_EQ(formSupplyCallback.OnEventHandle(want), ERR_OK);
+    // Owner path tears the connection down.
+    EXPECT_EQ(formSupplyCallback.connections_.size(), 0u);
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0025 end";
+}
+ 
+/**
+ * @tc.name: FmsFormSupplyCallbackTest_OnAcquireDataResult_002
+ * @tc.desc: OnAcquireDataResult rejects before provider binding check when GetCallerBundleName fails.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_OnAcquireDataResult_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquireDataResult_002 start";
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = 104;
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BMS_FAILED));
+    EXPECT_CALL(*MockFormDataMgr::obj, CheckAcquireDataProvider(_, _)).Times(0);
+    EXPECT_EQ(FormSupplyCallback().OnAcquireDataResult(wantParams, requestCode),
+        ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnAcquireDataResult_002 end";
+}
+ 
+/**
+ * @tc.name: FmsFormSupplyCallbackTest_OnRenderingBlock_001
+ * @tc.desc: OnRenderingBlock rejects empty bundleName.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_OnRenderingBlock_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnRenderingBlock_001 start";
+    EXPECT_EQ(FormSupplyCallback().OnRenderingBlock(""), ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnRenderingBlock_001 end";
+}
+ 
+/**
+ * @tc.name: FmsFormSupplyCallbackTest_OnRenderingBlock_002
+ * @tc.desc: OnRenderingBlock accepts valid bundleName.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FmsFormSupplyCallbackTest_OnRenderingBlock_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnRenderingBlock_002 start";
+    EXPECT_EQ(FormSupplyCallback().OnRenderingBlock(TEST_OWNER_BUNDLE), ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormSupplyCallbackTest_OnRenderingBlock_002 end";
+}
+ 
+/**
+ * @tc.name: FormOnRecycleFormTest_0003
+ * @tc.desc: OnRecycleForm rejects non-positive formId without querying the record.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormOnRecycleFormTest_0003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormOnRecycleFormTest_0003 start";
+    Want want;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(_, _)).Times(0);
+    EXPECT_EQ(FormSupplyCallback().OnRecycleForm(0, want), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    EXPECT_EQ(FormSupplyCallback().OnRecycleForm(-1, want), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "FormOnRecycleFormTest_0003 end";
+}
+ 
+/**
+ * @tc.name: FormOnRecycleFormTest_0004
+ * @tc.desc: OnRecycleForm rejects formId whose record does not exist.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormOnRecycleFormTest_0004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormOnRecycleFormTest_0004 start";
+    int64_t formId = 102;
+    Want want;
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(formId, _)).WillOnce(Return(false));
+    EXPECT_EQ(FormSupplyCallback().OnRecycleForm(formId, want), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    GTEST_LOG_(INFO) << "FormOnRecycleFormTest_0004 end";
 }
 
 }
