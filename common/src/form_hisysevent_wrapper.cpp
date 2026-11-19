@@ -192,7 +192,7 @@ void FormHiSysEventBuilder::InsertParam(const std::string &key, const std::vecto
         errno_t ret = memcpy_s(buffer.get(), values.size() * sizeof(int64_t),
             values.data(), values.size() * sizeof(int64_t));
         if (ret != EOK) {
-            HILOG_ERROR("memcpy_s failed,ret=%{public}d", ret);
+            HILOG_ERROR("[%{public}s]memcpy_s failed,ret=%{public}d", __FUNCTION__, ret);
             return;
         }
         param.v.array = static_cast<void*>(buffer.get());
@@ -216,7 +216,7 @@ void FormHiSysEventBuilder::InsertParam(const std::string &key, const std::vecto
         errno_t ret = memcpy_s(buffer.get(), values.size() * sizeof(uint64_t),
             values.data(), values.size() * sizeof(uint64_t));
         if (ret != EOK) {
-            HILOG_ERROR("memcpy_s failed,ret=%{public}d", ret);
+            HILOG_ERROR("[%{public}s]memcpy_s failed,ret=%{public}d", __FUNCTION__, ret);
             return;
         }
         param.v.array = static_cast<void*>(buffer.get());
@@ -240,7 +240,7 @@ void FormHiSysEventBuilder::InsertParam(const std::string &key, const std::vecto
         errno_t ret = memcpy_s(buffer.get(), values.size() * sizeof(int32_t),
             values.data(), values.size() * sizeof(int32_t));
         if (ret != EOK) {
-            HILOG_ERROR("memcpy_s failed,ret=%{public}d", ret);
+            HILOG_ERROR("[%{public}s]memcpy_s failed,ret=%{public}d", __FUNCTION__, ret);
             return;
         }
         param.v.array = static_cast<void*>(buffer.get());
@@ -264,7 +264,7 @@ void FormHiSysEventBuilder::InsertParam(const std::string &key, const std::vecto
         errno_t ret = memcpy_s(buffer.get(), values.size() * sizeof(uint32_t),
             values.data(), values.size() * sizeof(uint32_t));
         if (ret != EOK) {
-            HILOG_ERROR("memcpy_s failed,ret=%{public}d", ret);
+            HILOG_ERROR("[%{public}s]memcpy_s failed,ret=%{public}d", __FUNCTION__, ret);
             return;
         }
         param.v.array = static_cast<void*>(buffer.get());
@@ -288,7 +288,7 @@ void FormHiSysEventBuilder::InsertParam(const std::string &key, const std::vecto
         errno_t ret = memcpy_s(buffer.get(), values.size() * sizeof(uint8_t),
             values.data(), values.size() * sizeof(uint8_t));
         if (ret != EOK) {
-            HILOG_ERROR("memcpy_s failed,ret=%{public}d", ret);
+            HILOG_ERROR("[%{public}s]memcpy_s failed,ret=%{public}d", __FUNCTION__, ret);
             return;
         }
         param.v.array = static_cast<void*>(buffer.get());

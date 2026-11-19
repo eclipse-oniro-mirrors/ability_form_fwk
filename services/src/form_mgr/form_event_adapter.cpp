@@ -151,7 +151,7 @@ FormEventAdapter::~FormEventAdapter()
 int FormEventAdapter::MessageEvent(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (formId <= 0 || callerToken == nullptr) {
         HILOG_ERROR("invalid formId or null callerToken formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -166,7 +166,7 @@ int FormEventAdapter::MessageEvent(const int64_t formId, const Want &want,
     FormRecord record;
     bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!bGetRecord) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64, matchedFormId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64, __FUNCTION__, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
@@ -230,9 +230,9 @@ int FormEventAdapter::CheckRouterUriUnique(const std::string &uri, const int32_t
 int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (formId <= 0) {
-        HILOG_ERROR("invalid formId or bundleName");
+        HILOG_ERROR("[%{public}s]invalid formId or bundleName", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -250,13 +250,13 @@ int FormEventAdapter::RouterEvent(const int64_t formId, Want &want,
     FormRecord record;
     bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!bGetRecord) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64, matchedFormId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64, __FUNCTION__, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
     {
         if (!FormBmsHelper::GetInstance().IsBundleMgrValid()) {
-            HILOG_ERROR("get bundleMgr failed");
+            HILOG_ERROR("[%{public}s]get bundleMgr failed", __FUNCTION__);
             return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
         }
     }
@@ -347,9 +347,9 @@ int32_t FormEventAdapter::StartAbilityForRouter(const int64_t formId, Want &want
 int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (formId <= 0) {
-        HILOG_ERROR("invalid formId or bundleName");
+        HILOG_ERROR("[%{public}s]invalid formId or bundleName", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -357,13 +357,13 @@ int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
     FormRecord record;
     bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!bGetRecord) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64 "", matchedFormId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64 "", __FUNCTION__, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
     {
         if (!FormBmsHelper::GetInstance().IsBundleMgrValid()) {
-            HILOG_ERROR("get bundleMgr failed");
+            HILOG_ERROR("[%{public}s]get bundleMgr failed", __FUNCTION__);
             return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
         }
     }
@@ -413,7 +413,7 @@ int FormEventAdapter::BackgroundEvent(const int64_t formId, Want &want,
 int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (formId <= 0) {
         HILOG_ERROR("invalid formId");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -421,7 +421,7 @@ int FormEventAdapter::InsightIntentEvent(const int64_t formId, Want &want,
     const int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     FormRecord record;
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64 "", matchedFormId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64 "", __FUNCTION__, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     if (!record.isSystemApp) {
@@ -526,7 +526,7 @@ bool FormEventAdapter::OpenByOpenType(const int32_t openType, const FormRecord &
 void FormEventAdapter::NotifyFormClickEvent(int64_t formId, const std::string &formClickType,
     const int32_t userId)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     RunningFormInfo runningFormInfo;
     auto ref = FormDataMgr::GetInstance().GetRunningFormInfosByFormId(formId, runningFormInfo, userId);

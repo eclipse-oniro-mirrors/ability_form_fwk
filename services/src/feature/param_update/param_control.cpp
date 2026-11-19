@@ -355,11 +355,11 @@ std::vector<ParamCtrl> ParamControl::GetCompareDisableCtrls(const bool isApply)
 void ParamControl::ExecUpdateDurationCtrl(const bool isApply, const std::vector<ParamCtrl> &paramCtrls,
     const bool isAppUpgrade)
 {
-    HILOG_INFO("call,isApply:%{public}d,isAppUpgrade:%{public}d", isApply, isAppUpgrade);
+    HILOG_INFO("[%{public}s]call,isApply:%{public}d,isAppUpgrade:%{public}d", __FUNCTION__, isApply, isAppUpgrade);
     for (const auto &item : paramCtrls) {
         std::vector<FormRecord> formRecords;
         if (!FormDataMgr::GetInstance().GetFormRecord(item.bundleName, item.moduleName, formRecords)) {
-            HILOG_WARN("can not find form record");
+            HILOG_WARN("[%{public}s]can not find form record", __FUNCTION__);
             continue;
         }
 
@@ -387,14 +387,14 @@ void ParamControl::ExecUpdateDurationCtrl(const bool isApply, const std::vector<
 void ParamControl::ExecDisableCtrl(const bool isApply, const std::vector<ParamCtrl> &paramCtrls,
     const bool isAppUpgrade)
 {
-    HILOG_INFO("call,isApply:%{public}d,isAppUpgrade:%{public}d", isApply, isAppUpgrade);
+    HILOG_INFO("[%{public}s]call,isApply:%{public}d,isAppUpgrade:%{public}d", __FUNCTION__, isApply, isAppUpgrade);
     std::vector<ParamCtrl> compareCtrls = GetCompareDisableCtrls(isApply);
     std::vector<FormRecord> disableFormRecords;
     std::vector<FormRecord> removeFormRecords;
     for (const auto &item : paramCtrls) {
         std::vector<FormRecord> formRecords;
         if (!FormDataMgr::GetInstance().GetFormRecord(item.bundleName, item.moduleName, formRecords)) {
-            HILOG_WARN("can not find form record");
+            HILOG_WARN("[%{public}s]can not find form record", __FUNCTION__);
             continue;
         }
 

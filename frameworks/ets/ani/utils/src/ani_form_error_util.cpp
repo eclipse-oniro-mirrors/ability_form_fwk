@@ -85,7 +85,7 @@ std::string CreateParamTypeErrorMessage(const std::string &paramName, const std:
 bool EtsFormErrorUtil::ThrowParamError(ani_env *env, const std::string &extraMessage)
 {
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return false;
     }
     std::string errorMessage = "Parameter error. " + extraMessage;
@@ -95,7 +95,7 @@ bool EtsFormErrorUtil::ThrowParamError(ani_env *env, const std::string &extraMes
 bool EtsFormErrorUtil::ThrowByInternalErrorCode(ani_env *env, int32_t internalErrorCode)
 {
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return false;
     }
     int32_t externalErrorCode = 0;
@@ -107,7 +107,7 @@ bool EtsFormErrorUtil::ThrowByInternalErrorCode(ani_env *env, int32_t internalEr
 bool EtsFormErrorUtil::ThrowByExternalErrorCode(ani_env *env, int32_t externalErrorCode)
 {
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return false;
     }
     std::string externalErrorMessage = FormMgr::GetInstance().GetErrorMsgByExternalErrorCode(externalErrorCode);
@@ -117,7 +117,7 @@ bool EtsFormErrorUtil::ThrowByExternalErrorCode(ani_env *env, int32_t externalEr
 bool EtsFormErrorUtil::ThrowParamTypeError(ani_env *env, const std::string &paramName, const std::string &type)
 {
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return false;
     }
     return Throw(env, ERR_FORM_EXTERNAL_PARAM_INVALID, CreateParamTypeErrorMessage(paramName, type));
@@ -126,7 +126,7 @@ bool EtsFormErrorUtil::ThrowParamTypeError(ani_env *env, const std::string &para
 bool EtsFormErrorUtil::Throw(ani_env *env, int32_t errCode, const std::string &errMessage)
 {
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return false;
     }
     ani_object err = CreateError(env, errCode, errMessage);
@@ -141,7 +141,7 @@ bool EtsFormErrorUtil::Throw(ani_env *env, int32_t errCode, const std::string &e
 ani_object EtsFormErrorUtil::CreateErrorByInternalErrorCode(ani_env *env, int32_t internalErrorCode)
 {
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return nullptr;
     }
     int32_t externalErrorCode = 0;
@@ -153,18 +153,18 @@ ani_object EtsFormErrorUtil::CreateErrorByInternalErrorCode(ani_env *env, int32_
 ani_object EtsFormErrorUtil::CreateError(ani_env *env, ani_int code, const std::string &msg)
 {
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return nullptr;
     }
     ani_status status = ANI_ERROR;
     ani_class cls = nullptr;
     if ((status = env->FindClass(BUSINESS_ERROR_CLASS, &cls)) != ANI_OK) {
-        HILOG_ERROR("FindClass failed %{public}d", status);
+        HILOG_ERROR("[%{public}s]FindClass failed %{public}d", __FUNCTION__, status);
         return nullptr;
     }
     ani_method method = nullptr;
     if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &method)) != ANI_OK) {
-        HILOG_ERROR("Class_FindMethod failed %{public}d", status);
+        HILOG_ERROR("[%{public}s]Class_FindMethod failed %{public}d", __FUNCTION__, status);
         return nullptr;
     }
     ani_object error = EtsFormErrorUtil::WrapError(env, msg);
@@ -174,7 +174,7 @@ ani_object EtsFormErrorUtil::CreateError(ani_env *env, ani_int code, const std::
     }
     ani_object obj = nullptr;
     if ((status = env->Object_New(cls, method, &obj, code, error)) != ANI_OK) {
-        HILOG_ERROR("Object_New failed %{public}d", status);
+        HILOG_ERROR("[%{public}s]Object_New failed %{public}d", __FUNCTION__, status);
         return nullptr;
     }
     return obj;
@@ -183,7 +183,7 @@ ani_object EtsFormErrorUtil::CreateError(ani_env *env, ani_int code, const std::
 ani_object EtsFormErrorUtil::CreateError(ani_env *env, const ErrCode &err)
 {
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return nullptr;
     }
     return CreateError(env, static_cast<int32_t>(err), QueryRetMsg(err));
@@ -202,7 +202,7 @@ std::string EtsFormErrorUtil::QueryRetMsg(int32_t errorCode)
 ani_object EtsFormErrorUtil::WrapError(ani_env *env, const std::string &msg)
 {
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return nullptr;
     }
     ani_status status = ANI_ERROR;
@@ -218,18 +218,18 @@ ani_object EtsFormErrorUtil::WrapError(ani_env *env, const std::string &msg)
     }
     ani_class cls = nullptr;
     if ((status = env->FindClass(ERROR_CLASS_NAME, &cls)) != ANI_OK) {
-        HILOG_ERROR("FindClass failed %{public}d", status);
+        HILOG_ERROR("[%{public}s]FindClass failed %{public}d", __FUNCTION__, status);
         return nullptr;
     }
     ani_method method = nullptr;
     if ((status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{escompat.ErrorOptions}:", &method)) !=
         ANI_OK) {
-        HILOG_ERROR("Class_FindMethod failed %{public}d", status);
+        HILOG_ERROR("[%{public}s]Class_FindMethod failed %{public}d", __FUNCTION__, status);
         return nullptr;
     }
     ani_object obj = nullptr;
     if ((status = env->Object_New(cls, method, &obj, aniMsg, undefRef)) != ANI_OK) {
-        HILOG_ERROR("Object_New failed %{public}d", status);
+        HILOG_ERROR("[%{public}s]Object_New failed %{public}d", __FUNCTION__, status);
         return nullptr;
     }
     return obj;

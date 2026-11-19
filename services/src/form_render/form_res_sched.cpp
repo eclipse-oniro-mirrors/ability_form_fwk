@@ -54,12 +54,12 @@ FormResSched::FormResSched(int32_t userId) : userId_(userId)
 
 FormResSched::~FormResSched()
 {
-    HILOG_INFO("Call");
+    HILOG_INFO("[%{public}s]Call", __FUNCTION__);
 }
 
 void FormResSched::ReportFormLayoutStart()
 {
-    HILOG_INFO("Call");
+    HILOG_INFO("[%{public}s]Call", __FUNCTION__);
     if (pid_ <= 0 || uid_ <= 0) {
         return;
     }
@@ -68,7 +68,7 @@ void FormResSched::ReportFormLayoutStart()
 
 void FormResSched::ReportFormLayoutEnd()
 {
-    HILOG_INFO("Call");
+    HILOG_INFO("[%{public}s]Call", __FUNCTION__);
     if (pid_ <= 0 || uid_ <= 0) {
         return;
     }

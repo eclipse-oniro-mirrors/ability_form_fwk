@@ -65,15 +65,15 @@ void FormDbCache::Start()
  */
 ErrCode FormDbCache::SaveFormInfo(const FormDBInfo &formDBInfo)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formDBInfo.formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formDBInfo.formId);
     FormDBInfo tmpInfo;
     if (FindAndSaveFormDBInfoCache(formDBInfo, tmpInfo)) {
         if (tmpInfo.Compare(formDBInfo) == false) {
-            HILOG_WARN("need update,formId[%{public}" PRId64 "]", formDBInfo.formId);
+            HILOG_WARN("[%{public}s]need update,formId[%{public}" PRId64 "]", __FUNCTION__, formDBInfo.formId);
             InnerFormInfo innerFormInfo(formDBInfo);
             return FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormData(innerFormInfo);
         } else {
-            HILOG_WARN("already exist,formId[%{public}" PRId64 "].", formDBInfo.formId);
+            HILOG_WARN("[%{public}s]already exist,formId[%{public}" PRId64 "].", __FUNCTION__, formDBInfo.formId);
             return ERR_OK;
         }
     } else {
@@ -89,16 +89,16 @@ ErrCode FormDbCache::SaveFormInfo(const FormDBInfo &formDBInfo)
  */
 ErrCode FormDbCache::SaveFormInfoNolock(const FormDBInfo &formDBInfo)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formDBInfo.formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formDBInfo.formId);
     auto iter = find(formDBInfos_.begin(), formDBInfos_.end(), formDBInfo);
     if (iter != formDBInfos_.end()) {
         if (iter->Compare(formDBInfo) == false) {
-            HILOG_WARN("need update,formId[%{public}" PRId64 "].", formDBInfo.formId);
+            HILOG_WARN("[%{public}s]need update,formId[%{public}" PRId64 "].", __FUNCTION__, formDBInfo.formId);
             *iter = formDBInfo;
             InnerFormInfo innerFormInfo(formDBInfo);
             return FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormData(innerFormInfo);
         } else {
-            HILOG_WARN("already exist,formId[%{public}" PRId64 "].", formDBInfo.formId);
+            HILOG_WARN("[%{public}s]already exist,formId[%{public}" PRId64 "].", __FUNCTION__, formDBInfo.formId);
             return ERR_OK;
         }
     } else {
@@ -153,7 +153,7 @@ void FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, cons
  */
 void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     formDBInfos = formDBInfos_;
 }
@@ -201,7 +201,7 @@ ErrCode FormDbCache::GetDBRecord(const int64_t formId, FormRecord &record) const
             return ERR_OK;
         }
     }
-    HILOG_ERROR("not find formId[%{public}" PRId64 "]", formId);
+    HILOG_ERROR("[%{public}s]not find formId[%{public}" PRId64 "]", __FUNCTION__, formId);
     return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
 }
 /**
@@ -219,7 +219,7 @@ ErrCode FormDbCache::GetDBRecord(const int64_t formId, FormDBInfo &record) const
             return ERR_OK;
         }
     }
-    HILOG_ERROR("not find formId[%{public}" PRId64 "]", formId);
+    HILOG_ERROR("[%{public}s]not find formId[%{public}" PRId64 "]", __FUNCTION__, formId);
     return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
 }
 
@@ -450,7 +450,7 @@ ErrCode FormDbCache::DeleteInvalidDBForms(int32_t userId, int32_t callingUid, st
 #ifdef THEME_MGR_ENABLE
 void FormDbCache::DeleteThemeForms(std::map<int64_t, bool> &removedFormsMap)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::vector<int64_t> removeList;
     for (const auto &element : removedFormsMap) {
         FormDBInfo dbInfo;
@@ -565,7 +565,7 @@ int FormDbCache::GetFormCountsByCallingUid(const int32_t currentAccountId, const
  */
 int32_t FormDbCache::GetAllFormInfoSize()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     return static_cast<int32_t>(formDBInfos_.size());
 }

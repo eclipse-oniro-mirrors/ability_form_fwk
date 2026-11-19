@@ -68,7 +68,7 @@ int32_t ThemeFormClient::AddForm(const FormNotifyInfo& info)
 {
     auto proxy = GetProxy();
     if (!proxy) {
-        HILOG_ERROR("GetProxy failed");
+        HILOG_ERROR("[%{public}s]GetProxy failed", __FUNCTION__);
         return THEME_NULLPTR;
     }
 
@@ -94,7 +94,7 @@ int32_t ThemeFormClient::DeleteForms(const vector<int64_t> &formIds)
 {
     auto proxy = GetProxy();
     if (!proxy) {
-        HILOG_ERROR("GetProxy failed");
+        HILOG_ERROR("[%{public}s]GetProxy failed", __FUNCTION__);
         return THEME_NULLPTR;
     }
 
@@ -204,7 +204,7 @@ ErrCode ThemeFormServiceProxy::AddForm(const ThemeManagerThemeFormInfoByParcel& 
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        HILOG_ERROR("write token failed");
+        HILOG_ERROR("[%{public}s]write token failed", __FUNCTION__);
         return ERR_FAILED;
     }
 
@@ -217,7 +217,7 @@ ErrCode ThemeFormServiceProxy::AddForm(const ThemeManagerThemeFormInfoByParcel& 
     MessageParcel reply;
     auto remote = Remote();
     if (remote == nullptr) {
-        HILOG_ERROR("get Remote failed");
+        HILOG_ERROR("[%{public}s]get Remote failed", __FUNCTION__);
         return ERR_FAILED;
     }
 
@@ -226,7 +226,7 @@ ErrCode ThemeFormServiceProxy::AddForm(const ThemeManagerThemeFormInfoByParcel& 
         static_cast<uint32_t>(IThemeManagerServiceIpcCode::COMMAND_ADD_FORM), data, reply, option);
     IPCSkeleton::SetCallingIdentity(originId);
     if (ret != ERR_NONE) {
-        HILOG_ERROR("SendRequest error,ret = %{public}d", ret);
+        HILOG_ERROR("[%{public}s]SendRequest error,ret = %{public}d", __FUNCTION__, ret);
         return ERR_FAILED;
     }
 
@@ -237,7 +237,7 @@ ErrCode ThemeFormServiceProxy::DeleteForm(const vector<long> &formIds)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        HILOG_ERROR("write token failed");
+        HILOG_ERROR("[%{public}s]write token failed", __FUNCTION__);
         return ERR_FAILED;
     }
 
@@ -250,7 +250,7 @@ ErrCode ThemeFormServiceProxy::DeleteForm(const vector<long> &formIds)
     MessageParcel reply;
     auto remote = Remote();
     if (remote == nullptr) {
-        HILOG_ERROR("get Remote failed");
+        HILOG_ERROR("[%{public}s]get Remote failed", __FUNCTION__);
         return ERR_FAILED;
     }
     std::string originId = IPCSkeleton::ResetCallingIdentity();
@@ -258,7 +258,7 @@ ErrCode ThemeFormServiceProxy::DeleteForm(const vector<long> &formIds)
         static_cast<uint32_t>(IThemeManagerServiceIpcCode::COMMAND_DELETE_FORM), data, reply, option);
     IPCSkeleton::SetCallingIdentity(originId);
     if (ret != ERR_NONE) {
-        HILOG_ERROR("SendRequest error,ret = %{public}d", ret);
+        HILOG_ERROR("[%{public}s]SendRequest error,ret = %{public}d", __FUNCTION__, ret);
         return ERR_FAILED;
     }
 

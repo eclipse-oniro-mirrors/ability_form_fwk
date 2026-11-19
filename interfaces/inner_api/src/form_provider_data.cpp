@@ -54,7 +54,7 @@ FormProviderData::FormProviderData()
 FormProviderData::FormProviderData(nlohmann::json &jsonData)
 {
     if (!jsonData.is_object()) {
-        HILOG_ERROR("jsonData not object");
+        HILOG_ERROR("[%{public}s]jsonData not object", __FUNCTION__);
         return;
     }
     jsonFormProviderData_ = jsonData;
@@ -95,7 +95,7 @@ FormProviderData::FormProviderData(std::string jsonDataString, bool isUsedInFRS)
 void FormProviderData::UpdateData(nlohmann::json &jsonData)
 {
     if (!jsonData.is_object()) {
-        HILOG_ERROR("jsonData not object");
+        HILOG_ERROR("[%{public}s]jsonData not object", __FUNCTION__);
         return;
     }
     jsonFormProviderData_ = jsonData;
@@ -252,7 +252,7 @@ void FormProviderData::SetDataString(std::string &jsonDataString)
     }
     nlohmann::json jsonObject = SafeJsonParse(jsonDataString, false);
     if (jsonObject.is_discarded()) {
-        HILOG_ERROR("fail parse jsonDataString:%{private}s", jsonDataString.c_str());
+        HILOG_ERROR("[%{public}s]fail parse jsonDataString:%{private}s", __FUNCTION__, jsonDataString.c_str());
         return;
     }
     if (!jsonObject.is_object()) {
@@ -350,13 +350,13 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
     }
     nlohmann::json jsonObject = SafeJsonParse(jsonDataString, false);
     if (jsonObject.is_discarded()) {
-        HILOG_ERROR("fail parse jsonDataString:%{private}s", jsonDataString.c_str());
+        HILOG_ERROR("[%{public}s]fail parse jsonDataString:%{private}s", __FUNCTION__, jsonDataString.c_str());
         return false;
     }
     jsonFormProviderData_ = jsonObject;
 
     imageDataState_ = parcel.ReadInt32();
-    HILOG_DEBUG("imageDateState is %{public}d", imageDataState_);
+    HILOG_DEBUG("[%{public}s]imageDateState is %{public}d", __FUNCTION__, imageDataState_);
     switch (imageDataState_) {
         case IMAGE_DATA_STATE_ADDED: {
             if (!HandleImageDataStateAdded(parcel)) {
@@ -368,7 +368,7 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
         case IMAGE_DATA_STATE_REMOVED:
             break;
         default:
-            HILOG_WARN("unexpected imageDataState_ %{public}d", imageDataState_);
+            HILOG_WARN("[%{public}s]unexpected imageDataState_ %{public}d", __FUNCTION__, imageDataState_);
             break;
     }
     return true;
@@ -569,7 +569,7 @@ bool FormProviderData::Marshalling(Parcel &parcel) const
     }
 
     parcel.WriteInt32(imageDataState_);
-    HILOG_DEBUG("imageDateState is %{public}d", imageDataState_);
+    HILOG_DEBUG("[%{public}s]imageDateState is %{public}d", __FUNCTION__, imageDataState_);
     switch (imageDataState_) {
         case IMAGE_DATA_STATE_ADDED: {
             parcel.WriteInt32(rawImageBytesMap_.size()); // firstly write the number of shared image to add
@@ -587,7 +587,7 @@ bool FormProviderData::Marshalling(Parcel &parcel) const
         case IMAGE_DATA_STATE_REMOVED:
             break;
         default:
-            HILOG_WARN("unexpected imageDataState_ %{public}d", imageDataState_);
+            HILOG_WARN("[%{public}s]unexpected imageDataState_ %{public}d", __FUNCTION__, imageDataState_);
             break;
     }
     return true;

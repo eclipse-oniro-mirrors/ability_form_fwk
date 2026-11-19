@@ -77,7 +77,7 @@ void RemoveConnection(int64_t connectId)
 
 void JsLiveFormExtensionContext::Finalizer(napi_env env, void *data, void *hint)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s]called", __FUNCTION__);
     std::unique_ptr<JsLiveFormExtensionContext>(static_cast<JsLiveFormExtensionContext *>(data));
 }
 
@@ -112,49 +112,49 @@ napi_value JsLiveFormExtensionContext::CreateJsLiveFormExtensionContext(
 
 napi_value JsLiveFormExtensionContext::SetWindowBackgroundColor(napi_env env, napi_callback_info info)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s]called", __FUNCTION__);
     GET_NAPI_INFO_AND_CALL(env, info, JsLiveFormExtensionContext, OnSetWindowBackgroundColor);
 }
 
 napi_value JsLiveFormExtensionContext::SetUIExtCustomDensity(napi_env env, napi_callback_info info)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s]called", __FUNCTION__);
     GET_NAPI_INFO_AND_CALL(env, info, JsLiveFormExtensionContext, OnSetUIExtCustomDensity);
 }
 
 napi_value JsLiveFormExtensionContext::SetFontScale(napi_env env, napi_callback_info info)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s]called", __FUNCTION__);
     GET_NAPI_INFO_AND_CALL(env, info, JsLiveFormExtensionContext, OnSetFontScale);
 }
 
 napi_value JsLiveFormExtensionContext::StartAbilityByLiveForm(napi_env env, napi_callback_info info)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s]called", __FUNCTION__);
     GET_NAPI_INFO_AND_CALL(env, info, JsLiveFormExtensionContext, OnStartAbilityByLiveForm);
 }
 
 napi_value JsLiveFormExtensionContext::ConnectAbility(napi_env env, napi_callback_info info)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s]called", __FUNCTION__);
     GET_NAPI_INFO_AND_CALL(env, info, JsLiveFormExtensionContext, OnConnectAbility);
 }
 
 napi_value JsLiveFormExtensionContext::DisconnectAbility(napi_env env, napi_callback_info info)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s]called", __FUNCTION__);
     GET_NAPI_INFO_AND_CALL(env, info, JsLiveFormExtensionContext, OnDisconnectAbility);
 }
 
 napi_value JsLiveFormExtensionContext::OnSetWindowBackgroundColor(napi_env env, NapiCallbackInfo &info)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s]called", __FUNCTION__);
     NapiAsyncTask::CompleteCallback complete =
         [weak = context_](napi_env env, NapiAsyncTask &task, int32_t status) {
         HILOG_DEBUG("OnSetWindowBackgroundColor begin");
         auto context = weak.lock();
         if (!context) {
-            HILOG_ERROR("null context");
+            HILOG_ERROR("[%{public}s]null context", __FUNCTION__);
             task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
                 FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)));
             return;
@@ -179,9 +179,9 @@ napi_value JsLiveFormExtensionContext::OnSetWindowBackgroundColor(napi_env env, 
 
 napi_value JsLiveFormExtensionContext::OnSetUIExtCustomDensity(napi_env env, NapiCallbackInfo &info)
 {
-    HILOG_DEBUG("called:param size:%{public}d", static_cast<int32_t>(info.argc));
+    HILOG_DEBUG("[%{public}s]called:param size:%{public}d", __FUNCTION__, static_cast<int32_t>(info.argc));
     if (info.argc != ARGC_ONE) {
-        HILOG_ERROR("argc is not one");
+        HILOG_ERROR("[%{public}s]argc is not one", __FUNCTION__);
         ThrowError(env, ERR_FORM_EXTERNAL_PARAM_INVALID,
             FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_PARAM_INVALID));
         return CreateJsUndefined(env);
@@ -197,7 +197,7 @@ napi_value JsLiveFormExtensionContext::OnSetUIExtCustomDensity(napi_env env, Nap
 
     auto context = context_.lock();
     if (context == nullptr) {
-        HILOG_ERROR("Context is nullptr");
+        HILOG_ERROR("[%{public}s]Context is nullptr", __FUNCTION__);
         ThrowError(env, ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR,
             FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
         return CreateJsUndefined(env);
@@ -223,9 +223,9 @@ napi_value JsLiveFormExtensionContext::OnSetUIExtCustomDensity(napi_env env, Nap
 
 napi_value JsLiveFormExtensionContext::OnSetFontScale(napi_env env, NapiCallbackInfo &info)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s]called", __FUNCTION__);
     if (info.argc != ARGC_ONE) {
-        HILOG_ERROR("argc is not one");
+        HILOG_ERROR("[%{public}s]argc is not one", __FUNCTION__);
         ThrowError(env, ERR_FORM_EXTERNAL_PARAM_INVALID,
             FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_PARAM_INVALID));
         return CreateJsUndefined(env);
@@ -256,7 +256,7 @@ napi_value JsLiveFormExtensionContext::OnSetFontScale(napi_env env, NapiCallback
         HILOG_DEBUG("OnSetFontScale begin");
         auto context = weak.lock();
         if (!context) {
-            HILOG_ERROR("null context");
+            HILOG_ERROR("[%{public}s]null context", __FUNCTION__);
             task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
                 FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)));
             return;
@@ -272,7 +272,7 @@ napi_value JsLiveFormExtensionContext::OnSetFontScale(napi_env env, NapiCallback
 
 napi_value JsLiveFormExtensionContext::OnStartAbilityByLiveForm(napi_env env, NapiCallbackInfo &info)
 {
-    HILOG_DEBUG("called:param size:%{public}d", static_cast<int32_t>(info.argc));
+    HILOG_DEBUG("[%{public}s]called:param size:%{public}d", __FUNCTION__, static_cast<int32_t>(info.argc));
     if (info.argc != ARGC_TWO) {
         HILOG_ERROR("argc is not two");
         ThrowError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
@@ -282,7 +282,7 @@ napi_value JsLiveFormExtensionContext::OnStartAbilityByLiveForm(napi_env env, Na
  
     auto context = context_.lock();
     if (context == nullptr) {
-        HILOG_ERROR("Context is nullptr");
+        HILOG_ERROR("[%{public}s]Context is nullptr", __FUNCTION__);
         ThrowError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
             FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
         return CreateJsUndefined(env);
@@ -300,7 +300,7 @@ napi_value JsLiveFormExtensionContext::OnStartAbilityByLiveForm(napi_env env, Na
         HILOG_DEBUG("OnStartAbilityByLiveForm begin");
         auto context = weak.lock();
         if (!context) {
-            HILOG_ERROR("Context is nullptr");
+            HILOG_ERROR("[%{public}s]Context is nullptr", __FUNCTION__);
             task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
                 FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)));
             return;
@@ -330,15 +330,15 @@ napi_value JsLiveFormExtensionContext::OnStartAbilityByLiveForm(napi_env env, Na
 
 napi_value JsLiveFormExtensionContext::OnConnectAbility(napi_env env, NapiCallbackInfo &info)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s]called", __FUNCTION__);
     if (!CheckCallerIsSystemApp()) {
-        HILOG_ERROR("not system app");
+        HILOG_ERROR("[%{public}s]not system app", __FUNCTION__);
         ThrowError(env, AbilityErrorCode::ERROR_CODE_NOT_SYSTEM_APP);
         return CreateJsUndefined(env);
     }
     // Check params count
     if (info.argc != ARGC_TWO) {
-        HILOG_ERROR("invalid argc");
+        HILOG_ERROR("[%{public}s]invalid argc", __FUNCTION__);
         ThrowError(env, ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED, "invalid argument count");
         return CreateJsUndefined(env);
     }
@@ -355,7 +355,7 @@ napi_value JsLiveFormExtensionContext::OnConnectAbility(napi_env env, NapiCallba
         [weak = context_, want, connection, connectId](napi_env env, NapiAsyncTask &task, int32_t status) {
             auto context = weak.lock();
             if (!context) {
-                HILOG_ERROR("null context");
+                HILOG_ERROR("[%{public}s]null context", __FUNCTION__);
                 connection->CallJsFailed(ERR_FAILED);
                 task.Resolve(env, CreateJsUndefined(env));
                 RemoveConnection(connectId);
@@ -377,14 +377,14 @@ napi_value JsLiveFormExtensionContext::OnConnectAbility(napi_env env, NapiCallba
 
 napi_value JsLiveFormExtensionContext::OnDisconnectAbility(napi_env env, NapiCallbackInfo &info)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s]called", __FUNCTION__);
     if (!CheckCallerIsSystemApp()) {
-        HILOG_ERROR("not system app");
+        HILOG_ERROR("[%{public}s]not system app", __FUNCTION__);
         ThrowError(env, AbilityErrorCode::ERROR_CODE_NOT_SYSTEM_APP);
         return CreateJsUndefined(env);
     }
     if (info.argc != ARGC_ONE) {
-        HILOG_ERROR("invalid argc");
+        HILOG_ERROR("[%{public}s]invalid argc", __FUNCTION__);
         ThrowError(env, ERR_FORM_EXTERNAL_LIVE_OP_UNSUPPORTED, "invalid argument count");
         return CreateJsUndefined(env);
     }
@@ -401,7 +401,7 @@ napi_value JsLiveFormExtensionContext::OnDisconnectAbility(napi_env env, NapiCal
         [weak = context_, want, connection, connectId](napi_env env, NapiAsyncTask &task, int32_t status) {
             auto context = weak.lock();
             if (!context) {
-                HILOG_ERROR("null context");
+                HILOG_ERROR("[%{public}s]null context", __FUNCTION__);
                 task.Reject(env, CreateJsError(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR),
                     FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR)));
                 return;

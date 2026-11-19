@@ -29,13 +29,13 @@ static ani_object CreateFormBindingData(ani_env *env, ani_object paramObject)
 {
     HILOG_INFO("CreateFormBindingData call");
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr ");
+        HILOG_ERROR("[%{public}s]env is nullptr ", __FUNCTION__);
         return nullptr;
     }
     ani_status status = ANI_OK;
     ani_class formBindingDataCls;
     if ((status = env->FindClass(FORM_BINDING_DATA_INNER, &formBindingDataCls)) != ANI_OK) {
-        HILOG_ERROR("FindClass failed status %{public}d ", static_cast<int>(status));
+        HILOG_ERROR("[%{public}s]FindClass failed status %{public}d ", __FUNCTION__, static_cast<int>(status));
         return nullptr;
     }
     ani_method objectMethod;
@@ -60,7 +60,7 @@ static ani_object CreateFormBindingData(ani_env *env, ani_object paramObject)
     }
     ani_class stringClass;
     if ((status = env->FindClass("std.core.String", &stringClass)) != ANI_OK) {
-        HILOG_ERROR("FindClass failed status %{public}d ", static_cast<int>(status));
+        HILOG_ERROR("[%{public}s]FindClass failed status %{public}d ", __FUNCTION__, static_cast<int>(status));
         return nullptr;
     }
     if ((status = env->Object_CallMethodByName_Void(formBindingDataObj, "<set>data", nullptr, paramObject)) != ANI_OK) {
@@ -101,7 +101,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     }
 
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr ");
+        HILOG_ERROR("[%{public}s]env is nullptr ", __FUNCTION__);
         return ANI_ERROR;
     }
 

@@ -61,7 +61,7 @@ FormAmsHelper::~FormAmsHelper()
  */
 sptr<AAFwk::IAbilityManager> FormAmsHelper::GetAbilityManager()
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     {
         std::lock_guard<std::mutex> lock(abilityManagerMutex_);
         if (abilityManager_ != nullptr) {
@@ -107,7 +107,7 @@ sptr<AAFwk::IAbilityManager> FormAmsHelper::GetAbilityManager()
 
 void FormAmsHelper::ClearAbilityManager()
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(abilityManagerMutex_);
     abilityManager_ = nullptr;
     abilityManagerDeath_ = nullptr;
@@ -125,7 +125,7 @@ ErrCode FormAmsHelper::ConnectServiceAbility(
     HILOG_DEBUG("connect service ability");
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("ability service not connect");
+        HILOG_ERROR("[%{public}s]ability service not connect", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return IN_PROCESS_CALL(ams->ConnectAbility(want, connect, nullptr));
@@ -148,7 +148,7 @@ ErrCode FormAmsHelper::ConnectServiceAbilityWithUserId(
     }
     sptr<AAFwk::IAbilityManager> abilityManagerService = GetAbilityManager();
     if (abilityManagerService == nullptr) {
-        HILOG_ERROR("ability service not connect");
+        HILOG_ERROR("[%{public}s]ability service not connect", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return IN_PROCESS_CALL(abilityManagerService->ConnectAbility(want, connect, nullptr, userId));
@@ -161,10 +161,10 @@ ErrCode FormAmsHelper::ConnectServiceAbilityWithUserId(
  */
 ErrCode FormAmsHelper::DisconnectServiceAbility(const sptr<AAFwk::IAbilityConnection> &connect)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("ability service not connect");
+        HILOG_ERROR("[%{public}s]ability service not connect", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return IN_PROCESS_CALL(ams->DisconnectAbility(connect));
@@ -193,7 +193,7 @@ ErrCode FormAmsHelper::DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityC
  */
 ErrCode FormAmsHelper::StopExtensionAbility(const Want &want)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
         HILOG_ERROR("StopExtensionAbility ability service not connect");
@@ -220,7 +220,7 @@ void FormAmsHelper::DisconnectAbilityTask(const sptr<AAFwk::IAbilityConnection> 
 {
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("ability service not connect");
+        HILOG_ERROR("[%{public}s]ability service not connect", __FUNCTION__);
         return;
     }
     IN_PROCESS_CALL_WITHOUT_RET(ams->DisconnectAbility(connect));
@@ -230,7 +230,7 @@ ErrCode FormAmsHelper::StartAbility(const Want &want, int32_t userId)
 {
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("ability service not connect");
+        HILOG_ERROR("[%{public}s]ability service not connect", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return IN_PROCESS_CALL(ams->StartAbility(want, userId));
@@ -240,7 +240,7 @@ bool FormAmsHelper::GetConfiguration(AppExecFwk::Configuration& config, int32_t 
 {
     auto appMgrClient = std::make_unique<AppMgrClient>();
     if (appMgrClient == nullptr) {
-        HILOG_ERROR("create appMgrClient failed");
+        HILOG_ERROR("[%{public}s]create appMgrClient failed", __FUNCTION__);
         return false;
     }
     if (appMgrClient->GetConfiguration(config, userId) != AppMgrResultCode::RESULT_OK) {
@@ -252,7 +252,7 @@ bool FormAmsHelper::GetConfiguration(AppExecFwk::Configuration& config, int32_t 
 
 void FormAmsHelper::RegisterConfigurationObserver(int32_t userId)
 {
-    HILOG_INFO("begin,userId:%{public}d", userId);
+    HILOG_INFO("[%{public}s]begin,userId:%{public}d", __FUNCTION__, userId);
     std::lock_guard<std::mutex> lock(configObserverMutex_);
     if (configurationObservers_.find(userId) != configurationObservers_.end()) {
         HILOG_WARN("configurationObserver already exists for userId:%{public}d", userId);
@@ -265,7 +265,7 @@ void FormAmsHelper::RegisterConfigurationObserver(int32_t userId)
     }
     auto appMgrClient = std::make_unique<AppMgrClient>();
     if (appMgrClient == nullptr) {
-        HILOG_ERROR("create appMgrClient failed");
+        HILOG_ERROR("[%{public}s]create appMgrClient failed", __FUNCTION__);
         return;
     }
     AppMgrResultCode resCode = AppMgrResultCode::RESULT_OK;
@@ -279,35 +279,35 @@ void FormAmsHelper::RegisterConfigurationObserver(int32_t userId)
         return;
     }
     configurationObservers_[userId] = configurationObserver;
-    HILOG_INFO("end,userId:%{public}d", userId);
+    HILOG_INFO("[%{public}s]end,userId:%{public}d", __FUNCTION__, userId);
 }
 
 void FormAmsHelper::UnRegisterConfigurationObserver(int32_t userId)
 {
     std::lock_guard<std::mutex> lock(configObserverMutex_);
-    HILOG_INFO("begin,userId:%{public}d", userId);
+    HILOG_INFO("[%{public}s]begin,userId:%{public}d", __FUNCTION__, userId);
     auto it = configurationObservers_.find(userId);
     if (it == configurationObservers_.end()) {
         HILOG_WARN("no configurationObserver for userId:%{public}d", userId);
         return;
     }
     if (it->second == nullptr) {
-        HILOG_ERROR("configurationObserver is null,userId:%{public}d", userId);
+        HILOG_ERROR("[%{public}s]configurationObserver is null,userId:%{public}d", __FUNCTION__, userId);
         configurationObservers_.erase(it);
         return;
     }
     auto appMgrClient = std::make_unique<AppMgrClient>();
     if (appMgrClient == nullptr) {
-        HILOG_ERROR("create appMgrClient failed");
+        HILOG_ERROR("[%{public}s]create appMgrClient failed", __FUNCTION__);
         return;
     }
     AppMgrResultCode resCode = appMgrClient->UnregisterConfigurationObserver(it->second);
     if (resCode != AppMgrResultCode::RESULT_OK) {
-        HILOG_ERROR("UnregisterConfigurationObserver failed,userId:%{public}d", userId);
+        HILOG_ERROR("[%{public}s]UnregisterConfigurationObserver failed,userId:%{public}d", __FUNCTION__, userId);
         return;
     }
     configurationObservers_.erase(it);
-    HILOG_INFO("end,userId:%{public}d", userId);
+    HILOG_INFO("[%{public}s]end,userId:%{public}d", __FUNCTION__, userId);
 }
 
 void FormAmsHelper::UnRegisterAllConfigurationObservers()
@@ -323,18 +323,19 @@ void FormAmsHelper::UnRegisterAllConfigurationObservers()
     }
     auto appMgrClient = std::make_unique<AppMgrClient>();
     if (appMgrClient == nullptr) {
-        HILOG_ERROR("create appMgrClient failed");
+        HILOG_ERROR("[%{public}s]create appMgrClient failed", __FUNCTION__);
         return;
     }
     // IPC outside lock to avoid deadlock; local sptr copies keep observers alive
     for (auto &item : observers) {
         if (item.second == nullptr) {
-            HILOG_ERROR("configurationObserver is null,userId:%{public}d", item.first);
+            HILOG_ERROR("[%{public}s]configurationObserver is null,userId:%{public}d", __FUNCTION__, item.first);
             continue;
         }
         AppMgrResultCode resCode = appMgrClient->UnregisterConfigurationObserver(item.second);
         if (resCode != AppMgrResultCode::RESULT_OK) {
-            HILOG_ERROR("UnregisterConfigurationObserver failed,userId:%{public}d", item.first);
+            HILOG_ERROR("[%{public}s]UnregisterConfigurationObserver failed,userId:%{public}d",
+                __FUNCTION__, item.first);
         }
     }
     HILOG_INFO("end");
@@ -345,7 +346,7 @@ ErrCode FormAmsHelper::StartAbilityOnlyUIAbility(Want &want, const sptr<IRemoteO
 {
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("ability service not connect");
+        HILOG_ERROR("[%{public}s]ability service not connect", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     InsightIntentExecuteParam::RemoveInsightIntent(want);
@@ -371,10 +372,10 @@ ErrCode FormAmsHelper::StartAbilityByCall(const Want &want,
     const sptr<AAFwk::IAbilityConnection> &connect, const sptr<IRemoteObject> &callerToken,
     int32_t userId, bool isSilent, bool promotePriority)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("null ams");
+        HILOG_ERROR("[%{public}s]null ams", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return IN_PROCESS_CALL(ams->StartAbilityByCall(want, connect, callerToken, userId, isSilent, promotePriority));
@@ -388,10 +389,10 @@ ErrCode FormAmsHelper::StartAbilityByCall(const Want &want,
  */
 ErrCode FormAmsHelper::OpenLink(const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("null ams");
+        HILOG_ERROR("[%{public}s]null ams", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return IN_PROCESS_CALL(ams->OpenLink(want, callerToken));
@@ -407,10 +408,10 @@ ErrCode FormAmsHelper::OpenLink(const Want &want, const sptr<IRemoteObject> &cal
 ErrCode FormAmsHelper::OpenAtomicService(Want &want, const StartOptions &startOptions,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("null ams");
+        HILOG_ERROR("[%{public}s]null ams", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return IN_PROCESS_CALL(ams->OpenAtomicService(want, startOptions, callerToken));
@@ -424,10 +425,10 @@ ErrCode FormAmsHelper::OpenAtomicService(Want &want, const StartOptions &startOp
  */
 ErrCode FormAmsHelper::StartAbilityByCallerToken(const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("null ams");
+        HILOG_ERROR("[%{public}s]null ams", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return IN_PROCESS_CALL(ams->StartAbility(want, callerToken, DEFAULT_INVAL_VALUE, DEFAULT_INVAL_VALUE));
@@ -448,10 +449,10 @@ ErrCode FormAmsHelper::ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(const 
     const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteLiteParam &param,
     uint64_t specifiedFullTokenId)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("null ams");
+        HILOG_ERROR("[%{public}s]null ams", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return IN_PROCESS_CALL(ams->ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(

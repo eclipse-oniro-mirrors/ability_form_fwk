@@ -100,7 +100,8 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
 void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
     if (resultCode && connectState_.load() == ConnectState::CONNECTING) {
-        HILOG_WARN("formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
+        HILOG_WARN("[%{public}s]formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
+            __FUNCTION__,
             GetFormId(), resultCode, connectState_.load());
         FormRecord recordSnapshot;
         {
@@ -111,7 +112,8 @@ void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName
         FormHostTaskMgr::GetInstance().PostConnectFRSFailedTaskToHost(
             GetFormId(), ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, FORM_RECONNECT_DELAY_TIME);
     } else {
-        HILOG_INFO("formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
+        HILOG_INFO("[%{public}s]formId:%{public}" PRId64 ", resultCode:%{public}d, connectState:%{public}d",
+            __FUNCTION__,
             GetFormId(), resultCode, connectState_.load());
     }
     connectState_.store(ConnectState::DISCONNECTED);

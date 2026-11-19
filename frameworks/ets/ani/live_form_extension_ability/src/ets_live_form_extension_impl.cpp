@@ -50,7 +50,7 @@ void EtsLiveFormExtensionImpl::BindContext()
 
     auto env = etsRuntime_.GetAniEnv();
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
     if (context_ == nullptr) {
@@ -84,7 +84,7 @@ void EtsLiveFormExtensionImpl::BindContext()
 void EtsLiveFormExtensionImpl::BindMethod(ani_env *env)
 {
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
 
@@ -93,15 +93,15 @@ void EtsLiveFormExtensionImpl::BindMethod(ani_env *env)
     ani_method method = nullptr;
     ani_object object = nullptr;
     if ((status = env->FindClass(LIVE_FORM_EXTENSION_CLASS_NAME, &cls)) != ANI_OK) {
-        HILOG_ERROR("status:%{public}d", status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return;
     }
     if ((status = env->Class_FindMethod(cls, "<ctor>", "l:", &method)) != ANI_OK) {
-        HILOG_ERROR("status:%{public}d", status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return;
     }
     if ((status = env->Object_New(cls, method, &object)) != ANI_OK) {
-        HILOG_ERROR("status:%{public}d", status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return;
     }
     std::array functions = {
@@ -111,7 +111,7 @@ void EtsLiveFormExtensionImpl::BindMethod(ani_env *env)
             reinterpret_cast<void *>(EtsLiveFormExtensionImpl::SetFontScale) },
         };
     if ((status = env->Class_BindNativeMethods(cls, functions.data(), functions.size())) != ANI_OK) {
-        HILOG_ERROR("status:%{public}d", status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return;
     }
 }
@@ -119,14 +119,14 @@ void EtsLiveFormExtensionImpl::BindMethod(ani_env *env)
 EtsLiveFormExtensionImpl* EtsLiveFormExtensionImpl::GetEtsEtsLiveForm(ani_env *env, ani_object obj)
 {
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return nullptr;
     }
     EtsLiveFormExtensionImpl *etsLiveForm = nullptr;
     ani_status status = ANI_ERROR;
     ani_long etsContextLong = 0;
     if ((status = env->Object_GetFieldByName_Long(obj, "context", &etsContextLong)) != ANI_OK) {
-        HILOG_ERROR("status:%{public}d", status);
+        HILOG_ERROR("[%{public}s]status:%{public}d", __FUNCTION__, status);
         return nullptr;
     }
     etsLiveForm = reinterpret_cast<EtsLiveFormExtensionImpl *>(etsContextLong);
@@ -139,9 +139,9 @@ EtsLiveFormExtensionImpl* EtsLiveFormExtensionImpl::GetEtsEtsLiveForm(ani_env *e
 
 void EtsLiveFormExtensionImpl::SetWindowBackgroundColor(ani_env *env, ani_object obj)
 {
-    HILOG_INFO("called");
+    HILOG_INFO("[%{public}s]called", __FUNCTION__);
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
     auto etsContext = GetEtsEtsLiveForm(env, obj);
@@ -155,11 +155,11 @@ void EtsLiveFormExtensionImpl::SetWindowBackgroundColor(ani_env *env, ani_object
 void EtsLiveFormExtensionImpl::OnSetWindowBackgroundColor(ani_env *env)
 {
     if (env == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
     if (!context_) {
-        HILOG_ERROR("null context");
+        HILOG_ERROR("[%{public}s]null context", __FUNCTION__);
         EtsFormErrorUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR);
         return;
     }
@@ -173,7 +173,7 @@ void EtsLiveFormExtensionImpl::OnSetWindowBackgroundColor(ani_env *env)
 
 void EtsLiveFormExtensionImpl::SetFontScale(ani_env *env, ani_object aniObj, ani_double fontScale)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s]called", __FUNCTION__);
     auto etsLiveForm = GetEtsEtsLiveForm(env, aniObj);
     if (etsLiveForm == nullptr) {
         HILOG_ERROR("null EtsLiveFormExtensionImpl");
@@ -184,7 +184,7 @@ void EtsLiveFormExtensionImpl::SetFontScale(ani_env *env, ani_object aniObj, ani
 
 void EtsLiveFormExtensionImpl::OnSetFontScale(ani_env *env, ani_double fontScale)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("[%{public}s]called", __FUNCTION__);
 
     if (std::isnan(fontScale) || std::islessequal(fontScale, 0.0f)) {
         HILOG_ERROR("fontScale %{public}f is nan or less than default scale", fontScale);
@@ -198,7 +198,7 @@ void EtsLiveFormExtensionImpl::OnSetFontScale(ani_env *env, ani_double fontScale
     }
 
     if (!context_) {
-        HILOG_ERROR("null context");
+        HILOG_ERROR("[%{public}s]null context", __FUNCTION__);
         EtsFormErrorUtil::ThrowByExternalErrorCode(env, static_cast<int32_t>(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR));
         return;
     }

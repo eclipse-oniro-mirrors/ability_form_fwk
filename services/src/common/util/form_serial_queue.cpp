@@ -34,7 +34,7 @@ bool FormSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
 {
     HILOG_DEBUG("begin to ScheduleTask");
     if (baseQueue_ == nullptr) {
-        HILOG_ERROR("baseQueue_ is null");
+        HILOG_ERROR("[%{public}s]baseQueue_ is null", __FUNCTION__);
         return false;
     }
     return baseQueue_->ScheduleTask(ms, func);
@@ -45,7 +45,7 @@ bool FormSerialQueue::ScheduleDelayTask(const std::pair<int64_t, int64_t> &event
 {
     HILOG_DEBUG("begin to ScheduleDelayTask");
     if (baseQueue_ == nullptr) {
-        HILOG_ERROR("baseQueue_ is null");
+        HILOG_ERROR("[%{public}s]baseQueue_ is null", __FUNCTION__);
         return false;
     }
     return baseQueue_->ScheduleDelayTask(eventMsg, ms, func);
@@ -55,7 +55,7 @@ bool FormSerialQueue::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMs
 {
     HILOG_DEBUG("begin to CancelDelayTask");
     if (baseQueue_ == nullptr) {
-        HILOG_ERROR("baseQueue_ is null");
+        HILOG_ERROR("[%{public}s]baseQueue_ is null", __FUNCTION__);
         return false;
     }
     return baseQueue_->CancelDelayTask(eventMsg);

@@ -88,11 +88,11 @@ int32_t FormProviderCaller::OnAcquire(const FormProviderInfo &formProviderInfo, 
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     int type = want.GetIntParam(Constants::ACQUIRE_TYPE, 0);
-    HILOG_DEBUG("formId is %{public}" PRId64 ", type is %{public}d", formId, type);
+    HILOG_DEBUG("[%{public}s]formId is %{public}" PRId64 ", type is %{public}d", __FUNCTION__, formId, type);
 
     auto formProviderData = formProviderInfo.GetFormData();
     if (!formProviderData.ConvertRawImageData()) {
-        HILOG_ERROR("convert raw image data failed");
+        HILOG_ERROR("[%{public}s]convert raw image data failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     FormJsInfo formJsInfo;
@@ -107,10 +107,10 @@ int32_t FormProviderCaller::OnAcquire(const FormProviderInfo &formProviderInfo, 
 
 int32_t FormProviderCaller::OnAcquire(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &token)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     sptr<IFormHost> callerToken = iface_cast<IFormHost>(callerToken_);
     if (callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("[%{public}s]null callerToken", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     callerToken->OnAcquired(formJsInfo, token);
@@ -119,7 +119,7 @@ int32_t FormProviderCaller::OnAcquire(const FormJsInfo &formJsInfo, const sptr<I
 
 void FormProviderCaller::UpdateForm(int64_t formId, const FormProviderData &formProviderData)
 {
-    HILOG_DEBUG("formId is %{public}" PRId64, formId);
+    HILOG_DEBUG("[%{public}s]formId is %{public}" PRId64, __FUNCTION__, formId);
     FormJsInfo formJsInfo;
     if (!GetFormJsInfo(formId, formJsInfo)) {
         HILOG_ERROR("get form js info failed,formId is %{public}" PRId64, formId);
@@ -128,7 +128,7 @@ void FormProviderCaller::UpdateForm(int64_t formId, const FormProviderData &form
     formJsInfo.formData = formProviderData.GetDataString();
     formJsInfo.formProviderData = formProviderData;
     if (!formJsInfo.formProviderData.ConvertRawImageData()) {
-        HILOG_ERROR("convert raw image data failed");
+        HILOG_ERROR("[%{public}s]convert raw image data failed", __FUNCTION__);
         return;
     }
 
@@ -137,10 +137,10 @@ void FormProviderCaller::UpdateForm(int64_t formId, const FormProviderData &form
 
 void FormProviderCaller::UpdateForm(const FormJsInfo &formJsInfo)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     sptr<IFormHost> callerToken = iface_cast<IFormHost>(callerToken_);
     if (callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("[%{public}s]null callerToken", __FUNCTION__);
         return;
     }
     callerToken->OnUpdate(formJsInfo);
@@ -148,7 +148,7 @@ void FormProviderCaller::UpdateForm(const FormJsInfo &formJsInfo)
 
 void FormProviderCaller::AddDeathRecipient(sptr<IRemoteObject::DeathRecipient> deathRecipient)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (callerToken_ == nullptr) {
         HILOG_ERROR("callerToken_ is null");
         return;

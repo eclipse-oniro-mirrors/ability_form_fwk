@@ -37,7 +37,7 @@ constexpr ani_size REFERENCES_MAX_NUMBER = 16;
 EtsFormAddCallbackClient::EtsFormAddCallbackClient(ani_env* env, ani_ref callbackRef)
 {
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return;
     }
     env_ = env;
@@ -48,12 +48,12 @@ EtsFormAddCallbackClient::EtsFormAddCallbackClient(ani_env* env, ani_ref callbac
 EtsFormAddCallbackClient::~EtsFormAddCallbackClient()
 {
     if (env_ == nullptr || callbackRef_ == nullptr) {
-        HILOG_ERROR("null env or ref");
+        HILOG_ERROR("[%{public}s]null env or ref", __FUNCTION__);
         return;
     }
     ani_status status = ANI_ERROR;
     if ((status = env_->GlobalReference_Delete(callbackRef_)) != ANI_OK) {
-        HILOG_ERROR("GlobalReference_Delete status:%{public}d", status);
+        HILOG_ERROR("[%{public}s]GlobalReference_Delete status:%{public}d", __FUNCTION__, status);
         return;
     }
     callbackRef_ = nullptr;
@@ -63,28 +63,28 @@ void EtsFormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
     const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
     if (handler_ == nullptr) {
-        HILOG_ERROR("null handler");
+        HILOG_ERROR("[%{public}s]null handler", __FUNCTION__);
         return;
     }
     handler_->PostSyncTask([thisWeakPtr = weak_from_this(), bundleName, runningFormInfo]() {
         auto sharedThis = thisWeakPtr.lock();
         if (sharedThis == nullptr) {
-            HILOG_ERROR("null sharedThis");
+            HILOG_ERROR("[%{public}s]null sharedThis", __FUNCTION__);
             return;
         }
         if (sharedThis->env_->CreateLocalScope(REFERENCES_MAX_NUMBER) != ANI_OK) {
-            HILOG_ERROR("CreateLocalScope failed");
+            HILOG_ERROR("[%{public}s]CreateLocalScope failed", __FUNCTION__);
             return;
         }
         ani_object callbackValues = FormAniUtil::CreateRunningFormInfo(sharedThis->env_, runningFormInfo);
         if (callbackValues == nullptr) {
-            HILOG_ERROR("null callbackValues");
+            HILOG_ERROR("[%{public}s]null callbackValues", __FUNCTION__);
         } else if (!FormAniUtil::Callback(sharedThis->env_, static_cast<ani_object>(sharedThis->callbackRef_),
             callbackValues, CLASSNAME_CALLBACK_WRAPPER)) {
-            HILOG_ERROR("callback failed");
+            HILOG_ERROR("[%{public}s]callback failed", __FUNCTION__);
         }
         if (sharedThis->env_->DestroyLocalScope() != ANI_OK) {
-            HILOG_ERROR("DestroyLocalScope failed");
+            HILOG_ERROR("[%{public}s]DestroyLocalScope failed", __FUNCTION__);
         }
     });
 }
@@ -92,19 +92,19 @@ void EtsFormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
 bool EtsFormAddCallbackClient::IsStrictEqual(ani_object callback)
 {
     if (env_ == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return false;
     }
     ani_boolean isEqual = false;
     env_->Reference_StrictEquals(callback, callbackRef_, &isEqual);
-    HILOG_INFO("isStrictEqual:%{public}d", isEqual);
+    HILOG_INFO("[%{public}s]isStrictEqual:%{public}d", __FUNCTION__, isEqual);
     return static_cast<bool>(isEqual);
 }
 
 EtsFormRemoveCallbackClient::EtsFormRemoveCallbackClient(ani_env* env, ani_ref callbackRef)
 {
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return;
     }
     env_ = env;
@@ -115,12 +115,12 @@ EtsFormRemoveCallbackClient::EtsFormRemoveCallbackClient(ani_env* env, ani_ref c
 EtsFormRemoveCallbackClient::~EtsFormRemoveCallbackClient()
 {
     if (env_ == nullptr || callbackRef_ == nullptr) {
-        HILOG_ERROR("null env or ref");
+        HILOG_ERROR("[%{public}s]null env or ref", __FUNCTION__);
         return;
     }
     ani_status status = ANI_ERROR;
     if ((status = env_->GlobalReference_Delete(callbackRef_)) != ANI_OK) {
-        HILOG_ERROR("GlobalReference_Delete status:%{public}d", status);
+        HILOG_ERROR("[%{public}s]GlobalReference_Delete status:%{public}d", __FUNCTION__, status);
         return;
     }
     callbackRef_ = nullptr;
@@ -130,24 +130,24 @@ void EtsFormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleNam
     const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
     if (handler_ == nullptr) {
-        HILOG_ERROR("null handler");
+        HILOG_ERROR("[%{public}s]null handler", __FUNCTION__);
         return;
     }
     handler_->PostSyncTask([thisWeakPtr = weak_from_this(), bundleName, runningFormInfo]() {
         auto sharedThis = thisWeakPtr.lock();
         if (sharedThis == nullptr) {
-            HILOG_ERROR("null sharedThis");
+            HILOG_ERROR("[%{public}s]null sharedThis", __FUNCTION__);
             return;
         }
         ani_object callbackValues = FormAniUtil::CreateRunningFormInfo(sharedThis->env_, runningFormInfo);
         if (callbackValues == nullptr) {
-            HILOG_ERROR("null callbackValues");
+            HILOG_ERROR("[%{public}s]null callbackValues", __FUNCTION__);
             return;
         }
         bool bRet = FormAniUtil::Callback(sharedThis->env_, static_cast<ani_object>(sharedThis->callbackRef_),
             callbackValues, CLASSNAME_CALLBACK_WRAPPER);
         if (!bRet) {
-            HILOG_ERROR("callback failed");
+            HILOG_ERROR("[%{public}s]callback failed", __FUNCTION__);
             return;
         }
     });
@@ -156,12 +156,12 @@ void EtsFormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleNam
 bool EtsFormRemoveCallbackClient::IsStrictEqual(ani_object callback)
 {
     if (env_ == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return false;
     }
     ani_boolean isEqual = false;
     env_->Reference_StrictEquals(callback, callbackRef_, &isEqual);
-    HILOG_INFO("isStrictEqual:%{public}d", isEqual);
+    HILOG_INFO("[%{public}s]isStrictEqual:%{public}d", __FUNCTION__, isEqual);
     return static_cast<bool>(isEqual);
 }
 
@@ -173,7 +173,7 @@ sptr<EtsFormStateObserver> EtsFormStateObserver::GetInstance()
 
 bool EtsFormStateObserver::CheckMapSize(const std::string &type, const std::string &bundleName)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
     const size_t formAddLength = strlen(FORM_STATE_OBSERVER_FORMADD);
     const size_t formRemoveLength = strlen(FORM_STATE_OBSERVER_FORMREMOVE);
     if (type.length() != formAddLength && type.length() != formRemoveLength) {
@@ -183,7 +183,7 @@ bool EtsFormStateObserver::CheckMapSize(const std::string &type, const std::stri
         std::lock_guard<std::mutex> lock(addFormCallbackMutex_);
         if (formAddCallbackMap_.find(bundleName) == formAddCallbackMap_.end()) {
             if (formAddCallbackMap_.size() >= KEY_LIMIT) {
-                HILOG_ERROR("the number of the bundleName exceeds the limit");
+                HILOG_ERROR("[%{public}s]the number of the bundleName exceeds the limit", __FUNCTION__);
                 return false;
             }
         }
@@ -191,7 +191,7 @@ bool EtsFormStateObserver::CheckMapSize(const std::string &type, const std::stri
         std::lock_guard<std::mutex> lock(removeFormCallbackMutex_);
         if (formRemoveCallbackMap_.find(bundleName) == formRemoveCallbackMap_.end()) {
             if (formRemoveCallbackMap_.size() >= KEY_LIMIT) {
-                HILOG_ERROR("the number of the bundleName exceeds the limit");
+                HILOG_ERROR("[%{public}s]the number of the bundleName exceeds the limit", __FUNCTION__);
                 return false;
             }
         }
@@ -219,16 +219,16 @@ ani_env* EtsFormStateObserver::GetAniEnv(ani_vm* ani_vm)
 bool EtsFormStateObserver::RegisterFormAddCallback(ani_vm* ani_vm,
     const std::string &bundleName, const ani_object callback)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
     ani_env* env = GetAniEnv(ani_vm);
     if (env == nullptr) {
-        HILOG_ERROR("GetAniEnv failed");
+        HILOG_ERROR("[%{public}s]GetAniEnv failed", __FUNCTION__);
         return false;
     }
     ani_status status = ANI_ERROR;
     ani_ref callbackRef;
     if ((status = env->GlobalReference_Create(callback, &callbackRef)) != ANI_OK) {
-        HILOG_ERROR("GlobalReference_Create status :%{public}d", status);
+        HILOG_ERROR("[%{public}s]GlobalReference_Create status :%{public}d", __FUNCTION__, status);
         return false;
     }
     std::shared_ptr<EtsFormAddCallbackClient> callbackClient = std::make_shared<EtsFormAddCallbackClient>(env,
@@ -238,7 +238,7 @@ bool EtsFormStateObserver::RegisterFormAddCallback(ani_vm* ani_vm,
     auto formAddCallbacks = formAddCallbackMap_.find(bundleName);
     if (formAddCallbacks == formAddCallbackMap_.end()) {
         if (formAddCallbackMap_.size() >= KEY_LIMIT) {
-            HILOG_ERROR("the number of the bundleName exceeds the limit");
+            HILOG_ERROR("[%{public}s]the number of the bundleName exceeds the limit", __FUNCTION__);
             EtsFormErrorUtil::ThrowParamError(env,
                 "The number of bundleNames registered to listen has exceeded the limit.");
             return false;
@@ -251,7 +251,7 @@ bool EtsFormStateObserver::RegisterFormAddCallback(ani_vm* ani_vm,
         auto &callbacks = formAddCallbacks->second;
         for (auto &iter : callbacks) {
             if (iter->IsStrictEqual(callback)) {
-                HILOG_ERROR("found equal callback");
+                HILOG_ERROR("[%{public}s]found equal callback", __FUNCTION__);
                 return false;
             }
         }
@@ -263,16 +263,16 @@ bool EtsFormStateObserver::RegisterFormAddCallback(ani_vm* ani_vm,
 bool EtsFormStateObserver::RegisterFormRemoveCallback(ani_vm* ani_vm,
     const std::string &bundleName, const ani_object callback)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
     ani_env* env = GetAniEnv(ani_vm);
     if (env == nullptr) {
-        HILOG_ERROR("GetAniEnv failed");
+        HILOG_ERROR("[%{public}s]GetAniEnv failed", __FUNCTION__);
         return false;
     }
     ani_status status = ANI_ERROR;
     ani_ref callbackRef;
     if ((status = env->GlobalReference_Create(callback, &callbackRef)) != ANI_OK) {
-        HILOG_ERROR("GlobalReference_Create status :%{public}d", status);
+        HILOG_ERROR("[%{public}s]GlobalReference_Create status :%{public}d", __FUNCTION__, status);
         return false;
     }
     std::shared_ptr<EtsFormRemoveCallbackClient> callbackClient =
@@ -289,7 +289,7 @@ bool EtsFormStateObserver::RegisterFormRemoveCallback(ani_vm* ani_vm,
         auto &callbacks = formRemoveCallbacks->second;
         for (auto &iter : callbacks) {
             if (iter->IsStrictEqual(callback)) {
-                HILOG_ERROR("found equal callback");
+                HILOG_ERROR("[%{public}s]found equal callback", __FUNCTION__);
                 return false;
             }
         }
@@ -300,7 +300,7 @@ bool EtsFormStateObserver::RegisterFormRemoveCallback(ani_vm* ani_vm,
 
 void EtsFormStateObserver::ClearFormAddCallbackByBundle(const std::string &bundleName)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
     std::lock_guard<std::mutex> lock(addFormCallbackMutex_);
     auto formAddCallbacks = formAddCallbackMap_.find(bundleName);
     if (formAddCallbacks == formAddCallbackMap_.end()) {
@@ -314,7 +314,7 @@ void EtsFormStateObserver::ClearFormAddCallbackByBundle(const std::string &bundl
 
 void EtsFormStateObserver::DelFormAddCallbackByBundle(const ani_object callback, const std::string &bundleName)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
 
     std::lock_guard<std::mutex> lock(addFormCallbackMutex_);
     auto formAddCallbacks = formAddCallbackMap_.find(bundleName);
@@ -326,7 +326,7 @@ void EtsFormStateObserver::DelFormAddCallbackByBundle(const ani_object callback,
             return cb->IsStrictEqual(callback);
         });
         if (iter != callbacks.end()) {
-            HILOG_INFO("equal callback");
+            HILOG_INFO("[%{public}s]equal callback", __FUNCTION__);
             callbacks.erase(iter);
         } else {
             HILOG_INFO("no formAddCallback");
@@ -337,7 +337,7 @@ void EtsFormStateObserver::DelFormAddCallbackByBundle(const ani_object callback,
 int32_t EtsFormStateObserver::OnAddForm(const std::string &bundleName,
     const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::vector<std::shared_ptr<EtsFormAddCallbackClient>> callbackClients;
     {
         std::lock_guard<std::mutex> lock(addFormCallbackMutex_);
@@ -356,7 +356,7 @@ int32_t EtsFormStateObserver::OnAddForm(const std::string &bundleName,
 
 void EtsFormStateObserver::ClearFormRemoveCallbackByBundle(const std::string &bundleName)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
     std::lock_guard<std::mutex> lock(removeFormCallbackMutex_);
     auto formRemoveCallbacks = formRemoveCallbackMap_.find(bundleName);
     if (formRemoveCallbacks == formRemoveCallbackMap_.end()) {
@@ -370,7 +370,7 @@ void EtsFormStateObserver::ClearFormRemoveCallbackByBundle(const std::string &bu
 
 void EtsFormStateObserver::DelFormRemoveCallbackByBundle(const ani_object callback, const std::string &bundleName)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
 
     std::lock_guard<std::mutex> lock(removeFormCallbackMutex_);
     auto formRemoveCallbacks = formRemoveCallbackMap_.find(bundleName);
@@ -382,7 +382,7 @@ void EtsFormStateObserver::DelFormRemoveCallbackByBundle(const ani_object callba
             return cb->IsStrictEqual(callback);
         });
         if (iter != callbacks.end()) {
-            HILOG_INFO("equal callback");
+            HILOG_INFO("[%{public}s]equal callback", __FUNCTION__);
             callbacks.erase(iter);
         } else {
             HILOG_INFO("no formRemoveCallback");
@@ -393,11 +393,11 @@ void EtsFormStateObserver::DelFormRemoveCallbackByBundle(const ani_object callba
 int32_t EtsFormStateObserver::OnRemoveForm(const std::string &bundleName,
     const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto mainHandler = GetMainEventRunner();
     if (mainHandler == nullptr) {
-        HILOG_ERROR("null handler");
+        HILOG_ERROR("[%{public}s]null handler", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     bool posted = mainHandler->PostSyncTask([this, &bundleName, &runningFormInfo]() {
@@ -422,7 +422,7 @@ int32_t EtsFormStateObserver::OnRemoveForm(const std::string &bundleName,
 int EtsFormStateObserver::RegisterFormInstanceCallback(ani_vm* ani_vm, ani_object etsObserverObject,
     bool isVisibility, std::string &bundleName, sptr<EtsFormStateObserver> &formObserver)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     {
         std::lock_guard<std::mutex> lock(aniVmMutex_);
         if (ani_vm_ == nullptr) {
@@ -431,7 +431,7 @@ int EtsFormStateObserver::RegisterFormInstanceCallback(ani_vm* ani_vm, ani_objec
     }
     ani_env* env = GetAniEnv(ani_vm);
     if (env == nullptr) {
-        HILOG_ERROR("GetAniEnv failed");
+        HILOG_ERROR("[%{public}s]GetAniEnv failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
     std::string specialFlag = "#";
@@ -441,12 +441,13 @@ int EtsFormStateObserver::RegisterFormInstanceCallback(ani_vm* ani_vm, ani_objec
     if (isVisibility) {
         auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
         if (visibleCallback != formVisibleCallbackMap_.end()) {
-            HILOG_ERROR("bundleName is already in the map,bundleName id %{public}s", bundleName.c_str());
+            HILOG_ERROR("[%{public}s]bundleName is already in the map,bundleName id %{public}s",
+                __FUNCTION__, bundleName.c_str());
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
         ani_status status = ANI_ERROR;
         if ((status = env->GlobalReference_Create(etsObserverObject, &ref)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Create status :%{public}d", status);
+            HILOG_ERROR("[%{public}s]GlobalReference_Create status :%{public}d", __FUNCTION__, status);
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
         etsReference->aniRef = ref;
@@ -454,12 +455,13 @@ int EtsFormStateObserver::RegisterFormInstanceCallback(ani_vm* ani_vm, ani_objec
     } else {
         auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
         if (invisibleCallback != formInvisibleCallbackMap_.end()) {
-            HILOG_ERROR("bundleName is already in the map,bundleName id %{public}s", bundleName.c_str());
+            HILOG_ERROR("[%{public}s]bundleName is already in the map,bundleName id %{public}s",
+                __FUNCTION__, bundleName.c_str());
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
         ani_status status = ANI_ERROR;
         if ((status = env->GlobalReference_Create(etsObserverObject, &ref)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Create status :%{public}d", status);
+            HILOG_ERROR("[%{public}s]GlobalReference_Create status :%{public}d", __FUNCTION__, status);
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
         etsReference->aniRef = ref;
@@ -473,7 +475,7 @@ int EtsFormStateObserver::RegisterFormInstanceCallback(ani_vm* ani_vm, ani_objec
 ErrCode EtsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::string bundleName,
     bool isVisibility, sptr<EtsFormStateObserver> &formObserver)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
     std::string specialFlag = "#";
     if (isVisibility) {
@@ -484,7 +486,7 @@ ErrCode EtsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::
             formVisibleCallbackMap_.erase(visibleCallback);
             return ERR_OK;
         } else {
-            HILOG_ERROR("There is no formVisibleCallbackMap_ has been register");
+            HILOG_ERROR("[%{public}s]There is no formVisibleCallbackMap_ has been register", __FUNCTION__);
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
     } else {
@@ -495,7 +497,7 @@ ErrCode EtsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::
             formInvisibleCallbackMap_.erase(invisibleCallback);
             return ERR_OK;
         } else {
-            HILOG_ERROR("There is no formInvisibleCallbackMap_ has been register");
+            HILOG_ERROR("[%{public}s]There is no formInvisibleCallbackMap_ has been register", __FUNCTION__);
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
     }
@@ -504,10 +506,10 @@ ErrCode EtsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::
 ErrCode EtsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::string bundleName,
     bool isVisibility, ani_object etsObserverObject, sptr<EtsFormStateObserver> &formObserver)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     ani_env* env = GetAniEnv(ani_vm_);
     if (env == nullptr) {
-        HILOG_ERROR("GetAniEnv failed");
+        HILOG_ERROR("[%{public}s]GetAniEnv failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
     ani_boolean isEqual = false;
@@ -524,11 +526,11 @@ ErrCode EtsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::st
                 formVisibleCallbackMap_.erase(visibleCallback);
                 return ERR_OK;
             } else {
-                HILOG_ERROR("There is no formVisibleCallbackMap_ has been register");
+                HILOG_ERROR("[%{public}s]There is no formVisibleCallbackMap_ has been register", __FUNCTION__);
                 return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
             }
         } else {
-            HILOG_ERROR("There is no formVisibleCallbackMap_ has been register");
+            HILOG_ERROR("[%{public}s]There is no formVisibleCallbackMap_ has been register", __FUNCTION__);
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
     } else {
@@ -542,11 +544,11 @@ ErrCode EtsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::st
                 formInvisibleCallbackMap_.erase(invisibleCallback);
                 return ERR_OK;
             } else {
-                HILOG_ERROR("There is no formInvisibleCallbackMap_ has been register");
+                HILOG_ERROR("[%{public}s]There is no formInvisibleCallbackMap_ has been register", __FUNCTION__);
                 return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
             }
         } else {
-            HILOG_ERROR("There is no formInvisibleCallbackMap_ has been register");
+            HILOG_ERROR("[%{public}s]There is no formInvisibleCallbackMap_ has been register", __FUNCTION__);
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
     }
@@ -573,23 +575,23 @@ int32_t EtsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVi
     handler->PostSyncTask([weakObserver, visibleType, formInstances, bundleName, aniVm = ani_vm_]() {
         auto sharedThis = weakObserver.promote();
         if (sharedThis == nullptr) {
-            HILOG_ERROR("null sharedThis");
+            HILOG_ERROR("[%{public}s]null sharedThis", __FUNCTION__);
             return;
         }
         ani_env* env = sharedThis->GetAniEnv(aniVm);
         if (env == nullptr) {
-            HILOG_ERROR("GetAniEnv failed");
+            HILOG_ERROR("[%{public}s]GetAniEnv failed", __FUNCTION__);
             return;
         }
         ani_size nr_refs = REFERENCES_MAX_NUMBER;
         if (env->CreateLocalScope(nr_refs) != ANI_OK) {
-            HILOG_ERROR("CreateLocalScope failed");
+            HILOG_ERROR("[%{public}s]CreateLocalScope failed", __FUNCTION__);
             return;
         }
         bool isVisibility = visibleType == AppExecFwk::FormVisibilityType::VISIBLE;
         sharedThis->ProcessVisibilityNotificationInternal(env, bundleName, formInstances, isVisibility);
         if (env->DestroyLocalScope() != ANI_OK) {
-            HILOG_ERROR("DestroyLocalScope failed");
+            HILOG_ERROR("[%{public}s]DestroyLocalScope failed", __FUNCTION__);
         }
     });
     return ERR_OK;
@@ -630,14 +632,14 @@ void EtsFormStateObserver::ProcessVisibilityNotificationInternal(ani_env *env, c
 ErrCode EtsFormStateObserver::OnFormClickEvent(
     const std::string &bundleName, const std::string &callType, const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (callType.empty()) {
         HILOG_ERROR("empty Calltype");
         return ERR_INVALID_VALUE;
     }
     auto mainHandler = GetMainEventRunner();
     if (mainHandler == nullptr) {
-        HILOG_ERROR("null handler");
+        HILOG_ERROR("[%{public}s]null handler", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -679,10 +681,10 @@ ErrCode EtsFormStateObserver::OnFormClickEvent(
 ErrCode EtsFormStateObserver::RegisterClickEventCallback(
     ani_vm* ani_vm, const std::string &bundleName, const ani_object callback, const std::string &type)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     ani_env* env = GetAniEnv(ani_vm);
     if (env == nullptr) {
-        HILOG_ERROR("GetAniEnv failed");
+        HILOG_ERROR("[%{public}s]GetAniEnv failed", __FUNCTION__);
         return ERR_INVALID_VALUE;
     }
     auto record = std::make_shared<EtsFormEventCallbackList>(bundleName, type, env);
@@ -721,11 +723,11 @@ ErrCode EtsFormStateObserver::RegisterClickEventCallback(
 
 ErrCode EtsFormStateObserver::ClearFormClickCallbackByBundleName(const std::string &type, const std::string &bundleName)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::unique_lock<std::mutex> lock(formEventMapMutex_);
     auto formEventCallbackListIter = formEventMap_.find(bundleName);
     if (formEventCallbackListIter == formEventMap_.end()) {
-        HILOG_ERROR("Invalid bundleName");
+        HILOG_ERROR("[%{public}s]Invalid bundleName", __FUNCTION__);
         return ERR_INVALID_VALUE;
     }
 
@@ -735,7 +737,7 @@ ErrCode EtsFormStateObserver::ClearFormClickCallbackByBundleName(const std::stri
             return iter != nullptr && iter->BindFormEventType() == type && iter->BindHostBundleName() == bundleName;
         });
     if (callBackListIter == callbackListVec.end()) {
-        HILOG_ERROR("This bundle hasn't registered any callback of this type");
+        HILOG_ERROR("[%{public}s]This bundle hasn't registered any callback of this type", __FUNCTION__);
         return ERR_INVALID_VALUE;
     }
     callbackListVec.erase(callBackListIter);
@@ -747,11 +749,11 @@ ErrCode EtsFormStateObserver::ClearFormClickCallbackByBundleName(const std::stri
 ErrCode EtsFormStateObserver::ClearFormClickCallback(
     const std::string &type, const std::string &bundleName, const ani_object &callback)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::unique_lock<std::mutex> lock(formEventMapMutex_);
     auto formEventCallbackListIter = formEventMap_.find(bundleName);
     if (formEventCallbackListIter == formEventMap_.end()) {
-        HILOG_ERROR("Invalid bundleName");
+        HILOG_ERROR("[%{public}s]Invalid bundleName", __FUNCTION__);
         return ERR_INVALID_VALUE;
     }
 
@@ -761,7 +763,7 @@ ErrCode EtsFormStateObserver::ClearFormClickCallback(
             return iter != nullptr && iter->BindFormEventType() == type && iter->BindHostBundleName() == bundleName;
         });
     if (callBackListIter == callbackListVec.end()) {
-        HILOG_ERROR("This bundle hasn't registered any callback of this type");
+        HILOG_ERROR("[%{public}s]This bundle hasn't registered any callback of this type", __FUNCTION__);
         return ERR_INVALID_VALUE;
     }
 
@@ -784,13 +786,13 @@ ErrCode EtsFormStateObserver::ClearFormClickCallback(
 EtsFormEventCallbackList::~EtsFormEventCallbackList()
 {
     if (env_ == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
     ani_status status = ANI_ERROR;
     for (auto &iter : callbacks_) {
         if ((status = env_->GlobalReference_Delete(iter)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Delete status:%{public}d", status);
+            HILOG_ERROR("[%{public}s]GlobalReference_Delete status:%{public}d", __FUNCTION__, status);
             continue;
         }
     }
@@ -798,9 +800,9 @@ EtsFormEventCallbackList::~EtsFormEventCallbackList()
 
 bool EtsFormEventCallbackList::ContainEqualCallback(ani_object callback) const
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (env_ == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return false;
     }
     ani_boolean isEqual = false;
@@ -815,16 +817,16 @@ bool EtsFormEventCallbackList::ContainEqualCallback(ani_object callback) const
 
 void EtsFormEventCallbackList::PushCallback(ani_object call)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (env_ == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
     if (!ContainEqualCallback(call)) {
         ani_status status = ANI_ERROR;
         ani_ref callbackRef;
         if ((status = env_->GlobalReference_Create(call, &callbackRef)) != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Create status:%{public}d", status);
+            HILOG_ERROR("[%{public}s]GlobalReference_Create status:%{public}d", __FUNCTION__, status);
             return;
         }
         if (callbackRef != nullptr) {
@@ -835,7 +837,7 @@ void EtsFormEventCallbackList::PushCallback(ani_object call)
 
 void EtsFormEventCallbackList::RemoveCallback(ani_object call)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (env_ == nullptr || call == nullptr) {
         HILOG_ERROR("null env or callback");
         return;
@@ -857,7 +859,7 @@ void EtsFormEventCallbackList::RemoveCallback(ani_object call)
 std::shared_ptr<EtsFormEventCallbackList> EtsFormEventCallbackList::CopyCallbacks() const
 {
     if (env_ == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return nullptr;
     }
     auto snapshot = std::make_shared<EtsFormEventCallbackList>(bindHostBundleName, eventType_, env_);
@@ -865,7 +867,7 @@ std::shared_ptr<EtsFormEventCallbackList> EtsFormEventCallbackList::CopyCallback
         ani_ref callbackRef = nullptr;
         ani_status status = env_->GlobalReference_Create(callback, &callbackRef);
         if (status != ANI_OK) {
-            HILOG_ERROR("GlobalReference_Create status:%{public}d", status);
+            HILOG_ERROR("[%{public}s]GlobalReference_Create status:%{public}d", __FUNCTION__, status);
             return nullptr;
         }
         snapshot->callbacks_.emplace_back(callbackRef);
@@ -875,21 +877,21 @@ std::shared_ptr<EtsFormEventCallbackList> EtsFormEventCallbackList::CopyCallback
 
 void EtsFormEventCallbackList::HandleFormEvent(const AppExecFwk::RunningFormInfo &runningFormInfo) const
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (env_ == nullptr) {
-        HILOG_ERROR("null env");
+        HILOG_ERROR("[%{public}s]null env", __FUNCTION__);
         return;
     }
 
     ani_object formInfo = FormAniUtil::CreateRunningFormInfo(env_, runningFormInfo);
     if (formInfo == nullptr) {
-        HILOG_ERROR("null callbackValues");
+        HILOG_ERROR("[%{public}s]null callbackValues", __FUNCTION__);
         return;
     }
     for (auto &iter : callbacks_) {
         bool bRet = FormAniUtil::Callback(env_, static_cast<ani_object>(iter), formInfo, CLASSNAME_CALLBACK_WRAPPER);
         if (!bRet) {
-            HILOG_ERROR("callback failed");
+            HILOG_ERROR("[%{public}s]callback failed", __FUNCTION__);
             continue;
         }
     }
