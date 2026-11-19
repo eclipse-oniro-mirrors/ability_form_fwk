@@ -508,6 +508,17 @@ void FormStatusTaskMgr::RenderForm(
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     if (renderType == Constants::RENDER_FORM) {
         newWant.SetParam(Constants::FORM_IS_VISIBLE, FormDataMgr::GetInstance().GetFormVisible(formRecord.formId));
+        // Piggyback render params on the first render want: SetRenderGroup* messages
+        // sent before the FRS render record exists are dropped.
+        FormUpgradeInfo formUpgradeInfo;
+        if (FormDataMgr::GetInstance().GetFormUpgradeInfo(formRecord.formId, formUpgradeInfo)) {
+            if (!formUpgradeInfo.transparencyColor.empty()) {
+                newWant.SetParam(Constants::PARAM_FORM_TRANSPARENCY_KEY, formUpgradeInfo.transparencyColor);
+            }
+            if (formUpgradeInfo.disableUIFirst) {
+                newWant.SetParam(Constants::PARAM_FORM_DISABLE_UIFIRST_KEY, true);
+            }
+        }
     }
 
     int32_t error = remoteFormRender->RenderForm(formJsInfo, newWant, FormSupplyCallback::GetInstance());

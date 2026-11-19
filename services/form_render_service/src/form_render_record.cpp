@@ -1272,10 +1272,14 @@ void FormRenderRecord::PostReAddRecycledForms(const FormJsInfo &formJsInfo, cons
     auto task = [thisWeakPtr, formJsInfo, newWant = want]() {
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord) {
+            bool isVisible = renderRecord->IsFormVisible(formJsInfo.formId);
             int32_t ret = renderRecord->HandleUpdateInJsThread(formJsInfo, newWant);
             if (ret == ERR_OK) {
                 const auto compId = newWant.GetStringParam(Constants::FORM_COMP_ID);
                 renderRecord->UpdateFormRequestReleaseState(formJsInfo.formId, compId, false);
+                if (!isVisible) {
+                    renderRecord->SetVisibleChange(formJsInfo.formId, false);
+                }
             } else {
                 FormRenderEventReport::SendFormFailedEvent(FormEventName::RELOAD_FORM_FAILED,
                     formJsInfo.formId,

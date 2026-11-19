@@ -669,6 +669,74 @@ HWTEST_F(FormStatusTaskMgrTest, RenderForm_006, TestSize.Level1)
 }
 
 /**
+ * @tc.name: RenderForm_007
+ * @tc.desc: Verify first render want piggybacks transparency and UIFirst from FormUpgradeInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormStatusTaskMgrTest, RenderForm_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RenderForm_007 start";
+    auto formTaskMgr = std::make_shared<FormStatusTaskMgr>();
+    ASSERT_NE(formTaskMgr, nullptr);
+    int64_t formId = 999007;
+    FormStatusMgr::GetInstance().SetFormEventId(formId);
+    FormRecord formRecord;
+    formRecord.formId = formId;
+    formRecord.isVisible = false;
+    FormUpgradeInfo formUpgradeInfo;
+    formUpgradeInfo.transparencyColor = "#80000000";
+    formUpgradeInfo.disableUIFirst = true;
+    FormDataMgr::GetInstance().formRecords_[formId] = formRecord;
+    FormDataMgr::GetInstance().UpdateFormUpgradeInfo(formId, formUpgradeInfo);
+
+    Want capturedWant;
+    sptr<MockIFormRender> mockRender = new (std::nothrow) MockIFormRender();
+    ASSERT_NE(mockRender, nullptr);
+    EXPECT_CALL(*mockRender, RenderForm(_, _, _)).WillOnce(
+        [&capturedWant](const FormJsInfo &formJsInfo, const Want &want, sptr<IRemoteObject> callerToken) {
+            capturedWant = want;
+            return ERR_OK;
+        });
+    formTaskMgr->RenderForm(formRecord, Want(), mockRender);
+    EXPECT_EQ(capturedWant.GetStringParam(Constants::PARAM_FORM_TRANSPARENCY_KEY), "#80000000");
+    EXPECT_EQ(capturedWant.GetBoolParam(Constants::PARAM_FORM_DISABLE_UIFIRST_KEY, false), true);
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+    GTEST_LOG_(INFO) << "RenderForm_007 end";
+}
+
+/**
+ * @tc.name: RenderForm_008
+ * @tc.desc: Verify first render want carries no render params when FormUpgradeInfo is empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormStatusTaskMgrTest, RenderForm_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "RenderForm_008 start";
+    auto formTaskMgr = std::make_shared<FormStatusTaskMgr>();
+    ASSERT_NE(formTaskMgr, nullptr);
+    int64_t formId = 999008;
+    FormStatusMgr::GetInstance().SetFormEventId(formId);
+    FormRecord formRecord;
+    formRecord.formId = formId;
+    formRecord.isVisible = false;
+    FormDataMgr::GetInstance().formRecords_[formId] = formRecord;
+
+    Want capturedWant;
+    sptr<MockIFormRender> mockRender = new (std::nothrow) MockIFormRender();
+    ASSERT_NE(mockRender, nullptr);
+    EXPECT_CALL(*mockRender, RenderForm(_, _, _)).WillOnce(
+        [&capturedWant](const FormJsInfo &formJsInfo, const Want &want, sptr<IRemoteObject> callerToken) {
+            capturedWant = want;
+            return ERR_OK;
+        });
+    formTaskMgr->RenderForm(formRecord, Want(), mockRender);
+    EXPECT_TRUE(capturedWant.GetStringParam(Constants::PARAM_FORM_TRANSPARENCY_KEY).empty());
+    EXPECT_FALSE(capturedWant.GetBoolParam(Constants::PARAM_FORM_DISABLE_UIFIRST_KEY, false));
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+    GTEST_LOG_(INFO) << "RenderForm_008 end";
+}
+
+/**
  * @tc.name: OnRecycleDataDone_004
  * @tc.desc: Verify OnRecycleDataDone when eventId matches curTid (lambda posted).
  * @tc.type: FUNC

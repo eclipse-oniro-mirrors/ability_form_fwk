@@ -2248,4 +2248,61 @@ HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_ImageDataNumExceed_002, TestSiz
     GTEST_LOG_(INFO) << "ReadFromParcel_ImageDataNumExceed_002 end";
 }
 
+/**
+ * @tc.name: ReadFromParcel_NonObjectJson_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadFromParcel rejects a valid but non-object JSON string.
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_NonObjectJson_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFromParcel_NonObjectJson_001 start";
+    Parcel parcel;
+    std::string dataString = "123";
+    parcel.WriteInt32(dataString.length());
+    parcel.WriteString16(Str8ToStr16(dataString));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_REMOVED);
+
+    FormProviderData formProviderData;
+    EXPECT_FALSE(formProviderData.ReadFromParcel(parcel));
+    GTEST_LOG_(INFO) << "ReadFromParcel_NonObjectJson_001 end";
+}
+
+/**
+ * @tc.name: ReadFromParcel_NonObjectJson_002
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadFromParcel rejects a JSON array string.
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_NonObjectJson_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFromParcel_NonObjectJson_002 start";
+    Parcel parcel;
+    std::string dataString = "[1, 2, 3]";
+    parcel.WriteInt32(dataString.length());
+    parcel.WriteString16(Str8ToStr16(dataString));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_REMOVED);
+
+    FormProviderData formProviderData;
+    EXPECT_FALSE(formProviderData.ReadFromParcel(parcel));
+    GTEST_LOG_(INFO) << "ReadFromParcel_NonObjectJson_002 end";
+}
+
+/**
+ * @tc.name: ReadFromParcel_ObjectJson_003
+ * @tc.type: FUNC
+ * @tc.desc: Verify ReadFromParcel accepts a valid JSON object string.
+ */
+HWTEST_F(FmsFormProviderDataTest, ReadFromParcel_ObjectJson_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "ReadFromParcel_ObjectJson_003 start";
+    Parcel parcel;
+    std::string dataString = "{\"key\": \"value\"}";
+    parcel.WriteInt32(dataString.length());
+    parcel.WriteString16(Str8ToStr16(dataString));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_REMOVED);
+
+    FormProviderData formProviderData;
+    EXPECT_TRUE(formProviderData.ReadFromParcel(parcel));
+    GTEST_LOG_(INFO) << "ReadFromParcel_ObjectJson_003 end";
+}
+
 }  // namespace OHOS::AppExecFwk
