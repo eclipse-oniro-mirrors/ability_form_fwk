@@ -21,27 +21,27 @@ namespace AppExecFwk {
 bool FormMajorInfo::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteString(bundleName)) {
-        HILOG_ERROR("marshall bundleName failed");
+        HILOG_ERROR("[%{public}s]marshall bundleName failed", __FUNCTION__);
         return false;
     }
 
     if (!parcel.WriteString(moduleName)) {
-        HILOG_ERROR("marshall moduleName failed");
+        HILOG_ERROR("[%{public}s]marshall moduleName failed", __FUNCTION__);
         return false;
     }
 
     if (!parcel.WriteString(abilityName)) {
-        HILOG_ERROR("marshall abilityName failed");
+        HILOG_ERROR("[%{public}s]marshall abilityName failed", __FUNCTION__);
         return false;
     }
 
     if (!parcel.WriteString(formName)) {
-        HILOG_ERROR("marshall formName failed");
+        HILOG_ERROR("[%{public}s]marshall formName failed", __FUNCTION__);
         return false;
     }
 
     if (!parcel.WriteInt32(dimension)) {
-        HILOG_ERROR("marshall dimension failed");
+        HILOG_ERROR("[%{public}s]marshall dimension failed", __FUNCTION__);
         return false;
     }
 
@@ -53,34 +53,34 @@ FormMajorInfo *FormMajorInfo::Unmarshalling(Parcel &parcel)
     FormMajorInfo *majorInfo = new (std::nothrow) FormMajorInfo();
 
     if (majorInfo == nullptr) {
-        HILOG_ERROR("new FormMajorInfo failed.");
+        HILOG_ERROR("new FormMajorInfo failed");
         return nullptr;
     }
 
     bool readFlag = false;
     do {
         if (!parcel.ReadString(majorInfo->bundleName)) {
-            HILOG_ERROR("marshall bundleName failed.");
+            HILOG_ERROR("[%{public}s]marshall bundleName failed", __FUNCTION__);
             break;
         }
 
         if (!parcel.ReadString(majorInfo->moduleName)) {
-            HILOG_ERROR("marshall moduleName failed.");
+            HILOG_ERROR("[%{public}s]marshall moduleName failed", __FUNCTION__);
             break;
         }
 
         if (!parcel.ReadString(majorInfo->abilityName)) {
-            HILOG_ERROR("marshall abilityName failed.");
+            HILOG_ERROR("[%{public}s]marshall abilityName failed", __FUNCTION__);
             break;
         }
 
         if (!parcel.ReadString(majorInfo->formName)) {
-            HILOG_ERROR("marshall formName failed.");
+            HILOG_ERROR("[%{public}s]marshall formName failed", __FUNCTION__);
             break;
         }
 
         if (!parcel.ReadInt32(majorInfo->dimension)) {
-            HILOG_ERROR("marshall dimension failed.");
+            HILOG_ERROR("[%{public}s]marshall dimension failed", __FUNCTION__);
             break;
         }
 

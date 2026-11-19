@@ -24,7 +24,7 @@ int32_t DefaultStaggerStrategy::ExecuteRefresh(std::vector<RefreshData> &batch, 
     for (auto &data : batch) {
         int32_t ret = FormRefreshMgr::GetInstance().RequestRefresh(data, refreshType);
         if (ret != ERR_OK) {
-            HILOG_WARN("DefaultStaggerStrategy::ExecuteRefresh: refresh failed for form %{public}" PRId64 ""
+            HILOG_WARN("DefaultStaggerStrategy::ExecuteRefresh:refresh failed for form %{public}" PRId64 ""
                 ", err = %{public}d", data.formId, ret);
         }
     }

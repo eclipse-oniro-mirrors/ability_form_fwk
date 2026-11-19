@@ -176,7 +176,7 @@ void FormDumpMgr::DumpHasFormVisible(
  */
 void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, std::string &formInfos) const
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     for (const auto &info : formRecordInfos) {
         DumpFormInfo(info, formInfos);
         formInfos += LINE_FEED;
@@ -189,7 +189,7 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
  */
 void FormDumpMgr::DumpFormHostInfo(const FormHostRecord &formHostRecord, std::string &formInfo) const
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     formInfo += "  ================FormHostRecord=================\n";
     formInfo += "  callerUid [" + std::to_string(formHostRecord.GetCallerUid()) + "]\n";
     formInfo += "  hostBundleName [" + formHostRecord.GetHostBundleName() + "]\n";
@@ -202,7 +202,7 @@ void FormDumpMgr::DumpFormHostInfo(const FormHostRecord &formHostRecord, std::st
  */
 void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     formInfo += "  ================FormRecord=================\n";
     formInfo += "  FormId [" + std::to_string(formRecordInfo.formId) + "]\n";
     formInfo += "    formName [" + formRecordInfo.formName + "]\n";
@@ -276,7 +276,7 @@ void FormDumpMgr::AppendRunningFormInfos(const std::string &formHostBundleName,
     const std::vector<RunningFormInfo> &runningFormInfos,
     std::string &infosResult) const
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::unordered_map<std::string, std::string> liveFormStatusMap;
     FormMgrAdapterFacade::GetInstance().GetLiveFormStatus(liveFormStatusMap);
     for (const auto& info : runningFormInfos) {
@@ -343,7 +343,7 @@ void FormDumpMgr::AppendFormLocation(Constants::FormLocation formLocation, std::
 void FormDumpMgr::DumpRunningFormInfos(const std::vector<RunningFormInfo> &runningFormInfos,
     std::string &infosResult) const
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
 
     std::unordered_map<std::string, int> countMap;
 

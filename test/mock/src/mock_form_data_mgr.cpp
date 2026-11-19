@@ -303,12 +303,21 @@ bool FormDataMgr::CreateFormStateRecord(std::string &provider, const FormItemInf
 }
 
 bool FormDataMgr::CreateFormAcquireDataRecord(int64_t requestCode, const FormItemInfo &info,
-    const sptr<IRemoteObject> &callerToken, int32_t callingUid)
+    const sptr<IRemoteObject> &callerToken, int32_t callingUid, const std::string &providerBundleName)
 {
     GTEST_LOG_(INFO) << "CreateFormAcquireDataRecord called";
     if (AppExecFwk::MockFormDataMgr::obj) {
         return AppExecFwk::MockFormDataMgr::obj->CreateFormAcquireDataRecord(requestCode, info,
-            callerToken, callingUid);
+            callerToken, callingUid, providerBundleName);
+    }
+    return false;
+}
+
+bool FormDataMgr::CheckAcquireDataProvider(int64_t requestCode, const std::string &callerBundleName)
+{
+    GTEST_LOG_(INFO) << "CheckAcquireDataProvider called";
+    if (AppExecFwk::MockFormDataMgr::obj) {
+        return AppExecFwk::MockFormDataMgr::obj->CheckAcquireDataProvider(requestCode, callerBundleName);
     }
     return false;
 }

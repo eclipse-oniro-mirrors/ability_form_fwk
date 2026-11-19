@@ -32,7 +32,7 @@ void FormOsAccountSubscriber::OnStateChanged(const AccountSA::OsAccountStateData
         HILOG_WARN("invalid os account userId:%{public}d", userId);
         return;
     }
-    HILOG_INFO("os account created, userId:%{public}d, schedule reload", userId);
+    HILOG_INFO("os account created,userId:%{public}d,schedule reload", userId);
     // Callback runs on a binder thread: only enqueue, never execute reload inline.
     FormMgrQueue::GetInstance().ScheduleTask(0, [userId]() {
         FormInfoMgr::GetInstance().ReloadFormInfos(userId);

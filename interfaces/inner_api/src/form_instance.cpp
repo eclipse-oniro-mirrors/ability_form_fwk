@@ -117,7 +117,7 @@ bool Rect::ReadFromParcel(Parcel &parcel)
     top = parcel.ReadDouble();
     width = parcel.ReadDouble();
     height = parcel.ReadDouble();
-    HILOG_INFO("call rect: %{public}f, %{public}f, %{public}f, %{public}f", left, top, width, height);
+    HILOG_INFO("call rect:%{public}f,%{public}f,%{public}f,%{public}f", left, top, width, height);
     return true;
 }
 
@@ -155,7 +155,7 @@ bool OverflowInfo::ReadFromParcel(Parcel &parcel)
     }
     duration = parcel.ReadInt32();
     useDefaultAnimation = parcel.ReadBool();
-    HILOG_INFO("OverflowInfo, rect: %{public}f, %{public}f, %{public}f, %{public}f, duration: %{public}d,"
+    HILOG_INFO("OverflowInfo,rect:%{public}f,%{public}f,%{public}f,%{public}f,duration:%{public}d,"
         " useDefaultAnimate: %{public}d", area.left, area.top, area.width, area.height, duration, useDefaultAnimation);
     return true;
 }

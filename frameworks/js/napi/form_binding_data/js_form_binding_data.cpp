@@ -61,27 +61,27 @@ napi_value JsFormBindingData::OnCreateFormBindingData(napi_env env, size_t argc,
             napi_value globalValue = nullptr;
             napi_status status = napi_get_global(env, &globalValue);
             if (status != napi_ok || globalValue == nullptr) {
-                HILOG_ERROR("Failed to get global object");
+                HILOG_ERROR("[%{public}s]Failed to get global object", __FUNCTION__);
                 return CreateJsUndefined(env);
             }
             napi_value jsonValue = nullptr;
             status = napi_get_named_property(env, globalValue, "JSON", &jsonValue);
             if (status != napi_ok || jsonValue == nullptr) {
-                HILOG_ERROR("Failed to get JSON property");
+                HILOG_ERROR("[%{public}s]Failed to get JSON property", __FUNCTION__);
                 return CreateJsUndefined(env);
             }
 
             napi_value stringifyValue = nullptr;
             status = napi_get_named_property(env, jsonValue, "stringify", &stringifyValue);
             if (status != napi_ok || stringifyValue == nullptr) {
-                HILOG_ERROR("Failed to get stringify property");
+                HILOG_ERROR("[%{public}s]Failed to get stringify property", __FUNCTION__);
                 return CreateJsUndefined(env);
             }
             napi_value funcArgv[1] = { argv[0] };
             napi_value transValue = nullptr;
             status = napi_call_function(env, jsonValue, stringifyValue, 1, funcArgv, &transValue);
             if (status != napi_ok || transValue == nullptr) {
-                HILOG_ERROR("Failed to call JSON.stringify");
+                HILOG_ERROR("[%{public}s]Failed to call JSON.stringify", __FUNCTION__);
                 return CreateJsUndefined(env);
             }
             nativeValue = transValue;
@@ -91,7 +91,7 @@ napi_value JsFormBindingData::OnCreateFormBindingData(napi_env env, size_t argc,
     napi_value objValue = nullptr;
     napi_status status = napi_create_object(env, &objValue);
     if (status != napi_ok || objValue == nullptr) {
-        HILOG_ERROR("Failed to create object");
+        HILOG_ERROR("[%{public}s]Failed to create object", __FUNCTION__);
         return CreateJsUndefined(env);
     }
     napi_set_named_property(env, objValue, "data", CreateJsValue(env, formDataStr));
@@ -111,26 +111,26 @@ napi_value JsFormBindingData::OnCreateFormBindingDataEx(napi_env env, size_t arg
             napi_value globalValue = nullptr;
             napi_status status = napi_get_global(env, &globalValue);
             if (status != napi_ok || globalValue == nullptr) {
-                HILOG_ERROR("Failed to get global object");
+                HILOG_ERROR("[%{public}s]Failed to get global object", __FUNCTION__);
                 return CreateJsUndefined(env);
             }
             napi_value jsonValue = nullptr;
             status = napi_get_named_property(env, globalValue, "JSON", &jsonValue);
             if (status != napi_ok || jsonValue == nullptr) {
-                HILOG_ERROR("Failed to get JSON property");
+                HILOG_ERROR("[%{public}s]Failed to get JSON property", __FUNCTION__);
                 return CreateJsUndefined(env);
             }
 
             napi_value stringifyValue = nullptr;
             status = napi_get_named_property(env, jsonValue, "stringify", &stringifyValue);
             if (status != napi_ok || stringifyValue == nullptr) {
-                HILOG_ERROR("Failed to get stringify property");
+                HILOG_ERROR("[%{public}s]Failed to get stringify property", __FUNCTION__);
                 return CreateJsUndefined(env);
             }
             napi_value transValue = nullptr;
             status = napi_call_function(env, jsonValue, stringifyValue, 1, &argv[0], &transValue);
             if (status != napi_ok || transValue == nullptr) {
-                HILOG_ERROR("Failed to call JSON.stringify");
+                HILOG_ERROR("[%{public}s]Failed to call JSON.stringify", __FUNCTION__);
                 return CreateJsUndefined(env);
             }
             nativeValue = transValue;
@@ -143,7 +143,7 @@ napi_value JsFormBindingData::OnCreateFormBindingDataEx(napi_env env, size_t arg
     napi_value objValue = nullptr;
     napi_status status = napi_create_object(env, &objValue);
     if (status != napi_ok || objValue == nullptr) {
-        HILOG_ERROR("Failed to create object");
+        HILOG_ERROR("[%{public}s]Failed to create object", __FUNCTION__);
         return CreateJsUndefined(env);
     }
     napi_set_named_property(env, objValue, "data", CreateJsValue(env, formDataStr));

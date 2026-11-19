@@ -80,7 +80,9 @@ public:
     virtual bool CreateFormStateRecord(std::string &provider, const FormItemInfo &info,
         const sptr<IRemoteObject> &callerToken, int32_t callingUid) = 0;
     virtual bool CreateFormAcquireDataRecord(int64_t requestCode, const FormItemInfo &info,
-        const sptr<IRemoteObject> &callerToken, int32_t callingUid) = 0;
+        const sptr<IRemoteObject> &callerToken, int32_t callingUid,
+        const std::string &providerBundleName) = 0;
+    virtual bool CheckAcquireDataProvider(int64_t requestCode, const std::string &callerBundleName) = 0;
     virtual bool GetMatchedHostClient(const sptr<IRemoteObject> &callerToken,
         FormHostRecord &formHostRecord) const = 0;
     virtual ErrCode UpdateHostFormFlag(const std::vector<int64_t> &formIds,
@@ -160,8 +162,9 @@ public:
         std::vector<FormInstance> &formInstances));
     MOCK_METHOD4(CreateFormStateRecord, bool(std::string &provider, const FormItemInfo &info,
         const sptr<IRemoteObject> &callerToken, int32_t callingUid));
-    MOCK_METHOD4(CreateFormAcquireDataRecord, bool(int64_t requestCode, const FormItemInfo &info,
-        const sptr<IRemoteObject> &callerToken, int32_t callingUid));
+    MOCK_METHOD5(CreateFormAcquireDataRecord, bool(int64_t requestCode, const FormItemInfo &info,
+        const sptr<IRemoteObject> &callerToken, int32_t callingUid, const std::string &providerBundleName));
+    MOCK_METHOD2(CheckAcquireDataProvider, bool(int64_t requestCode, const std::string &callerBundleName));
     MOCK_CONST_METHOD2(GetMatchedHostClient, bool(const sptr<IRemoteObject> &callerToken,
         FormHostRecord &formHostRecord));
     MOCK_METHOD5(UpdateHostFormFlag, ErrCode(const std::vector<int64_t> &formIds,

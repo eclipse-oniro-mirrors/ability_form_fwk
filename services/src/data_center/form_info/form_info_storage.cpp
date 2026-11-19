@@ -41,9 +41,9 @@ FormInfoStorage::FormInfoStorage(int32_t userId, const std::vector<AppExecFwk::F
 
 void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
-    HILOG_INFO("caller:%{public}d,this:%{public}d", userId, this->userId);
+    HILOG_INFO("[%{public}s]caller:%{public}d,this:%{public}d", __FUNCTION__, userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
-        HILOG_ERROR("Invalid userId");
+        HILOG_ERROR("[%{public}s]Invalid userId", __FUNCTION__);
         return;
     }
 
@@ -57,9 +57,9 @@ void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::Fo
 
 void FormInfoStorage::GetAllTemplateFormsInfo(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
-    HILOG_INFO("caller:%{public}d,this:%{public}d", userId, this->userId);
+    HILOG_INFO("[%{public}s]caller:%{public}d,this:%{public}d", __FUNCTION__, userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
-        HILOG_ERROR("Invalid userId");
+        HILOG_ERROR("[%{public}s]Invalid userId", __FUNCTION__);
         return;
     }
  
@@ -128,9 +128,9 @@ static bool find_rect_shape(const std::vector<int32_t> &supportShapes)
 void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
     const AppExecFwk::FormInfoFilter &filter, std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
-    HILOG_INFO("caller:%{public}d,this:%{public}d", userId, this->userId);
+    HILOG_INFO("[%{public}s]caller:%{public}d,this:%{public}d", __FUNCTION__, userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
-        HILOG_ERROR("Invalid userId");
+        HILOG_ERROR("[%{public}s]Invalid userId", __FUNCTION__);
         return;
     }
     for (const auto &item : this->formInfos) {
@@ -163,9 +163,9 @@ void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
 void FormInfoStorage::GetFormsInfoByModule(int32_t userId, const std::string &moduleName,
     std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
-    HILOG_INFO("caller:%{public}d,this:%{public}d", userId, this->userId);
+    HILOG_INFO("[%{public}s]caller:%{public}d,this:%{public}d", __FUNCTION__, userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
-        HILOG_ERROR("Invalid userId");
+        HILOG_ERROR("[%{public}s]Invalid userId", __FUNCTION__);
         return;
     }
     for (const auto &item : this->formInfos) {
@@ -181,9 +181,9 @@ void FormInfoStorage::GetFormsInfoByModule(int32_t userId, const std::string &mo
 void FormInfoStorage::GetTemplateFormsInfoByModule(int32_t userId, const std::string &moduleName,
     std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
-    HILOG_INFO("caller:%{public}d,this:%{public}d", userId, this->userId);
+    HILOG_INFO("[%{public}s]caller:%{public}d,this:%{public}d", __FUNCTION__, userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
-        HILOG_ERROR("Invalid userId");
+        HILOG_ERROR("[%{public}s]Invalid userId", __FUNCTION__);
         return;
     }
     for (const auto &item : this->formInfos) {
@@ -205,7 +205,7 @@ bool FormInfoStorage::IsEquipmentLevelFiltered(const AppExecFwk::FormInfo &formI
         return false;
     }
 
-    HILOG_ERROR("fms not support form of bundleName: %{public}s, formName: %{public}s",
+    HILOG_ERROR("fms not support form of bundleName:%{public}s,formName:%{public}s",
         formInfo.bundleName.c_str(), formInfo.name.c_str());
     return true;
 }
@@ -224,7 +224,7 @@ bool FormInfoStorage::IsFunInterFormInfoFiltered(const AppExecFwk::FormInfo &for
         return false;
     }
 
-    HILOG_ERROR("fms not support fun interaction of bundleName: %{public}s", formInfo.bundleName.c_str());
+    HILOG_ERROR("fms not support fun interaction of bundleName:%{public}s", formInfo.bundleName.c_str());
     return true;
 }
 

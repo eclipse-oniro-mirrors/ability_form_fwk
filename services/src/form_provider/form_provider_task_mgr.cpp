@@ -39,7 +39,7 @@ FormProviderTaskMgr::~FormProviderTaskMgr() {}
 void FormProviderTaskMgr::PostAcquireTask(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto acquireProviderFormInfoFunc = [formId, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().AcquireProviderFormInfo(formId, want, remoteObject);
@@ -58,7 +58,7 @@ void FormProviderTaskMgr::PostAcquireTask(const int64_t formId, const Want &want
 void FormProviderTaskMgr::PostRefreshLocationTask(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("Call.");
+    HILOG_DEBUG("[%{public}s]Call", __FUNCTION__);
     auto notifyFormLocationUpdateFunc = [formId, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().NotifyFormLocationUpdate(formId, want, remoteObject);
     };
@@ -76,7 +76,7 @@ void FormProviderTaskMgr::PostRefreshLocationTask(const int64_t formId, const Wa
 void FormProviderTaskMgr::PostRefreshTask(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call, formId:%{public}" PRId64, formId);
+    HILOG_INFO("[%{public}s]call,formId:%{public}" PRId64, __FUNCTION__, formId);
 
     auto notifyFormUpdateFunc = [formId, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().NotifyFormUpdate(formId, want, remoteObject);
@@ -93,7 +93,7 @@ void FormProviderTaskMgr::PostRefreshTask(const int64_t formId, const Want &want
 void FormProviderTaskMgr::PostDeleteTask(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto notifyFormDeleteFunc = [formId, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().NotifyFormDelete(formId, want, remoteObject);
@@ -110,7 +110,7 @@ void FormProviderTaskMgr::PostDeleteTask(const int64_t formId, const Want &want,
 void FormProviderTaskMgr::PostProviderBatchDeleteTask(std::set<int64_t> &formIds, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto batchDeleteFunc = [formIds, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().ProviderBatchDelete(formIds, want, remoteObject);
@@ -129,7 +129,7 @@ void FormProviderTaskMgr::PostProviderBatchDeleteTask(std::set<int64_t> &formIds
 void FormProviderTaskMgr::PostCastTempTask(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto notifyCastTempFunc = [formId, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().NotifyCastTemp(formId, want, remoteObject);
@@ -147,7 +147,7 @@ void FormProviderTaskMgr::PostCastTempTask(const int64_t formId, const Want &wan
 void FormProviderTaskMgr::PostAcquireStateTask(const Want &wantArg, const std::string &provider, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto acquireStateFunc = [wantArg, provider, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().AcquireState(wantArg, provider, want, remoteObject);
@@ -164,7 +164,7 @@ void FormProviderTaskMgr::PostAcquireStateTask(const Want &wantArg, const std::s
 void FormProviderTaskMgr::PostAcquireDataTask(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto acquireDataFunc = [formId, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().AcquireFormData(formId, want, remoteObject);
@@ -182,7 +182,7 @@ void FormProviderTaskMgr::PostAcquireDataTask(const int64_t formId, const Want &
 void FormProviderTaskMgr::PostFormEventTask(const int64_t formId, const std::string &message,
     const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto formEventFunc = [formId, message, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().FireFormEvent(formId, message, want, remoteObject);
@@ -200,7 +200,7 @@ void FormProviderTaskMgr::PostFormEventTask(const int64_t formId, const std::str
 void FormProviderTaskMgr::PostEventNotifyTask(const std::vector<int64_t> &formEvent, const int32_t formVisibleType,
     const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     auto eventNotifyFunc = [formEvent, formVisibleType, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().EventNotify(formEvent, formVisibleType, want, remoteObject);
@@ -220,7 +220,7 @@ void FormProviderTaskMgr::PostEventNotifyTask(const std::vector<int64_t> &formEv
 void FormProviderTaskMgr::PostSizeChangedTask(const int64_t formId, const int32_t newDimension,
     const Rect &newRect, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("Call.");
+    HILOG_INFO("[%{public}s]Call", __FUNCTION__);
     auto sizeChangedFunc = [formId, newDimension, newRect, want, remoteObject]() {
         FormProviderTaskMgr::GetInstance().NotifySizeChanged(formId, newDimension, newRect, want, remoteObject);
     };
@@ -237,17 +237,17 @@ void FormProviderTaskMgr::PostSizeChangedTask(const int64_t formId, const int32_
 void FormProviderTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
-        HILOG_ERROR("get formProviderProxy failed");
+        HILOG_ERROR("[%{public}s]get formProviderProxy failed", __FUNCTION__);
         return;
     }
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
-        HILOG_ERROR("get formRecord failed, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("get formRecord failed,formId:%{public}" PRId64, formId);
         RemoveConnection(connectId);
         return;
     }
@@ -262,7 +262,7 @@ void FormProviderTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Wa
         FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
         return;
     }
-    HILOG_ERROR("fail acquire providerFormInfo, error:%{public}d", error);
+    HILOG_ERROR("fail acquire providerFormInfo,error:%{public}d", error);
     bool handled = FormProviderErrorHandlerFactory::GetAcquireHandler()
         ->HandleSendRequestFailed(formId, error, want);
     if (!handled) {
@@ -283,11 +283,11 @@ void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &wan
     const sptr<IRemoteObject> &remoteObject)
 {
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
-    HILOG_INFO("call, formId:%{public}" PRId64", connectId:%{public}d", formId, connectId);
+    HILOG_INFO("[%{public}s]call,formId:%{public}" PRId64", connectId:%{public}d", __FUNCTION__, formId, connectId);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
-        HILOG_ERROR("get formProviderProxy failed");
+        HILOG_ERROR("[%{public}s]get formProviderProxy failed", __FUNCTION__);
         return;
     }
     int error = formProviderProxy->NotifyFormUpdate(formId, want, FormSupplyCallback::GetInstance());
@@ -296,7 +296,7 @@ void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &wan
         DelayedFormExitDetect(connectId);
         return;
     }
-    HILOG_ERROR("fail notify form update, error:%{public}d", error);
+    HILOG_ERROR("fail notify form update,error:%{public}d", error);
     bool handled = FormProviderErrorHandlerFactory::GetRefreshHandler()
         ->HandleSendRequestFailed(formId, error, want);
     if (!handled) {
@@ -313,12 +313,12 @@ void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &wan
 void FormProviderTaskMgr::NotifyFormDelete(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
-        HILOG_ERROR("get formProviderProxy failed");
+        HILOG_ERROR("[%{public}s]get formProviderProxy failed", __FUNCTION__);
         RemoveConnection(connectId);
         return;
     }
@@ -341,7 +341,7 @@ void FormProviderTaskMgr::NotifyFormDelete(const int64_t formId, const Want &wan
 void FormProviderTaskMgr::ProviderBatchDelete(std::set<int64_t> formIds, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
 
     if (formIds.empty()) {
         HILOG_ERROR("FormIds is empty");
@@ -374,20 +374,20 @@ void FormProviderTaskMgr::ProviderBatchDelete(std::set<int64_t> formIds, const W
 void FormProviderTaskMgr::NotifyCastTemp(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
-        HILOG_ERROR("get formProviderProxy failed");
+        HILOG_ERROR("[%{public}s]get formProviderProxy failed", __FUNCTION__);
         return;
     }
 
     int error = formProviderProxy->NotifyFormCastTempForm(formId, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         RemoveConnection(connectId);
-        HILOG_ERROR("acquire providerFormInfo failed");
+        HILOG_ERROR("[%{public}s]acquire providerFormInfo failed", __FUNCTION__);
         return;
     }
 
@@ -404,13 +404,13 @@ void FormProviderTaskMgr::NotifyCastTemp(const int64_t formId, const Want &want,
 void FormProviderTaskMgr::AcquireState(const Want &wantArg, const std::string &provider, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("[%{public}s]start", __FUNCTION__);
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
-        HILOG_ERROR("get formProviderProxy failed");
+        HILOG_ERROR("[%{public}s]get formProviderProxy failed", __FUNCTION__);
         return;
     }
 
@@ -422,7 +422,7 @@ void FormProviderTaskMgr::AcquireState(const Want &wantArg, const std::string &p
     }
 
     DelayedFormExitDetect(connectId);
-    HILOG_INFO("end");
+    HILOG_INFO("[%{public}s]end", __FUNCTION__);
 }
 
 /**
@@ -434,7 +434,7 @@ void FormProviderTaskMgr::AcquireState(const Want &wantArg, const std::string &p
 void FormProviderTaskMgr::AcquireFormData(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("[%{public}s]start", __FUNCTION__);
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     int64_t requestCode = static_cast<int64_t>(want.GetLongParam(Constants::FORM_ACQUIRE_DATA_REQUEST_CODE, 0));
@@ -451,7 +451,7 @@ void FormProviderTaskMgr::AcquireFormData(const int64_t formId, const Want &want
         HILOG_ERROR("fail acquire formStateToFormProvider");
     }
     RemoveConnection(connectId);
-    HILOG_INFO("end");
+    HILOG_INFO("[%{public}s]end", __FUNCTION__);
 }
 
 /**
@@ -464,13 +464,13 @@ void FormProviderTaskMgr::AcquireFormData(const int64_t formId, const Want &want
 void FormProviderTaskMgr::FireFormEvent(const int64_t formId, const std::string &message, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("[%{public}s]start", __FUNCTION__);
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
-        HILOG_ERROR("get formProviderProxy failed");
+        HILOG_ERROR("[%{public}s]get formProviderProxy failed", __FUNCTION__);
         return;
     }
 
@@ -494,13 +494,13 @@ void FormProviderTaskMgr::FireFormEvent(const int64_t formId, const std::string 
 void FormProviderTaskMgr::EventNotify(const std::vector<int64_t> &formEvents, const int32_t formVisibleType,
     const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
-        HILOG_ERROR("get formProviderProxy failed");
+        HILOG_ERROR("[%{public}s]get formProviderProxy failed", __FUNCTION__);
         return;
     }
 
@@ -518,7 +518,7 @@ void FormProviderTaskMgr::RemoveConnection(int32_t connectId)
 {
     auto formSupplyCallback = FormSupplyCallback::GetInstance();
     if (formSupplyCallback == nullptr) {
-        HILOG_ERROR("formSupplyCallback is nullptr.");
+        HILOG_ERROR("formSupplyCallback is nullptr");
         return;
     }
     formSupplyCallback->RemoveConnection(connectId);
@@ -527,20 +527,20 @@ void FormProviderTaskMgr::RemoveConnection(int32_t connectId)
 void FormProviderTaskMgr::NotifyConfigurationUpdate(const AppExecFwk::Configuration& configuration,
     const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
-        HILOG_ERROR("get formProviderProxy failed");
+        HILOG_ERROR("[%{public}s]get formProviderProxy failed", __FUNCTION__);
         return;
     }
 
     int error = formProviderProxy->NotifyConfigurationUpdate(configuration, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         RemoveConnection(connectId);
-        HILOG_ERROR("acquire providerFormInfo failed");
+        HILOG_ERROR("[%{public}s]acquire providerFormInfo failed", __FUNCTION__);
         return;
     }
 
@@ -550,18 +550,18 @@ void FormProviderTaskMgr::NotifyConfigurationUpdate(const AppExecFwk::Configurat
 void FormProviderTaskMgr::NotifyFormLocationUpdate(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
-        HILOG_ERROR("get formProviderProxy failed");
+        HILOG_ERROR("[%{public}s]get formProviderProxy failed", __FUNCTION__);
         return;
     }
     int error = formProviderProxy->NotifyFormLocationUpdate(formId, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         RemoveConnection(connectId);
-        HILOG_ERROR("fail notify form update");
+        HILOG_ERROR("[%{public}s]fail notify form update", __FUNCTION__);
         return;
     }
 
@@ -571,19 +571,19 @@ void FormProviderTaskMgr::NotifyFormLocationUpdate(const int64_t formId, const W
 void FormProviderTaskMgr::NotifySizeChanged(const int64_t formId, const int32_t newDimension,
     const Rect &newRect, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
-        HILOG_ERROR("get formProviderProxy failed");
+        HILOG_ERROR("[%{public}s]get formProviderProxy failed", __FUNCTION__);
         return;
     }
     int error = formProviderProxy->NotifySizeChanged(formId, newDimension, newRect,
         want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         RemoveConnection(connectId);
-        HILOG_ERROR("fail notify form update");
+        HILOG_ERROR("[%{public}s]fail notify form update", __FUNCTION__);
         return;
     }
 
@@ -593,7 +593,7 @@ void FormProviderTaskMgr::NotifySizeChanged(const int64_t formId, const int32_t 
 void FormProviderTaskMgr::DelayedFormExitDetect(int32_t connectId)
 {
     auto detectFunc = [connectId]() {
-        HILOG_INFO("form exit timeout, handle it. connectId:%{public}d", connectId);
+        HILOG_INFO("form exit timeout,handle it.connectId:%{public}d", connectId);
         FormProviderTaskMgr::GetInstance().RemoveConnection(connectId);
     };
     FormProviderQueue::GetInstance().ScheduleDelayTask(

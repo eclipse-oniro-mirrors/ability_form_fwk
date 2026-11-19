@@ -34,7 +34,7 @@ bool FormCrossDevicePublishCallbackProxy::WriteInterfaceToken(MessageParcel &dat
 
 void FormCrossDevicePublishCallbackProxy::OnResult(const PublishFormCrossDeviceResult &result)
 {
-    HILOG_DEBUG("errCode:%{public}d, formId:%{public}" PRId64, result.errCode, result.formId);
+    HILOG_DEBUG("errCode:%{public}d,formId:%{public}" PRId64, result.errCode, result.formId);
     MessageParcel data;
     if (!WriteInterfaceToken(data) || !data.WriteParcelable(&result)) {
         HILOG_ERROR("write parcelable failed");

@@ -21,17 +21,17 @@ namespace AppExecFwk {
 bool FormLockInfo::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteString(bundleName)) {
-        HILOG_ERROR("marshall bundleName failed");
+        HILOG_ERROR("[%{public}s]marshall bundleName failed", __FUNCTION__);
         return false;
     }
 
     if (!parcel.WriteInt32(userId)) {
-        HILOG_ERROR("marshall userId failed");
+        HILOG_ERROR("[%{public}s]marshall userId failed", __FUNCTION__);
         return false;
     }
 
     if (!parcel.WriteBool(lock)) {
-        HILOG_ERROR("marshall lock failed");
+        HILOG_ERROR("[%{public}s]marshall lock failed", __FUNCTION__);
         return false;
     }
     return true;
@@ -42,26 +42,26 @@ FormLockInfo *FormLockInfo::Unmarshalling(Parcel &parcel)
     FormLockInfo *lockInfo = new (std::nothrow) FormLockInfo();
 
     if (lockInfo == nullptr) {
-        HILOG_ERROR("new FormLockInfo failed.");
+        HILOG_ERROR("new FormLockInfo failed");
         return nullptr;
     }
 
     if (!parcel.ReadString(lockInfo->bundleName)) {
-        HILOG_ERROR("marshall bundleName failed.");
+        HILOG_ERROR("[%{public}s]marshall bundleName failed", __FUNCTION__);
         delete lockInfo;
         lockInfo = nullptr;
         return lockInfo;
     }
 
     if (!parcel.ReadInt32(lockInfo->userId)) {
-        HILOG_ERROR("marshall userId failed.");
+        HILOG_ERROR("[%{public}s]marshall userId failed", __FUNCTION__);
         delete lockInfo;
         lockInfo = nullptr;
         return lockInfo;
     }
 
     if (!parcel.ReadBool(lockInfo->lock)) {
-        HILOG_ERROR("marshall lock failed.");
+        HILOG_ERROR("[%{public}s]marshall lock failed", __FUNCTION__);
         delete lockInfo;
         lockInfo = nullptr;
         return lockInfo;

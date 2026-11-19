@@ -32,7 +32,7 @@ TaskType FormProviderAcquireErrorHandler::GetRetryTaskType() const
 void FormProviderAcquireErrorHandler::OnRetryLimitReached(int64_t formId)
 {
     // Align with ReAcquireProviderFormInfoAsync exhaustion: report HiSys failed event, no host push.
-    HILOG_WARN("Acquire retry limit reached, formId %{public}" PRId64, formId);
+    HILOG_WARN("Acquire retry limit reached,formId %{public}" PRId64, formId);
     FormEventReport::SendFormFailedEvent(FormEventName::CONNECT_FORM_ABILITY_FAILED, formId,
         "", "", static_cast<int32_t>(ConnectFormAbilityErrorType::UPDATE_FORM_FAILED),
         ERR_APPEXECFWK_CONNECT_PROVIDER_TIMEOUT);

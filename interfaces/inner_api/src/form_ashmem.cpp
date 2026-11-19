@@ -61,7 +61,7 @@ FormAshmem* FormAshmem::Unmarshalling(Parcel &parcel)
 bool FormAshmem::WriteToAshmem(std::string name, char *data, int32_t size)
 {
     if (size <= 0) {
-        HILOG_ERROR("invalid param, size= %{public}d", size);
+        HILOG_ERROR("invalid param,size= %{public}d", size);
         return false;
     }
 

@@ -49,7 +49,8 @@ const std::unordered_set<std::string> FormWant::FILTER_INTERNAL_PARAMS_ = {
     Constants::PARAM_DELETE_BACKGROUND_IMAGE,
     Constants::PARAM_FORM_COLOR_MODE_KEY,
     Constants::CONNECT_TO_RENDER,
-    Constants::RECREATE_FORM_KEY
+    Constants::RECREATE_FORM_KEY,
+    Constants::FORM_ENABLE_SNAPSHOT_ON_DETACH
 };
 
 FormWant::FormWant()

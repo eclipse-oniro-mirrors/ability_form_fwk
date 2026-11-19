@@ -51,21 +51,24 @@ ParamManager::~ParamManager()
 void ParamManager::InitParam()
 {
     HILOG_INFO("call");
+    // Hold for the whole body: ReloadParam is only called from here and must not
+    // re-acquire the non-recursive mutex.
+    std::lock_guard<std::mutex> lock(paramMutex_);
     g_paramStr = LoadParamStr();
     g_currentVersion = LoadVersion();
     std::string presetVersion = ParamReader::GetInstance().GetPathVersion(PARAM_PRESET_PATH);
     long long presetVersionNum;
     if (!VersionStrToNumber(presetVersion, presetVersionNum)) {
-        HILOG_ERROR("path version error:%{public}s", presetVersion.c_str());
+        HILOG_ERROR("[%{public}s]path version error:%{public}s", __FUNCTION__, presetVersion.c_str());
         return;
     }
     std::string pathVersion = ParamReader::GetInstance().GetPathVersion(Constants::FORM_MGR_CONFIG_DIR);
     long long pathVersionNum;
     if (!VersionStrToNumber(pathVersion, pathVersionNum)) {
-        HILOG_ERROR("path version error:%{public}s", pathVersion.c_str());
+        HILOG_ERROR("[%{public}s]path version error:%{public}s", __FUNCTION__, pathVersion.c_str());
         return;
     }
-    HILOG_INFO("presetVersion: %{public}s  pathVersion:%{public}s", presetVersion.c_str(), pathVersion.c_str());
+    HILOG_INFO("presetVersion:%{public}s  pathVersion:%{public}s", presetVersion.c_str(), pathVersion.c_str());
     std::string path = Constants::FORM_MGR_CONFIG_DIR;
     if (presetVersionNum > pathVersionNum) {
         pathVersionNum = presetVersionNum;
@@ -78,20 +81,22 @@ void ParamManager::InitParam()
         HILOG_ERROR("current version error:%{public}s", currentVersion.c_str());
         return;
     }
-    HILOG_INFO("currentVersion: %{public}s", currentVersion.c_str());
+    HILOG_INFO("currentVersion:%{public}s", currentVersion.c_str());
     if (currentVersionNum < pathVersionNum) {
         ReloadParam(pathVersion, path);
     }
     ParamControl::GetInstance().DealDueParam(g_paramStr);
 }
 
-const std::string &ParamManager::GetParamStr()
+std::string ParamManager::GetParamStr()
 {
+    std::lock_guard<std::mutex> lock(paramMutex_);
     return g_paramStr;
 }
 
-const std::string &ParamManager::GetParamVersion()
+std::string ParamManager::GetParamVersion()
 {
+    std::lock_guard<std::mutex> lock(paramMutex_);
     return g_currentVersion;
 }
 
@@ -147,7 +152,7 @@ void ParamManager::SaveVersionStr(const std::string &versionStr)
     ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME,
         FORM_MGR_CONFIG_VERSION, versionStr);
     if (result != ERR_OK) {
-        HILOG_ERROR("update formMgrConfig version to rdbstore failed, code is %{public}d", result);
+        HILOG_ERROR("update formMgrConfig version to rdbstore failed,code is %{public}d", result);
     }
 }
 
@@ -156,7 +161,7 @@ void ParamManager::SaveParamStr(const std::string &paramStr)
     ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME,
         FORM_MGR_CONFIG_DATA, paramStr);
     if (result != ERR_OK) {
-        HILOG_ERROR("update formMgrConfig param to rdbstore failed, code is %{public}d", result);
+        HILOG_ERROR("update formMgrConfig param to rdbstore failed,code is %{public}d", result);
     }
 }
 

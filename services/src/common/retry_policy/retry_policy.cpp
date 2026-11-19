@@ -56,7 +56,7 @@ int32_t RetryPolicy::CalculateNextDelay() const
     }
     if (config_.strategyType == RetryStrategyType::LINEAR) {
         if (retryCount_ > 0 && config_.baseDelayMs > INT32_MAX / retryCount_) {
-            HILOG_WARN("Integer overflow in LINEAR delay calculation, use maxDelayMs");
+            HILOG_WARN("Integer overflow in LINEAR delay calculation,use maxDelayMs");
             return config_.maxDelayMs;
         }
         int32_t delay = config_.baseDelayMs * retryCount_;

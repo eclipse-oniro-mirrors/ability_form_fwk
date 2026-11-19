@@ -60,7 +60,7 @@ bool FormExemptLockMgr::IsExemptLock(int64_t formId)
 {
     std::string formId_s = std::to_string(formId);
     if (!Init()) {
-        HILOG_ERROR("Form exempt lock mgr not init");
+        HILOG_ERROR("[%{public}s]Form exempt lock mgr not init", __FUNCTION__);
         return false;
     }
 
@@ -73,7 +73,7 @@ void FormExemptLockMgr::SetExemptLockStatus(int64_t formId, bool isExempt)
 {
     std::string formId_s = std::to_string(formId);
     if (!Init()) {
-        HILOG_ERROR("Form exempt lock mgr not init");
+        HILOG_ERROR("[%{public}s]Form exempt lock mgr not init", __FUNCTION__);
         return;
     }
 

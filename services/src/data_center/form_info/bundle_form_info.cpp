@@ -69,24 +69,24 @@ ErrCode BundleFormInfo::MergeStaticFormInfosLocked(std::vector<FormInfo> &formIn
         bool findUser = false;
         for (auto item = formInfoStorages_.begin(); item != formInfoStorages_.end(); ++item) {
             // Update all user's formInfos
-            HILOG_DEBUG("Update formInfos, user:%{public}d", item->userId);
+            HILOG_DEBUG("Update formInfos,user:%{public}d", item->userId);
             item->formInfos = finalFormInfos;
             findUser = findUser || (item->userId == userId);
         }
         if (!findUser) {
-            HILOG_DEBUG("Add new userId, user:%{public}d", userId);
+            HILOG_DEBUG("Add new userId,user:%{public}d", userId);
             formInfoStorages_.emplace_back(userId, finalFormInfos);
         }
         return ERR_OK;
     }
 
     bool IsBundleDistributed = FormDistributedMgr::GetInstance().IsBundleDistributed(bundleName_, userId);
-    HILOG_INFO("The new package of %{public}s does not contain a card, IsBundleDistributed:%{public}d.",
+    HILOG_INFO("The new package of %{public}s does not contain a card,IsBundleDistributed:%{public}d",
         bundleName_.c_str(), IsBundleDistributed);
     if (IsBundleDistributed) {
         ClearDistributedFormInfos(userId);
     } else {
-        HILOG_INFO("clear normal app formInfos, bundleName: %{public}s", bundleName_.c_str());
+        HILOG_INFO("clear normal app formInfos,bundleName:%{public}s", bundleName_.c_str());
         formInfoStorages_.clear();
     }
     return ERR_OK;
@@ -94,7 +94,7 @@ ErrCode BundleFormInfo::MergeStaticFormInfosLocked(std::vector<FormInfo> &formIn
 
 ErrCode BundleFormInfo::UpdateStaticFormInfos(std::vector<FormInfo> &formInfos, int32_t userId)
 {
-    HILOG_INFO("userId is %{public}d", userId);
+    HILOG_INFO("[%{public}s]userId is %{public}d", __FUNCTION__, userId);
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     ErrCode errCode = MergeStaticFormInfosLocked(formInfos, userId);
     if (errCode != ERR_OK) {
@@ -106,7 +106,7 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(std::vector<FormInfo> &formInfos, 
 ErrCode BundleFormInfo::UpdateStaticFormInfosBatch(std::vector<FormInfo> &formInfos, int32_t userId,
     std::string &formInfoStoragesJson, bool &needRemoveStorage)
 {
-    HILOG_INFO("userId is %{public}d", userId);
+    HILOG_INFO("[%{public}s]userId is %{public}d", __FUNCTION__, userId);
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     ErrCode errCode = MergeStaticFormInfosLocked(formInfos, userId);
     if (errCode != ERR_OK) {
@@ -119,7 +119,7 @@ ErrCode BundleFormInfo::UpdateStaticFormInfosBatch(std::vector<FormInfo> &formIn
     }
     nlohmann::json jsonObject = formInfoStorages_;
     if (jsonObject.is_discarded()) {
-        HILOG_ERROR("bad form infos");
+        HILOG_ERROR("[%{public}s]bad form infos", __FUNCTION__);
         return ERR_APPEXECFWK_PARSE_BAD_PROFILE;
     }
     formInfoStoragesJson = jsonObject.dump(Constants::DUMP_INDENT);
@@ -128,7 +128,7 @@ ErrCode BundleFormInfo::UpdateStaticFormInfosBatch(std::vector<FormInfo> &formIn
 
 ErrCode BundleFormInfo::Remove(int32_t userId)
 {
-    HILOG_INFO("userId is %{public}d", userId);
+    HILOG_INFO("[%{public}s]userId is %{public}d", __FUNCTION__, userId);
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     for (auto item = formInfoStorages_.begin(); item != formInfoStorages_.end();) {
         if (item->userId == userId) {
@@ -142,7 +142,7 @@ ErrCode BundleFormInfo::Remove(int32_t userId)
 
 ErrCode BundleFormInfo::AddDynamicFormInfo(const FormInfo &formInfo, int32_t userId)
 {
-    HILOG_INFO("userId is %{public}d", userId);
+    HILOG_INFO("[%{public}s]userId is %{public}d", __FUNCTION__, userId);
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     for (auto &formInfoStorage : formInfoStorages_) {
         if (formInfoStorage.userId != userId) {
@@ -173,7 +173,7 @@ ErrCode BundleFormInfo::AddDynamicFormInfo(const FormInfo &formInfo, int32_t use
 ErrCode BundleFormInfo::RemoveDynamicFormInfo(const std::string &moduleName, const std::string &formName,
                                               int32_t userId)
 {
-    HILOG_INFO("userId is %{public}d", userId);
+    HILOG_INFO("[%{public}s]userId is %{public}d", __FUNCTION__, userId);
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     for (auto &formInfoStorage : formInfoStorages_) {
         if (formInfoStorage.userId != userId) {
@@ -198,7 +198,7 @@ ErrCode BundleFormInfo::RemoveDynamicFormInfo(const std::string &moduleName, con
 
 ErrCode BundleFormInfo::RemoveAllDynamicFormsInfo(int32_t userId)
 {
-    HILOG_INFO("userId is %{public}d", userId);
+    HILOG_INFO("[%{public}s]userId is %{public}d", __FUNCTION__, userId);
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     int32_t numRemoved = 0;
     for (auto &formInfoStorage : formInfoStorages_) {
@@ -216,7 +216,7 @@ ErrCode BundleFormInfo::RemoveAllDynamicFormsInfo(int32_t userId)
         break;
     }
     if (numRemoved > 0) {
-        HILOG_ERROR("%{public}d dynamic forms info removed.", numRemoved);
+        HILOG_ERROR("%{public}d dynamic forms info removed", numRemoved);
         return UpdateFormInfoStorageLocked();
     }
     return ERR_OK;
@@ -230,7 +230,7 @@ bool BundleFormInfo::Empty() const
 
 ErrCode BundleFormInfo::GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId)
 {
-    HILOG_DEBUG("begin");
+    HILOG_DEBUG("[%{public}s]begin", __FUNCTION__);
     std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     for (const auto &item : formInfoStorages_) {
         item.GetAllFormsInfo(userId, formInfos);
@@ -240,7 +240,7 @@ ErrCode BundleFormInfo::GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_
 
 ErrCode BundleFormInfo::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId)
 {
-    HILOG_DEBUG("begin");
+    HILOG_DEBUG("[%{public}s]begin", __FUNCTION__);
     std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     for (const auto &item : formInfoStorages_) {
         item.GetAllTemplateFormsInfo(userId, formInfos);
@@ -250,7 +250,7 @@ ErrCode BundleFormInfo::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos
 
 uint32_t BundleFormInfo::GetVersionCode(int32_t userId)
 {
-    HILOG_DEBUG("begin");
+    HILOG_DEBUG("[%{public}s]begin", __FUNCTION__);
     std::vector<FormInfo> formInfos;
     std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     for (const auto &item : formInfoStorages_) {
@@ -287,7 +287,7 @@ ErrCode BundleFormInfo::GetTemplateFormsInfoByModule(const std::string &moduleNa
 ErrCode BundleFormInfo::GetFormsInfoByFilter(
     const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId)
 {
-    HILOG_DEBUG("begin");
+    HILOG_DEBUG("[%{public}s]begin", __FUNCTION__);
     std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     for (const auto &item : formInfoStorages_) {
         item.GetFormsInfoByFilter(userId, filter, formInfos);
@@ -303,7 +303,7 @@ ErrCode BundleFormInfo::UpdateFormInfoStorageLocked()
     } else {
         nlohmann::json jsonObject = formInfoStorages_;
         if (jsonObject.is_discarded()) {
-            HILOG_ERROR("bad form infos");
+            HILOG_ERROR("[%{public}s]bad form infos", __FUNCTION__);
             return ERR_APPEXECFWK_PARSE_BAD_PROFILE;
         }
         std::string formInfoStoragesStr = jsonObject.dump(Constants::DUMP_INDENT);
@@ -315,7 +315,7 @@ ErrCode BundleFormInfo::UpdateFormInfoStorageLocked()
 void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
     std::vector<FormInfo> &outFormInfos, const std::vector<FormDBInfo> &formDBInfos)
 {
-    HILOG_INFO("formInfo num: %{public}zu,formDBInfo num: %{public}zu",
+    HILOG_INFO("formInfo num:%{public}zu,formDBInfo num:%{public}zu",
         inFormInfos.size(), formDBInfos.size());
     std::set<std::string> formDBNames;
     GetAllUsedFormName(formDBInfos, inFormInfos, formDBNames);
@@ -364,7 +364,7 @@ void BundleFormInfo::GetAllUsedFormName(const std::vector<FormDBInfo> &formDBInf
             }
         }
     }
-    HILOG_INFO("used form num: %{public}zu", formDBNames.size());
+    HILOG_INFO("used form num:%{public}zu", formDBNames.size());
 }
 
 void BundleFormInfo::ClearDistributedFormInfos(int32_t userId)
@@ -380,7 +380,7 @@ void BundleFormInfo::ClearDistributedFormInfos(int32_t userId)
         // install a part of distributed app package, do not clear for now
         return;
     }
-    HILOG_INFO("clear distributed app formInfos, bundleName: %{public}s", bundleName_.c_str());
+    HILOG_INFO("clear distributed app formInfos,bundleName:%{public}s", bundleName_.c_str());
     formInfoStorages_.clear();
 }
 
@@ -421,14 +421,14 @@ bool BundleFormInfo::ApplyConfigToStorages(const FormCustomConfig &config)
 
 void BundleFormInfo::UpdateFormShowConfigs(const std::vector<FormCustomConfig> &configs)
 {
-    HILOG_DEBUG("call, bundleName:%{public}s", bundleName_.c_str());
+    HILOG_DEBUG("call,bundleName:%{public}s", bundleName_.c_str());
     int32_t matchedCount = 0;
     for (const auto &config : configs) {
         if (ApplyConfigToStorages(config)) {
             ++matchedCount;
         }
     }
-    HILOG_INFO("bundleName:%{public}s, config size:%{public}zu, matched config num:%{public}d",
+    HILOG_INFO("bundleName:%{public}s,config size:%{public}zu,matched config num:%{public}d",
         bundleName_.c_str(), configs.size(), matchedCount);
 }
 }  // namespace AppExecFwk

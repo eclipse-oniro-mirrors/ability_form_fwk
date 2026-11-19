@@ -66,7 +66,7 @@ FormSysEventReceiver::FormSysEventReceiver(const EventFwk::CommonEventSubscribeI
 void FormSysEventReceiver::HandleAbilityUpdate(const AAFwk::Want& want, std::string &bundleName)
 {
     auto task = [want, bundleName]() {
-        HILOG_WARN("bundle updated, bundleName:%{public}s", bundleName.c_str());
+        HILOG_WARN("bundle updated,bundleName:%{public}s", bundleName.c_str());
         int userId = want.GetIntParam(KEY_USER_ID, 0);
         FormEventUtil::HandleProviderUpdated(bundleName, userId);
     };
@@ -88,7 +88,7 @@ void FormSysEventReceiver::HandleScreenUnlocked(int32_t userId)
         return;
     }
 
-    HILOG_INFO("handle screen unlocked, userId: %{public}d", userId);
+    HILOG_INFO("handle screen unlocked,userId:%{public}d", userId);
     auto task = [userId]() {
         FormRenderMgr::GetInstance().OnScreenUnlock(userId);
     };
@@ -98,7 +98,7 @@ void FormSysEventReceiver::HandleScreenUnlocked(int32_t userId)
 void FormSysEventReceiver::HandleUserUnlocked(int32_t userId)
 {
     if (userId == -1) {
-        HILOG_ERROR("invalid userId: -1");
+        HILOG_ERROR("[%{public}s]invalid userId:-1", __FUNCTION__);
         return;
     }
 
@@ -122,7 +122,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         return;
     }
     if (bundleName.empty() && actionSet.find(action) == actionSet.end()) {
-        HILOG_ERROR("invalid param, action:%{public}s, bundleName:%{public}s",
+        HILOG_ERROR("invalid param,action:%{public}s,bundleName:%{public}s",
             action.c_str(), bundleName.c_str());
         return;
     }
@@ -165,7 +165,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
 void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
 {
     if (userId == -1) {
-        HILOG_ERROR("invalid userId: -1");
+        HILOG_ERROR("[%{public}s]invalid userId:-1", __FUNCTION__);
         return;
     }
     FormMgrQueue::GetInstance().ScheduleTask(0, [userId]() {
@@ -207,7 +207,7 @@ void FormSysEventReceiver::InitFormInfosAndRegister()
         std::vector<int32_t> activeUsers;
         FormUtil::GetActiveUsers(activeUsers);
         if (activeUsers.empty()) {
-            HILOG_INFO("no active user, fallback to MAIN_USER_ID(%{public}d)", MAIN_USER_ID);
+            HILOG_INFO("no active user,fallback to MAIN_USER_ID(%{public}d)", MAIN_USER_ID);
             activeUsers.emplace_back(MAIN_USER_ID);
         }
         for (int32_t userId : activeUsers) {
@@ -239,7 +239,7 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
         }
 
         lastUserId_ = userId;
-        HILOG_INFO("switch to userId: (%{public}d)", userId);
+        HILOG_INFO("switch to userId:(%{public}d)", userId);
     }
 
     if (FormRenderMgr::GetInstance().GetFRSDiedInLowMemoryByUid(userId)) {
@@ -276,7 +276,7 @@ void FormSysEventReceiver::HandleUserStopped(const int32_t userId)
         return;
     }
 
-    HILOG_INFO("user stopped userId: %{public}d", userId);
+    HILOG_INFO("user stopped userId:%{public}d", userId);
     auto task = [userId]() {
         FormInfoMgr::GetInstance().ClearReloadUserId(userId);
         FormAmsHelper::GetInstance().UnRegisterConfigurationObserver(userId);
@@ -292,7 +292,7 @@ void FormSysEventReceiver::HandleUserStarted(const int32_t userId)
         return;
     }
 
-    HILOG_INFO("user started userId: %{public}d", userId);
+    HILOG_INFO("user started userId:%{public}d", userId);
     // doneCallback fires after the reload chain completes, so rerender always follows fresh data.
     auto task = [userId]() {
         FormInfoMgr::GetInstance().ReloadFormInfos(userId, [userId]() {

@@ -33,9 +33,9 @@ namespace AppExecFwk {
 void FormHostCallback::OnAcquired(const int64_t formId, const FormRecord& record,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("FormHostCallback OnAcquired, formId:%{public}" PRId64, formId);
+    HILOG_DEBUG("FormHostCallback OnAcquired,formId:%{public}" PRId64, formId);
     if (formId <= 0) {
-        HILOG_ERROR("OnAcquired invalid param, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("OnAcquired invalid param,formId:%{public}" PRId64, formId);
         return;
     }
     if (callerToken == nullptr) {
@@ -53,16 +53,16 @@ void FormHostCallback::OnAcquired(const int64_t formId, const FormRecord& record
 */
 void FormHostCallback::OnUpdate(const int64_t formId, const FormRecord &record, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("[%{public}s]start", __FUNCTION__);
 
     // check formId
     if (formId < 0) {
-        HILOG_ERROR("OnUpdate invalid param, formId:%{public}" PRId64 ".", formId);
+        HILOG_ERROR("OnUpdate invalid param,formId:%{public}" PRId64 ".", formId);
         return;
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("[%{public}s]null callerToken", __FUNCTION__);
         return;
     }
 
@@ -79,12 +79,12 @@ void FormHostCallback::OnUninstall(std::vector<int64_t> &formIds, const sptr<IRe
 {
     // check formId
     if (formIds.empty()) {
-        HILOG_ERROR("OnUninstall invalid param, formIds is empty");
+        HILOG_ERROR("OnUninstall invalid param,formIds is empty");
         return;
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("[%{public}s]null callerToken", __FUNCTION__);
         return;
     }
     // post updateTask to host
@@ -95,7 +95,7 @@ void FormHostCallback::OnAcquireFormData(const AAFwk::WantParams &wantParams, in
                                          const sptr<IRemoteObject> &callerToken)
 {
     if (callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("[%{public}s]null callerToken", __FUNCTION__);
         return;
     }
     // post updateTask to host
@@ -112,7 +112,7 @@ void FormHostCallback::OnAcquireState(AppExecFwk::FormState state, const AAFwk::
                                       const sptr<IRemoteObject> &callerToken)
 {
     if (callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("[%{public}s]null callerToken", __FUNCTION__);
         return;
     }
     // post updateTask to host
@@ -128,13 +128,13 @@ void FormHostCallback::OnAcquireState(AppExecFwk::FormState state, const AAFwk::
 void FormHostCallback::OnRecycleForms(
     const std::vector<int64_t> &formIds, const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
     if (formIds.empty()) {
-        HILOG_ERROR("empty formIds");
+        HILOG_ERROR("[%{public}s]empty formIds", __FUNCTION__);
         return;
     }
     if (callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("[%{public}s]null callerToken", __FUNCTION__);
         return;
     }
     FormRenderMgr::GetInstance().RecycleForms(formIds, want, callerToken);
@@ -143,14 +143,14 @@ void FormHostCallback::OnRecycleForms(
 void FormHostCallback::OnEnableForms(
     const std::vector<int64_t> &formIds, const bool enable, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("size:%{public}zu, enable:%{public}d", formIds.size(), enable);
+    HILOG_INFO("size:%{public}zu,enable:%{public}d", formIds.size(), enable);
     if (formIds.empty()) {
-        HILOG_ERROR("empty formIds");
+        HILOG_ERROR("[%{public}s]empty formIds", __FUNCTION__);
         return;
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("[%{public}s]null callerToken", __FUNCTION__);
         return;
     }
     // post enableFormsTask to host
@@ -160,14 +160,14 @@ void FormHostCallback::OnEnableForms(
 void FormHostCallback::OnLockForms(const std::vector<int64_t> &formIds,
     const bool lock, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("size:%{public}zu, lock:%{public}d", formIds.size(), lock);
+    HILOG_INFO("size:%{public}zu,lock:%{public}d", formIds.size(), lock);
     if (formIds.empty()) {
-        HILOG_ERROR("empty formIds");
+        HILOG_ERROR("[%{public}s]empty formIds", __FUNCTION__);
         return;
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("[%{public}s]null callerToken", __FUNCTION__);
         return;
     }
     // post enableFormsTask to host
@@ -177,15 +177,15 @@ void FormHostCallback::OnLockForms(const std::vector<int64_t> &formIds,
 void FormHostCallback::OnDueControlForms(const std::vector<int64_t> &formIds, const bool isDisablePolicy,
     const bool isControl, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("size:%{public}zu, isDisablePolicy:%{public}d, isControl:%{public}d",
+    HILOG_INFO("size:%{public}zu,isDisablePolicy:%{public}d,isControl:%{public}d",
         formIds.size(), isDisablePolicy, isControl);
     if (formIds.empty()) {
-        HILOG_ERROR("empty formIds");
+        HILOG_ERROR("[%{public}s]empty formIds", __FUNCTION__);
         return;
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("[%{public}s]null callerToken", __FUNCTION__);
         return;
     }
     FormHostTaskMgr::GetInstance().PostDueControlFormsTaskToHost(formIds, isDisablePolicy, isControl, callerToken);
@@ -194,12 +194,12 @@ void FormHostCallback::OnDueControlForms(const std::vector<int64_t> &formIds, co
 void FormHostCallback::OnCheckForms(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken)
 {
     if (formIds.empty()) {
-        HILOG_ERROR("empty formIds");
+        HILOG_ERROR("[%{public}s]empty formIds", __FUNCTION__);
         return;
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("[%{public}s]null callerToken", __FUNCTION__);
         return;
     }
     FormHostTaskMgr::GetInstance().PostCheckFormsTaskToHost(formIds, callerToken);

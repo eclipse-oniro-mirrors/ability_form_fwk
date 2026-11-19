@@ -191,6 +191,15 @@ private:
     int32_t CheckCallerOwnsForm(int64_t formId);
 
     /**
+     * @brief Check whether the caller owns the connection of the connectId.
+     * @param connectId The ability connection id.
+     * @return Returns ERR_OK if caller owns the connection; returns
+     *         ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF if the connection is not registered or
+     *         owned by another bundle (same code for both cases to avoid enumeration).
+     */
+    int32_t CheckCallerOwnsConnection(int32_t connectId);
+
+    /**
      * @brief Validate acquire request parameters and caller identity.
      * @param want Input data from IPC.
      * @param formId Output form ID extracted from want.

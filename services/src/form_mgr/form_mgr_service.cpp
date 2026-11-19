@@ -121,12 +121,12 @@ FormMgrService::FormMgrService()
       state_(ServiceRunningState::STATE_NOT_START),
       serialQueue_(nullptr)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
 }
 
 FormMgrService::~FormMgrService()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     // Safety net: OnStop normally tears down subscriptions first; guards make this idempotent.
     UnsubscribeSystemEvents();
 #ifdef MEM_MGR_ENABLE
@@ -195,7 +195,8 @@ bool FormMgrService::IsSystemAppForm(const std::string &bundleName)
 int FormMgrService::AddForm(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo)
 {
-    HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
+    HILOG_INFO("[%{public}s]begin:%{public}s,publish:%{public}s,end:%{public}s,onKvDataServiceAddTime:%{public}s",
+        __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
 
@@ -210,7 +211,7 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
     if (newFormId == 0) {
         newFormId = formInfo.formId;
     }
-    HILOG_WARN("add form result:%{public}d, userId:%{public}d, formId:%{public}" PRId64, ret, userId, newFormId);
+    HILOG_WARN("add form result:%{public}d,userId:%{public}d,formId:%{public}" PRId64, ret, userId, newFormId);
     return ret;
 }
 
@@ -222,7 +223,8 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
  */
 int FormMgrService::CreateForm(const Want &want, RunningFormInfo &runningFormInfo)
 {
-    HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
+    HILOG_INFO("[%{public}s]begin:%{public}s,publish:%{public}s,end:%{public}s,onKvDataServiceAddTime:%{public}s",
+        __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
 
@@ -255,7 +257,8 @@ void FormMgrService::ReportAddFormEvent(const int64_t formId, const Want &want)
  */
 int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
+    HILOG_INFO("[%{public}s]begin:%{public}s,publish:%{public}s,end:%{public}s,onKvDataServiceAddTime:%{public}s",
+        __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
 
@@ -277,7 +280,7 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     ErrCode ret = FormMgrAdapterFacade::GetInstance().DeleteForm(formId, callerToken);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
-    HILOG_WARN("delete form result:%{public}d, formId:%{public}" PRId64, ret, formId);
+    HILOG_WARN("delete form result:%{public}d,formId:%{public}" PRId64, ret, formId);
     return ret;
 }
 
@@ -293,7 +296,7 @@ int FormMgrService::StopRenderingForm(const int64_t formId, const std::string &c
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     ErrCode ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
-        HILOG_ERROR("invalid formId or not under currentActiveUser");
+        HILOG_ERROR("[%{public}s]invalid formId or not under currentActiveUser", __FUNCTION__);
         return ret;
     }
     return FormMgrAdapterFacade::GetInstance().StopRenderingForm(formId, compId);
@@ -308,7 +311,8 @@ int FormMgrService::StopRenderingForm(const int64_t formId, const std::string &c
  */
 int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache)
 {
-    HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
+    HILOG_INFO("[%{public}s]begin:%{public}s,publish:%{public}s,end:%{public}s,onKvDataServiceAddTime:%{public}s",
+        __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
 
@@ -327,14 +331,14 @@ int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
  */
 int FormMgrService::UpdateForm(const int64_t formId, const FormProviderData &formBindingData)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     auto callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapterFacade::GetInstance().UpdateForm(formId, callingUid, formBindingData);
 }
 
 int FormMgrService::UpdateForm(const int64_t formId, const FormProviderInfo &formProviderInfo)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     auto callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapterFacade::GetInstance().UpdateForm(formId, callingUid, formProviderInfo);
 }
@@ -375,7 +379,8 @@ int32_t FormMgrService::UpdateFormsWithReminderAgent(
  */
 int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want)
 {
-    HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
+    HILOG_INFO("[%{public}s]begin:%{public}s,publish:%{public}s,end:%{public}s,onKvDataServiceAddTime:%{public}s",
+        __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     FormEventInfo eventInfo;
@@ -396,7 +401,7 @@ int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
  */
 int FormMgrService::SetNextRefreshTime(const int64_t formId, const int64_t nextTime)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     FormEventInfo eventInfo;
     eventInfo.formId = formId;
     FormEventReport::SendSecondFormEvent(
@@ -413,7 +418,8 @@ int FormMgrService::ReleaseRenderer(int64_t formId, const std::string &compId)
 ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
-    HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
+    HILOG_INFO("[%{public}s]begin:%{public}s,publish:%{public}s,end:%{public}s,onKvDataServiceAddTime:%{public}s",
+        __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     bool isFormAgent = want.GetBoolParam(Constants::IS_FORM_AGENT, false);
@@ -421,7 +427,7 @@ ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
     if (isFormAgent) {
         ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_AGENT_REQUIRE_FORM);
         if (ret != ERR_OK) {
-            HILOG_ERROR("request form permission denied");
+            HILOG_ERROR("[%{public}s]request form permission denied", __FUNCTION__);
             return ret;
         }
     } else {
@@ -430,7 +436,7 @@ ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
         }
 
         if (!CheckAcrossLocalAccountsPermission()) {
-            HILOG_ERROR("Across local accounts permission failed");
+            HILOG_ERROR("[%{public}s]Across local accounts permission failed", __FUNCTION__);
             return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
         }
     }
@@ -443,7 +449,8 @@ ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
 
 ErrCode FormMgrService::RequestPublishFormCrossUser(Want &want, int32_t userId, int64_t &formId)
 {
-    HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
+    HILOG_INFO("[%{public}s]begin:%{public}s,publish:%{public}s,end:%{public}s,onKvDataServiceAddTime:%{public}s",
+        __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     if (userId == Constants::INVALID_USER_ID) {
@@ -472,7 +479,7 @@ ErrCode FormMgrService::AcquireAddFormResult(const int64_t formId)
 int FormMgrService::NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_NotifyWhetherVisibleForms",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
@@ -488,7 +495,7 @@ int FormMgrService::NotifyWhetherVisibleForms(const std::vector<int64_t> &formId
  */
 bool FormMgrService::HasFormVisible(const uint32_t tokenId)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     return FormMgrAdapterFacade::GetInstance().HasFormVisible(tokenId);
 }
@@ -501,13 +508,13 @@ bool FormMgrService::HasFormVisible(const uint32_t tokenId)
  */
 int FormMgrService::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     ErrCode ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
-        HILOG_ERROR("invalid formId or not under currentActiveUser");
+        HILOG_ERROR("[%{public}s]invalid formId or not under currentActiveUser", __FUNCTION__);
         return ret;
     }
     FormEventInfo eventInfo;
@@ -584,19 +591,20 @@ int FormMgrService::DumpFormTimerByFormId(const std::int64_t formId, std::string
  */
 int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
+    HILOG_INFO("[%{public}s]begin:%{public}s,publish:%{public}s,end:%{public}s,onKvDataServiceAddTime:%{public}s",
+        __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     ErrCode ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
-        HILOG_ERROR("invalid formId or not under currentActiveUser");
+        HILOG_ERROR("[%{public}s]invalid formId or not under currentActiveUser", __FUNCTION__);
         return ret;
     }
     ret = FormMgrAdapterFacade::GetInstance().MessageEvent(formId, want, callerToken);
     if (ret != ERR_OK) {
-        HILOG_ERROR("MessageEvent failed, formId:%{public}" PRId64 ", ret:%{public}d", formId, ret);
+        HILOG_ERROR("MessageEvent failed,formId:%{public}" PRId64 ", ret:%{public}d", formId, ret);
         return ret;
     }
     FormEventInfo eventInfo;
@@ -622,14 +630,15 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
  */
 int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
+    HILOG_INFO("[%{public}s]begin:%{public}s,publish:%{public}s,end:%{public}s,onKvDataServiceAddTime:%{public}s",
+        __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     ErrCode ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
-        HILOG_ERROR("invalid formId or not under currentActiveUser");
+        HILOG_ERROR("[%{public}s]invalid formId or not under currentActiveUser", __FUNCTION__);
         return ret;
     }
     FormEventInfo eventInfo;
@@ -665,7 +674,7 @@ int FormMgrService::InsightIntentEvent(const int64_t formId, Want &want, const s
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     ErrCode ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
-        HILOG_ERROR("invalid formId or not under currentActiveUser");
+        HILOG_ERROR("[%{public}s]invalid formId or not under currentActiveUser", __FUNCTION__);
         return ret;
     }
     return FormMgrAdapterFacade::GetInstance().InsightIntentEvent(formId, want, callerToken);
@@ -680,7 +689,8 @@ int FormMgrService::InsightIntentEvent(const int64_t formId, Want &want, const s
  */
 int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("begin:%{public}s,publish:%{public}s,end:%{public}s, onKvDataServiceAddTime:%{public}s",
+    HILOG_INFO("[%{public}s]begin:%{public}s,publish:%{public}s,end:%{public}s,onKvDataServiceAddTime:%{public}s",
+        __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     int callingUid = IPCSkeleton::GetCallingUid();
@@ -703,7 +713,7 @@ void FormMgrService::RegisterSystemAbilityListener()
 {
     auto addListener = [this](int32_t systemAbilityId) {
         if (!AddSystemAbilityListener(systemAbilityId)) {
-            HILOG_WARN("AddSystemAbilityListener failed, saId:%{public}d", systemAbilityId);
+            HILOG_WARN("AddSystemAbilityListener failed,saId:%{public}d", systemAbilityId);
         }
     };
     // listener for FormDataProxyMgr
@@ -765,11 +775,11 @@ void FormMgrService::OnStop()
 
     DelayedSingleton<FormShareMgr>::GetInstance()->UnregisterObserver();
 
-    if (serialQueue_) {
+    // Reset under instanceMutex_ so a concurrent binder-thread read in
+    // InitFormShareMgrSerialQueue cannot copy a torn shared_ptr.
+    {
+        std::lock_guard<std::mutex> lock(instanceMutex_);
         serialQueue_.reset();
-    }
-
-    if (handler_) {
         handler_.reset();
     }
     FormAmsHelper::GetInstance().UnRegisterAllConfigurationObservers();
@@ -781,7 +791,7 @@ ErrCode FormMgrService::ReadFormConfigXML()
     FormXMLParser parser;
     int32_t ret = parser.Parse();
     if (ret != ERR_OK) {
-        HILOG_WARN("parse form config failed, use the default vaule");
+        HILOG_WARN("[%{public}s]parse form config failed,use the default vaule", __FUNCTION__);
         return ret;
     }
     const std::map<std::string, int32_t> &configMap = parser.GetConfigMap();
@@ -814,7 +824,7 @@ void FormMgrService::SubscribeSystemEvents()
         if (EventFwk::CommonEventManager::SubscribeCommonEvent(formSysEventReceiver_)) {
             isCesSubscribed_ = true;
         } else {
-            HILOG_ERROR("SubscribeCommonEvent failed, retry on common event service ready");
+            HILOG_ERROR("SubscribeCommonEvent failed,retry on common event service ready");
         }
     }
 
@@ -828,7 +838,7 @@ void FormMgrService::SubscribeSystemEvents()
         if (subscribeRet == ERR_OK) {
             isOsAccountSubscribed_ = true;
         } else {
-            HILOG_ERROR("SubscribeOsAccount failed, err:%{public}d, retry on account service ready", subscribeRet);
+            HILOG_ERROR("SubscribeOsAccount failed,err:%{public}d,retry on account service ready", subscribeRet);
         }
     }
 }
@@ -856,16 +866,21 @@ void FormMgrService::UnsubscribeSystemEvents()
 ErrCode FormMgrService::Init()
 {
     HILOG_INFO("call");
-    serialQueue_ = std::make_shared<FormSerialQueue>(FORM_MGR_SERVICE_QUEUE);
-    if (serialQueue_ == nullptr) {
-        HILOG_ERROR("Init failed,null serialQueue_");
-        return ERR_INVALID_OPERATION;
-    }
+    // Assign under instanceMutex_ so a concurrent binder-thread read in
+    // InitFormShareMgrSerialQueue cannot copy a torn shared_ptr.
+    {
+        std::lock_guard<std::mutex> lock(instanceMutex_);
+        serialQueue_ = std::make_shared<FormSerialQueue>(FORM_MGR_SERVICE_QUEUE);
+        if (serialQueue_ == nullptr) {
+            HILOG_ERROR("Init failed,null serialQueue_");
+            return ERR_INVALID_OPERATION;
+        }
 
-    handler_ = std::make_shared<FormEventHandler>(serialQueue_);
-    if (handler_ == nullptr) {
-        HILOG_ERROR("init failed.null handler_");
-        return ERR_INVALID_OPERATION;
+        handler_ = std::make_shared<FormEventHandler>(serialQueue_);
+        if (handler_ == nullptr) {
+            HILOG_ERROR("init failed.null handler_");
+            return ERR_INVALID_OPERATION;
+        }
     }
     // Assemble the real access checker before Publish, since remote IPC may arrive right after publish.
     FormIpcDispatchTable::GetInstance().SetAccessChecker(std::make_shared<FormStubAccessChecker>());
@@ -878,7 +893,7 @@ ErrCode FormMgrService::Init()
         return ERR_INVALID_OPERATION;
     }
     onStartPublishTime_ = GetCurrentDateTime();
-    HILOG_INFO("FMS onStart publish done, time:%{public}s", onStartPublishTime_.c_str());
+    HILOG_INFO("FMS onStart publish done,time:%{public}s", onStartPublishTime_.c_str());
 
     SubscribeSystemEvents();
 
@@ -897,7 +912,7 @@ ErrCode FormMgrService::Init()
 
     // read param form form_config.xml.
     if (ReadFormConfigXML() != ERR_OK) {
-        HILOG_WARN("parse form config failed, use the default vaule");
+        HILOG_WARN("[%{public}s]parse form config failed,use the default vaule", __FUNCTION__);
     }
     FormMgrAdapterFacade::GetInstance().Init();
     FormAmsHelper::GetInstance().RegisterConfigurationObserver(Constants::DEFAULT_USER_ID);
@@ -908,7 +923,7 @@ ErrCode FormMgrService::Init()
 
 ErrCode FormMgrService::CheckFormPermission(std::string_view permission, bool checkSA)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     if (!checkSA && FormUtil::IsSACall()) {
         return ERR_OK;
@@ -926,7 +941,7 @@ ErrCode FormMgrService::CheckFormPermission(std::string_view permission, bool ch
 
     // checks whether the current user is inactive
     if (!CheckAcrossLocalAccountsPermission()) {
-        HILOG_ERROR("Across local accounts permission failed");
+        HILOG_ERROR("[%{public}s]Across local accounts permission failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
 
@@ -1005,7 +1020,8 @@ int FormMgrService::UnregisterFormRouterProxy(const std::vector<int64_t> &formId
 int FormMgrService::NotifyFormsVisible(const std::vector<int64_t> &formIds,
     bool isVisible, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
+    HILOG_INFO("[%{public}s]begin:%{public}s,publish:%{public}s,end:%{public}s,onKvDataServiceAddTime:%{public}s",
+        __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     return FormMgrAdapterFacade::GetInstance().NotifyFormsVisible(formIds, isVisible, callerToken);
@@ -1121,11 +1137,11 @@ int FormMgrService::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vect
 
 int32_t FormMgrService::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string callerBundleName;
     ErrCode ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
     if (ret != ERR_OK) {
-        HILOG_ERROR("get host bundle name failed");
+        HILOG_ERROR("[%{public}s]get host bundle name failed", __FUNCTION__);
         return ret;
     }
     // retrieve moduleName from filter.
@@ -1141,11 +1157,11 @@ int32_t FormMgrService::GetFormsInfo(const FormInfoFilter &filter, std::vector<F
 
 int32_t FormMgrService::GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string callerBundleName;
     ErrCode ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
     if (ret != ERR_OK) {
-        HILOG_ERROR("get host bundle name failed");
+        HILOG_ERROR("[%{public}s]get host bundle name failed", __FUNCTION__);
         return ret;
     }
     HILOG_INFO("flows to GetPublishedFormInfoById");
@@ -1154,11 +1170,11 @@ int32_t FormMgrService::GetPublishedFormInfoById(const int64_t formId, RunningFo
 
 int32_t FormMgrService::GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string callerBundleName;
     ErrCode ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
     if (ret != ERR_OK) {
-        HILOG_ERROR("get host bundle name failed");
+        HILOG_ERROR("[%{public}s]get host bundle name failed", __FUNCTION__);
         return ret;
     }
     HILOG_INFO("flows to GetPublishedFormInfos");
@@ -1168,19 +1184,19 @@ int32_t FormMgrService::GetPublishedFormInfos(std::vector<RunningFormInfo> &form
 int32_t FormMgrService::AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
     AAFwk::WantParams &formData)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (formId <= 0) {
-        HILOG_ERROR("invalid formId");
+        HILOG_ERROR("[%{public}s]invalid formId", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("[%{public}s]null callerToken", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     if (requestCode <= 0) {
-        HILOG_ERROR("invalid requestCode");
+        HILOG_ERROR("[%{public}s]invalid requestCode", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -1194,7 +1210,8 @@ bool FormMgrService::IsRequestPublishFormSupported()
 
 int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
+    HILOG_INFO("[%{public}s]begin:%{public}s,publish:%{public}s,end:%{public}s,onKvDataServiceAddTime:%{public}s",
+        __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     // check abilityName and uri to void implicit want.
@@ -1207,13 +1224,13 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
 
 int32_t FormMgrService::StartAbilityByFms(const Want &want)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     std::string dstBundleName = want.GetElement().GetBundleName();
     std::string bundleName;
     auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
     if (ret != ERR_OK) {
-        HILOG_ERROR("get BundleName failed");
+        HILOG_ERROR("[%{public}s]get BundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
     if (dstBundleName != bundleName) {
@@ -1225,7 +1242,7 @@ int32_t FormMgrService::StartAbilityByFms(const Want &want)
 
 ErrCode FormMgrService::StartUIAbilityByFms(const Want &want)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     auto callingUid = IPCSkeleton::GetCallingUid();
     return FormAmsAdapter::GetInstance().StartUIAbilityByFms(callingUid, want);
@@ -1239,7 +1256,7 @@ int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
         return ERR_APPEXECFWK_SYSTEMCAP_ERROR;
     }
     if (!PublishFormCrossBundleControl(want)) {
-        HILOG_ERROR("PublishFormCrossBundleControl failed.");
+        HILOG_ERROR("PublishFormCrossBundleControl failed");
         return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
     }
     if (!FormMgrAdapterFacade::GetInstance().IsForegroundApp()) {
@@ -1273,16 +1290,26 @@ int32_t FormMgrService::OpenLiveFormPage(const Want &want, const std::string &fo
 
 void FormMgrService::InitFormShareMgrSerialQueue()
 {
-    DelayedSingleton<FormShareMgr>::GetInstance()->Initialize(handler_, serialQueue_);
+    // Copy the shared_ptrs under instanceMutex_ so OnStop cannot reset them
+    // mid-copy (torn shared_ptr). Initialize is called outside the lock: its
+    // RegisterEventTimeoutObserver virtual callback may re-enter the service.
+    std::shared_ptr<FormEventHandler> handler;
+    std::shared_ptr<FormSerialQueue> serialQueue;
+    {
+        std::lock_guard<std::mutex> lock(instanceMutex_);
+        handler = handler_;
+        serialQueue = serialQueue_;
+    }
+    DelayedSingleton<FormShareMgr>::GetInstance()->Initialize(handler, serialQueue);
 }
 
 int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,
     int64_t requestCode)
 {
-    HILOG_DEBUG("FormMgrService ShareForm call deviceId :%{public}s, formId:%{public}" PRId64 "",
+    HILOG_DEBUG("FormMgrService ShareForm call deviceId :%{public}s,formId:%{public}" PRId64 "",
         deviceId.c_str(), formId);
     if (formId <= 0) {
-        HILOG_ERROR("invalid formId");
+        HILOG_ERROR("[%{public}s]invalid formId", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -1292,12 +1319,12 @@ int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, c
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("[%{public}s]null callerToken", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     if (requestCode <= 0) {
-        HILOG_ERROR("invalid requestCode");
+        HILOG_ERROR("[%{public}s]invalid requestCode", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -1305,7 +1332,7 @@ int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, c
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     ErrCode ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
-        HILOG_ERROR("invalid formId or not under currentActiveUser");
+        HILOG_ERROR("[%{public}s]invalid formId or not under currentActiveUser", __FUNCTION__);
         return ret;
     }
 
@@ -1332,12 +1359,12 @@ int FormMgrService::Dump(int fd, const std::vector<std::u16string> &args)
 
 int32_t FormMgrService::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     auto callingUid = IPCSkeleton::GetCallingUid();
 
     {
         if (!FormBmsHelper::GetInstance().IsBundleMgrValid()) {
-            HILOG_ERROR("get bundleMgr failed");
+            HILOG_ERROR("[%{public}s]get bundleMgr failed", __FUNCTION__);
             return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
         }
     }
@@ -1351,12 +1378,12 @@ int32_t FormMgrService::RegisterPublishFormInterceptor(const sptr<IRemoteObject>
 
 int32_t FormMgrService::UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     auto callingUid = IPCSkeleton::GetCallingUid();
 
     {
         if (!FormBmsHelper::GetInstance().IsBundleMgrValid()) {
-            HILOG_ERROR("get bundleMgr failed");
+            HILOG_ERROR("[%{public}s]get bundleMgr failed", __FUNCTION__);
             return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
         }
     }
@@ -1372,7 +1399,7 @@ void FormMgrService::OnAddSystemAbility(int32_t systemAbilityId, const std::stri
 {
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID ||
         systemAbilityId == SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
-        HILOG_INFO("SA:%{public}d ready, retry system event subscription", systemAbilityId);
+        HILOG_INFO("SA:%{public}d ready,retry system event subscription", systemAbilityId);
         SubscribeSystemEvents();
         return;
     }
@@ -1451,7 +1478,7 @@ bool FormMgrService::CheckAcrossLocalAccountsPermission() const
         bool isCallingPermAccount =
             FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS);
         if (!isCallingPermAccount) {
-            HILOG_ERROR("Across local accounts permission failed");
+            HILOG_ERROR("[%{public}s]Across local accounts permission failed", __FUNCTION__);
             return false;
         }
     }
@@ -1463,7 +1490,7 @@ ErrCode FormMgrService::RegisterFormAddObserverByBundle(const std::string bundle
 {
     HILOG_DEBUG("call");
     if (callerToken == nullptr) {
-        HILOG_ERROR("callerToken is null");
+        HILOG_ERROR("[%{public}s]callerToken is null", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     return FormMgrAdapterFacade::GetInstance().RegisterFormAddObserverByBundle(bundleName, callerToken);
@@ -1474,7 +1501,7 @@ ErrCode FormMgrService::RegisterFormRemoveObserverByBundle(const std::string bun
 {
     HILOG_DEBUG("call");
     if (callerToken == nullptr) {
-        HILOG_ERROR("callerToken is null");
+        HILOG_ERROR("[%{public}s]callerToken is null", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     return FormMgrAdapterFacade::GetInstance().RegisterFormRemoveObserverByBundle(bundleName, callerToken);
@@ -1535,7 +1562,7 @@ ErrCode FormMgrService::RegisterRemoveObserver(const std::string &bundleName, co
 ErrCode FormMgrService::UpdateProxyForm(int64_t formId, const FormProviderData &formBindingData,
     const std::vector<FormDataProxy> &formDataProxies)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     auto callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapterFacade::GetInstance().UpdateForm(formId, callingUid, formBindingData, formDataProxies);
 }
@@ -1552,9 +1579,9 @@ ErrCode FormMgrService::RequestPublishProxyForm(Want &want, bool withFormBinding
 ErrCode FormMgrService::RegisterClickEventObserver(
     const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (observer == nullptr) {
-        HILOG_ERROR("empty callerTokenParameter");
+        HILOG_ERROR("[%{public}s]empty callerTokenParameter", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     return FormMgrAdapterFacade::GetInstance().RegisterClickEventObserver(bundleName, formEventType, observer);
@@ -1563,9 +1590,9 @@ ErrCode FormMgrService::RegisterClickEventObserver(
 ErrCode FormMgrService::UnregisterClickEventObserver(
     const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (observer == nullptr) {
-        HILOG_ERROR("empty callerTokenParameter");
+        HILOG_ERROR("[%{public}s]empty callerTokenParameter", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     return FormMgrAdapterFacade::GetInstance().UnregisterClickEventObserver(bundleName, formEventType, observer);
@@ -1609,7 +1636,8 @@ ErrCode FormMgrService::BatchRefreshForms(const int32_t formRefreshType)
 ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
-    HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
+    HILOG_INFO("[%{public}s]begin:%{public}s,publish:%{public}s,end:%{public}s,onKvDataServiceAddTime:%{public}s",
+        __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
     std::string bundleName;
@@ -1686,14 +1714,14 @@ int32_t FormMgrService::LockForms(const std::vector<FormLockInfo> &formLockInfos
         if (type == LockChangeType::SWITCH_CHANGE) {
             ErrCode ret = FormMgrAdapterFacade::GetInstance().SwitchLockForms(info.bundleName, info.userId, info.lock);
             if (ret != ERR_OK) {
-                HILOG_ERROR("SwitchLockForms failed, bundleName: %{public}s, userId: %{public}d, "
+                HILOG_ERROR("SwitchLockForms failed,bundleName:%{public}s,userId:%{public}d,"
                     "lock: %{public}d, ret: %{public}d", info.bundleName.c_str(), info.userId, info.lock, ret);
                 retErrCode = ret;
             }
         } else {
             ErrCode ret = FormMgrAdapterFacade::GetInstance().ProtectLockForms(info.bundleName, info.userId, info.lock);
             if (ret != ERR_OK) {
-                HILOG_ERROR("ProtectLockForms failed, bundleName: %{public}s, userId: %{public}d, "
+                HILOG_ERROR("ProtectLockForms failed,bundleName:%{public}s,userId:%{public}d,"
                     "protect: %{public}d, ret: %{public}d", info.bundleName.c_str(), info.userId, info.lock, ret);
                 retErrCode = ret;
             }
@@ -1731,7 +1759,7 @@ bool FormMgrService::IsFormBundleDebugSignature(const std::string &bundleName)
 
 bool FormMgrService::IsFormBundleExempt(int64_t formId)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (!CheckCallerIsSystemApp()) {
         return true;
     }
@@ -1825,7 +1853,7 @@ ErrCode FormMgrService::UnregisterOverflowProxy()
 
 ErrCode FormMgrService::RequestOverflow(const int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapterFacade::GetInstance().RequestOverflow(formId, callingUid, overflowInfo, isOverflow);
 }
@@ -1859,7 +1887,7 @@ ErrCode FormMgrService::UnregisterGetFormRectProxy()
 
 ErrCode FormMgrService::GetFormRect(const int64_t formId, Rect &rect)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapterFacade::GetInstance().GetFormRect(formId, callingUid, rect);
 }
@@ -1907,13 +1935,13 @@ ErrCode FormMgrService::UnregisterGetLiveFormStatusProxy()
 ErrCode FormMgrService::ReloadForms(int32_t &reloadNum, const std::string &moduleName, const std::string &abilityName,
     const std::string &formName)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::string callerBundleName;
     // the caller's own index comes from its uid, not from enable state
     int32_t appIndex = Constants::MAIN_APP_INDEX;
     auto ret = FormBmsHelper::GetInstance().GetCallerBundleNameAndAppIndex(callerBundleName, appIndex);
     if (ret != ERR_OK) {
-        HILOG_ERROR("get BundleName failed");
+        HILOG_ERROR("[%{public}s]get BundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
 
@@ -1932,13 +1960,13 @@ ErrCode FormMgrService::ReloadForms(int32_t &reloadNum, const std::string &modul
 
 ErrCode FormMgrService::ReloadAllForms(int32_t &reloadNum)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::string callerBundleName;
     // the caller's own index comes from its uid, not from enable state
     int32_t appIndex = Constants::MAIN_APP_INDEX;
     auto ret = FormBmsHelper::GetInstance().GetCallerBundleNameAndAppIndex(callerBundleName, appIndex);
     if (ret != ERR_OK) {
-        HILOG_ERROR("get BundleName failed");
+        HILOG_ERROR("[%{public}s]get BundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
 
@@ -1981,7 +2009,7 @@ ErrCode FormMgrService::UnregisterPublishFormCrossBundleControl()
 
 ErrCode FormMgrService::GetFormIdsByFormLocation(int32_t formLocation, std::vector<std::string> &formIds)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
@@ -1991,7 +2019,7 @@ ErrCode FormMgrService::GetFormIdsByFormLocation(int32_t formLocation, std::vect
  
     if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
         formLocation >= static_cast<int32_t>(Constants::FormLocation::FORM_LOCATION_END)) {
-        HILOG_ERROR("formLocation not FormLocation enum, formLocation = %{public}d", formLocation);
+        HILOG_ERROR("formLocation not FormLocation enum,formLocation = %{public}d", formLocation);
         return ERR_APPEXECFWK_FORM_LOCATION_INVALID;
     }
  
@@ -2012,7 +2040,7 @@ bool FormMgrService::PublishFormCrossBundleControl(const Want &want)
     std::string callerBundleName;
     auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
     if (ret != ERR_OK) {
-        HILOG_ERROR("get BundleName failed");
+        HILOG_ERROR("[%{public}s]get BundleName failed", __FUNCTION__);
         return false;
     }
     PublishFormCrossBundleInfo bundleInfo;
@@ -2102,7 +2130,7 @@ ErrCode FormMgrService::RegisterFormHostService(const FormHostServiceInfo &servi
 #ifdef DISTRIBUTED_FORM_SUPPORTED
     return FormMgrAdapterFacade::GetInstance().RegisterFormHostService(serviceInfo, serviceId);
 #else
-    HILOG_WARN("cross-device not supported on this build");
+    HILOG_WARN("[%{public}s]cross-device not supported on this build", __FUNCTION__);
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 #endif
 }
@@ -2113,7 +2141,7 @@ ErrCode FormMgrService::UnregisterFormHostService(int64_t serviceId)
 #ifdef DISTRIBUTED_FORM_SUPPORTED
     return FormMgrAdapterFacade::GetInstance().UnregisterFormHostService(serviceId);
 #else
-    HILOG_WARN("cross-device not supported on this build");
+    HILOG_WARN("[%{public}s]cross-device not supported on this build", __FUNCTION__);
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 #endif
 }
@@ -2124,7 +2152,7 @@ ErrCode FormMgrService::GetAvailableFormHostServices(std::vector<PeerFormHostSer
 #ifdef DISTRIBUTED_FORM_SUPPORTED
     return FormMgrAdapterFacade::GetInstance().GetAvailableFormHostServices(services);
 #else
-    HILOG_WARN("cross-device not supported on this build");
+    HILOG_WARN("[%{public}s]cross-device not supported on this build", __FUNCTION__);
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 #endif
 }
@@ -2140,7 +2168,7 @@ ErrCode FormMgrService::RequestPublishFormCrossDevice(const FormCrossDeviceReque
 #ifdef DISTRIBUTED_FORM_SUPPORTED
     return FormMgrAdapterFacade::GetInstance().RequestPublishFormCrossDevice(request, callerToken, callback);
 #else
-    HILOG_WARN("cross-device not supported on this build");
+    HILOG_WARN("[%{public}s]cross-device not supported on this build", __FUNCTION__);
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 #endif
 }

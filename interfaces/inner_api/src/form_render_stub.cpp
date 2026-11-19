@@ -99,7 +99,7 @@ int FormRenderStub::HandleRenderForm(MessageParcel &data, MessageParcel &reply)
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("error to ReadParcelable<Want>");
+        HILOG_ERROR("[%{public}s]error to ReadParcelable<Want>", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -120,7 +120,7 @@ int FormRenderStub::HandleStopRenderingForm(MessageParcel &data, MessageParcel &
 {
     std::unique_ptr<FormJsInfo> formJsInfo(data.ReadParcelable<FormJsInfo>());
     if (!formJsInfo) {
-        HILOG_ERROR("ReadParcelable<formJsInfo> fail");
+        HILOG_ERROR("[%{public}s]ReadParcelable<formJsInfo> fail", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
@@ -176,7 +176,7 @@ int32_t FormRenderStub::HandleReleaseRenderer(MessageParcel &data, MessageParcel
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s]ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_ReleaseRenderer",
@@ -198,7 +198,7 @@ int FormRenderStub::HandleReloadForm(MessageParcel &data, MessageParcel &reply)
 
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s]ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_ReloadForm",
@@ -225,7 +225,7 @@ int32_t FormRenderStub::HandleSetRenderGroupEnableFlag(MessageParcel &data, Mess
     bool isEnable = data.ReadBool();
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("error to ReadParcelable<Want>");
+        HILOG_ERROR("[%{public}s]error to ReadParcelable<Want>", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_SetRenderGroupEnableFlag",
@@ -241,7 +241,7 @@ int32_t FormRenderStub::HandleSetVisibleChange(MessageParcel &data, MessageParce
     bool isVisible = data.ReadBool();
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("error to ReadParcelable<Want>");
+        HILOG_ERROR("[%{public}s]error to ReadParcelable<Want>", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_SetVisibleChange",
@@ -277,7 +277,7 @@ int32_t FormRenderStub::HandleRecycleForm(MessageParcel &data, MessageParcel &re
     int64_t formId = data.ReadInt64();
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("error to ReadParcelable<Want>");
+        HILOG_ERROR("[%{public}s]error to ReadParcelable<Want>", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_RecycleForm",
@@ -321,7 +321,7 @@ int32_t FormRenderStub::HandleUpdateFormSize(MessageParcel &data, MessageParcel 
 
     std::unique_ptr<FormJsInfo> formJsInfo(data.ReadParcelable<FormJsInfo>());
     if (!formJsInfo) {
-        HILOG_ERROR("ReadParcelable<formJsInfo> fail");
+        HILOG_ERROR("[%{public}s]ReadParcelable<formJsInfo> fail", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_UpdateFormSize",
@@ -338,7 +338,7 @@ int32_t FormRenderStub::HandleSetRenderGroupParams(MessageParcel &data, MessageP
     int64_t formId = data.ReadInt64();
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("error to ReadParcelable<Want>");
+        HILOG_ERROR("[%{public}s]error to ReadParcelable<Want>", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = SetRenderGroupParams(formId, *want);

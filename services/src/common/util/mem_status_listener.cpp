@@ -22,12 +22,12 @@ namespace OHOS {
 namespace AppExecFwk {
 void MemStatusListener::OnConnected()
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 }
 
 void MemStatusListener::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 }
 
 void MemStatusListener::OnTrim(Memory::SystemMemoryLevel level)
@@ -38,7 +38,7 @@ void MemStatusListener::OnTrim(Memory::SystemMemoryLevel level)
 
 void MemStatusListener::ForceReclaim(int32_t pid, int32_t uid)
 {
-    HILOG_DEBUG("pid is %{public}d, uid is %{public}d", pid, uid);
+    HILOG_DEBUG("pid is %{public}d,uid is %{public}d", pid, uid);
     FormDataMgr::GetInstance().RecycleAllRecyclableForms();
 }
 } // namespace AppExecFwk

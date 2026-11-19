@@ -39,7 +39,7 @@ void FormRenderStatusTaskMgr::OnRenderFormDone(const int64_t formId, const FormF
     const std::string &eventId, const sptr<IFormSupply> formSupplyClient)
 {
     if (formSupplyClient == nullptr) {
-        HILOG_ERROR("null formSupplyClient");
+        HILOG_ERROR("[%{public}s]null formSupplyClient", __FUNCTION__);
         FormRenderStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RENDER_FORM_FAIL);
         return;
     }
@@ -61,7 +61,7 @@ void FormRenderStatusTaskMgr::OnRecycleForm(const int64_t formId, const FormFsmE
     const std::string &statusData, const Want &want, const sptr<IFormSupply> formSupplyClient)
 {
     if (formSupplyClient == nullptr) {
-        HILOG_ERROR("null formSupplyClient");
+        HILOG_ERROR("[%{public}s]null formSupplyClient", __FUNCTION__);
         FormRenderStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECYCLE_DATA_FAIL);
         return;
     }
@@ -86,7 +86,7 @@ void FormRenderStatusTaskMgr::OnRecoverFormDone(const int64_t formId, const Form
     const std::string &eventId, const sptr<IFormSupply> formSupplyClient)
 {
     if (formSupplyClient == nullptr) {
-        HILOG_ERROR("null formSupplyClient");
+        HILOG_ERROR("[%{public}s]null formSupplyClient", __FUNCTION__);
         FormRenderStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECOVER_FORM_FAIL);
         return;
     }
@@ -108,7 +108,7 @@ void FormRenderStatusTaskMgr::OnDeleteFormDone(const int64_t formId, const FormF
     const std::string &eventId, const sptr<IFormSupply> formSupplyClient)
 {
     if (formSupplyClient == nullptr) {
-        HILOG_ERROR("null formSupplyClient");
+        HILOG_ERROR("[%{public}s]null formSupplyClient", __FUNCTION__);
         FormRenderStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::DELETE_FORM_FAIL);
         return;
     }
@@ -130,7 +130,7 @@ void FormRenderStatusTaskMgr::OnRecycleFormDone(const int64_t formId, const Form
     const std::string &eventId, const sptr<IFormSupply> formSupplyClient)
 {
     if (formSupplyClient == nullptr) {
-        HILOG_ERROR("null formSupplyClient");
+        HILOG_ERROR("[%{public}s]null formSupplyClient", __FUNCTION__);
         FormRenderStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECYCLE_FORM_FAIL);
         return;
     }
@@ -154,13 +154,13 @@ bool FormRenderStatusTaskMgr::ScheduleRecycleTimeout(const int64_t formId)
 
     std::lock_guard<std::mutex> lock(serialQueueMutex_);
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("null serialQueue_");
+        HILOG_ERROR("[%{public}s]null serialQueue_", __FUNCTION__);
         return false;
     }
 
     std::string str = std::to_string(formId);
     auto timeoutTask = [formId]() {
-        HILOG_ERROR("RecycleForm failed, wait form release timeout, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("RecycleForm failed,wait form release timeout,formId:%{public}" PRId64, formId);
         FormRenderStatus::GetInstance().SetFormStatus(formId, FormFsmStatus::UNPROCESSABLE);
         FormRenderStatusTaskMgr::GetInstance().CancelRecycleTimeout(formId);
     };
@@ -171,7 +171,7 @@ bool FormRenderStatusTaskMgr::CancelRecycleTimeout(const int64_t formId)
 {
     std::lock_guard<std::mutex> lock(serialQueueMutex_);
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("null serialQueue_");
+        HILOG_ERROR("[%{public}s]null serialQueue_", __FUNCTION__);
         return false;
     }
 

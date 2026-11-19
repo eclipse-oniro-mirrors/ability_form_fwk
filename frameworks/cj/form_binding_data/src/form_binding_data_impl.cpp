@@ -50,7 +50,7 @@ CArrProxyData CjFormBindingDataImpl::Convert2CArrProxyData(const std::vector<Pro
         return res;
     }
     if (in.size() > MAX_PROXY_DATA_COUNT) {
-        HILOG_ERROR("ProxyData count exceeds limit: %{public}zu", in.size());
+        HILOG_ERROR("ProxyData count exceeds limit:%{public}zu", in.size());
         return res;
     }
     size_t allocSize = sizeof(CProxyData) * in.size();

@@ -42,7 +42,7 @@ int64_t NowMs()
 bool CopyNetworkIdBuf(const std::string &peerUuid, char (&buf)[DEVICE_ID_LEN_MAX])
 {
     if (peerUuid.size() >= DEVICE_ID_LEN_MAX) {
-        HILOG_ERROR("peerUuid too long: %{public}zu", peerUuid.size());
+        HILOG_ERROR("peerUuid too long:%{public}zu", peerUuid.size());
         return false;
     }
     errno_t ret = strcpy_s(buf, sizeof(buf), peerUuid.c_str());
@@ -135,7 +135,7 @@ ErrCode FormConnectionPool::StartListen(int64_t serviceId)
             serverRegistered_ = true;
         }
     }
-    HILOG_INFO("StartListen succeeded, serviceId=%{public}" PRId64 " listenFd=%{public}d", serviceId, fd);
+    HILOG_INFO("StartListen succeeded,serviceId=%{public}" PRId64 " listenFd=%{public}d", serviceId, fd);
     return ERR_OK;
 }
 
@@ -152,7 +152,7 @@ void FormConnectionPool::StopListen(int64_t serviceId)
     }
     if (fd >= 0) {
         Shutdown(fd);
-        HILOG_INFO("StopListen: serviceId=%{public}" PRId64 " listenFd=%{public}d", serviceId, fd);
+        HILOG_INFO("StopListen:serviceId=%{public}" PRId64 " listenFd=%{public}d", serviceId, fd);
     }
 }
 
@@ -160,7 +160,7 @@ ErrCode FormConnectionPool::GetOrCreateConnection(const std::string &peerNetwork
     bool forceReconnect)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("connect peer:%{public}s, peerServiceId:%{public}" PRId64
+    HILOG_INFO("connect peer:%{public}s,peerServiceId:%{public}" PRId64
         " forceReconnect=%{public}d",
         peerNetworkId.c_str(), peerServiceId, static_cast<int32_t>(forceReconnect));
     if (peerNetworkId.empty()) {
@@ -211,7 +211,7 @@ FormConnectionPool::ExistingConnResult FormConnectionPool::WaitForExistingConnec
     }
 
     // IDLE or FAILED — clean up stale entry so a fresh connection can be created
-    HILOG_INFO("existing connection in state=%{public}d, recreating for peer:%{public}s",
+    HILOG_INFO("existing connection in state=%{public}d,recreating for peer:%{public}s",
         static_cast<int32_t>(it->second.state), peerNetworkId.c_str());
     int32_t staleFd = it->second.fd;
     fdToPeer_.erase(staleFd);
@@ -333,7 +333,7 @@ ErrCode FormConnectionPool::SendFrame(const std::string &peerNetworkId, FormCdMs
         std::lock_guard<std::mutex> lock(mutex_);
         auto it = connections_.find(peerNetworkId);
         if (it == connections_.end() || it->second.state != ConnState::READY) {
-            HILOG_ERROR("connection not ready for peer:%{public}s", peerNetworkId.c_str());
+            HILOG_ERROR("[%{public}s]connection not ready for peer:%{public}s", __FUNCTION__, peerNetworkId.c_str());
             return ERR_APPEXECFWK_FORM_CD_SOFTBUS_UNAVAILABLE;
         }
         if (static_cast<uint8_t>(msgType) < FORM_CD_MSG_RESPONSE_BASE) {
@@ -349,7 +349,7 @@ ErrCode FormConnectionPool::SendFrame(const std::string &peerNetworkId, FormCdMs
 
     int32_t ret = SendBytes(fd, frame.data(), static_cast<uint32_t>(frame.size()));
     if (ret != 0) {
-        HILOG_ERROR("SendBytes failed fd=%{public}d ret=%{public}d", fd, ret);
+        HILOG_ERROR("[%{public}s]SendBytes failed fd=%{public}d ret=%{public}d", __FUNCTION__, fd, ret);
         HandleSendFailure(peerNetworkId);
         return ERR_APPEXECFWK_FORM_CD_SOFTBUS_UNAVAILABLE;
     }
@@ -371,7 +371,7 @@ ErrCode FormConnectionPool::SendRawFrame(const std::string &peerNetworkId, const
         std::lock_guard<std::mutex> lock(mutex_);
         auto it = connections_.find(peerNetworkId);
         if (it == connections_.end() || it->second.state != ConnState::READY) {
-            HILOG_ERROR("connection not ready for peer:%{public}s", peerNetworkId.c_str());
+            HILOG_ERROR("[%{public}s]connection not ready for peer:%{public}s", __FUNCTION__, peerNetworkId.c_str());
             return ERR_APPEXECFWK_FORM_CD_SOFTBUS_UNAVAILABLE;
         }
         fd = it->second.fd;
@@ -379,7 +379,7 @@ ErrCode FormConnectionPool::SendRawFrame(const std::string &peerNetworkId, const
 
     int32_t ret = SendBytes(fd, frame.data(), static_cast<uint32_t>(frame.size()));
     if (ret != 0) {
-        HILOG_ERROR("SendBytes failed fd=%{public}d ret=%{public}d", fd, ret);
+        HILOG_ERROR("[%{public}s]SendBytes failed fd=%{public}d ret=%{public}d", __FUNCTION__, fd, ret);
         HandleSendFailure(peerNetworkId);
         return ERR_APPEXECFWK_FORM_CD_SOFTBUS_UNAVAILABLE;
     }
@@ -453,26 +453,26 @@ void FormConnectionPool::OnServiceBind(int32_t fd, ServiceSocketInfo info)
                 connIt->second.state = ConnState::READY;
                 connIt->second.lastActiveTime = NowMs();
                 connIt->second.cv.notify_all();
-                HILOG_INFO("peer connected: networkId=%{public}s fd=%{public}d", peerNetworkId.c_str(), fd);
+                HILOG_INFO("peer connected:networkId=%{public}s fd=%{public}d", peerNetworkId.c_str(), fd);
             }
         } else {
             // Incoming connection (server-side accept)
-            HILOG_INFO("incoming connection accepted: fd=%{public}d", fd);
+            HILOG_INFO("incoming connection accepted:fd=%{public}d", fd);
         }
     }
 }
 
 bool FormConnectionPool::OnServiceNegotiate(int32_t fd, ServiceSocketInfo info)
 {
-    HILOG_INFO("negotiate accept: fd=%{public}d", fd);
+    HILOG_INFO("negotiate accept:fd=%{public}d", fd);
     return true;
 }
 
 void FormConnectionPool::OnBytes(int32_t fd, const void *data, uint32_t len)
 {
-    HILOG_DEBUG("OnBytes: fd=%{public}d len=%{public}u", fd, len);
+    HILOG_DEBUG("OnBytes:fd=%{public}d len=%{public}u", fd, len);
     codec_.Feed(fd, data, len, [this, fd](FormCdMsgType msgType, uint32_t seqId, const std::string &payload) {
-        HILOG_INFO("frame decoded: fd=%{public}d msgType=%{public}u seq=%{public}u payloadLen=%{public}zu",
+        HILOG_INFO("frame decoded:fd=%{public}d msgType=%{public}u seq=%{public}u payloadLen=%{public}zu",
             fd, static_cast<uint32_t>(msgType), seqId, payload.size());
         // Client-side: match pending request response
         ResponseHandler handler;
@@ -483,7 +483,7 @@ void FormConnectionPool::OnBytes(int32_t fd, const void *data, uint32_t len)
                 handler = it->second;
                 pendingHandlers_.erase(it);
                 seqToPeer_.erase(seqId);
-                HILOG_INFO("matched pending handler for seq=%{public}u, remaining=%{public}zu",
+                HILOG_INFO("matched pending handler for seq=%{public}u,remaining=%{public}zu",
                     seqId, pendingHandlers_.size());
             }
         }
@@ -494,11 +494,11 @@ void FormConnectionPool::OnBytes(int32_t fd, const void *data, uint32_t len)
 
         // Server-side: dispatch incoming frame to handler (Strategy pattern)
         if (frameHandler_ == nullptr) {
-            HILOG_WARN("frameHandler is null, dropping incoming frame type=%{public}u seq=%{public}u",
+            HILOG_WARN("frameHandler is null,dropping incoming frame type=%{public}u seq=%{public}u",
                 static_cast<uint32_t>(msgType), seqId);
             return;
         }
-        HILOG_INFO("dispatching to frameHandler: fd=%{public}d msgType=%{public}u seq=%{public}u",
+        HILOG_INFO("dispatching to frameHandler:fd=%{public}d msgType=%{public}u seq=%{public}u",
             fd, static_cast<uint32_t>(msgType), seqId);
         frameHandler_->OnFrame(fd, msgType, seqId, payload);
     });
@@ -507,7 +507,7 @@ void FormConnectionPool::OnBytes(int32_t fd, const void *data, uint32_t len)
 void FormConnectionPool::OnShutdown(int32_t fd, ShutdownReason reason)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("OnShutdown: fd=%{public}d reason=%{public}d", fd, static_cast<int32_t>(reason));
+    HILOG_INFO("OnShutdown:fd=%{public}d reason=%{public}d", fd, static_cast<int32_t>(reason));
     codec_.Clear(fd);
 
     std::string peerNetworkId;
@@ -520,7 +520,7 @@ void FormConnectionPool::OnShutdown(int32_t fd, ShutdownReason reason)
             peerNetworkId = it->second;
             auto connIt = connections_.find(peerNetworkId);
             if (connIt != connections_.end()) {
-                HILOG_INFO("connection closed: peer=%{public}s lastActive=%{public}" PRId64 "ms ago",
+                HILOG_INFO("connection closed:peer=%{public}s lastActive=%{public}" PRId64 "ms ago",
                     peerNetworkId.c_str(), NowMs() - connIt->second.lastActiveTime);
                 connIt->second.fd = -1;
                 connIt->second.state = ConnState::IDLE;
@@ -695,7 +695,7 @@ void FormConnectionPool::ScheduleReconnect(const std::string &peerNetworkId)
         }
         auto &conn = it->second;
         if (conn.retryCount >= FORM_CD_MAX_RETRY_COUNT) {
-            HILOG_WARN("max retry reached for peer:%{public}s, giving up", peerNetworkId.c_str());
+            HILOG_WARN("max retry reached for peer:%{public}s,giving up", peerNetworkId.c_str());
             conn.state = ConnState::FAILED;
             return;
         }

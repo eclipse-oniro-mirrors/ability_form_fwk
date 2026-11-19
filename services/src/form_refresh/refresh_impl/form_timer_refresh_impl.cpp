@@ -99,7 +99,7 @@ int FormTimerRefreshImpl::DealRefresh(const RefreshData &data)
     refreshRecord.isTimerRefresh = isTimerRefresh;
     ret = RefreshExecMgr::AskForProviderData(newData.formId, refreshRecord, newData.want);
     if (ret != ERR_OK) {
-        HILOG_ERROR("ask for provider data failed, ret:%{public}d, formId:%{public}" PRId64, ret, newData.formId);
+        HILOG_ERROR("ask for provider data failed,ret:%{public}d,formId:%{public}" PRId64, ret, newData.formId);
         return ret;
     }
 

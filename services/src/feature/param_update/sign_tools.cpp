@@ -119,13 +119,13 @@ std::string SignTools::GetfileStream(const std::string &filepath)
     std::string fileString;
     char canonicalPath[PATH_MAX] = { '\0' };
     if (realpath(filepath.c_str(), canonicalPath) == nullptr) {
-        HILOG_ERROR("canonicalPath is null");
+        HILOG_ERROR("[%{public}s]canonicalPath is null", __FUNCTION__);
         return fileString;
     }
     canonicalPath[PATH_MAX - 1] = '\0';
     std::ifstream file(canonicalPath, std::ios::in | std::ios::binary);
     if (!file.good()) {
-        HILOG_ERROR("Failed to open the file!");
+        HILOG_ERROR("Failed to open the file");
         return fileString;
     }
     std::stringstream infile;
@@ -156,7 +156,7 @@ int SignTools::ForEachFileSegment(const std::string &fpath, std::function<void(c
 {
     char canonicalPath[PATH_MAX] = { '\0' };
     if (realpath(fpath.c_str(), canonicalPath) == nullptr) {
-        HILOG_ERROR("canonicalPath is null");
+        HILOG_ERROR("[%{public}s]canonicalPath is null", __FUNCTION__);
         return errno;
     }
     canonicalPath[PATH_MAX - 1] = '\0';
@@ -183,7 +183,7 @@ void SignTools::CalcBase64(uint8_t *input, uint32_t inputLen, std::string &encod
     encodedStr.resize(expectedLength);
     int actualLength = EVP_EncodeBlock(reinterpret_cast<uint8_t *>(&encodedStr[0]), input, inputLen);
     encodedStr.resize(actualLength);
-    HILOG_INFO("expectedLength = %{public}zu, actualLength = %{public}d", expectedLength, actualLength);
+    HILOG_INFO("expectedLength = %{public}zu,actualLength = %{public}d", expectedLength, actualLength);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

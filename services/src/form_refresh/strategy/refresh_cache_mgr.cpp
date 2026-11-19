@@ -36,7 +36,7 @@ void RefreshCacheMgr::AddToOverloadTaskQueue(const FormTimer &task)
     for (auto &item : overloadTask_) {
         if (item.formId == task.formId && item.userId == task.userId) {
             item = task;
-            HILOG_INFO("already exists, update task");
+            HILOG_INFO("already exists,update task");
             return;
         }
     }
@@ -72,7 +72,8 @@ void RefreshCacheMgr::AddFlagByHealthyControl(const int64_t formId, bool isAskFo
 
 void RefreshCacheMgr::ConsumeHealthyControlFlag(std::vector<FormRecord>::iterator &record, const int32_t userId)
 {
-    HILOG_INFO("formId:%{public}" PRId64  ",isRefresh: %{public}d ,isUpdate: %{public}d", record->formId,
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64  ",isRefresh: %{public}d ,isUpdate: %{public}d",
+        __FUNCTION__, record->formId,
         record->isRefreshDuringDisableForm, record->isUpdateDuringDisableForm);
     if (record->isRefreshDuringDisableForm) {
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(record->formId, false);
@@ -111,17 +112,17 @@ void RefreshCacheMgr::AddFlagByInvisible(const int64_t formId, int refreshType)
 void RefreshCacheMgr::ConsumeInvisibleFlag(const std::vector<FormRecord> &visibleFormRecords, int32_t userId)
 {
     if (visibleFormRecords.empty()) {
-        HILOG_DEBUG("visibleFormRecords is empty, skip batch refresh");
+        HILOG_DEBUG("visibleFormRecords is empty,skip batch refresh");
         return;
     }
 
-    HILOG_INFO("batch consume invisible flag, size:%{public}zu, userId:%{public}d", visibleFormRecords.size(), userId);
+    HILOG_INFO("batch consume invisible flag,size:%{public}zu,userId:%{public}d", visibleFormRecords.size(), userId);
     std::vector<RefreshData> batch;
     bool isActiveUser = FormUtil::IsActiveUser(userId);
     for (const auto &record : visibleFormRecords) {
         const int64_t formId = record.formId;
-        HILOG_INFO("formId:%{public}" PRId64", userId:%{public}d, isTimerRefresh:%{public}d, isHostRefresh:%{public}d,"
-            " isReminderAgentRefresh:%{public}d",
+        HILOG_INFO("[%{public}s]formId:%{public}" PRId64", userId:%{public}d, isTimerRefresh:%{public}d,"
+            " isHostRefresh:%{public}d, isReminderAgentRefresh:%{public}d", __FUNCTION__,
             formId, userId, record.isTimerRefresh, record.isHostRefresh, record.isReminderAgentRefresh);
         Want want;
         if (record.isTimerRefresh) {
@@ -161,7 +162,7 @@ void RefreshCacheMgr::AddFlagByScreenOff(const int64_t formId, const Want &want)
 void RefreshCacheMgr::ConsumeScreenOffFlag()
 {
     const int32_t currUserId = FormUtil::GetCurrentAccountId();
-    HILOG_INFO("screen on and refresh forms, currUserId:%{public}d", currUserId);
+    HILOG_INFO("screen on and refresh forms,currUserId:%{public}d", currUserId);
     std::vector<FormRecord> formRecords;
     FormDataMgr::GetInstance().GetFormRecordsByUserId(currUserId, formRecords);
     std::vector<FormRecord> visibleFormRecords;
@@ -186,7 +187,7 @@ void RefreshCacheMgr::AddRenderTask(int64_t formId, std::function<void()> task)
     } else {
         search->second = task;
     }
-    HILOG_WARN("add render task, formId:%{public}" PRId64, formId);
+    HILOG_WARN("add render task,formId:%{public}" PRId64, formId);
 }
 
 void RefreshCacheMgr::ConsumeRenderTask(int64_t formId)
@@ -203,7 +204,7 @@ void RefreshCacheMgr::ConsumeRenderTask(int64_t formId)
         }
     }
     if (findTask) {
-        HILOG_INFO("cosume render task, formId:%{public}" PRId64, formId);
+        HILOG_INFO("cosume render task,formId:%{public}" PRId64, formId);
         task();
     }
 }
@@ -214,13 +215,13 @@ void RefreshCacheMgr::DelRenderTask(int64_t formId)
     auto search = renderTaskMap_.find(formId);
     if (search != renderTaskMap_.end()) {
         renderTaskMap_.erase(search);
-        HILOG_INFO("delete render task, formId:%{public}" PRId64, formId);
+        HILOG_INFO("delete render task,formId:%{public}" PRId64, formId);
     }
 }
 
 void RefreshCacheMgr::CosumeRefreshByDueControl(const std::vector<FormRecord> &disableFormRecords)
 {
-    HILOG_INFO("call, formRecord size:%{public}zu", disableFormRecords.size());
+    HILOG_INFO("call,formRecord size:%{public}zu", disableFormRecords.size());
     for (const auto &formRecord : disableFormRecords) {
         RefreshData data;
         data.formId = formRecord.formId;
@@ -256,7 +257,8 @@ void RefreshCacheMgr::ConsumeAddUnfinishFlag(const int64_t formId, const int32_t
         return;
     }
 
-    HILOG_INFO("formId:%{public}" PRId64", isHostRefresh:%{public}d", formId, record.isHostRefresh);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64", isHostRefresh:%{public}d",
+        __FUNCTION__, formId, record.isHostRefresh);
     Want want;
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     if (record.isHostRefresh && record.refreshWantMap.find(formId) != record.refreshWantMap.end()) {

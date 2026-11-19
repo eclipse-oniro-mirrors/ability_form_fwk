@@ -109,7 +109,7 @@ void FormRenderEventReport::StartReleaseTimeoutReportTimer(int64_t formId, const
 {
     FormRenderEventReport::StopReleaseTimeoutReportTimer(formId);
     auto timeoutCallback = [formId, uid](void *) {
-        HILOG_ERROR("RecycleForm failed, wait form release timeout, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("RecycleForm failed,wait form release timeout,formId:%{public}" PRId64, formId);
         std::string eventName = ConvertEventName(FormEventName::RECYCLE_RECOVER_FORM_FAILED);
         FormHiSysEventBuilder builder;
         builder.InsertParam(EVENT_KEY_FORM_ID, formId);
@@ -123,7 +123,7 @@ void FormRenderEventReport::StartReleaseTimeoutReportTimer(int64_t formId, const
     const std::string taskName = "FRS_WaitReleaseRenderer_" + std::to_string(formId);
     int32_t timerId = HiviewDFX::XCollie::GetInstance().SetTimer(taskName, WAIT_RELEASE_RENDERER_TIMEOUT,
         timeoutCallback, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
-    HILOG_INFO("waiting form release, formId: %{public}" PRId64 ", timerId: %{public}d", formId, timerId);
+    HILOG_INFO("waiting form release,formId:%{public}" PRId64 ", timerId: %{public}d", formId, timerId);
     FormRenderEventReport::waitReleaseTimerMap_.emplace(formId, timerId);
 }
 
@@ -132,7 +132,7 @@ void FormRenderEventReport::StopReleaseTimeoutReportTimer(int64_t formId)
     auto iter = FormRenderEventReport::waitReleaseTimerMap_.find(formId);
     if (iter != FormRenderEventReport::waitReleaseTimerMap_.end()) {
         int32_t timerId = iter->second;
-        HILOG_INFO("form release completed, formId: %{public}" PRId64 "timerId: %{public}d", formId, timerId);
+        HILOG_INFO("form release completed,formId:%{public}" PRId64 "timerId: %{public}d", formId, timerId);
         HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
         FormRenderEventReport::waitReleaseTimerMap_.erase(iter);
     }
@@ -141,7 +141,7 @@ void FormRenderEventReport::StopReleaseTimeoutReportTimer(int64_t formId)
 void FormRenderEventReport::SendRuntimeMemoryLeakEvent(const std::string &bundleName, uint64_t processMemory,
     uint64_t runtimeMemory, std::vector<std::string> &formName, std::vector<uint32_t> &formLocation)
 {
-    HILOG_INFO("runtime memory leak, bundleName: %{public}s processMemory: %{public}" PRIu64
+    HILOG_INFO("runtime memory leak,bundleName:%{public}s processMemory:%{public}" PRIu64
         ", runtimeMemory: %{public}" PRIu64, bundleName.c_str(), processMemory, runtimeMemory);
 
     FormHiSysEventBuilder builder;

@@ -46,7 +46,7 @@ void FormMemmgrClient::SetCritical(bool critical)
     HILOG_INFO("pid:%{public}" PRId32 ", critical:%{public}d", pid, critical);
 
     if (!critical && !criticalNotifyEnable_) {
-        HILOG_ERROR("setCritical fail, critical notify enable is false");
+        HILOG_ERROR("setCritical fail,critical notify enable is false");
         return;
     }
     void *libMemmgrClientHandle = dlopen(LIB_MEMMGR_CLIENT_NAME, RTLD_NOW);

@@ -39,7 +39,7 @@ FormFsmStatus FormRenderStatus::GetFormStatus(const int64_t formId)
     std::shared_lock<std::shared_mutex> lock(formStatusMutex_);
     auto iter = formStatusMap_.find(formId);
     if (iter == formStatusMap_.end()) {
-        HILOG_ERROR("formStatusMap_ do not exist, formId:%{public}" PRId64, formId);
+        HILOG_ERROR("formStatusMap_ do not exist,formId:%{public}" PRId64, formId);
         return FormFsmStatus::UNPROCESSABLE;
     }
 
@@ -51,7 +51,7 @@ void FormRenderStatus::SetFormStatus(const int64_t formId, FormFsmStatus formSta
     std::unique_lock<std::shared_mutex> lock(formStatusMutex_);
     auto iter = formStatusMap_.find(formId);
     if (iter == formStatusMap_.end()) {
-        HILOG_INFO("set new form status, formId:%{public}" PRId64 ", status is %{public}d.",
+        HILOG_INFO("set new form status,formId:%{public}" PRId64 ", status is %{public}d.",
             formId,
             static_cast<int32_t>(formStatus));
         formStatusMap_.emplace(formId, formStatus);
@@ -60,17 +60,34 @@ void FormRenderStatus::SetFormStatus(const int64_t formId, FormFsmStatus formSta
 
     iter->second = formStatus;
     HILOG_INFO(
-        "formId:%{public}" PRId64 ", status is %{public}d.", formId, static_cast<int32_t>(formStatus));
+        "[%{public}s]formId:%{public}" PRId64 ", status is %{public}d.",
+            __FUNCTION__, formId, static_cast<int32_t>(formStatus));
 }
 
 void FormRenderStatus::DeleteFormStatus(const int64_t formId)
 {
     std::unique_lock<std::shared_mutex> lock(formStatusMutex_);
-    HILOG_INFO("formId:%{public}" PRId64, formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formId);
     auto iter = formStatusMap_.find(formId);
     if (iter != formStatusMap_.end()) {
         formStatusMap_.erase(iter);
     }
+}
+
+bool FormRenderStatus::TransitionFormStatus(const int64_t formId, const FormFsmEvent event,
+    FormRenderStatusMachineInfo &info)
+{
+    std::unique_lock<std::shared_mutex> lock(formStatusMutex_);
+    auto iter = formStatusMap_.find(formId);
+    if (iter == formStatusMap_.end()) {
+        HILOG_INFO("create new status.");
+        iter = formStatusMap_.emplace(formId, FormFsmStatus::INIT).first;
+    }
+    if (!FormRenderStatusTable::GetInstance().GetFormStatusInfo(iter->second, event, info)) {
+        return false;
+    }
+    iter->second = info.nextStatus;
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

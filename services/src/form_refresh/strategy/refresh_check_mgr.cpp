@@ -48,7 +48,7 @@ RefreshCheckMgr::~RefreshCheckMgr() {}
 int RefreshCheckMgr::IsBaseValidPass(const std::vector<int32_t> &types, const CheckValidFactor &factor)
 {
     if (types.empty()) {
-        HILOG_INFO("the refresh task need't check valid, formId:%{public}" PRId64, factor.formId);
+        HILOG_INFO("the refresh task need't check valid,formId:%{public}" PRId64, factor.formId);
         return ERR_OK;
     }
 
@@ -65,7 +65,7 @@ int RefreshCheckMgr::IsBaseValidPass(const std::vector<int32_t> &types, const Ch
 
 int RefreshCheckMgr::HandleCheckValid(const CheckValidFactor &factor, const int32_t checkType)
 {
-    HILOG_DEBUG("checkType:%{public}d, formId:%{public}" PRId64, checkType, factor.formId);
+    HILOG_DEBUG("checkType:%{public}d,formId:%{public}" PRId64, checkType, factor.formId);
     auto it = CHECKER_MAP.find(checkType);
     if (it != CHECKER_MAP.end()) {
         return it->second->CheckValid(factor);

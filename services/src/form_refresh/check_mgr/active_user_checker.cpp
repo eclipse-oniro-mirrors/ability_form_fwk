@@ -33,7 +33,7 @@ int ActiveUserChecker::CheckValid(const CheckValidFactor &factor)
         currentActiveUserId = FormUtil::GetCallerUserId(factor.callingUid);
     }
     if (currentActiveUserId != factor.record.providerUserId) {
-        HILOG_ERROR("not current user:%{public}d, providerUserId:%{public}d, formId:%{public}" PRId64,
+        HILOG_ERROR("not current user:%{public}d,providerUserId:%{public}d,formId:%{public}" PRId64,
             currentActiveUserId, factor.record.providerUserId, factor.formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }

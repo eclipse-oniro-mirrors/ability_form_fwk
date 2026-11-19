@@ -59,7 +59,7 @@ bool UnmarshallFrom(const std::string &payload, T &obj)
 {
     MessageParcel parcel;
     if (!parcel.WriteUnpadBuffer(payload.data(), payload.size())) {
-        HILOG_ERROR("WriteUnpadBuffer failed, size=%{public}zu", payload.size());
+        HILOG_ERROR("WriteUnpadBuffer failed,size=%{public}zu", payload.size());
         return false;
     }
     std::unique_ptr<T> ptr(T::Unmarshalling(parcel));
@@ -151,7 +151,7 @@ void FormCrossDeviceCodec::Feed(int32_t fd, const void *data, uint32_t len, cons
         uint32_t payloadLen = ReadBe32U(hdr + 12);
         if (magic != FORM_CD_MAGIC || version != FORM_CD_PROTO_VERSION ||
             payloadLen > FORM_CD_MAX_PAYLOAD) {
-            HILOG_ERROR("dirty frame, magic=0x%{public}x ver=%{public}d payloadLen=%{public}u, drop fd=%{public}d",
+            HILOG_ERROR("dirty frame,magic=0x%{public}x ver=%{public}d payloadLen=%{public}u,drop fd=%{public}d",
                 magic, version, payloadLen, fd);
             return; // cannot locate next frame boundary
         }

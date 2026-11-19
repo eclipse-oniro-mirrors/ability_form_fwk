@@ -82,7 +82,7 @@ void FormRenderServiceExtension::OnStop()
 
 sptr<IRemoteObject> FormRenderServiceExtension::OnConnect(const AAFwk::Want &want)
 {
-    HILOG_INFO("begin");
+    HILOG_INFO("[%{public}s]begin", __FUNCTION__);
     return OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->AsObject();
 }
 
@@ -97,7 +97,7 @@ void FormRenderServiceExtension::OnDisconnect(const AAFwk::Want &want)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     Extension::OnDisconnect(want);
-    HILOG_DEBUG("begin");
+    HILOG_DEBUG("[%{public}s]begin", __FUNCTION__);
 }
 
 void FormRenderServiceExtension::OnDisconnect(const AAFwk::Want &want,
@@ -105,7 +105,7 @@ void FormRenderServiceExtension::OnDisconnect(const AAFwk::Want &want,
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     Extension::OnDisconnect(want);
-    HILOG_DEBUG("begin");
+    HILOG_DEBUG("[%{public}s]begin", __FUNCTION__);
 }
 
 void FormRenderServiceExtension::OnCommand(const AAFwk::Want &want, bool restart, int startId)
@@ -124,7 +124,7 @@ void FormRenderServiceExtension::OnConfigurationUpdated(const AppExecFwk::Config
         HILOG_ERROR("null configuration");
         return;
     }
-    HILOG_INFO("configuration detail: %{public}s", config->GetName().c_str());
+    HILOG_INFO("configuration detail:%{public}s", config->GetName().c_str());
     FormRenderServiceMgr::GetInstance().OnConfigurationUpdated(config);
 }
 }

@@ -916,7 +916,7 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormData_002, TestSize.Level1)
         .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillOnce(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormAcquireDataRecord(_, _, _, _))
+    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormAcquireDataRecord(_, _, _, _, _))
         .WillOnce(Return(true));
     EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
         .WillOnce(Return(ERR_OK));
@@ -949,7 +949,7 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormData_003, TestSize.Level1)
         .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillOnce(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormAcquireDataRecord(_, _, _, _))
+    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormAcquireDataRecord(_, _, _, _, _))
         .WillOnce(Return(true));
     EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
         .WillOnce(Return(ERR_OK));
@@ -982,7 +982,7 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormData_004, TestSize.Level1)
         .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillOnce(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormAcquireDataRecord(_, _, _, _))
+    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormAcquireDataRecord(_, _, _, _, _))
         .WillOnce(Return(true));
     EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
         .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
@@ -1015,7 +1015,7 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormData_005, TestSize.Level1)
         .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
     EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
         .WillOnce(Return(TEST_CALLING_UID));
-    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormAcquireDataRecord(_, _, _, _))
+    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormAcquireDataRecord(_, _, _, _, _))
         .WillOnce(Return(true));
     EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
         .WillOnce(Return(ERR_APPEXECFWK_FORM_COMMON_CODE));
@@ -1286,5 +1286,74 @@ HWTEST_F(FmsFormQueryAdapterTest, AcquireFormState_006, TestSize.Level1)
     GTEST_LOG_(INFO) << "AcquireFormState_006 end";
 }
 
+/**
+ * @tc.name: AcquireFormData_006
+ * @tc.desc: Verify AcquireFormData binds the requestCode to the queried provider bundle.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, AcquireFormData_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireFormData_006 start";
+ 
+    AAFwk::WantParams formData;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    int64_t requestCode = 601;
+ 
+    FormRecord formRecord;
+    formRecord.bundleName = "com.test.bundle";
+    formRecord.abilityName = "MainAbility";
+    formRecord.moduleName = "entry";
+ 
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    // The request must be bound atomically to the queried provider for result caller verification.
+    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormAcquireDataRecord(requestCode, _, _, _, "com.test.bundle"))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
+        .WillOnce(Return(ERR_OK));
+ 
+    auto result = FormQueryAdapter::GetInstance().AcquireFormData(
+        TEST_FORM_ID, requestCode, callerToken, formData);
+    EXPECT_EQ(result, ERR_OK);
+ 
+    GTEST_LOG_(INFO) << "AcquireFormData_006 end";
+}
+ 
+/**
+ * @tc.name: AcquireFormData_007
+ * @tc.desc: Verify AcquireFormData is rejected when the requestCode is owned by another caller
+ *           (record creation fails) and no connection is made.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormQueryAdapterTest, AcquireFormData_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "AcquireFormData_007 start";
+ 
+    AAFwk::WantParams formData;
+    sptr<IRemoteObject> callerToken = new MockIRemoteObject();
+    int64_t requestCode = 602;
+ 
+    FormRecord formRecord;
+    formRecord.bundleName = "com.test.bundle";
+    formRecord.abilityName = "MainAbility";
+    formRecord.moduleName = "entry";
+ 
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(formRecord), Return(true)));
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillOnce(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormDataMgr::obj, CreateFormAcquireDataRecord(requestCode, _, _, _, _))
+        .WillOnce(Return(false));
+    EXPECT_CALL(*MockFormAmsHelper::obj, ConnectServiceAbility(_, _))
+        .Times(0);
+ 
+    auto result = FormQueryAdapter::GetInstance().AcquireFormData(
+        TEST_FORM_ID, requestCode, callerToken, formData);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+ 
+    GTEST_LOG_(INFO) << "AcquireFormData_007 end";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

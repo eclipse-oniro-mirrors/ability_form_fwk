@@ -84,7 +84,7 @@ ErrCode FormPublishAdapter::CheckFormBundleName(Want &want, std::string &bundleN
     bool needCheckFormPermission)
 {
     if (!GetBundleName(bundleName, needCheckFormPermission)) {
-        HILOG_ERROR("get BundleName failed");
+        HILOG_ERROR("[%{public}s]get BundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
 
@@ -118,7 +118,7 @@ bool FormPublishAdapter::CheckIsSystemAppByBundleName(const int32_t &userId, con
         return false;
     }
 
-    HILOG_DEBUG("bundle:%{public}s. isSystemApp=%{public}d", bundleName.c_str(), appInfo.isSystemApp);
+    HILOG_DEBUG("bundle:%{public}s.isSystemApp=%{public}d", bundleName.c_str(), appInfo.isSystemApp);
     return appInfo.isSystemApp;
 }
 
@@ -150,7 +150,7 @@ bool FormPublishAdapter::IsErmsSupportPublishForm(const std::string &bundleName,
 
     int32_t ret = FormEcologicalRuleClient::GetInstance().IsSupportPublishForm(wants, callerInfo, isSupport);
     if (ret != ERR_OK) {
-        HILOG_ERROR("call IsSupportPublishForm failed:%{public}d, default is support.", ret);
+        HILOG_ERROR("call IsSupportPublishForm failed:%{public}d,default is support", ret);
         return true;
     }
     return isSupport;
@@ -205,11 +205,11 @@ bool FormPublishAdapter::CheckSnapshotWant(const Want &want)
         std::string height = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY);
         std::string screenX = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY);
         std::string screenY = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY);
-        HILOG_INFO("SnapshotInfo screenX:%{public}s, screenY:%{public}s, width:%{public}s, height:%{public}s",
+        HILOG_INFO("SnapshotInfo screenX:%{public}s,screenY:%{public}s,width:%{public}s,height:%{public}s",
             screenX.c_str(), screenY.c_str(), width.c_str(), height.c_str());
         return true;
     } else {
-        HILOG_DEBUG("CheckSnapshotWant: want has no component snapshot info");
+        HILOG_DEBUG("CheckSnapshotWant:want has no component snapshot info");
         return false;
     }
 }
@@ -234,13 +234,13 @@ ErrCode FormPublishAdapter::CheckPublishForm(Want &want, bool needCheckFormPermi
 
     std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
     if (moduleName.empty()) {
-        HILOG_ERROR("empty moduleName");
+        HILOG_ERROR("[%{public}s]empty moduleName", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     bool isTemporary = want.GetBoolParam(AppExecFwk::Constants::PARAM_FORM_TEMPORARY_KEY, false);
     if (isTemporary) {
-        HILOG_WARN("The published form should not be temp");
+        HILOG_WARN("[%{public}s]The published form should not be temp", __FUNCTION__);
         want.SetParam(AppExecFwk::Constants::PARAM_FORM_TEMPORARY_KEY, false);
     }
 
@@ -283,21 +283,21 @@ ErrCode FormPublishAdapter::QueryPublishFormToHost(Want &wantToHost, int32_t use
     AppExecFwk::ExtensionAbilityInfo extensionAbilityInfo;
     if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
         action, userId, abilityInfo, extensionAbilityInfo)) {
-        HILOG_ERROR("fail ImplicitQueryInfoByPriority for publishing form");
+        HILOG_ERROR("[%{public}s]fail ImplicitQueryInfoByPriority for publishing form", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
 
     if (abilityInfo.name.empty() && extensionAbilityInfo.name.empty()) {
-        HILOG_ERROR("Query highest priority ability failed, no form host ability found");
+        HILOG_ERROR("[%{public}s]Query highest priority ability failed,no form host ability found", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
 
     if (!abilityInfo.name.empty()) {
-        HILOG_DEBUG("Query highest priority ability success. bundleName:%{public}s, ability:%{public}s",
+        HILOG_DEBUG("Query highest priority ability success.bundleName:%{public}s,ability:%{public}s",
             abilityInfo.bundleName.c_str(), abilityInfo.name.c_str());
         wantToHost.SetElementName(abilityInfo.bundleName, abilityInfo.name);
     } else {
-        HILOG_DEBUG("Query highest priority extension ability success. bundleName:%{public}s, ability:%{public}s",
+        HILOG_DEBUG("Query highest priority extension ability success.bundleName:%{public}s,ability:%{public}s",
             extensionAbilityInfo.bundleName.c_str(), extensionAbilityInfo.name.c_str());
         wantToHost.SetElementName(extensionAbilityInfo.bundleName, extensionAbilityInfo.name);
     }
@@ -306,9 +306,9 @@ ErrCode FormPublishAdapter::QueryPublishFormToHost(Want &wantToHost, int32_t use
 
 void FormPublishAdapter::IncreaseAddFormRequestTimeOutTask(const int64_t formId, int timeoutMs)
 {
-    HILOG_INFO("call, timeoutMs:%{public}d", timeoutMs);
+    HILOG_INFO("call,timeoutMs:%{public}d", timeoutMs);
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("null serialQueue_");
+        HILOG_ERROR("[%{public}s]null serialQueue_", __FUNCTION__);
         return;
     }
     auto timerTask = [formId]() {
@@ -328,9 +328,9 @@ void FormPublishAdapter::IncreaseAddFormRequestTimeOutTask(const int64_t formId,
 
 void FormPublishAdapter::CancelAddFormRequestTimeOutTask(const int64_t formId, const int result)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("null serialQueue_");
+        HILOG_ERROR("[%{public}s]null serialQueue_", __FUNCTION__);
         return;
     }
     std::lock_guard<std::mutex> lock(formResultMutex_);
@@ -345,7 +345,7 @@ void FormPublishAdapter::CancelAddFormRequestTimeOutTask(const int64_t formId, c
 
 ErrCode FormPublishAdapter::AcquireAddFormResult(const int64_t formId)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     ErrCode result = ERR_OK;
     std::unique_lock<std::mutex> lock(formResultMutex_);
     condition_.wait(lock, [this, formId, &result]() {
@@ -364,23 +364,23 @@ bool FormPublishAdapter::ResolveAcquireResult(const int64_t formId, ErrCode &res
     }
     auto mapIt = ACQUIRE_RESULT_MAP.find(static_cast<int8_t>(iter->second));
     if (mapIt == ACQUIRE_RESULT_MAP.end()) {
-        HILOG_INFO("Add form result state not ready, keep waiting");
+        HILOG_INFO("Add form result state not ready,keep waiting");
         return false;
     }
     result = mapIt->second;
     if (result == ERR_OK) {
         HILOG_INFO("Acquire the result of the success");
     } else {
-        HILOG_ERROR("Acquire the result failed, errCode:%{public}d", result);
+        HILOG_ERROR("Acquire the result failed,errCode:%{public}d", result);
     }
     return true;
 }
 
 ErrCode FormPublishAdapter::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("null serialQueue_");
+        HILOG_ERROR("[%{public}s]null serialQueue_", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::pair<int64_t, int64_t> eventMsg(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER), formId);
@@ -392,7 +392,7 @@ ErrCode FormPublishAdapter::SetPublishFormResult(const int64_t formId, Constants
         if (mapIt != PUBLISH_RESULT_MAP.end()) {
             iter->second = mapIt->second;
         } else {
-            HILOG_ERROR("Unknown PublishFormErrorCode:%{public}d, fallback to FAILED",
+            HILOG_ERROR("Unknown PublishFormErrorCode:%{public}d,fallback to FAILED",
                 static_cast<int32_t>(errorCodeInfo.code));
             iter->second = AddFormResultErrorCodes::FAILED;
         }
@@ -404,10 +404,10 @@ ErrCode FormPublishAdapter::SetPublishFormResult(const int64_t formId, Constants
 
 bool FormPublishAdapter::IsRequestPublishFormSupported()
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName;
     if (!GetBundleName(bundleName)) {
-        HILOG_ERROR("get BundleName failed");
+        HILOG_ERROR("[%{public}s]get BundleName failed", __FUNCTION__);
         return false;
     }
 
@@ -419,7 +419,7 @@ bool FormPublishAdapter::IsRequestPublishFormSupported()
     }
 
     if (FormCallbackAdapter::GetInstance().GetFormPublishInterceptor() != nullptr) {
-        HILOG_DEBUG("query publish form has publish interceptor, return true");
+        HILOG_DEBUG("query publish form has publish interceptor,return true");
         return true;
     }
 
@@ -430,16 +430,16 @@ bool FormPublishAdapter::IsRequestPublishFormSupported()
     AppExecFwk::ExtensionAbilityInfo extensionAbilityInfo;
     if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
         action, userId, abilityInfo, extensionAbilityInfo)) {
-        HILOG_ERROR("fail ImplicitQueryInfoByPriority for publishing form");
+        HILOG_ERROR("[%{public}s]fail ImplicitQueryInfoByPriority for publishing form", __FUNCTION__);
         return false;
     }
 
     if (abilityInfo.name.empty() && extensionAbilityInfo.name.empty()) {
-        HILOG_ERROR("Query highest priority ability failed, no form host ability found");
+        HILOG_ERROR("[%{public}s]Query highest priority ability failed,no form host ability found", __FUNCTION__);
         return false;
     }
 
-    HILOG_DEBUG("IsRequestPublishFormSupported: true");
+    HILOG_DEBUG("IsRequestPublishFormSupported:true");
     return true;
 }
 
@@ -447,7 +447,7 @@ ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingD
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
     const std::vector<FormDataProxy> &formDataProxies)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
     ErrCode errCode = CheckPublishForm(want, true, userId);
     if (errCode != ERR_OK) {
@@ -464,7 +464,7 @@ ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingD
         errCode = FormDataMgr::GetInstance().AddRequestPublishFormInfo(formId, want, noFormBindingData);
     }
     if (errCode != ERR_OK) {
-        HILOG_ERROR("add form info error");
+        HILOG_ERROR("[%{public}s]add form info error", __FUNCTION__);
         RemoveFormIdMapElement(formId);
         return errCode;
     }
@@ -486,7 +486,7 @@ ErrCode FormPublishAdapter::RequestPublishForm(Want &want, bool withFormBindingD
 ErrCode FormPublishAdapter::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int32_t userId = FormCommonAdapter::GetInstance().GetCallingUserId();
     ErrCode errCode = CheckPublishForm(want, false, userId);
     if (errCode != ERR_OK) {
@@ -504,7 +504,7 @@ ErrCode FormPublishAdapter::RequestPublishFormWithSnapshot(Want &want, bool with
         errCode = FormDataMgr::GetInstance().AddRequestPublishFormInfo(formId, want, noFormBindingData);
     }
     if (errCode != ERR_OK) {
-        HILOG_ERROR("add form info error");
+        HILOG_ERROR("[%{public}s]add form info error", __FUNCTION__);
         RemoveFormIdMapElement(formId);
         return errCode;
     }
@@ -522,7 +522,7 @@ ErrCode FormPublishAdapter::RequestPublishFormWithSnapshot(Want &want, bool with
 
 ErrCode FormPublishAdapter::RequestPublishFormCommon(Want &want, int32_t userId, int64_t &formId)
 {
-    HILOG_INFO("RequestPublishFormCommon called, userId:%{public}d", userId);
+    HILOG_INFO("RequestPublishFormCommon called,userId:%{public}d", userId);
 
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetAction(Constants::FORM_PUBLISH_ACTION);
@@ -552,7 +552,7 @@ ErrCode FormPublishAdapter::RequestPublishFormCommon(Want &want, int32_t userId,
 
 ErrCode FormPublishAdapter::RequestPublishFormCrossUser(Want &want, int32_t userId, int64_t &formId)
 {
-    HILOG_INFO("RequestPublishFormCrossUser called, userId:%{public}d", userId);
+    HILOG_INFO("RequestPublishFormCrossUser called,userId:%{public}d", userId);
 
     ErrCode errCode = ValidatePublishFormParamsForCrossUser(want, userId);
     if (errCode != ERR_OK) {
@@ -562,7 +562,7 @@ ErrCode FormPublishAdapter::RequestPublishFormCrossUser(Want &want, int32_t user
 
     bool isTemporary = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     if (isTemporary) {
-        HILOG_WARN("The published form should not be temp");
+        HILOG_WARN("[%{public}s]The published form should not be temp", __FUNCTION__);
         want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     }
 
@@ -603,27 +603,27 @@ ErrCode FormPublishAdapter::CheckPublishFormCrossDevice(Want &want, int32_t user
 
     std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
     if (moduleName.empty()) {
-        HILOG_ERROR("empty moduleName");
+        HILOG_ERROR("[%{public}s]empty moduleName", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     std::string abilityName = want.GetElement().GetAbilityName();
     std::string formName = want.GetStringParam(AppExecFwk::Constants::PARAM_FORM_NAME_KEY);
     int32_t dimensionId = want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0);
-    HILOG_DEBUG("bundleName:%{public}s, moduleName:%{public}s, "
+    HILOG_DEBUG("bundleName:%{public}s,moduleName:%{public}s,"
         "abilityName:%{public}s, formName:%{public}s, dimensionId:%{public}d",
         bundleName.c_str(), moduleName.c_str(), abilityName.c_str(), formName.c_str(), dimensionId);
 
     AppExecFwk::BundleInfo bundleInfo;
     if (!FormBmsHelper::GetInstance().GetBundleInfo(bundleName, userId, bundleInfo)) {
-        HILOG_ERROR("peer app not installed, bundleName:%{public}s, userId:%{public}d",
+        HILOG_ERROR("peer app not installed,bundleName:%{public}s,userId:%{public}d",
             bundleName.c_str(), userId);
         return ERR_APPEXECFWK_FORM_CD_PEER_APP_NOT_INSTALLED;
     }
 
     int32_t minVersionCode = want.GetIntParam("ohos.extra.param.key.application_min_version_code", 0);
     if (minVersionCode > 0 && static_cast<int32_t>(bundleInfo.versionCode) < minVersionCode) {
-        HILOG_ERROR("peer app version too old, bundleName:%{public}s, installed:%{public}d, minRequired:%{public}d",
+        HILOG_ERROR("peer app version too old,bundleName:%{public}s,installed:%{public}d,minRequired:%{public}d",
             bundleName.c_str(), static_cast<int32_t>(bundleInfo.versionCode), minVersionCode);
         return ERR_APPEXECFWK_FORM_CD_PEER_APP_NOT_INSTALLED;
     }
@@ -632,7 +632,7 @@ ErrCode FormPublishAdapter::CheckPublishFormCrossDevice(Want &want, int32_t user
     ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModuleWithoutCheck(bundleName,
         moduleName, formInfos, userId);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("GetFormsInfoByModuleWithoutCheck failed, bundleName:%{public}s, moduleName:%{public}s",
+        HILOG_ERROR("GetFormsInfoByModuleWithoutCheck failed,bundleName:%{public}s,moduleName:%{public}s",
             bundleName.c_str(), moduleName.c_str());
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
@@ -644,7 +644,7 @@ ErrCode FormPublishAdapter::CheckPublishFormCrossDevice(Want &want, int32_t user
             return ERR_OK;
         }
     }
-    HILOG_ERROR("no matching form info, bundleName:%{public}s, moduleName:%{public}s, "
+    HILOG_ERROR("no matching form info,bundleName:%{public}s,moduleName:%{public}s,"
         "abilityName:%{public}s, formName:%{public}s, dimensionId:%{public}d",
         bundleName.c_str(), moduleName.c_str(), abilityName.c_str(), formName.c_str(), dimensionId);
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -653,7 +653,7 @@ ErrCode FormPublishAdapter::CheckPublishFormCrossDevice(Want &want, int32_t user
 ErrCode FormPublishAdapter::RequestPublishFormCrossDevice(Want &want, int32_t userId, int64_t &formId,
     std::unique_ptr<FormProviderData> &formProviderData)
 {
-    HILOG_INFO("RequestPublishFormCrossDevice called, userId:%{public}d", userId);
+    HILOG_INFO("RequestPublishFormCrossDevice called,userId:%{public}d", userId);
 
     ErrCode errCode = CheckPublishFormCrossDevice(want, userId);
     bool peerNotInstalled = (errCode == ERR_APPEXECFWK_FORM_CD_PEER_APP_NOT_INSTALLED);
@@ -662,7 +662,7 @@ ErrCode FormPublishAdapter::RequestPublishFormCrossDevice(Want &want, int32_t us
     }
 
     if (peerNotInstalled) {
-        HILOG_WARN("peer app not installed, continue to publish to host for install-and-add");
+        HILOG_WARN("peer app not installed,continue to publish to host for install-and-add");
     }
 
     errCode = RequestPublishFormCommon(want, userId, formId);
@@ -672,7 +672,7 @@ ErrCode FormPublishAdapter::RequestPublishFormCrossDevice(Want &want, int32_t us
 
     errCode = FormDataMgr::GetInstance().AddRequestPublishFormInfo(formId, want, formProviderData);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("add form info error");
+        HILOG_ERROR("[%{public}s]add form info error", __FUNCTION__);
         return errCode;
     }
 
@@ -745,7 +745,7 @@ ErrCode FormPublishAdapter::RequestPublishFormToHost(Want &want, int32_t userId,
 
 ErrCode FormPublishAdapter::CheckAddFormTaskTimeoutOrFailed(const int64_t formId, AddFormResultErrorCodes &formStates)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::lock_guard<std::mutex> lock(formResultMutex_);
     auto result = std::find_if(formIdMap_.begin(), formIdMap_.end(), [formId, &formStates] (const auto &elem) {
         if (elem.first == formId) {
@@ -787,27 +787,27 @@ ErrCode FormPublishAdapter::ValidatePublishFormParamsForCrossUser(const Want &wa
 ErrCode FormPublishAdapter::ValidateParamsForCrossUser(const Want &want)
 {
     if (want.GetElement().GetBundleName().empty()) {
-        HILOG_ERROR("Param invalid, bundleName is empty");
+        HILOG_ERROR("Param invalid,bundleName is empty");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     if (want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY).empty()) {
-        HILOG_ERROR("Param invalid, moduleName is empty");
+        HILOG_ERROR("Param invalid,moduleName is empty");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     if (want.GetElement().GetAbilityName().empty()) {
-        HILOG_ERROR("Param invalid, abilityName is empty");
+        HILOG_ERROR("Param invalid,abilityName is empty");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     if (want.GetStringParam(Constants::PARAM_FORM_NAME_KEY).empty()) {
-        HILOG_ERROR("Param invalid, formName is empty");
+        HILOG_ERROR("Param invalid,formName is empty");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     if (!want.HasParameter(Constants::PARAM_FORM_DIMENSION_KEY)) {
-        HILOG_ERROR("Param invalid, dimensionId is not set");
+        HILOG_ERROR("Param invalid,dimensionId is not set");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -825,7 +825,7 @@ ErrCode FormPublishAdapter::ValidateFormInfoMatchForCrossUser(const Want &want, 
     ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModuleWithoutCheck(
         bundleName, moduleName, formInfos, userId);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("Get forms info failed, bundle:%{public}s, module:%{public}s, userId:%{public}d",
+        HILOG_ERROR("Get forms info failed,bundle:%{public}s,module:%{public}s,userId:%{public}d",
             bundleName.c_str(), moduleName.c_str(), userId);
         return errCode;
     }
@@ -839,7 +839,7 @@ ErrCode FormPublishAdapter::ValidateFormInfoMatchForCrossUser(const Want &want, 
         }
     }
 
-    HILOG_ERROR("No matching form info found, ability:%{public}s, formName:%{public}s, dimensionId:%{public}d",
+    HILOG_ERROR("No matching form info found,ability:%{public}s,formName:%{public}s,dimensionId:%{public}d",
         abilityName.c_str(), formName.c_str(), dimensionId);
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
@@ -847,7 +847,7 @@ ErrCode FormPublishAdapter::ValidateFormInfoMatchForCrossUser(const Want &want, 
 
 ErrCode FormPublishAdapter::CheckFormCountLimit(const Want &want, int32_t userId)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
 
     std::string hostBundleName = want.GetElement().GetBundleName();
     if (hostBundleName.empty()) {
@@ -863,7 +863,7 @@ ErrCode FormPublishAdapter::CheckFormCountLimit(const Want &want, int32_t userId
 
     ErrCode errCode = FormDataMgr::GetInstance().CheckEnoughForm(hostUid, userId);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("Form number exceeds limit, errCode:%{public}d", errCode);
+        HILOG_ERROR("Form number exceeds limit,errCode:%{public}d", errCode);
         return errCode;
     }
 

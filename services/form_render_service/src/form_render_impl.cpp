@@ -45,7 +45,7 @@ FormRenderImpl::~FormRenderImpl() = default;
 
 int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &want, sptr<IRemoteObject> callerToken)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formJsInfo.formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formJsInfo.formId);
     auto renderForm = [formJsInfo, want, callerToken] {
         return FormRenderServiceMgr::GetInstance().RenderForm(formJsInfo, want, callerToken);
     };
@@ -56,7 +56,7 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
 int32_t FormRenderImpl::StopRenderingForm(
     const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formJsInfo.formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formJsInfo.formId);
     auto deleteForm = [formJsInfo, want, callerToken] {
         return FormRenderServiceMgr::GetInstance().StopRenderingForm(formJsInfo, want, callerToken);
     };
@@ -67,7 +67,7 @@ int32_t FormRenderImpl::StopRenderingForm(
 int32_t FormRenderImpl::ReleaseRenderer(
     int64_t formId, const std::string &compId, const std::string &uid, const Want &want)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formId);
     auto releaseForm = [formId, compId, uid, want] {
         return FormRenderServiceMgr::GetInstance().ReleaseRenderer(formId, compId, uid, want);
     };
@@ -107,7 +107,7 @@ void FormRenderImpl::RunCachedConfigurationUpdated()
 
 int32_t FormRenderImpl::RecycleForm(const int64_t &formId, const Want &want)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formId);
     auto recoverForm = [formId, want] { return FormRenderServiceMgr::GetInstance().RecycleForm(formId, want); };
 
     return FormRenderStatusMgr::GetInstance().PostFormEvent(formId, FormFsmEvent::RECYCLE_DATA, recoverForm);
@@ -115,7 +115,7 @@ int32_t FormRenderImpl::RecycleForm(const int64_t &formId, const Want &want)
 
 int32_t FormRenderImpl::RecoverForm(const FormJsInfo &formJsInfo, const Want &want)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formJsInfo.formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formJsInfo.formId);
     auto recoverForm = [formJsInfo, want] { return FormRenderServiceMgr::GetInstance().RecoverForm(formJsInfo, want); };
 
     return FormRenderStatusMgr::GetInstance().PostFormEvent(formJsInfo.formId, FormFsmEvent::RECOVER_FORM, recoverForm);

@@ -419,6 +419,8 @@ namespace Constants {
     constexpr const char* FORM_DENSITY = "ohos.extra.param.key.form_density";
     constexpr const char* FORM_PROCESS_ON_ADD_SURFACE = "ohos.extra.param.key.process_on_add_surface";
     constexpr const char* FORM_ALLOW_UPDATE = "allowUpdate";
+    // Opt-in switch for mounting the last-frame snapshot when the surface is detached to another host.
+    constexpr const char* FORM_ENABLE_SNAPSHOT_ON_DETACH = "ohos.extra.param.key.form_enable_snapshot_on_detach";
 
     // The state of whether the ArkTs card can be rendered
     constexpr const char FORM_RENDER_STATE[] = "ohos.extra.param.key.form_render_state";
@@ -471,7 +473,7 @@ namespace Constants {
     // Max form provider data buffer size (32 MB)
     constexpr const int32_t MAX_FORM_PROVIDER_DATA_BUFFER_SIZE = 32 * 1024 * 1024;
     // Form version code
-    constexpr const int32_t FORM_VERSION_CODE = 100003;
+    constexpr const int32_t FORM_VERSION_CODE = 100004;
     // Form domain id
     constexpr uint64_t FORM_DOMAIN_ID = 0xD001301;
     // Is delete cache in upgrade scene

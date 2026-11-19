@@ -22,6 +22,7 @@
 #include <shared_mutex>
 
 #include "util/form_status_common.h"
+#include "status_mgr_center/form_render_status_table.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -57,6 +58,17 @@ public:
      * @param formId The ID of the form
      */
     void DeleteFormStatus(const int64_t formId);
+
+    /**
+     * @brief Atomically transitions the form status: find-or-create (INIT), look up the
+     * FSM table and apply nextStatus all under one exclusive lock, so concurrent
+     * PostFormEvent calls cannot interleave read-check-set.
+     * @param formId The ID of the form
+     * @param event The event that triggers the status change
+     * @param info The matched FSM info (curStatus/nextStatus/processType) on success
+     * @return True if the transition was applied, false if the FSM table has no entry
+     */
+    bool TransitionFormStatus(const int64_t formId, const FormFsmEvent event, FormRenderStatusMachineInfo &info);
 
 private:
     // <formId, formStatus>

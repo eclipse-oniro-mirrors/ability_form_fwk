@@ -231,7 +231,7 @@ napi_value JsFormEditExtensionContext::OnSetWindowBackgroundColor(napi_env env, 
         return CreateJsUndefined(env);
     }
     if (!IsValidColorFormat(color)) {
-        HILOG_ERROR("Invalid color format: %{public}s", color.c_str());
+        HILOG_ERROR("Invalid color format:%{public}s", color.c_str());
         ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_INVALID_COLOR_VALUE),
             ERR_MSG_INVALID_COLOR_VALUE);
         return CreateJsUndefined(env);

@@ -94,7 +94,7 @@ int64_t FormUtil::GenerateFormId(int64_t udidHash)
             std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
         }
     }
-    HILOG_INFO("generate elapsed hash %{public}zu, formId:%{public}" PRId64, elapsedHash, ret);
+    HILOG_INFO("generate elapsed hash %{public}zu,formId:%{public}" PRId64, elapsedHash, ret);
     return ret;
 }
 
@@ -214,7 +214,7 @@ int FormUtil::GetCurrentAccountId()
     std::vector<int32_t> activeList;
     ErrCode errCode = DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("QueryActiveOsAccountIds failed");
+        HILOG_ERROR("[%{public}s]QueryActiveOsAccountIds failed", __FUNCTION__);
         return Constants::ANY_USERID;
     }
     if (activeList.empty()) {
@@ -228,11 +228,11 @@ int FormUtil::GetCurrentAccountId()
 bool FormUtil::IsSACall()
 {
     auto callerToken = IPCSkeleton::GetCallingTokenID();
-    HILOG_DEBUG("callerToken : %{private}u", callerToken);
+    HILOG_DEBUG("callerToken :%{private}u", callerToken);
 
     auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
     if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
-        HILOG_DEBUG("caller tokenType is native, verify success");
+        HILOG_DEBUG("caller tokenType is native,verify success");
         return true;
     }
 
@@ -252,7 +252,7 @@ bool FormUtil::VerifyCallingPermission(std::string_view permissionName)
     int32_t ret = Security::AccessToken::AccessTokenKit::VerifyAccessToken(
         callerToken, std::string(permissionName));
     if (ret == Security::AccessToken::PermissionState::PERMISSION_DENIED) {
-        HILOG_ERROR("permission %{public}s: PERMISSION_DENIED", std::string(permissionName).c_str());
+        HILOG_ERROR("permission %{public}s:PERMISSION_DENIED", std::string(permissionName).c_str());
         return false;
     }
     HILOG_DEBUG("Verify calling permission success");
@@ -264,14 +264,14 @@ bool FormUtil::VerifyPermissionByBundleName(int32_t userId, const std::string &b
 {
     auto accessTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(userId, bundleName, 0);
     if (accessTokenId == 0) {
-        HILOG_ERROR("GetHapTokenID failed, userId:%{public}d, bundleName:%{public}s",
+        HILOG_ERROR("GetHapTokenID failed,userId:%{public}d,bundleName:%{public}s",
             userId, bundleName.c_str());
         return false;
     }
     std::string permStr(permissionName);
     int32_t ret = Security::AccessToken::AccessTokenKit::VerifyAccessToken(accessTokenId, permStr);
     if (ret == Security::AccessToken::PermissionState::PERMISSION_DENIED) {
-        HILOG_ERROR("permission %{public}s: PERMISSION_DENIED for bundleName:%{public}s",
+        HILOG_ERROR("permission %{public}s:PERMISSION_DENIED for bundleName:%{public}s",
             permStr.c_str(), bundleName.c_str());
         return false;
     }
@@ -389,7 +389,7 @@ void FormUtil::GetActiveUsers(std::vector<int32_t> &activeList)
 {
     ErrCode errCode = DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("QueryActiveOsAccountIds failed");
+        HILOG_ERROR("[%{public}s]QueryActiveOsAccountIds failed", __FUNCTION__);
         return;
     }
 }
@@ -401,7 +401,7 @@ int32_t FormUtil::GetCallerUserId(const int callingUid)
     auto errCode = DelayedSingleton<OsAccountManagerWrapper>::GetInstance()
         ->GetOsAccountLocalIdFromUid(callingUid, userId);
     if (errCode != ERR_OK) {
-        HILOG_WARN("GetOsAccountLocalIdFromUid failed, use fallback userId");
+        HILOG_WARN("GetOsAccountLocalIdFromUid failed,use fallback userId");
     }
     return userId;
 }

@@ -62,7 +62,7 @@ FormProviderMgr::~FormProviderMgr() {}
  */
 ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInfo &formProviderInfo)
 {
-    HILOG_DEBUG("formId:%{public}" PRId64 "", formId);
+    HILOG_DEBUG("[%{public}s]formId:%{public}" PRId64 "", __FUNCTION__, formId);
 
     if (formId <= 0) {
         HILOG_ERROR("formId not greater than 0");
@@ -72,7 +72,7 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
     FormRecord formRecord;
     bool isGetFormRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!isGetFormRecord) {
-        HILOG_ERROR("not exist such form, formId:%{public}" PRId64 "", formId);
+        HILOG_ERROR("not exist such form,formId:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
@@ -117,7 +117,7 @@ void FormProviderMgr::DataProxyUpdate(const int64_t formId, const FormRecord &re
         FormProviderData formProviderData;
         formProviderData.EnableDbCache(true);
         FormMgrAdapterFacade::GetInstance().UpdateForm(formId, record.uid, formProviderData);
-        HILOG_INFO("Upgrade APP data agent card update, formId:%{public}" PRId64, formId);
+        HILOG_INFO("Upgrade APP data agent card update,formId:%{public}" PRId64, formId);
     }
 }
 
@@ -168,7 +168,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     if (result != ERR_OK) {
         return result;
     }
-    HILOG_BRIEF("FormProviderMgr::RefreshForm, formId:%{public}" PRId64 "., record.enableForm = %{public}d",
+    HILOG_BRIEF("FormProviderMgr::RefreshForm,formId:%{public}" PRId64 "., record.enableForm = %{public}d",
         formId, record.enableForm);
     if (!record.enableForm) {
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
@@ -191,7 +191,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
         FormDataMgr::GetInstance().SetTimerRefresh(formId, true);
         bool isFormVisible = record.formVisibleNotifyState == Constants::FORM_VISIBLE;
         if (!isFormVisible) {
-            HILOG_INFO("form is invisible, formId:%{public}" PRId64, formId);
+            HILOG_INFO("form is invisible,formId:%{public}" PRId64, formId);
             FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
             FormDataMgr::GetInstance().SetRefreshType(formId, refreshType);
             FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_INVISIBLE_INTERCEPT);
@@ -228,7 +228,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
         FormDataMgr::GetInstance().MergeRefreshWant(formId, want);
         FormDataMgr::GetInstance().SetHostRefresh(formId, true);
         FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
-        HILOG_INFO("screen off, set refresh flag, do not refresh now, formId:%{public}" PRId64 ".", formId);
+        HILOG_INFO("screen off,set refresh flag,do not refresh now,formId:%{public}" PRId64 ".", formId);
         return ERR_OK;
     }
 #endif
@@ -236,7 +236,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     bool needRefresh = IsNeedToFresh(record, formId, isVisibleToFresh);
     if (!needRefresh) {
         FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
-        HILOG_ERROR("no one needReresh, set refresh flag, do not refresh now");
+        HILOG_ERROR("no one needReresh,set refresh flag,do not refresh now");
         return ERR_OK;
     }
 
@@ -252,7 +252,7 @@ ErrCode FormProviderMgr::RefreshCheck(FormRecord &record, const int64_t formId, 
 {
     bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     if (!bGetRecord) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64 "", formId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64 "", __FUNCTION__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
@@ -260,7 +260,7 @@ ErrCode FormProviderMgr::RefreshCheck(FormRecord &record, const int64_t formId, 
     int32_t currentActiveUserId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, Constants::DEFAULT_PROVIDER_USER_ID);
     if (currentActiveUserId != record.providerUserId) {
         FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
-        HILOG_ERROR("not current user, just set refresh flag, userId:%{public}d",
+        HILOG_ERROR("not current user,just set refresh flag,userId:%{public}d",
             record.providerUserId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
@@ -284,12 +284,12 @@ ErrCode FormProviderMgr::RefreshCheck(FormRecord &record, const int64_t formId, 
 ErrCode FormProviderMgr::ConnectForConfigUpdate(const AppExecFwk::Configuration &configuration,
     const FormRecord &record, const Want &want)
 {
-    HILOG_INFO("bundleName:%{public}s, abilityName:%{public}s",
+    HILOG_INFO("[%{public}s]bundleName:%{public}s,abilityName:%{public}s", __FUNCTION__,
         record.bundleName.c_str(), record.abilityName.c_str());
     sptr<IAbilityConnection> abilityConnection = new (std::nothrow) ConfigurationUpdateConnection(record.formId, want,
         record.bundleName, record.abilityName, configuration, record.providerUserId);
     if (abilityConnection == nullptr) {
-        HILOG_ERROR("create FormRefreshConnection failed");
+        HILOG_ERROR("[%{public}s]create FormRefreshConnection failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     Want connectWant;
@@ -301,7 +301,7 @@ ErrCode FormProviderMgr::ConnectForConfigUpdate(const AppExecFwk::Configuration 
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
         connectWant, abilityConnection, record.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
+        HILOG_ERROR("[%{public}s]ConnectServiceAbilityWithUserId failed,errorCode:%{public}d", __FUNCTION__, errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
@@ -311,7 +311,7 @@ ErrCode FormProviderMgr::ConnectForConfigUpdate(const AppExecFwk::Configuration 
 ErrCode FormProviderMgr::ConnectForConfigUpdateWithUserId(const AppExecFwk::Configuration &configuration,
     const FormRecord &record, const Want &want, int32_t userId)
 {
-    HILOG_INFO("bundleName:%{public}s, abilityName:%{public}s, userId:%{public}d, providerUserId:%{public}d",
+    HILOG_INFO("bundleName:%{public}s,abilityName:%{public}s,userId:%{public}d,providerUserId:%{public}d",
         record.bundleName.c_str(), record.abilityName.c_str(), userId, record.providerUserId);
     sptr<IAbilityConnection> abilityConnection = new (std::nothrow) ConfigurationUpdateConnection(record.formId, want,
         record.bundleName, record.abilityName, configuration, record.providerUserId);
@@ -328,7 +328,7 @@ ErrCode FormProviderMgr::ConnectForConfigUpdateWithUserId(const AppExecFwk::Conf
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
         connectWant, abilityConnection, record.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
+        HILOG_ERROR("[%{public}s]ConnectServiceAbilityWithUserId failed,errorCode:%{public}d", __FUNCTION__, errorCode);
         if (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) {
             return ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED;
         }
@@ -348,14 +348,14 @@ ErrCode FormProviderMgr::ConnectForConfigUpdateWithUserId(const AppExecFwk::Conf
  */
 ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId, const FormRecord &record, const Want &want)
 {
-    HILOG_INFO("formId:%{public} " PRId64 ", bundleName:%{public}s, abilityName:%{public}s, "
-        "needFreeInstall:%{public}d, isCountTimerRefresh:%{public}d, userId:%{public}d", formId,
+    HILOG_INFO("[%{public}s]formId:%{public} " PRId64 ", bundleName:%{public}s, abilityName:%{public}s, "
+        "needFreeInstall:%{public}d, isCountTimerRefresh:%{public}d, userId:%{public}d", __FUNCTION__, formId,
         record.bundleName.c_str(), record.abilityName.c_str(), record.needFreeInstall, record.isCountTimerRefresh,
         record.providerUserId);
 
     sptr<FormAbilityConnection> formRefreshConnection = new (std::nothrow) FormRefreshConnection(formId, want, record);
     if (formRefreshConnection == nullptr) {
-        HILOG_ERROR("create FormRefreshConnection failed");
+        HILOG_ERROR("[%{public}s]create FormRefreshConnection failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -380,7 +380,7 @@ ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId, const FormRe
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(connectWant, formRefreshConnection,
         record.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbility failed, errorCode:%{public}d", errorCode);
+        HILOG_ERROR("ConnectServiceAbility failed,errorCode:%{public}d", errorCode);
         FormEventReport::SendFormFailedEvent(FormEventName::CONNECT_FORM_ABILITY_FAILED, formId,
             record.bundleName, "", static_cast<int32_t>(ConnectFormAbilityErrorType::UPDATE_FORM_FAILED), errorCode);
         errorCode = (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) ?
@@ -408,7 +408,7 @@ ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId, const FormRe
  */
 ErrCode FormProviderMgr::ConnectAmsForRefreshPermission(const int64_t formId, Want &want)
 {
-    HILOG_DEBUG("ConnectAmsForRefreshPermission start, form id:%{public}" PRId64 "", formId);
+    HILOG_DEBUG("ConnectAmsForRefreshPermission start,form id:%{public}" PRId64 "", formId);
     if (!want.HasParameter(Constants::FORM_PERMISSION_NAME_KEY) ||
         !want.HasParameter(Constants::FORM_PERMISSION_GRANTED_KEY)) {
         HILOG_ERROR("permissionInfo not exist,form:%{public}" PRId64 "", formId);
@@ -417,7 +417,7 @@ ErrCode FormProviderMgr::ConnectAmsForRefreshPermission(const int64_t formId, Wa
     FormRecord record;
     bool result = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     if (!result) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64 "", formId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64 "", __FUNCTION__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     want.RemoveParam(Constants::KEY_IS_TIMER);
@@ -425,7 +425,7 @@ ErrCode FormProviderMgr::ConnectAmsForRefreshPermission(const int64_t formId, Wa
 
     sptr<FormAbilityConnection> formRefreshConnection = new (std::nothrow) FormRefreshConnection(formId, want, record);
     if (formRefreshConnection == nullptr) {
-        HILOG_ERROR("create FormRefreshConnection failed");
+        HILOG_ERROR("[%{public}s]create FormRefreshConnection failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -443,7 +443,7 @@ ErrCode FormProviderMgr::ConnectAmsForRefreshPermission(const int64_t formId, Wa
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
         connectWant, formRefreshConnection, record.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
+        HILOG_ERROR("[%{public}s]ConnectServiceAbilityWithUserId failed,errorCode:%{public}d", __FUNCTION__, errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
@@ -468,7 +468,7 @@ ErrCode FormProviderMgr::NotifyProviderFormDelete(const int64_t formId, const Fo
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    HILOG_DEBUG("connectAbility,bundleName:%{public}s, abilityName:%{public}s",
+    HILOG_DEBUG("connectAbility,bundleName:%{public}s,abilityName:%{public}s",
         formRecord.bundleName.c_str(), formRecord.abilityName.c_str());
     sptr<IAbilityConnection> formDeleteConnection = new (std::nothrow) FormDeleteConnection(formId,
         formRecord.bundleName, formRecord.abilityName, formRecord.providerUserId);
@@ -486,7 +486,7 @@ ErrCode FormProviderMgr::NotifyProviderFormDelete(const int64_t formId, const Fo
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
         want, formDeleteConnection, formRecord.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
+        HILOG_ERROR("[%{public}s]ConnectServiceAbilityWithUserId failed,errorCode:%{public}d", __FUNCTION__, errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
@@ -513,7 +513,7 @@ ErrCode FormProviderMgr::NotifyProviderFormsBatchDelete(const std::string &bundl
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    HILOG_DEBUG("bundleName:%{public}s, abilityName:%{public}s",
+    HILOG_DEBUG("[%{public}s]bundleName:%{public}s,abilityName:%{public}s", __FUNCTION__,
         bundleName.c_str(), abilityName.c_str());
     sptr<IAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds, bundleName, abilityName,
         userId);
@@ -531,7 +531,7 @@ ErrCode FormProviderMgr::NotifyProviderFormsBatchDelete(const std::string &bundl
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
         want, batchDeleteConnection, userId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
+        HILOG_ERROR("[%{public}s]ConnectServiceAbilityWithUserId failed,errorCode:%{public}d", __FUNCTION__, errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
@@ -547,7 +547,7 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId, const FormProviderInfo
     // check exist and get the formRecord
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64 ".", formId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64 ".", __FUNCTION__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     UpdateSupportMoreImagesAndDB(formId, formProviderInfo, formRecord);
@@ -598,7 +598,7 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId,
 #endif
 
     if (formRecord.formProviderInfo.NeedCache()) {
-        HILOG_INFO("updateJsForm, data is less than 1k, cache data");
+        HILOG_INFO("updateJsForm,data is less than 1k,cache data");
         FormCacheMgr::GetInstance().AddData(formId, formRecord.formProviderInfo.GetFormData());
     } else {
         FormCacheMgr::GetInstance().DeleteData(formId);
@@ -616,7 +616,7 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId,
  */
 int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record, const Want &want)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formId);
+    HILOG_INFO("[%{public}s]formId:%{public}" PRId64, __FUNCTION__, formId);
 
 #ifdef SUPPORT_POWER
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
@@ -662,7 +662,8 @@ int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record
  ErrCode FormProviderMgr::ConnectAmsChangeLocation(const int64_t formId, const FormRecord &record,
     const Want &want)
 {
-    HILOG_INFO("formId:%{public} " PRId64 ", bundleName:%{public}s, abilityName:%{public}s", formId,
+    HILOG_INFO("[%{public}s]formId:%{public} " PRId64 ", bundleName:%{public}s, abilityName:%{public}s",
+        __FUNCTION__, formId,
         record.bundleName.c_str(), record.abilityName.c_str());
 
     sptr<IAbilityConnection> formLocationConnection = new (std::nothrow) FormLocationConnection(formId, want,
@@ -680,7 +681,7 @@ int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
         connectWant, formLocationConnection, record.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
+        HILOG_ERROR("[%{public}s]ConnectServiceAbilityWithUserId failed,errorCode:%{public}d", __FUNCTION__, errorCode);
         if (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) {
             return ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED;
         }
@@ -698,7 +699,7 @@ void FormProviderMgr::IncreaseTimerRefreshCount(const int64_t formId)
 {
     FormRecord record;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId, record)) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64 ".", formId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64 ".", __FUNCTION__, formId);
         return;
     }
 
@@ -717,7 +718,7 @@ void FormProviderMgr::IncreaseTimerRefreshCount(const int64_t formId)
  */
 ErrCode FormProviderMgr::AcquireFormStateBack(FormState state, const std::string& provider, const Want &wantArg)
 {
-    HILOG_DEBUG("AcquireFormState start:%{public}d, provider:%{public}s", state, provider.c_str());
+    HILOG_DEBUG("AcquireFormState start:%{public}d,provider:%{public}s", state, provider.c_str());
     FormDataMgr::GetInstance().AcquireFormStateBack(state, provider, wantArg);
     return ERR_OK;
 }
@@ -725,7 +726,7 @@ ErrCode FormProviderMgr::AcquireFormStateBack(FormState state, const std::string
 ErrCode FormProviderMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams,
     int64_t requestCode)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("[%{public}s]start", __FUNCTION__);
     FormDataMgr::GetInstance().AcquireFormDataBack(wantParams, requestCode);
     return ERR_OK;
 }
@@ -738,7 +739,7 @@ bool FormProviderMgr::IsNeedToFresh(FormRecord &record, int64_t formId, bool isV
         return true;
     }
 
-    HILOG_DEBUG("isVisibleToFresh is %{public}d, record.isVisible is %{public}d", isVisibleToFresh, record.isVisible);
+    HILOG_DEBUG("isVisibleToFresh is %{public}d,record.isVisible is %{public}d", isVisibleToFresh, record.isVisible);
     if (isVisibleToFresh) {
         if (!record.isVisible) {
             FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_INVISIBLE_INTERCEPT);
@@ -762,13 +763,13 @@ bool FormProviderMgr::IsFormCached(const FormRecord &record)
 ErrCode FormProviderMgr::RebindByFreeInstall(const FormRecord &record, Want &want,
     const sptr<AAFwk::IAbilityConnection> formRefreshConnection)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("[%{public}s]start", __FUNCTION__);
     want.AddFlags(Want::FLAG_INSTALL_ON_DEMAND | Want::FLAG_INSTALL_WITH_BACKGROUND_MODE);
     want.SetModuleName(record.moduleName);
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
         want, formRefreshConnection, record.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, err:%{public}d", errorCode);
+        HILOG_ERROR("ConnectServiceAbilityWithUserId failed,err:%{public}d", errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
@@ -784,7 +785,7 @@ ErrCode FormProviderMgr::RebindByFreeInstall(const FormRecord &record, Want &wan
 ErrCode FormProviderMgr::ConnectAmsUpdateSize(const int32_t newDimension,
     const Rect &newRect, const FormRecord &record)
 {
-    HILOG_INFO("formId:%{public} " PRId64, record.formId);
+    HILOG_INFO("[%{public}s]formId:%{public} " PRId64, __FUNCTION__, record.formId);
     sptr<IAbilityConnection> formUpdateSizeConnection = new (std::nothrow) FormUpdateSizeConnection(
         record.formId, record.bundleName, record.abilityName, newDimension, newRect, record.providerUserId);
     if (formUpdateSizeConnection == nullptr) {
@@ -800,7 +801,7 @@ ErrCode FormProviderMgr::ConnectAmsUpdateSize(const int32_t newDimension,
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
         connectWant, formUpdateSizeConnection, record.providerUserId);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("ConnectServiceAbilityWithUserId failed, errorCode:%{public}d", errorCode);
+        HILOG_ERROR("[%{public}s]ConnectServiceAbilityWithUserId failed,errorCode:%{public}d", __FUNCTION__, errorCode);
         if (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) {
             return ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED;
         }

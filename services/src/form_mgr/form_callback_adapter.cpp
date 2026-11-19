@@ -59,7 +59,7 @@ ErrCode FormCallbackAdapter::RegisterFormRouterProxy(const std::vector<int64_t> 
     const sptr<IRemoteObject> &callerToken)
 {
 #ifndef WATCH_API_DISABLE
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (callerToken == nullptr) {
         HILOG_ERROR("null callerToken");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -72,12 +72,13 @@ ErrCode FormCallbackAdapter::RegisterFormRouterProxy(const std::vector<int64_t> 
     FormRecord record;
     for (int64_t formId : formIds) {
         if (formId <= 0) {
-            HILOG_WARN("FormId %{public}" PRId64 " is less than 0", formId);
+            HILOG_WARN("[%{public}s]FormId %{public}" PRId64 " is less than 0", __FUNCTION__, formId);
             continue;
         }
         auto matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
         if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
-            HILOG_ERROR("No matching formRecord was found for formId:%{public}" PRId64 "", formId);
+            HILOG_ERROR("[%{public}s]No matching formRecord was found for formId:%{public}" PRId64 "",
+                __FUNCTION__, formId);
             continue;
         }
         matchedFormIds.push_back(formId);
@@ -87,20 +88,21 @@ ErrCode FormCallbackAdapter::RegisterFormRouterProxy(const std::vector<int64_t> 
             continue;
         } else if (std::find(record.formUserUids.begin(),
             record.formUserUids.end(), uid) == record.formUserUids.end()) {
-            HILOG_ERROR("The formId:%{public}" PRId64 " owned by other formHost", formId);
+            HILOG_ERROR("[%{public}s]The formId:%{public}" PRId64 " owned by other formHost", __FUNCTION__, formId);
             continue;
         } else {
-            HILOG_DEBUG("The setup was successful, matchedFormIds:%{public}" PRId64 "", formId);
+            HILOG_DEBUG("[%{public}s]The setup was successful,matchedFormIds:%{public}" PRId64 "",
+                __FUNCTION__, formId);
             hostOwnFormIds.push_back(formId);
         }
     }
     if (matchedFormIds.empty()) {
-        HILOG_ERROR("invalid formIds");
+        HILOG_ERROR("[%{public}s]invalid formIds", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     if (hostOwnFormIds.empty()) {
-        HILOG_ERROR("All formIds were not set by self");
+        HILOG_ERROR("[%{public}s]All formIds were not set by self", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
@@ -112,7 +114,7 @@ ErrCode FormCallbackAdapter::RegisterFormRouterProxy(const std::vector<int64_t> 
 
 ErrCode FormCallbackAdapter::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::vector<int64_t> matchedFormIds {};
     std::vector<int64_t> hostOwnFormIds {};
     auto uid = IPCSkeleton::GetCallingUid();
@@ -120,36 +122,38 @@ ErrCode FormCallbackAdapter::UnregisterFormRouterProxy(const std::vector<int64_t
     FormRecord record;
     for (int64_t formId : formIds) {
         if (formId <= 0) {
-            HILOG_WARN("FormId %{public}" PRId64 " is less than 0", formId);
+            HILOG_WARN("[%{public}s]FormId %{public}" PRId64 " is less than 0", __FUNCTION__, formId);
             continue;
         }
         auto matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
         if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
-            HILOG_ERROR("No matching formRecord was found for formId:%{public}" PRId64 "", formId);
+            HILOG_ERROR("[%{public}s]No matching formRecord was found for formId:%{public}" PRId64 "",
+                __FUNCTION__, formId);
             continue;
         }
         matchedFormIds.push_back(formId);
 
         if (record.providerUserId != userId) {
-            HILOG_ERROR("The formId:%{public}" PRId64
-                        " corresponds to a card that is not for the currently active user.", formId);
+            HILOG_ERROR("[%{public}s]The formId:%{public}" PRId64
+                        " corresponds to a card that is not for the currently active user.", __FUNCTION__, formId);
             continue;
         } else if (std::find(record.formUserUids.begin(),
             record.formUserUids.end(), uid) == record.formUserUids.end()) {
-            HILOG_ERROR("The formId:%{public}" PRId64 " owned by other formHost", formId);
+            HILOG_ERROR("[%{public}s]The formId:%{public}" PRId64 " owned by other formHost", __FUNCTION__, formId);
             continue;
         } else {
-            HILOG_DEBUG("The setup was successful, matchedFormIds:%{public}" PRId64 "", formId);
+            HILOG_DEBUG("[%{public}s]The setup was successful,matchedFormIds:%{public}" PRId64 "",
+                __FUNCTION__, formId);
             hostOwnFormIds.push_back(formId);
         }
     }
     if (matchedFormIds.empty()) {
-        HILOG_ERROR("invalid formIds");
+        HILOG_ERROR("[%{public}s]invalid formIds", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     if (hostOwnFormIds.empty()) {
-        HILOG_ERROR("All formIds were not set by self");
+        HILOG_ERROR("[%{public}s]All formIds were not set by self", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
@@ -159,9 +163,9 @@ ErrCode FormCallbackAdapter::UnregisterFormRouterProxy(const std::vector<int64_t
 ErrCode FormCallbackAdapter::RegisterPublishFormInterceptor(
     const sptr<IRemoteObject> &interceptorCallback)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (interceptorCallback == nullptr) {
-        HILOG_ERROR("null interceptorCallback");
+        HILOG_ERROR("[%{public}s]null interceptorCallback", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     auto interceptor = iface_cast<AppExecFwk::IFormPublishInterceptor>(interceptorCallback);
@@ -177,9 +181,9 @@ ErrCode FormCallbackAdapter::RegisterPublishFormInterceptor(
 ErrCode FormCallbackAdapter::UnregisterPublishFormInterceptor(
     const sptr<IRemoteObject> &interceptorCallback)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (interceptorCallback == nullptr) {
-        HILOG_ERROR("null interceptorCallback");
+        HILOG_ERROR("[%{public}s]null interceptorCallback", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     auto interceptor = iface_cast<AppExecFwk::IFormPublishInterceptor>(interceptorCallback);
@@ -199,14 +203,14 @@ ErrCode FormCallbackAdapter::UnregisterPublishFormInterceptor(
 
 ErrCode FormCallbackAdapter::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return overflowRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterOverflowProxy()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return overflowRegistry_->Unregister(callingUid);
 }
@@ -214,7 +218,7 @@ ErrCode FormCallbackAdapter::UnregisterOverflowProxy()
 ErrCode FormCallbackAdapter::RequestOverflow(const int64_t formId, const int32_t callingUid,
     const OverflowInfo &overflowInfo, bool isOverflow)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     ErrCode checkResult = SceneAnimationCheck(formId, callingUid);
     if (checkResult != ERR_OK) {
         return checkResult;
@@ -222,7 +226,7 @@ ErrCode FormCallbackAdapter::RequestOverflow(const int64_t formId, const int32_t
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64, matchedFormId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64, __FUNCTION__, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     ErrCode result = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
@@ -237,21 +241,21 @@ ErrCode FormCallbackAdapter::RequestOverflow(const int64_t formId, const int32_t
         }
         result = proxy->RequestOverflow(formId, overflowInfo, isOverflow);
     }
-    HILOG_INFO("RequestOverflow result: %{public}d", result);
+    HILOG_INFO("RequestOverflow result:%{public}d", result);
     return result;
 }
 
 ErrCode FormCallbackAdapter::RegisterChangeSceneAnimationStateProxy(
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return sceneAnimationRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterChangeSceneAnimationStateProxy()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return sceneAnimationRegistry_->Unregister(callingUid);
 }
@@ -259,7 +263,7 @@ ErrCode FormCallbackAdapter::UnregisterChangeSceneAnimationStateProxy()
 ErrCode FormCallbackAdapter::ChangeSceneAnimationState(const int64_t formId,
     const int32_t callingUid, int32_t state)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     ErrCode checkResult = SceneAnimationCheck(formId, callingUid);
     if (checkResult != ERR_OK) {
         return checkResult;
@@ -267,7 +271,7 @@ ErrCode FormCallbackAdapter::ChangeSceneAnimationState(const int64_t formId,
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64, matchedFormId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64, __FUNCTION__, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     ErrCode result = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
@@ -285,20 +289,20 @@ ErrCode FormCallbackAdapter::ChangeSceneAnimationState(const int64_t formId,
             break;
         }
     }
-    HILOG_INFO("ChangeSceneAnimationState result: %{public}d", result);
+    HILOG_INFO("ChangeSceneAnimationState result:%{public}d", result);
     return result;
 }
 
 ErrCode FormCallbackAdapter::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return formRectRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterGetFormRectProxy()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return formRectRegistry_->Unregister(callingUid);
 }
@@ -306,7 +310,7 @@ ErrCode FormCallbackAdapter::UnregisterGetFormRectProxy()
 ErrCode FormCallbackAdapter::GetFormRect(const int64_t formId,
     const int32_t callingUid, Rect &rect)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     ErrCode checkResult = CallerCheck(formId, callingUid);
     if (checkResult != ERR_OK) {
         return checkResult;
@@ -314,7 +318,7 @@ ErrCode FormCallbackAdapter::GetFormRect(const int64_t formId,
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64, matchedFormId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64, __FUNCTION__, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     ErrCode result = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
@@ -332,20 +336,20 @@ ErrCode FormCallbackAdapter::GetFormRect(const int64_t formId,
             break;
         }
     }
-    HILOG_DEBUG("GetFormRect, result:%{public}d", result);
+    HILOG_DEBUG("GetFormRect,result:%{public}d", result);
     return result;
 }
 
 ErrCode FormCallbackAdapter::RegisterGetVisibleFormRectProxy(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return visibleFormRectRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterGetVisibleFormRectProxy()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return visibleFormRectRegistry_->Unregister(callingUid);
 }
@@ -353,21 +357,21 @@ ErrCode FormCallbackAdapter::UnregisterGetVisibleFormRectProxy()
 ErrCode FormCallbackAdapter::GetVisibleFormRect(const int64_t formId,
     const int32_t callingUid, Rect &rect)
 {
-    HILOG_INFO("call");
-    // Inline caller checks (mirrors CallerCheck semantics/order) — avoids
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
+    // Inline caller checks (mirrors CallerCheck semantics/order) 鈥?avoids
     // duplicate FindMatchedFormId + GetFormRecord lookups.
     if (formId <= 0) {
-        HILOG_ERROR("invalid formId");
+        HILOG_ERROR("[%{public}s]invalid formId", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64 ".", matchedFormId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64 ".", __FUNCTION__, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     if (formRecord.uid != callingUid) {
-        HILOG_ERROR("not match providerUid:%{public}d and callingUid:%{public}d",
+        HILOG_ERROR("[%{public}s]not match providerUid:%{public}d and callingUid:%{public}d", __FUNCTION__,
             formRecord.uid, callingUid);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
@@ -388,7 +392,7 @@ ErrCode FormCallbackAdapter::GetVisibleFormRect(const int64_t formId,
             break;
         }
     }
-    HILOG_DEBUG("GetVisibleFormRect, result:%{public}d", result);
+    HILOG_DEBUG("GetVisibleFormRect,result:%{public}d", result);
     // Only ERR_OK exits the loop early; any other result (no host answered, or a
     // host-side IPC failure) settles as the declared 16500100.
     return (result == ERR_OK) ? result : ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
@@ -396,14 +400,14 @@ ErrCode FormCallbackAdapter::GetVisibleFormRect(const int64_t formId,
 
 ErrCode FormCallbackAdapter::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return liveFormStatusRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterGetLiveFormStatusProxy()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return liveFormStatusRegistry_->Unregister(callingUid);
 }
@@ -411,7 +415,7 @@ ErrCode FormCallbackAdapter::UnregisterGetLiveFormStatusProxy()
 ErrCode FormCallbackAdapter::GetLiveFormStatus(
     std::unordered_map<std::string, std::string> &liveFormStatusMap)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::vector<sptr<IRemoteObject>> callerTokens;
     ErrCode ret = liveFormStatusRegistry_->GetAll(callerTokens);
     if (ret != ERR_OK) {
@@ -430,28 +434,28 @@ ErrCode FormCallbackAdapter::GetLiveFormStatus(
             liveFormStatusMap.insert(partialMap.begin(), partialMap.end());
         }
     }
-    HILOG_INFO("GetLiveFormStatus, result:%{public}d", result);
+    HILOG_INFO("GetLiveFormStatus,result:%{public}d", result);
     return result;
 }
 
 ErrCode FormCallbackAdapter::RegisterPublishFormCrossBundleControl(
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return crossBundleControlRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterPublishFormCrossBundleControl()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return crossBundleControlRegistry_->Unregister(callingUid);
 }
 
 bool FormCallbackAdapter::PublishFormCrossBundleControl(const PublishFormCrossBundleInfo &bundleInfo)
 {
-    HILOG_INFO("call, callerBundleName:%{public}s, targetBundleName:%{public}s, targetTemplateFormDetailId:%{public}s,",
+    HILOG_INFO("call,callerBundleName:%{public}s,targetBundleName:%{public}s,targetTemplateFormDetailId:%{public}s",
         bundleInfo.callerBundleName.c_str(), bundleInfo.targetBundleName.c_str(),
         bundleInfo.targetTemplateFormDetailId.c_str());
     int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
@@ -470,7 +474,7 @@ bool FormCallbackAdapter::PublishFormCrossBundleControl(const PublishFormCrossBu
         }
         bool isCanOpen = false;
         ErrCode result = remoteFormProviderDelegateProxy->PublishFormCrossBundleControl(bundleInfo, isCanOpen);
-        HILOG_INFO("result:%{public}d, isCanOpen:%{public}d", result, isCanOpen);
+        HILOG_INFO("result:%{public}d,isCanOpen:%{public}d", result, isCanOpen);
         if (result != ERR_OK || !isCanOpen) {
             return false;
         }
@@ -481,14 +485,14 @@ bool FormCallbackAdapter::PublishFormCrossBundleControl(const PublishFormCrossBu
 ErrCode FormCallbackAdapter::RegisterTemplateFormDetailInfoChange(
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return templateFormDetailInfoRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterTemplateFormDetailInfoChange()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return templateFormDetailInfoRegistry_->Unregister(callingUid);
 }
@@ -496,7 +500,7 @@ ErrCode FormCallbackAdapter::UnregisterTemplateFormDetailInfoChange()
 ErrCode FormCallbackAdapter::UpdateTemplateFormDetailInfo(
     const std::vector<TemplateFormDetailInfo> &templateFormInfo)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     std::vector<sptr<IRemoteObject>> callerTokens;
     ErrCode ret = templateFormDetailInfoRegistry_->GetByUserId(userId, callerTokens);
@@ -508,7 +512,7 @@ ErrCode FormCallbackAdapter::UpdateTemplateFormDetailInfo(
         sptr<IFormHostDelegate> remoteFormHostDelegateProxy =
             iface_cast<IFormHostDelegate>(callerToken);
         if (remoteFormHostDelegateProxy == nullptr) {
-            HILOG_ERROR("failed, remoteFormHostDelegateProxy is nullptr!");
+            HILOG_ERROR("failed,remoteFormHostDelegateProxy is nullptr");
             continue;
         }
         ErrCode ret = remoteFormHostDelegateProxy->TemplateFormDetailInfoChange(templateFormInfo);
@@ -522,7 +526,7 @@ ErrCode FormCallbackAdapter::UpdateTemplateFormDetailInfo(
 
 ErrCode FormCallbackAdapter::RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     ErrCode result = updateFormsConfigRegistry_->Register(callingUid, callerToken);
     if (result == ERR_OK) {
@@ -533,14 +537,14 @@ ErrCode FormCallbackAdapter::RegisterUpdateFormsConfigCallback(const sptr<IRemot
 
 ErrCode FormCallbackAdapter::UnregisterUpdateFormsConfigCallback()
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return updateFormsConfigRegistry_->Unregister(callingUid);
 }
 
 ErrCode FormCallbackAdapter::UpdateFormsConfig(const std::vector<FormCustomConfig> &configs)
 {
-    HILOG_INFO("call, config size: %{public}zu", configs.size());
+    HILOG_INFO("call,config size:%{public}zu", configs.size());
     {
         std::lock_guard<std::mutex> lock(formCustomConfigCacheMutex_);
         formCustomConfigCache_ = configs;
@@ -554,21 +558,21 @@ ErrCode FormCallbackAdapter::UpdateFormsConfig(const std::vector<FormCustomConfi
 
 ErrCode FormCallbackAdapter::RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return deleteFormsRegistry_->Register(callingUid, callerToken);
 }
 
 ErrCode FormCallbackAdapter::UnregisterDeleteFormsCallback()
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return deleteFormsRegistry_->Unregister(callingUid);
 }
 
 ErrCode FormCallbackAdapter::DeleteForms(const std::vector<FormRecordFilter> &filters)
 {
-    HILOG_INFO("call, filter size: %{public}zu", filters.size());
+    HILOG_INFO("call,filter size:%{public}zu", filters.size());
     std::vector<std::string> matchedFormIds;
     GetMatchedFormIds(filters, matchedFormIds);
     if (matchedFormIds.empty()) {
@@ -611,41 +615,42 @@ ErrCode FormCallbackAdapter::NotifyAllHosts(FormProxyRegistry &registry, const s
         int32_t userId = FormUtil::GetCallerUserId(callingUid);
         std::string bundleName;
         if (FormBmsHelper::GetInstance().GetBundleNameByUid(callingUid, bundleName) != ERR_OK) {
-            HILOG_WARN("get bundleName failed, %{public}s, uid=%{public}d", tag.c_str(), callingUid);
+            HILOG_WARN("get bundleName failed,%{public}s,uid=%{public}d", tag.c_str(), callingUid);
         }
         sptr<IFormHostDelegate> proxy = iface_cast<IFormHostDelegate>(callerToken);
         if (proxy == nullptr) {
-            HILOG_ERROR("iface_cast failed, %{public}s, userId=%{public}d, bundleName=%{public}s",
+            HILOG_ERROR("iface_cast failed,%{public}s,userId=%{public}d,bundleName=%{public}s",
                 tag.c_str(), userId, bundleName.c_str());
             result = ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
             continue;
         }
         ErrCode notifyRet = callback(proxy);
         if (notifyRet != ERR_OK) {
-            HILOG_ERROR("notify failed, %{public}s, userId=%{public}d, bundleName=%{public}s, ret=%{public}d",
+            HILOG_ERROR("notify failed,%{public}s,userId=%{public}d,bundleName=%{public}s,ret=%{public}d",
                 tag.c_str(), userId, bundleName.c_str(), notifyRet);
             result = notifyRet;
         }
     }
-    HILOG_INFO("%{public}s notified %{public}zu hosts, result=%{public}d", tag.c_str(), entries.size(), result);
+    HILOG_INFO("%{public}s notified %{public}zu hosts,result=%{public}d", tag.c_str(), entries.size(), result);
     return result;
 }
 
 ErrCode FormCallbackAdapter::CallerCheck(const int64_t formId, const int32_t callingUid)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     if (formId <= 0) {
-        HILOG_ERROR("invalid formId");
+        HILOG_ERROR("[%{public}s]invalid formId", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64 ".", matchedFormId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64 ".", __FUNCTION__, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     if (formRecord.uid != callingUid) {
-        HILOG_ERROR("not match providerUid:%{public}d and callingUid:%{public}d", formRecord.uid, callingUid);
+        HILOG_ERROR("[%{public}s]not match providerUid:%{public}d and callingUid:%{public}d",
+            __FUNCTION__, formRecord.uid, callingUid);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
     return ERR_OK;
@@ -653,7 +658,7 @@ ErrCode FormCallbackAdapter::CallerCheck(const int64_t formId, const int32_t cal
 
 ErrCode FormCallbackAdapter::SceneAnimationCheck(const int64_t formId, const int32_t callingUid)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     ErrCode checkResult = CallerCheck(formId, callingUid);
     if (checkResult != ERR_OK) {
         return checkResult;
@@ -665,13 +670,13 @@ ErrCode FormCallbackAdapter::SceneAnimationCheck(const int64_t formId, const int
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64 ".", matchedFormId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64 ".", __FUNCTION__, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     bool isBundleProtect = FormBundleLockMgr::GetInstance().IsBundleProtect(formRecord.bundleName, userId, formId);
     if (isBundleProtect) {
-        HILOG_ERROR("Failed, application is locked");
+        HILOG_ERROR("Failed,application is locked");
         return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
     }
     Want want;
@@ -711,7 +716,7 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
     wantToHost.SetParam(Constants::PARAM_FORM_USER_ID, userId);
 
     int32_t pageRouterServiceCode = want.GetIntParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, -1);
-    HILOG_DEBUG("StartAbilityByFms pageRouterServiceCode: %{public}" PRId32, pageRouterServiceCode);
+    HILOG_DEBUG("StartAbilityByFms pageRouterServiceCode:%{public}" PRId32, pageRouterServiceCode);
     if (pageRouterServiceCode == Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE) {
         HILOG_DEBUG("StartAbilityByFms getForegroundApplications begin");
         bool isForeground = IsForegroundApp();
@@ -727,12 +732,12 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
         const std::string formId = want.GetStringParam(Constants::PARAM_LIVE_FORM_ID_KEY);
         auto it = liveFormStatusMap.find(formId);
         if (it == liveFormStatusMap.end()) {
-            HILOG_ERROR("This live form is non-existent, formId:%{public}s", formId.c_str());
+            HILOG_ERROR("This live form is non-existent,formId:%{public}s", formId.c_str());
             return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
         }
         std::string status = it->second;
         if (!FormConstantsUtil::IsLiveFormSupportLauncher(status)) {
-            HILOG_ERROR("This live form is not support launcher, status:%{public}s", status.c_str());
+            HILOG_ERROR("This live form is not support launcher,status:%{public}s", status.c_str());
             return ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED;
         }
         HILOG_DEBUG("support launcher check success");
@@ -744,7 +749,7 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
     wantToHost.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, dstBundleName);
     wantToHost.SetParam(Constants::PARAM_ABILITY_NAME_KEY, dstAbilityName);
 
-    HILOG_INFO("dstBundleName:%{public}s, dstAbilityName:%{public}s",
+    HILOG_INFO("dstBundleName:%{public}s,dstAbilityName:%{public}s",
         dstBundleName.c_str(), dstAbilityName.c_str());
 
     // Query ability info by action
@@ -755,7 +760,7 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
     }
 
     if (!FormPublishAdapter::GetInstance().IsActionAllowToPublish(action)) {
-        HILOG_ERROR("action is not allowed to publish: %{public}s", action.c_str());
+        HILOG_ERROR("action is not allowed to publish:%{public}s", action.c_str());
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -772,15 +777,15 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
     }
 
     if (!abilityInfo.name.empty()) {
-        HILOG_DEBUG("Query highest priority ability success. bundleName:%{public}s, ability:%{public}s",
+        HILOG_DEBUG("Query highest priority ability success.bundleName:%{public}s,ability:%{public}s",
             abilityInfo.bundleName.c_str(), abilityInfo.name.c_str());
         wantToHost.SetElementName(abilityInfo.bundleName, abilityInfo.name);
     } else if (!extensionAbilityInfo.name.empty()) {
-        HILOG_DEBUG("Query highest priority extension ability success. bundleName:%{public}s, ability:%{public}s",
+        HILOG_DEBUG("Query highest priority extension ability success.bundleName:%{public}s,ability:%{public}s",
             extensionAbilityInfo.bundleName.c_str(), extensionAbilityInfo.name.c_str());
         wantToHost.SetElementName(extensionAbilityInfo.bundleName, extensionAbilityInfo.name);
     } else {
-        HILOG_ERROR("Query highest priority ability failed, no form host ability found");
+        HILOG_ERROR("Query highest priority ability failed,no form host ability found");
         if (want.GetStringParam(Constants::PARMA_REQUEST_METHOD) == Constants::OPEN_FORM_MANAGE_VIEW) {
             FormEventReport::SendRequestPublicFormEvent(dstBundleName, "",
                 RequestFormType::OPEN_FORM_MANAGER);
@@ -939,7 +944,7 @@ bool FormCallbackAdapter::IsForegroundApp()
     std::vector<AppExecFwk::AppStateData> curForegroundApps;
     IN_PROCESS_CALL_WITHOUT_RET(appMgrProxy->GetForegroundApplications(curForegroundApps));
     for (auto &appData : curForegroundApps) {
-        HILOG_DEBUG("appData.bundleName: %{public}s", appData.bundleName.c_str());
+        HILOG_DEBUG("appData.bundleName:%{public}s", appData.bundleName.c_str());
         if (appData.bundleName == bundleName) {
             checkFlag = true;
             break;
@@ -950,7 +955,7 @@ bool FormCallbackAdapter::IsForegroundApp()
 
 void FormCallbackAdapter::NotifyCachedFormConfigs(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::vector<FormCustomConfig> cached;
     {
         std::lock_guard<std::mutex> lock(formCustomConfigCacheMutex_);
@@ -989,7 +994,7 @@ void FormCallbackAdapter::CancelSceneEffects(const int64_t formId)
     // Caller ensures the form is an active live form.
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64, formId);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64, __FUNCTION__, formId);
         return;
     }
     for (int uid : formRecord.formUserUids) {

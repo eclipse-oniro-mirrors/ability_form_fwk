@@ -40,7 +40,7 @@ FormRenderReport::~FormRenderReport() {}
 
 void FormRenderReport::RecordFRSStart()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     bool expected = true;
     if (isFRSFirstLoaded_.compare_exchange_strong(expected, false)) {
         RecordFRSStatus(FRS_START);
@@ -49,7 +49,7 @@ void FormRenderReport::RecordFRSStart()
 
 void FormRenderReport::RecordFRSDead()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     bool expected = false;
     isFRSFirstLoaded_.compare_exchange_strong(expected, true);
     RecordFRSStatus(FRS_DEAD);
@@ -61,7 +61,7 @@ void FormRenderReport::RecordFRSStatus(uint8_t status)
     if (frsStatusRecords_.size() < FRS_STATUS_MAX_COUNT) {
         int64_t formCount = GetAllFormsCount();
         bool isLowMemory = FormDataMgr::GetInstance().IsLowMemory();
-        HILOG_INFO("formCount:  %{public}" PRId64 ", isLowMemory: %{public}d", formCount, isLowMemory);
+        HILOG_INFO("formCount:%{public}" PRId64 ", isLowMemory: %{public}d", formCount, isLowMemory);
         FormRenderStatusRecord record = {
             .isLowMemory = isLowMemory,
             .status = status,
@@ -74,7 +74,7 @@ void FormRenderReport::RecordFRSStatus(uint8_t status)
 
 void FormRenderReport::ReportFRSStatus()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     {
         std::unique_lock<std::mutex> lock(frsStatusRecordsMutex_);
         if (frsStatusRecords_.empty()) {

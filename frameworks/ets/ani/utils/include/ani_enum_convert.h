@@ -27,12 +27,12 @@ namespace AniEnumConvertUtil {
     ani_size sz {};
     ani_status status = ANI_ERROR;
     if ((status = env->String_GetUTF8Size(str, &sz)) != ANI_OK) {
-        HILOG_ERROR("status : %{public}d", status);
+        HILOG_ERROR("[%{public}s]status :%{public}d", __FUNCTION__, status);
         return false;
     }
     res.resize(sz + 1);
     if ((status = env->String_GetUTF8SubString(str, 0, sz, res.data(), res.size(), &sz)) != ANI_OK) {
-        HILOG_ERROR("status : %{public}d", status);
+        HILOG_ERROR("[%{public}s]status :%{public}d", __FUNCTION__, status);
         return false;
     }
     res.resize(sz);
@@ -47,7 +47,7 @@ static bool EnumConvert_EtsToNative(ani_env *env, ani_enum_item enumItem, T &res
         ani_int intValue{};
         status = env->EnumItem_GetValue_Int(enumItem, &intValue);
         if (ANI_OK != status) {
-            HILOG_ERROR("EnumConvert_EtsToNative failed, status : %{public}d", status);
+            HILOG_ERROR("EnumConvert_EtsToNative failed,status :%{public}d", status);
             return false;
         }
         result = static_cast<T>(intValue);
@@ -56,12 +56,12 @@ static bool EnumConvert_EtsToNative(ani_env *env, ani_enum_item enumItem, T &res
         ani_string strValue{};
         status = env->EnumItem_GetValue_String(enumItem, &strValue);
         if (ANI_OK != status) {
-            HILOG_ERROR("EnumItem_GetValue_String failed, status : %{public}d", status);
+            HILOG_ERROR("EnumItem_GetValue_String failed,status :%{public}d", status);
             return false;
         }
         return GetStdString(env, strValue, result);
     } else {
-        HILOG_ERROR("Enum convert failed: type not supported");
+        HILOG_ERROR("Enum convert failed:type not supported");
         return false;
     }
 }
@@ -78,7 +78,7 @@ static bool EnumConvert_NativeToEts(ani_env *env, const char *enumName, const T 
     ani_enum aniEnum{};
     ani_status status = env->FindEnum(enumName, &aniEnum);
     if (ANI_OK != status) {
-        HILOG_ERROR("Enum convert FindEnum failed: %{public}s status: %{public}d", enumName, status);
+        HILOG_ERROR("Enum convert FindEnum failed:%{public}s status:%{public}d", enumName, status);
         return false;
     }
     constexpr int32_t loopMaxNum = 1000;
@@ -98,7 +98,7 @@ static bool EnumConvert_NativeToEts(ani_env *env, const char *enumName, const T 
             return true;
         }
     }
-    HILOG_ERROR("EnumConvert_NativeToEts failed enumName: %{public}s", enumName);
+    HILOG_ERROR("EnumConvert_NativeToEts failed enumName:%{public}s", enumName);
     return false;
 }
 }

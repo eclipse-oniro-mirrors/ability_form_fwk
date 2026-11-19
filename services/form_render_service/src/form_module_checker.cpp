@@ -205,13 +205,13 @@ bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
         }
     }
 
-    HILOG_DEBUG("api not allowed, apiPath: '%{public}s'", apiPath.c_str());
+    HILOG_DEBUG("api not allowed,apiPath:'%{public}s'", apiPath.c_str());
     return false;
 }
 
 bool FormModuleChecker::CheckApiWithSuffix(const std::string& apiPath, const std::string& item)
 {
-    HILOG_DEBUG("apiPath: '%{public}s', item: '%{public}s'", apiPath.c_str(), item.c_str());
+    HILOG_DEBUG("apiPath:'%{public}s',item:'%{public}s'", apiPath.c_str(), item.c_str());
     if (item.compare(0, apiPath.size(), apiPath) == 0) {
         return true;
     }
@@ -234,27 +234,27 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
         return false;
     }
     if (isAppModule) {
-        HILOG_DEBUG("module is not system, moduleName= %{public}s", moduleName);
+        HILOG_DEBUG("module is not system,moduleName= %{public}s", moduleName);
         return false;
     }
 
     // only check module
     for (const auto& item : modulesFromCfg_) {
         if (item == moduleName) {
-            HILOG_DEBUG("load moduleName= %{public}s", moduleName);
+            HILOG_DEBUG("[%{public}s]load moduleName= %{public}s", __FUNCTION__, moduleName);
             return true;
         }
     }
     for (const auto& item : MODULE_ALLOW_LIST) {
         if (std::strcmp(item, moduleName) == 0) {
-            HILOG_DEBUG("load moduleName= %{public}s", moduleName);
+            HILOG_DEBUG("[%{public}s]load moduleName= %{public}s", __FUNCTION__, moduleName);
             return true;
         }
     }
 
     // check mnodule and api
     if (IsModuelAllowToLoad(moduleName)) {
-        HILOG_DEBUG("module has been allowed by the allowlist in form, module name = %{public}s", moduleName);
+        HILOG_DEBUG("module has been allowed by the allowlist in form,module name = %{public}s", moduleName);
         if (apiAllowListChecker == nullptr) {
             apiAllowListChecker = std::make_unique<ApiAllowListChecker>([](const std::string& apiPath) {
                 return CheckApiAllowList(apiPath);
@@ -302,7 +302,7 @@ std::vector<std::string> FormModuleChecker::GetModuleAllowList()
     }
     if (jsonData.contains(KEY_MODULE_ALLOW) && jsonData[KEY_MODULE_ALLOW].is_array()) {
         for (const auto& module : jsonData[KEY_MODULE_ALLOW]) {
-            HILOG_INFO("read moduleAllowList module: %{public}s", std::string(module).c_str());
+            HILOG_INFO("read moduleAllowList module:%{public}s", std::string(module).c_str());
             result.push_back(module);
         }
     }

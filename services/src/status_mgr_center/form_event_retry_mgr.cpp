@@ -33,7 +33,7 @@ bool FormEventRetryMgr::GetLastFormEvent(const int64_t formId, FormEventTaskInfo
     std::shared_lock<std::shared_mutex> lock(lastFormEventMutex_);
     auto iter = lastFormEventMap_.find(formId);
     if (iter == lastFormEventMap_.end()) {
-        HILOG_ERROR("lastFormEvent not exist, formId:%{public}" PRId64 ". ", formId);
+        HILOG_ERROR("lastFormEvent not exist,formId:%{public}" PRId64 ". ", formId);
         return false;
     }
 
@@ -46,13 +46,13 @@ void FormEventRetryMgr::SetLastFormEvent(const int64_t formId, const FormEventTa
     std::unique_lock<std::shared_mutex> lock(lastFormEventMutex_);
     auto iter = lastFormEventMap_.find(formId);
     if (iter == lastFormEventMap_.end()) {
-        HILOG_INFO("set new lastFormEvent, formId:%{public}" PRId64 ".", formId);
+        HILOG_INFO("set new lastFormEvent,formId:%{public}" PRId64 ".", formId);
         lastFormEventMap_.emplace(formId, formEventInfo);
         return;
     }
 
     iter->second = formEventInfo;
-    HILOG_DEBUG("set lastFormEvent, formId:%{public}" PRId64 ".", formId);
+    HILOG_DEBUG("set lastFormEvent,formId:%{public}" PRId64 ".", formId);
 }
 
 void FormEventRetryMgr::DeleteLastFormEvent(const int64_t formId)
@@ -60,7 +60,7 @@ void FormEventRetryMgr::DeleteLastFormEvent(const int64_t formId)
     std::unique_lock<std::shared_mutex> lock(lastFormEventMutex_);
     auto iter = lastFormEventMap_.find(formId);
     if (iter != lastFormEventMap_.end()) {
-        HILOG_INFO("delete last form event, formId:%{public}" PRId64 ". ", formId);
+        HILOG_INFO("delete last form event,formId:%{public}" PRId64 ". ", formId);
         lastFormEventMap_.erase(iter);
     }
 }
@@ -70,7 +70,7 @@ bool FormEventRetryMgr::GetRetryCount(const int64_t formId, int32_t &retryCount)
     std::shared_lock<std::shared_mutex> lock(retryCountMutex_);
     auto iter = retryCountMap_.find(formId);
     if (iter == retryCountMap_.end()) {
-        HILOG_ERROR("retryCount not exist, formId:%{public}" PRId64 ". ", formId);
+        HILOG_ERROR("retryCount not exist,formId:%{public}" PRId64 ". ", formId);
         return false;
     }
 
@@ -83,13 +83,13 @@ void FormEventRetryMgr::SetRetryCount(const int64_t formId, const int32_t retryC
     std::unique_lock<std::shared_mutex> lock(retryCountMutex_);
     auto iter = retryCountMap_.find(formId);
     if (iter == retryCountMap_.end()) {
-        HILOG_INFO("set new retryCount, formId:%{public}" PRId64 ".", formId);
+        HILOG_INFO("set new retryCount,formId:%{public}" PRId64 ".", formId);
         retryCountMap_.emplace(formId, retryCount);
         return;
     }
 
     iter->second = retryCount;
-    HILOG_INFO("set retryCount, formId:%{public}" PRId64 ".", formId);
+    HILOG_INFO("set retryCount,formId:%{public}" PRId64 ".", formId);
 }
 
 void FormEventRetryMgr::DeleteRetryCount(const int64_t formId)
@@ -97,7 +97,7 @@ void FormEventRetryMgr::DeleteRetryCount(const int64_t formId)
     std::unique_lock<std::shared_mutex> lock(retryCountMutex_);
     auto iter = retryCountMap_.find(formId);
     if (iter != retryCountMap_.end()) {
-        HILOG_INFO("delete retry count, formId:%{public}" PRId64 ". ", formId);
+        HILOG_INFO("delete retry count,formId:%{public}" PRId64 ". ", formId);
         retryCountMap_.erase(iter);
     }
 }

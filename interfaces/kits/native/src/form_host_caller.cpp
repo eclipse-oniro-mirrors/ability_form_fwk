@@ -33,7 +33,7 @@ void FormHostCallerRecipient::OnRemoteDied(const wptr<IRemoteObject> &__attribut
 
 void FormHostCaller::UpdateForm(int64_t formId, const FormProviderData &formProviderData)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     FormJsInfo formJsInfo = formJsInfo_;
     formJsInfo.formData = formProviderData.GetDataString();
     formJsInfo.formProviderData = formProviderData;
@@ -47,7 +47,7 @@ ErrCode FormHostCaller::RequestForm(int64_t formId, const sptr<IRemoteObject> &c
 {
     sptr<IFormProvider> providerToken = iface_cast<IFormProvider>(callerToken_);
     if (providerToken == nullptr) {
-        HILOG_ERROR("null callerToken formId: %{public}" PRId64, formId);
+        HILOG_ERROR("[%{public}s]null callerToken formId:%{public}" PRId64, __FUNCTION__, formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return providerToken->NotifyFormUpdate(formId, want, callerToken);
@@ -58,7 +58,7 @@ ErrCode FormHostCaller::MessageEvent(int64_t formId, const AAFwk::Want &want, co
     std::string message = want.GetStringParam(Constants::PARAM_MESSAGE_KEY);
     sptr<IFormProvider> providerToken = iface_cast<IFormProvider>(callerToken_);
     if (providerToken == nullptr) {
-        HILOG_ERROR("null callerToken formId: %{public}" PRId64, formId);
+        HILOG_ERROR("[%{public}s]null callerToken formId:%{public}" PRId64, __FUNCTION__, formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return providerToken->FireFormEvent(formId, message, want, callerToken);
@@ -71,7 +71,7 @@ bool FormHostCaller::IsSameToken(const sptr<IRemoteObject> &callerToken) const
 
 void FormHostCaller::AddDeathRecipient(sptr<IRemoteObject::DeathRecipient> deathRecipient)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     if (callerToken_ == nullptr) {
         HILOG_ERROR("callerToken_ is null");
         return;

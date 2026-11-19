@@ -26,12 +26,12 @@ constexpr int32_t EVENT_QUEUE_SIZE_MAX = 100;
 }
 FormEventQueue::FormEventQueue(int64_t formId) : formId_(formId)
 {
-    HILOG_INFO("create FormEventQueue, formId :%{public}" PRId64 ". ", formId_);
+    HILOG_INFO("create FormEventQueue,formId :%{public}" PRId64 ". ", formId_);
 }
 
 FormEventQueue::~FormEventQueue()
 {
-    HILOG_INFO("destroy FormEventQueue, formId :%{public}" PRId64 ". ", formId_);
+    HILOG_INFO("destroy FormEventQueue,formId :%{public}" PRId64 ". ", formId_);
 }
 
 bool FormEventQueue::PushFormEvent(FormEventTaskInfo &eventInfo)
@@ -42,7 +42,7 @@ bool FormEventQueue::PushFormEvent(FormEventTaskInfo &eventInfo)
         return false;
     }
     if (eventQueue_.size() >= EVENT_QUEUE_SIZE_MAX) {
-        HILOG_ERROR("queue size reached max, formId :%{public}" PRId64 ". ", formId_);
+        HILOG_ERROR("queue size reached max,formId :%{public}" PRId64 ". ", formId_);
         ReportQueueOverLimit(formId_);
         return false;
     }
@@ -89,7 +89,7 @@ bool FormEventQueue::ReportQueueOverLimit(const int64_t formId)
         return false;
     }
     if (eventQueue_.empty()) {
-        HILOG_ERROR("eventQueue_ is empty, formId :%{public}" PRId64 ".", formId);
+        HILOG_ERROR("eventQueue_ is empty,formId :%{public}" PRId64 ".", formId);
         return false;
     }
 

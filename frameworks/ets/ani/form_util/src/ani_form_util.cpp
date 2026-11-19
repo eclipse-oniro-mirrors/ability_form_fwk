@@ -41,7 +41,7 @@ bool GetPropertyDoubleByName(ani_env *env, ani_object object, const char *name, 
 
     ani_status status = ANI_ERROR;
     if ((status = env->Object_GetPropertyByName_Double(object, name, &value)) != ANI_OK) {
-        HILOG_ERROR("status: %{public}d", status);
+        HILOG_ERROR("status:%{public}d", status);
         return false;
     }
     return true;
@@ -51,17 +51,17 @@ void SetRecordStringToMap(ani_env *env, ani_string aniKey, ani_string aniValue,
     std::unordered_map<std::string, std::string> &uMap)
 {
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return;
     }
     std::string mapKey = "";
     if (!FormAniUtil::GetStdString(env, aniKey, mapKey)) {
-        HILOG_ERROR("GetStdString failed");
+        HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
         return;
     }
     std::string mapValue = "";
     if (!FormAniUtil::GetStdString(env, aniValue, mapValue)) {
-        HILOG_ERROR("GetStdString failed");
+        HILOG_ERROR("[%{public}s]GetStdString failed", __FUNCTION__);
         return;
     }
     uMap.emplace(mapKey, mapValue);
@@ -71,29 +71,29 @@ bool ParseRecordStringInner(ani_env *env, ani_ref next, ani_object aniMockList, 
 {
     ani_status status = ANI_ERROR;
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return false;
     }
     status = env->Object_GetFieldByName_Ref(static_cast<ani_object>(next), DELEGATOR_RECORD_VALUE, &aniKey);
     if (ANI_OK != status) {
-        HILOG_ERROR("Failed to get value status: %{public}d", status);
+        HILOG_ERROR("Failed to get value status:%{public}d", status);
         return false;
     }
     ani_class recordCls = nullptr;
     status = env->FindClass(DELEGATOR_RECORD_CLASS_NAME, &recordCls);
     if (status != ANI_OK) {
-        HILOG_ERROR("FindClass failed status: %{public}d", status);
+        HILOG_ERROR("FindClass failed status:%{public}d", status);
         return false;
     }
     ani_method recordGetMethod = nullptr;
     status = env->Class_FindMethod(recordCls, DELEGATOR_RECORD_GET, DELEGATOR_RECORD_GET_NAME, &recordGetMethod);
     if (status != ANI_OK) {
-        HILOG_ERROR("Class_FindMethod failed status: %{public}d", status);
+        HILOG_ERROR("Class_FindMethod failed status:%{public}d", status);
         return false;
     }
     status = env->Object_CallMethod_Ref(aniMockList, recordGetMethod, &aniValue, static_cast<ani_string>(aniKey));
     if (status != ANI_OK) {
-        HILOG_ERROR("Object_CallMethod_Void failed status: %{public}d", status);
+        HILOG_ERROR("Object_CallMethod_Void failed status:%{public}d", status);
         return false;
     }
     return true;
@@ -107,27 +107,27 @@ bool UnwrapFormRect(ani_env *env, ani_object rectobject, AppExecFwk::Rect &rect)
 {
     HILOG_DEBUG("call");
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return false;
     }
     ani_double left = 0.0;
     if (!GetPropertyDoubleByName(env, rectobject, "left", left)) {
-        HILOG_ERROR("GetPropertyDoubleByName failed");
+        HILOG_ERROR("[%{public}s]GetPropertyDoubleByName failed", __FUNCTION__);
         return false;
     }
     ani_double top = 0.0;
     if (!GetPropertyDoubleByName(env, rectobject, "top", top)) {
-        HILOG_ERROR("GetPropertyDoubleByName failed");
+        HILOG_ERROR("[%{public}s]GetPropertyDoubleByName failed", __FUNCTION__);
         return false;
     }
     ani_double width = 0.0;
     if (!GetPropertyDoubleByName(env, rectobject, "width", width)) {
-        HILOG_ERROR("GetPropertyDoubleByName failed");
+        HILOG_ERROR("[%{public}s]GetPropertyDoubleByName failed", __FUNCTION__);
         return false;
     }
     ani_double height = 0.0;
     if (!GetPropertyDoubleByName(env, rectobject, "height", height)) {
-        HILOG_ERROR("GetPropertyDoubleByName failed");
+        HILOG_ERROR("[%{public}s]GetPropertyDoubleByName failed", __FUNCTION__);
         return false;
     }
     rect.left = left;
@@ -140,14 +140,14 @@ bool UnwrapFormRect(ani_env *env, ani_object rectobject, AppExecFwk::Rect &rect)
 bool ParseRecordString(ani_env *env, ani_object aniMockList, std::unordered_map<std::string, std::string> &mockList)
 {
     if (env == nullptr) {
-        HILOG_ERROR("env is nullptr");
+        HILOG_ERROR("[%{public}s]env is nullptr", __FUNCTION__);
         return false;
     }
     ani_ref iter = nullptr;
     ani_status status = ANI_ERROR;
     status = env->Object_CallMethodByName_Ref(aniMockList, DELEGATOR_RECORD_KEY, nullptr, &iter);
     if (ANI_OK != status) {
-        HILOG_ERROR("Failed to get keys iterator status: %{public}d", status);
+        HILOG_ERROR("Failed to get keys iterator status:%{public}d", status);
         return false;
     }
     ani_ref next = nullptr;
@@ -157,7 +157,7 @@ bool ParseRecordString(ani_env *env, ani_object aniMockList, std::unordered_map<
         static_cast<ani_object>(iter), DELEGATOR_RECORD_NEXT, nullptr, &next)) {
         status = env->Object_GetFieldByName_Boolean(static_cast<ani_object>(next), DELEGATOR_RECORD_DONE, &done);
         if (ANI_OK != status) {
-            HILOG_ERROR("Failed to check iterator done status: %{public}d", status);
+            HILOG_ERROR("Failed to check iterator done status:%{public}d", status);
             return false;
         }
         if (done) {

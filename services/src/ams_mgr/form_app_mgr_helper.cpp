@@ -49,14 +49,14 @@ sptr<OHOS::AppExecFwk::IAppMgr> FormAppMgrHelper::GetAppMgr()
 
 bool FormAppMgrHelper::IsAbilityForeground(const std::string &bundleName, ExtensionAbilityType extensionAbilityType)
 {
-    HILOG_INFO("bundleName:%{public}s, extensionAbilityType:%{public}d", bundleName.c_str(), extensionAbilityType);
+    HILOG_INFO("bundleName:%{public}s,extensionAbilityType:%{public}d", bundleName.c_str(), extensionAbilityType);
     if (bundleName.empty()) {
-        HILOG_ERROR("Empty bundle name");
+        HILOG_ERROR("[%{public}s]Empty bundle name", __FUNCTION__);
         return false;
     }
     auto appMgrProxy = GetAppMgr();
     if (!appMgrProxy) {
-        HILOG_ERROR("Get app mgr failed");
+        HILOG_ERROR("[%{public}s]Get app mgr failed", __FUNCTION__);
         return false;
     }
     std::vector<AppExecFwk::AppStateData> list;
@@ -72,7 +72,7 @@ bool FormAppMgrHelper::IsAbilityForeground(const std::string &bundleName, Extens
             return true;
         }
     }
-    HILOG_WARN("ability not foreground, foreground apps size:%{public}zu", list.size());
+    HILOG_WARN("ability not foreground,foreground apps size:%{public}zu", list.size());
     return false;
 }
 
@@ -80,12 +80,12 @@ bool FormAppMgrHelper::GetRunningProcessInfo(
     const std::string &bundleName, int32_t userId, RunningProcessInfo &info, const std::string &processNameSuffix)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("Empty bundle name");
+        HILOG_ERROR("[%{public}s]Empty bundle name", __FUNCTION__);
         return false;
     }
     auto appMgr = GetAppMgr();
     if (!appMgr) {
-        HILOG_ERROR("Get app mgr failed");
+        HILOG_ERROR("[%{public}s]Get app mgr failed", __FUNCTION__);
         return false;
     }
 

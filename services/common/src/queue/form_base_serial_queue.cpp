@@ -42,7 +42,7 @@ int Convert2FfrtQos(TaskQos qos)
 FormBaseSerialQueue::FormBaseSerialQueue(const std::string &queueName)
     : queueName_(queueName), queue_(queueName.c_str())
 {
-    HILOG_DEBUG("create FormBaseSerialQueue, queueName: %{public}s", queueName.c_str());
+    HILOG_DEBUG("create FormBaseSerialQueue,queueName:%{public}s", queueName.c_str());
 }
 
 FormBaseSerialQueue::~FormBaseSerialQueue()
@@ -61,7 +61,7 @@ bool FormBaseSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func, 
 {
     HILOG_DEBUG("ScheduleTask");
     if (ms > (std::numeric_limits<uint64_t>::max() / CONVERSION_FACTOR)) {
-        HILOG_ERROR("invalid ms");
+        HILOG_ERROR("[%{public}s]invalid ms", __FUNCTION__);
         return false;
     }
 
@@ -69,7 +69,7 @@ bool FormBaseSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func, 
     ffrt::task_handle handle = queue_.submit_h(func,
         ffrt::task_attr().delay(ms * CONVERSION_FACTOR).qos(Convert2FfrtQos(qos)));
     if (handle == nullptr) {
-        HILOG_ERROR("submit_h return null");
+        HILOG_ERROR("[%{public}s]submit_h return null", __FUNCTION__);
         return false;
     }
     return true;
@@ -80,7 +80,7 @@ bool FormBaseSerialQueue::ScheduleDelayTask(const TaskKey& taskKey,
 {
     HILOG_DEBUG("ScheduleDelayTask");
     if (ms > (std::numeric_limits<uint64_t>::max() / CONVERSION_FACTOR)) {
-        HILOG_ERROR("invalid ms");
+        HILOG_ERROR("[%{public}s]invalid ms", __FUNCTION__);
         return false;
     }
 
@@ -110,7 +110,7 @@ bool FormBaseSerialQueue::ScheduleDelayTask(const TaskKey& taskKey,
     ffrt::task_handle handle = queue_.submit_h(std::move(wrappedFunc),
         ffrt::task_attr().delay(ms * CONVERSION_FACTOR).qos(Convert2FfrtQos(qos)));
     if (handle == nullptr) {
-        HILOG_ERROR("submit_h return null");
+        HILOG_ERROR("[%{public}s]submit_h return null", __FUNCTION__);
         return false;
     }
 
@@ -134,7 +134,7 @@ bool FormBaseSerialQueue::CancelDelayTask(const TaskKey& taskKey)
         int32_t ret = queue_.cancel(it->second.first);
         if (ret != 0) {
             // Expected when the task is already executing; its wrapper cleans up the map entry.
-            HILOG_WARN("Cancel skipped, task already running, errCode:%{public}d", ret);
+            HILOG_WARN("Cancel skipped,task already running,errCode:%{public}d", ret);
             result = false;
         }
     }

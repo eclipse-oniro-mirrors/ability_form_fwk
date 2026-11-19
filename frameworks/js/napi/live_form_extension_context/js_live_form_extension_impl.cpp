@@ -59,13 +59,13 @@ napi_value AttachUIExtensionContext(napi_env env, void *value, void *)
         [](napi_env, void *data, void *) {
             HILOG_DEBUG("Finalizer called");
             if (data == nullptr) {
-                HILOG_ERROR("Finalizer for weak_ptr is nullptr");
+                HILOG_ERROR("[%{public}s]Finalizer for weak_ptr is nullptr", __FUNCTION__);
                 return;
             }
             delete static_cast<std::weak_ptr<LiveFormExtensionContext> *>(data);
         }, nullptr, nullptr);
     if (status != napi_ok && workContext != nullptr) {
-        HILOG_ERROR("napi_wrap Failed: %{public}d", status);
+        HILOG_ERROR("[%{public}s]napi_wrap Failed:%{public}d", __FUNCTION__, status);
         delete workContext;
         return nullptr;
     }
@@ -122,13 +122,13 @@ void JsLiveFormExtensionImpl::BindContext()
     napi_status status = napi_wrap(env, contextObj, workContext,
         [](napi_env, void *data, void *) {
             if (data == nullptr) {
-                HILOG_ERROR("Finalizer for weak_ptr is nullptr");
+                HILOG_ERROR("[%{public}s]Finalizer for weak_ptr is nullptr", __FUNCTION__);
                 return;
             }
             delete static_cast<std::weak_ptr<LiveFormExtensionContext> *>(data);
         }, nullptr, nullptr);
     if (status != napi_ok && workContext != nullptr) {
-        HILOG_ERROR("napi_wrap Failed: %{public}d", status);
+        HILOG_ERROR("[%{public}s]napi_wrap Failed:%{public}d", __FUNCTION__, status);
         delete workContext;
     }
 

@@ -44,7 +44,7 @@ std::weak_ptr<IStaggerStrategy> BatchRefreshMgr::GetStaggerStrategy(const Stagge
             return visibleDelayStrategy_;
 
         default:
-            HILOG_ERROR("BatchRefreshMgr::GetStaggerStrategy: unknown strategyType = %{public}d",
+            HILOG_ERROR("BatchRefreshMgr::GetStaggerStrategy:unknown strategyType = %{public}d",
                 static_cast<int>(strategyType));
             return std::weak_ptr<IStaggerStrategy>();
     }
@@ -60,7 +60,7 @@ int32_t BatchRefreshMgr::BatchRequestRefresh(const int32_t refreshType,
     std::weak_ptr<IStaggerStrategy> weakStrategy = GetStaggerStrategy(strategyType);
     std::shared_ptr<IStaggerStrategy> strategy = weakStrategy.lock();
     if (strategy == nullptr) {
-        HILOG_ERROR("BatchRefreshMgr::BatchRequestRefresh: strategy is nullptr for strategyType = %{public}d",
+        HILOG_ERROR("BatchRefreshMgr::BatchRequestRefresh:strategy is nullptr for strategyType = %{public}d",
             static_cast<int>(strategyType));
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
@@ -68,7 +68,7 @@ int32_t BatchRefreshMgr::BatchRequestRefresh(const int32_t refreshType,
     strategy->Filter(batch, refreshType);
     int32_t ret = strategy->ExecuteRefresh(batch, refreshType);
     if (ret != ERR_OK) {
-        HILOG_ERROR("BatchRefreshMgr::BatchRequestRefresh: ExecuteRefresh failed, ret = %{public}d", ret);
+        HILOG_ERROR("BatchRefreshMgr::BatchRequestRefresh:ExecuteRefresh failed,ret = %{public}d", ret);
     }
 
     return ret;

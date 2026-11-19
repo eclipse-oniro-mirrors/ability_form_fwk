@@ -54,7 +54,7 @@ FormProviderData::FormProviderData()
 FormProviderData::FormProviderData(nlohmann::json &jsonData)
 {
     if (!jsonData.is_object()) {
-        HILOG_ERROR("jsonData not object");
+        HILOG_ERROR("[%{public}s]jsonData not object", __FUNCTION__);
         return;
     }
     jsonFormProviderData_ = jsonData;
@@ -95,7 +95,7 @@ FormProviderData::FormProviderData(std::string jsonDataString, bool isUsedInFRS)
 void FormProviderData::UpdateData(nlohmann::json &jsonData)
 {
     if (!jsonData.is_object()) {
-        HILOG_ERROR("jsonData not object");
+        HILOG_ERROR("[%{public}s]jsonData not object", __FUNCTION__);
         return;
     }
     jsonFormProviderData_ = jsonData;
@@ -117,7 +117,7 @@ std::string FormProviderData::GetDataString() const
 {
     HILOG_DEBUG("get data string");
     std::string dataStr = jsonFormProviderData_.empty() ? "" : jsonFormProviderData_.dump();
-    HILOG_DEBUG("data: %{private}s", dataStr.c_str());
+    HILOG_DEBUG("data:%{private}s", dataStr.c_str());
     return dataStr;
 }
 
@@ -158,7 +158,7 @@ bool FormProviderData::isValidSize(off_t offSize)
  */
 void FormProviderData::AddImageData(const std::string &picName, int fd)
 {
-    HILOG_BRIEF("fd is %{public}d, picName:%{public}s", fd, picName.c_str());
+    HILOG_BRIEF("fd is %{public}d,picName:%{public}s", fd, picName.c_str());
     if (fd < 0) {
         HILOG_ERROR("invalid fd");
         return;
@@ -179,7 +179,7 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
     }
     char* bytes = new (std::nothrow) char[size];
     if (bytes == nullptr) {
-        HILOG_ERROR("malloc memory failed, errno is %{public}d", errno);
+        HILOG_ERROR("malloc memory failed,errno is %{public}d", errno);
         return;
     }
     int32_t totalRead = 0;
@@ -187,7 +187,7 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
         ssize_t bytesRead = read(fd, bytes + totalRead, size - totalRead);
         if (bytesRead == -1) {
             delete[] bytes;
-            HILOG_ERROR("Read error: errno is %{public}d", errno);
+            HILOG_ERROR("Read error:errno is %{public}d", errno);
             return;
         } else if (bytesRead == 0) {
             HILOG_ERROR("Unexpected end of file");
@@ -211,14 +211,14 @@ void FormProviderData::ParseImagesData()
     }
     nlohmann::json jsonImages = jsonFormProviderData_.at(JSON_IMAGES_STRING);
     if (!jsonImages.is_object()) {
-        HILOG_ERROR("formImages is not an object, skip parsing");
+        HILOG_ERROR("formImages is not an object,skip parsing");
         return;
     }
     for (auto iter = jsonImages.begin(); iter != jsonImages.end(); iter++) {
         if (iter->is_number_integer()) {
             int fdValue = iter.value().get<int>();
             if (fdValue < 0) {
-                HILOG_ERROR("invalid fd in json image: %{public}d", fdValue);
+                HILOG_ERROR("invalid fd in json image:%{public}d", fdValue);
                 continue;
             }
             AddImageData(iter.key(), fdValue);
@@ -247,12 +247,12 @@ void FormProviderData::SetDataString(std::string &jsonDataString)
         jsonDataString = JSON_EMPTY_STRING;
     }
     if (jsonDataString.size() > static_cast<size_t>(Constants::MAX_FORM_PROVIDER_DATA_BUFFER_SIZE)) {
-        HILOG_ERROR("jsonDataString too large: %{public}zu", jsonDataString.size());
+        HILOG_ERROR("jsonDataString too large:%{public}zu", jsonDataString.size());
         return;
     }
     nlohmann::json jsonObject = SafeJsonParse(jsonDataString, false);
     if (jsonObject.is_discarded()) {
-        HILOG_ERROR("fail parse jsonDataString: %{private}s.", jsonDataString.c_str());
+        HILOG_ERROR("[%{public}s]fail parse jsonDataString:%{private}s", __FUNCTION__, jsonDataString.c_str());
         return;
     }
     if (!jsonObject.is_object()) {
@@ -349,14 +349,14 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
         jsonDataString = Str16ToStr8(parcel.ReadString16());
     }
     nlohmann::json jsonObject = SafeJsonParse(jsonDataString, false);
-    if (jsonObject.is_discarded()) {
-        HILOG_ERROR("fail parse jsonDataString: %{private}s.", jsonDataString.c_str());
+    if (jsonObject.is_discarded() || !jsonObject.is_object()) {
+        HILOG_ERROR("[%{public}s]fail parse jsonDataString:%{private}s", __FUNCTION__, jsonDataString.c_str());
         return false;
     }
     jsonFormProviderData_ = jsonObject;
 
     imageDataState_ = parcel.ReadInt32();
-    HILOG_DEBUG("imageDateState is %{public}d", imageDataState_);
+    HILOG_DEBUG("[%{public}s]imageDateState is %{public}d", __FUNCTION__, imageDataState_);
     switch (imageDataState_) {
         case IMAGE_DATA_STATE_ADDED: {
             if (!HandleImageDataStateAdded(parcel)) {
@@ -368,7 +368,7 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
         case IMAGE_DATA_STATE_REMOVED:
             break;
         default:
-            HILOG_WARN("unexpected imageDataState_ %{public}d", imageDataState_);
+            HILOG_WARN("[%{public}s]unexpected imageDataState_ %{public}d", __FUNCTION__, imageDataState_);
             break;
     }
     return true;
@@ -383,7 +383,7 @@ int FormProviderData::ReadFileDescriptor(Parcel &parcel)
     }
     int fd = descriptor->GetFd();
     if (fd < 0) {
-        HILOG_INFO("ReadFileDescriptor get fd failed, fd:[%{public}d].", fd);
+        HILOG_INFO("ReadFileDescriptor get fd failed,fd:[%{public}d]", fd);
         return -1;
     }
     return dup(fd);
@@ -416,19 +416,19 @@ char *FormProviderData::ReadAshmemDataFromParcel(Parcel &parcel, int32_t bufferS
     }
     fdsan_exchange_owner_tag(fd, 0, Constants::FORM_DOMAIN_ID);
     if (!CheckAshmemSize(fd, bufferSize)) {
-        HILOG_INFO("ReadAshmemDataFromParcel check ashmem size failed, fd:[%{public}d].", fd);
+        HILOG_INFO("ReadAshmemDataFromParcel check ashmem size failed,fd:[%{public}d]", fd);
         fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return nullptr;
     }
     if (bufferSize <= 0 || bufferSize > Constants::MAX_FORM_PROVIDER_DATA_BUFFER_SIZE) {
-        HILOG_INFO("malloc parameter bufferSize:[%{public}d] error.", bufferSize);
+        HILOG_INFO("malloc parameter bufferSize:[%{public}d] error", bufferSize);
         fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return nullptr;
     }
 
     void *ptr = ::mmap(nullptr, bufferSize, PROT_READ, MAP_SHARED, fd, 0);
     if (ptr == MAP_FAILED) {
-        HILOG_INFO("ReadImageData map failed, errno:%{public}d", errno);
+        HILOG_INFO("ReadImageData map failed,errno:%{public}d", errno);
         fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return nullptr;
     }
@@ -437,7 +437,7 @@ char *FormProviderData::ReadAshmemDataFromParcel(Parcel &parcel, int32_t bufferS
     if (base == nullptr) {
         ::munmap(ptr, bufferSize);
         fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
-        HILOG_INFO("alloc output pixel memory size:[%{public}d] error.", bufferSize);
+        HILOG_INFO("alloc output pixel memory size:[%{public}d] error", bufferSize);
         return nullptr;
     }
     if (memcpy_s(base, bufferSize, ptr, bufferSize) != 0) {
@@ -445,7 +445,7 @@ char *FormProviderData::ReadAshmemDataFromParcel(Parcel &parcel, int32_t bufferS
         free(base);
         base = nullptr;
         fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
-        HILOG_INFO("memcpy pixel data size:[%{public}d] error.", bufferSize);
+        HILOG_INFO("memcpy pixel data size:[%{public}d] error", bufferSize);
         return nullptr;
     }
 
@@ -468,7 +468,7 @@ bool FormProviderData::HandleImageDataStateAdded(Parcel &parcel)
         }
         int32_t len = parcel.ReadInt32();
         if (len <= 0 || len > MAX_IMAGE_BYTE_SIZE) {
-            HILOG_ERROR("invalid image data len: %{public}d", len);
+            HILOG_ERROR("invalid image data len:%{public}d", len);
             return false;
         }
         std::pair<sptr<FormAshmem>, int32_t> imageDataRecord = std::make_pair(formAshmem, len);
@@ -481,12 +481,12 @@ bool FormProviderData::HandleImageDataStateAdded(Parcel &parcel)
 bool FormProviderData::WriteFileDescriptor(Parcel &parcel, int fd) const
 {
     if (fd < 0) {
-        HILOG_INFO("WriteFileDescriptor get fd failed, fd:[%{public}d].", fd);
+        HILOG_INFO("WriteFileDescriptor get fd failed,fd:[%{public}d]", fd);
         return false;
     }
     int dupFd = dup(fd);
     if (dupFd < 0) {
-        HILOG_INFO("WriteFileDescriptor dup fd failed, dupFd:[%{public}d].", dupFd);
+        HILOG_INFO("WriteFileDescriptor dup fd failed,dupFd:[%{public}d]", dupFd);
         return false;
     }
     sptr<IPCFileDescriptor> descriptor = new IPCFileDescriptor(dupFd);
@@ -503,13 +503,13 @@ bool FormProviderData::WriteAshmemDataToParcel(Parcel &parcel, size_t size, cons
     const char *data = dataPtr;
     std::string name = "formAshmemData";
     int fd = AshmemCreate(name.c_str(), size);
-    HILOG_INFO("AshmemCreate:[%{public}d].", fd);
+    HILOG_INFO("AshmemCreate:[%{public}d]", fd);
     if (fd < 0) {
         return false;
     }
     fdsan_exchange_owner_tag(fd, 0, Constants::FORM_DOMAIN_ID);
     int result = AshmemSetProt(fd, PROT_READ | PROT_WRITE);
-    HILOG_INFO("AshmemSetProt:[%{public}d].", result);
+    HILOG_INFO("AshmemSetProt:[%{public}d]", result);
     if (result < 0) {
         fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return false;
@@ -517,7 +517,7 @@ bool FormProviderData::WriteAshmemDataToParcel(Parcel &parcel, size_t size, cons
     void *ptr = ::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (ptr == MAP_FAILED) {
         fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
-        HILOG_INFO("WriteAshmemData map failed, errno:%{public}d", errno);
+        HILOG_INFO("WriteAshmemData map failed,errno:%{public}d", errno);
         return false;
     }
     HILOG_INFO("mmap success");
@@ -569,7 +569,7 @@ bool FormProviderData::Marshalling(Parcel &parcel) const
     }
 
     parcel.WriteInt32(imageDataState_);
-    HILOG_DEBUG("imageDateState is %{public}d", imageDataState_);
+    HILOG_DEBUG("[%{public}s]imageDateState is %{public}d", __FUNCTION__, imageDataState_);
     switch (imageDataState_) {
         case IMAGE_DATA_STATE_ADDED: {
             parcel.WriteInt32(rawImageBytesMap_.size()); // firstly write the number of shared image to add
@@ -587,7 +587,7 @@ bool FormProviderData::Marshalling(Parcel &parcel) const
         case IMAGE_DATA_STATE_REMOVED:
             break;
         default:
-            HILOG_WARN("unexpected imageDataState_ %{public}d", imageDataState_);
+            HILOG_WARN("[%{public}s]unexpected imageDataState_ %{public}d", __FUNCTION__, imageDataState_);
             break;
     }
     return true;
@@ -619,7 +619,7 @@ bool FormProviderData::WriteImageDataToParcel(Parcel &parcel, const std::string 
     const std::shared_ptr<char> &data, int32_t size) const
 {
     if (size <= 0 || size > MAX_IMAGE_BYTE_SIZE) {
-        HILOG_ERROR("invalid image data size: %{public}d", size);
+        HILOG_ERROR("invalid image data size:%{public}d", size);
         return false;
     }
     FormAshmem formAshmem;
@@ -633,7 +633,7 @@ bool FormProviderData::WriteImageDataToParcel(Parcel &parcel, const std::string 
         return false;
     }
 
-    HILOG_INFO("write FormAshmem success, picName:%{public}s, size:%{public}d", picName.c_str(), size);
+    HILOG_INFO("write FormAshmem success,picName:%{public}s,size:%{public}d", picName.c_str(), size);
     return true;
 }
 

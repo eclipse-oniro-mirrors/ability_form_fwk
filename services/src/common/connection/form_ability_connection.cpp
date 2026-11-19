@@ -45,7 +45,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
 
     if (resultCode != ERR_OK) {
         OnConnectError(resultCode, element);
-        HILOG_ERROR("abilityName:%{public}s, resultCode:%{public}d",
+        HILOG_ERROR("abilityName:%{public}s,resultCode:%{public}d",
             element.GetAbilityName().c_str(), resultCode);
         return;
     }
@@ -96,7 +96,7 @@ void FormAbilityConnection::ProcessFreeInstall(const AppExecFwk::ElementName &el
 
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId_, formRecord)) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64, formId_);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64, __FUNCTION__, formId_);
         return;
     }
 
@@ -115,7 +115,7 @@ void FormAbilityConnection::ProcessFreeInstall(const AppExecFwk::ElementName &el
         return;
     }
 
-    HILOG_WARN("delete form record, form:%{public}" PRId64, formId_);
+    HILOG_WARN("delete form record,form:%{public}" PRId64, formId_);
     if (formRecord.formTempFlag) {
         FormDataMgr::GetInstance().DeleteTempForm(formId_);
     } else {
@@ -129,13 +129,13 @@ void FormAbilityConnection::ProcessFreeInstall(const AppExecFwk::ElementName &el
 
 void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    HILOG_INFO("element:%{public}s, resultCode:%{public}d", element.GetURI().c_str(), resultCode);
+    HILOG_INFO("element:%{public}s,resultCode:%{public}d", element.GetURI().c_str(), resultCode);
     int32_t connectId = connectId_.load();
     if (connectId != 0) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
         // CAS: skip clear if SetConnectId has set a new value concurrently
         if (!connectId_.compare_exchange_strong(connectId, 0)) {
-            HILOG_INFO("connectId_ changed during disconnect, skip clear, current:%{public}d", connectId);
+            HILOG_INFO("connectId_ changed during disconnect,skip clear,current:%{public}d", connectId);
         }
     } else {
         HILOG_ERROR("invalid connectId_:%{public}d", connectId);
@@ -174,7 +174,7 @@ bool FormAbilityConnection::onFormAppConnect()
 
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId_, formRecord)) {
-        HILOG_ERROR("not exist such form:%{public}" PRId64, formId_);
+        HILOG_ERROR("[%{public}s]not exist such form:%{public}" PRId64, __FUNCTION__, formId_);
         return false;
     }
     std::vector<AppExecFwk::RunningProcessInfo> infos;
@@ -201,7 +201,7 @@ void FormAbilityConnection::ReportFormAppUnbindEvent()
     eventInfo.formId = GetFormId();
     eventInfo.bundleName = GetBundleName() + ":form";
     eventInfo.formAppPid = GetAppFormPid();
-    HILOG_DEBUG("bundleName:%{public}s, formId:%{public}" PRId64 ",pid:%{public}" PRId32 ",timstamp:%{public}" PRId64,
+    HILOG_DEBUG("bundleName:%{public}s,formId:%{public}" PRId64 ",pid:%{public}" PRId32 ",timstamp:%{public}" PRId64,
         eventInfo.bundleName.c_str(), eventInfo.formId, eventInfo.formAppPid, eventInfo.timeStamp);
     FormReport::GetInstance().RemoveFormId(eventInfo.formId);
     FormEventReport::SendThirdFormEvent(FormEventName::UNBIND_FORM_APP, HiSysEventType::BEHAVIOR, eventInfo);
