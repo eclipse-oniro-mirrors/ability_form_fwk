@@ -416,6 +416,8 @@ namespace Constants {
     constexpr const char* FORM_DENSITY = "ohos.extra.param.key.form_density";
     constexpr const char* FORM_PROCESS_ON_ADD_SURFACE = "ohos.extra.param.key.process_on_add_surface";
     constexpr const char* FORM_ALLOW_UPDATE = "allowUpdate";
+    // Opt-in switch for mounting the last-frame snapshot when the surface is detached to another host.
+    constexpr const char* FORM_ENABLE_SNAPSHOT_ON_DETACH = "ohos.extra.param.key.form_enable_snapshot_on_detach";
 
     // The state of whether the ArkTs card can be rendered
     constexpr const char FORM_RENDER_STATE[] = "ohos.extra.param.key.form_render_state";
