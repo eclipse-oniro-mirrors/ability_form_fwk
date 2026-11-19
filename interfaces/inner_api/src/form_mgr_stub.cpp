@@ -19,6 +19,7 @@
 #include "fms_log_wrapper.h"
 #include "form_ipc_dispatch_table.h"
 #include "form_mgr_errors.h"
+#include "form_stub_access_checker.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "iremote_object.h"
@@ -93,7 +94,6 @@ int FormMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParc
     FormIpcContext context{};
     context.callingUid = IPCSkeleton::GetCallingUid();
     context.callingTokenId = IPCSkeleton::GetCallingFullTokenID();
-    context.callingPid = IPCSkeleton::GetCallingPid();
 
     // Deny before deserialize: denied requests never read business params.
     auto checker = table.GetAccessChecker();

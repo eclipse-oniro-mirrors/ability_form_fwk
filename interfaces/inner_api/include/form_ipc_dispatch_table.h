@@ -21,11 +21,12 @@
 
 #include "form_mgr_interface.h"
 #include "form_permission_policy.h"
-#include "form_stub_access_checker.h"
 #include "message_parcel.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+
+class IStubAccessChecker;
 
 // Handlers are free functions over IFormMgr;
 // form_mgr_interface.h also defines the Message code domain.

@@ -119,7 +119,7 @@ HWTEST_F(FormIpcDispatchTableTest, GetAccessCheckerNonNullDefaultFailClosed, Tes
     auto defaultChecker = table.GetAccessChecker();
     ASSERT_NE(defaultChecker, nullptr);
     FormPermissionPolicy emptyPolicy{};
-    FormIpcContext context{1000, 0xdeadbeefcafe0000ULL, 42};
+    FormIpcContext context{1000, 0xdeadbeefcafe0000ULL};
     EXPECT_EQ(defaultChecker->Check(emptyPolicy, context), ERR_OK);
     FormPermissionPolicy checkedPolicy{};
     checkedPolicy.checks[0] = CheckType::SystemCaller;
@@ -141,12 +141,11 @@ HWTEST_F(FormIpcDispatchTableTest, SetAccessCheckerInjectsAndObserved, TestSize.
         CheckerScopeGuard guard(fake);
         EXPECT_EQ(table.GetAccessChecker().get(), fake.get());
         FormPermissionPolicy p{};
-        FormIpcContext context{1, 2, 3};
+        FormIpcContext context{1, 2};
         EXPECT_EQ(table.GetAccessChecker()->Check(p, context), ERR_OK);
         EXPECT_EQ(fake->calls, 1u);
         EXPECT_EQ(fake->lastContext.callingUid, 1);
         EXPECT_EQ(fake->lastContext.callingTokenId, 2u);
-        EXPECT_EQ(fake->lastContext.callingPid, 3);
         EXPECT_EQ(fake->lastPolicy.checkCount, 0);
     }
     EXPECT_NE(table.GetAccessChecker().get(), fake.get());

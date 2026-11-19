@@ -43,8 +43,14 @@ enum class CheckType : uint8_t {
  *
  * Deny shape is part of each command's client-visible IPC contract and cannot be
  * derived from the reply protocol automatically (two commands may share the same
- * reply format yet differ in the deny channel). It exists solely to keep legacy
- * client compatibility; new commands must stay on the default CARRIER_STATUS.
+ * reply format yet differ in the deny channel).
+ *
+ * CARRIER_REPLY_INT32 is the default because it matches the legacy majority
+ * contract: most deny-carrying legacy commands transported the deny code as the
+ * reply's leading int32 with an ERR_OK status, so an untagged dispatch-table row
+ * keeps a legacy command on its pre-refactor deny channel. CARRIER_STATUS and
+ * CARRIER_REPLY_BOOL are explicit special cases: a row that deviates from the
+ * default must state its carrier.
  */
 enum class DenyShape : uint8_t {
     CARRIER_STATUS,      // Deny code rides the binder status channel (SendRequest return value).
@@ -67,7 +73,7 @@ struct FormPermissionPolicy {
     // Final deny code for the Permission step: explicit override, else GetDefaultDenyCode(permName).
     ErrCode permDenyCode = 0;
     // Carrier of the deny result for legacy client compatibility; see DenyShape.
-    DenyShape denyShape = DenyShape::CARRIER_STATUS;
+    DenyShape denyShape = DenyShape::CARRIER_REPLY_INT32;
 };
 
 /**

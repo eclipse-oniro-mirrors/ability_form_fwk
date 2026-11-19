@@ -1291,7 +1291,7 @@ public:
      */
     virtual int32_t OpenFormManagePage(const Want &want)
     {
-        return 0;
+        return ERR_OK;
     }
 
     /**
@@ -1301,7 +1301,7 @@ public:
      */
     virtual int32_t OpenFormEditPage(const Want &want)
     {
-        return 0;
+        return ERR_OK;
     }
 
     /**
@@ -1312,7 +1312,7 @@ public:
      */
     virtual int32_t OpenLiveFormPage(const Want &want, const std::string &formId)
     {
-        return 0;
+        return ERR_OK;
     }
 
     enum class Message {

@@ -15,6 +15,8 @@
 
 #include "form_ipc_handlers.h"
 
+#include <vector>
+
 #include "appexecfwk_errors.h"
 #include "fms_log_wrapper.h"
 #include "form_info.h"
@@ -24,7 +26,6 @@
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "iremote_object.h"
-#include <vector>
 
 namespace OHOS {
 namespace AppExecFwk {

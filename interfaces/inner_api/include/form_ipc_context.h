@@ -29,7 +29,6 @@ namespace AppExecFwk {
 struct FormIpcContext {
     int32_t callingUid = 0;
     uint64_t callingTokenId = 0;
-    int32_t callingPid = 0;
 };
 
 static_assert(std::is_trivially_copyable_v<FormIpcContext>,

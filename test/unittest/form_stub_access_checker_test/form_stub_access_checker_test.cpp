@@ -65,7 +65,7 @@ FormPermissionPolicy MakePolicy(std::initializer_list<CheckType> steps)
 
 FormIpcContext MakeContext()
 {
-    return FormIpcContext{1000, 0xdeadbeefcafe0000ULL, 42};
+    return FormIpcContext{1000, 0xdeadbeefcafe0000ULL};
 }
 
 }  // namespace
@@ -98,7 +98,6 @@ HWTEST_F(FormStubAccessCheckerTest, EmptyPolicyReturnsOk, TestSize.Level0)
  */
 HWTEST_F(FormStubAccessCheckerTest, SaBypassWithSaCallShortCircuitsLaterSteps, TestSize.Level0)
 {
-    ResetMocks();
     MockIsSACall(true);
     // SystemApp stays denied; passing proves the chain was short-circuited.
     FormStubAccessChecker checker;
@@ -113,7 +112,6 @@ HWTEST_F(FormStubAccessCheckerTest, SaBypassWithSaCallShortCircuitsLaterSteps, T
  */
 HWTEST_F(FormStubAccessCheckerTest, SaBypassWithoutSaCallSkipsFirstStep, TestSize.Level0)
 {
-    ResetMocks();
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(true);
     FormStubAccessChecker checker;
@@ -128,7 +126,6 @@ HWTEST_F(FormStubAccessCheckerTest, SaBypassWithoutSaCallSkipsFirstStep, TestSiz
  */
 HWTEST_F(FormStubAccessCheckerTest, SaBypassWithoutSaCallDeniesOnLaterStep, TestSize.Level0)
 {
-    ResetMocks();
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(false);
     FormStubAccessChecker checker;
@@ -144,7 +141,6 @@ HWTEST_F(FormStubAccessCheckerTest, SaBypassWithoutSaCallDeniesOnLaterStep, Test
  */
 HWTEST_F(FormStubAccessCheckerTest, SaBypassAsOnlyStepReturnsOk, TestSize.Level0)
 {
-    ResetMocks();
     MockIsSACall(false);
     // The loop starts after the SaBypass slot, so a lone SaBypass never denies.
     FormStubAccessChecker checker;
@@ -158,7 +154,6 @@ HWTEST_F(FormStubAccessCheckerTest, SaBypassAsOnlyStepReturnsOk, TestSize.Level0
  */
 HWTEST_F(FormStubAccessCheckerTest, SaOnlyWithSaCallPasses, TestSize.Level0)
 {
-    ResetMocks();
     MockIsSACall(true);
     FormStubAccessChecker checker;
     EXPECT_EQ(checker.Check(MakePolicy({CheckType::SaOnly}), MakeContext()), ERR_OK);
@@ -171,7 +166,6 @@ HWTEST_F(FormStubAccessCheckerTest, SaOnlyWithSaCallPasses, TestSize.Level0)
  */
 HWTEST_F(FormStubAccessCheckerTest, SaOnlyWithoutSaCallDenies, TestSize.Level0)
 {
-    ResetMocks();
     MockIsSACall(false);
     FormStubAccessChecker checker;
     EXPECT_EQ(checker.Check(MakePolicy({CheckType::SaOnly}), MakeContext()),
@@ -186,7 +180,6 @@ HWTEST_F(FormStubAccessCheckerTest, SaOnlyWithoutSaCallDenies, TestSize.Level0)
  */
 HWTEST_F(FormStubAccessCheckerTest, SystemCallerSaCallPasses, TestSize.Level0)
 {
-    ResetMocks();
     MockIsSACall(true);
     FormStubAccessChecker checker;
     EXPECT_EQ(checker.Check(MakePolicy({CheckType::SystemCaller}), MakeContext()), ERR_OK);
@@ -200,7 +193,6 @@ HWTEST_F(FormStubAccessCheckerTest, SystemCallerSaCallPasses, TestSize.Level0)
  */
 HWTEST_F(FormStubAccessCheckerTest, SystemCallerSystemAppPasses, TestSize.Level0)
 {
-    ResetMocks();
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(true);
     FormStubAccessChecker checker;
@@ -215,7 +207,6 @@ HWTEST_F(FormStubAccessCheckerTest, SystemCallerSystemAppPasses, TestSize.Level0
  */
 HWTEST_F(FormStubAccessCheckerTest, SystemCallerBothFailDenySys, TestSize.Level0)
 {
-    ResetMocks();
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(false);
     FormStubAccessChecker checker;
@@ -230,7 +221,6 @@ HWTEST_F(FormStubAccessCheckerTest, SystemCallerBothFailDenySys, TestSize.Level0
  */
 HWTEST_F(FormStubAccessCheckerTest, SystemAppPasses, TestSize.Level0)
 {
-    ResetMocks();
     MockIsSystemAppByFullTokenID(true);
     FormStubAccessChecker checker;
     EXPECT_EQ(checker.Check(MakePolicy({CheckType::SystemApp}), MakeContext()), ERR_OK);
@@ -244,7 +234,6 @@ HWTEST_F(FormStubAccessCheckerTest, SystemAppPasses, TestSize.Level0)
  */
 HWTEST_F(FormStubAccessCheckerTest, SystemAppFailsDenySys, TestSize.Level0)
 {
-    ResetMocks();
     MockIsSystemAppByFullTokenID(false);
     FormStubAccessChecker checker;
     EXPECT_EQ(checker.Check(MakePolicy({CheckType::SystemApp}), MakeContext()),
@@ -259,7 +248,6 @@ HWTEST_F(FormStubAccessCheckerTest, SystemAppFailsDenySys, TestSize.Level0)
  */
 HWTEST_F(FormStubAccessCheckerTest, PermissionGrantedReturnsOk, TestSize.Level0)
 {
-    ResetMocks();
     MockVerifyCallingPermission(true);
     FormPermissionPolicy policy = MakePolicy({CheckType::Permission});
     policy.permName = Constants::PERMISSION_REQUIRE_FORM;
@@ -276,7 +264,6 @@ HWTEST_F(FormStubAccessCheckerTest, PermissionGrantedReturnsOk, TestSize.Level0)
  */
 HWTEST_F(FormStubAccessCheckerTest, PermissionDeniedReturnsBakedCode, TestSize.Level0)
 {
-    ResetMocks();
     MockVerifyCallingPermission(false);
     FormPermissionPolicy policy = MakePolicy({CheckType::Permission});
     policy.permName = Constants::PERMISSION_REQUIRE_FORM;
@@ -294,7 +281,6 @@ HWTEST_F(FormStubAccessCheckerTest, PermissionDeniedReturnsBakedCode, TestSize.L
  */
 HWTEST_F(FormStubAccessCheckerTest, CrossAccountForegroundUserPasses, TestSize.Level0)
 {
-    ResetMocks();
     MockGetCallerUserId(100);
     MockGetForegroundUsers({100});
     // Permission stays denied; passing proves foreground users skip the permission check.
@@ -311,7 +297,6 @@ HWTEST_F(FormStubAccessCheckerTest, CrossAccountForegroundUserPasses, TestSize.L
  */
 HWTEST_F(FormStubAccessCheckerTest, CrossAccountBackgroundUserWithInteractPermissionPasses, TestSize.Level0)
 {
-    ResetMocks();
     MockGetCallerUserId(101);
     MockGetForegroundUsers({100});
     MockVerifyCallingPermission(true);
@@ -327,7 +312,6 @@ HWTEST_F(FormStubAccessCheckerTest, CrossAccountBackgroundUserWithInteractPermis
  */
 HWTEST_F(FormStubAccessCheckerTest, CrossAccountBackgroundUserWithoutInteractPermissionDenies, TestSize.Level0)
 {
-    ResetMocks();
     MockGetCallerUserId(101);
     MockGetForegroundUsers({100});
     MockVerifyCallingPermission(false);
@@ -344,7 +328,6 @@ HWTEST_F(FormStubAccessCheckerTest, CrossAccountBackgroundUserWithoutInteractPer
  */
 HWTEST_F(FormStubAccessCheckerTest, UnknownStepDenies, TestSize.Level0)
 {
-    ResetMocks();
     FormStubAccessChecker checker;
     FormPermissionPolicy policy{};
     policy.checks[0] = static_cast<CheckType>(0xFF);
@@ -360,7 +343,6 @@ HWTEST_F(FormStubAccessCheckerTest, UnknownStepDenies, TestSize.Level0)
  */
 HWTEST_F(FormStubAccessCheckerTest, ChainStopsAtFirstDeny, TestSize.Level0)
 {
-    ResetMocks();
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(false);
     MockVerifyCallingPermission(true);
@@ -380,7 +362,6 @@ HWTEST_F(FormStubAccessCheckerTest, ChainStopsAtFirstDeny, TestSize.Level0)
  */
 HWTEST_F(FormStubAccessCheckerTest, FullChainPasses, TestSize.Level0)
 {
-    ResetMocks();
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(true);
     MockVerifyCallingPermission(true);

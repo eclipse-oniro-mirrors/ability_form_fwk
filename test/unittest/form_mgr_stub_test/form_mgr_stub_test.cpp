@@ -24,6 +24,7 @@
 #include "mock_form_token.h"
 #include "form_mgr_errors.h"
 #include "form_ipc_dispatch_table.h"
+#include "form_stub_access_checker.h"
 #include "mock_form_provider_client.h"
 
 using namespace testing::ext;
@@ -4441,8 +4442,9 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_GetVisibleFormRect_007, TestSize.Level
 
 /**
  * @tc.name: FormMgrStubTest_OnRemoteRequestDeny_001
- * @tc.desc: When the installed checker denies, the deny code is returned verbatim,
- *           the business handler is never invoked, and the reply stays empty.
+ * @tc.desc: When the installed checker denies, the deny code rides the reply's
+ *           leading int32 with an ERR_OK status (the legacy REPLY_INT32 carrier),
+ *           and the business handler is never invoked.
  * @tc.type: FUNC
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestDeny_001, TestSize.Level1) {
@@ -4465,10 +4467,11 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestDeny_001, TestSize.Leve
     // Deny must short-circuit before the handler: AddForm is never invoked.
     EXPECT_CALL(*mockFormMgrService, AddForm(_, _, _, _)).Times(0);
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t replyCode = ERR_OK;
+    EXPECT_TRUE(reply.ReadInt32(replyCode));
+    EXPECT_EQ(replyCode, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
     EXPECT_EQ(denyChecker->calls, 1u);
-    // Denied requests never write business data into the reply.
-    EXPECT_EQ(reply.GetDataSize(), 0u);
     GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestDeny_001 ends";
 }
 
@@ -4532,10 +4535,11 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestDenyShapeReplyBool_001,
 /**
  * @tc.name: FormMgrStubTest_DenyShapeLegacyWhitelistSnapshot_001
  * @tc.desc: The legacy deny-shape whitelist is frozen: exactly the audited
- *           37 CARRIER_REPLY_INT32 rows and 6 CARRIER_REPLY_BOOL rows keep the
- *           pre-refactor deny channels; every other row must stay on the
- *           CARRIER_STATUS default so new commands cannot silently inherit
- *           a legacy shape.
+ *           89 CARRIER_REPLY_INT32 rows (38 explicitly tagged plus 51 legacy rows
+ *           restored by the REPLY_INT32 default) and 6 CARRIER_REPLY_BOOL rows
+ *           keep the pre-refactor deny channels; every other row is explicitly
+ *           pinned to CARRIER_STATUS (empty-policy, one-way, or new-deny rows
+ *           with no legacy deny contract).
  * @tc.type: FUNC
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_DenyShapeLegacyWhitelistSnapshot_001, TestSize.Level1) {
@@ -4578,6 +4582,58 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DenyShapeLegacyWhitelistSnapshot_001, 
         IFormMgr::Message::FORM_MGR_REGISTER_GET_VISIBLE_FORM_RECT_PROXY,
         IFormMgr::Message::FORM_MGR_UNREGISTER_GET_VISIBLE_FORM_RECT_PROXY,
         IFormMgr::Message::FORM_MGR_GET_VISIBLE_FORM_RECT,
+        IFormMgr::Message::FORM_MGR_ADD_FORM,
+        IFormMgr::Message::FORM_MGR_DELETE_FORM,
+        IFormMgr::Message::FORM_MGR_LIFECYCLE_UPDATE,
+        IFormMgr::Message::FORM_MGR_REQUEST_FORM,
+        IFormMgr::Message::FORM_MGR_RELEASE_FORM,
+        IFormMgr::Message::FORM_MGR_CAST_TEMP_FORM,
+        IFormMgr::Message::FORM_MGR_NOTIFY_FORM_WHETHER_VISIBLE,
+        IFormMgr::Message::FORM_MGR_STORAGE_FORM_INFOS,
+        IFormMgr::Message::FORM_MGR_FORM_INFOS_BY_NAME,
+        IFormMgr::Message::FORM_MGR_FORM_INFOS_BY_ID,
+        IFormMgr::Message::FORM_MGR_FORM_TIMER_INFO_BY_ID,
+        IFormMgr::Message::FORM_MGR_MESSAGE_EVENT,
+        IFormMgr::Message::FORM_MGR_DELETE_INVALID_FORMS,
+        IFormMgr::Message::FORM_MGR_ACQUIRE_FORM_STATE,
+        IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_VISIBLE,
+        IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_ENABLE_UPDATE,
+        IFormMgr::Message::FORM_MGR_GET_ALL_FORMS_INFO,
+        IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_APP,
+        IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_MODULE,
+        IFormMgr::Message::FORM_MGR_ROUTER_EVENT,
+        IFormMgr::Message::FORM_MGR_SHARE_FORM,
+        IFormMgr::Message::FORM_MGR_RECV_FORM_SHARE_INFO_FROM_REMOTE,
+        IFormMgr::Message::FORM_MGR_START_ABILITY,
+        IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_PRIVACY_PROTECTED,
+        IFormMgr::Message::FORM_MGR_BACKGROUND_EVENT,
+        IFormMgr::Message::FORM_MGR_STOP_RENDERING_FORM,
+        IFormMgr::Message::FORM_MGR_ACQUIRE_DATA,
+        IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS,
+        IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS_BY_BUNDLE,
+        IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_PROXY_FORM,
+        IFormMgr::Message::FORM_MGR_RELEASE_RENDERER,
+        IFormMgr::Message::FORM_MGR_REGISTER_FORM_ROUTER_PROXY,
+        IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY,
+        IFormMgr::Message::FORM_MGR_SET_FORMS_RECYCLABLE,
+        IFormMgr::Message::FORM_MGR_RECYCLE_FORMS,
+        IFormMgr::Message::FORM_MGR_RECOVER_FORMS,
+        IFormMgr::Message::FORM_MGR_UPDATE_FORM_LOCATION,
+        IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_FILTER,
+        IFormMgr::Message::FORM_MGR_CREATE_FORM,
+        IFormMgr::Message::FORM_MGR_PUBLISH_FORM_ERRCODE_RESULT,
+        IFormMgr::Message::FORM_MGR_ACQUIRE_ADD_FORM_RESULT,
+        IFormMgr::Message::FORM_MGR_BATCH_REFRESH_FORMS,
+        IFormMgr::Message::FORM_MGR_ENABLE_FORMS,
+        IFormMgr::Message::FORM_MGR_UPDATE_FORM_SIZE,
+        IFormMgr::Message::FORM_MGR_LOCK_FORMS,
+        IFormMgr::Message::FORM_MGR_START_ABILITY_BY_CROSS_BUNDLE,
+        IFormMgr::Message::FORM_MGR_GET_ALL_TEMPLATE_FORMS_INFO,
+        IFormMgr::Message::FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_APP,
+        IFormMgr::Message::FORM_MGR_GET_TEMPLATE_FORMS_INFO_BY_MODULE,
+        IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_CROSS_USER,
+        IFormMgr::Message::FORM_MGR_INSIGHT_INTENT_EVENT,
+        IFormMgr::Message::FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT,
     };
     static constexpr IFormMgr::Message kReplyBoolWhitelist[] = {
         IFormMgr::Message::FORM_MGR_HAS_FORM_VISIBLE_WITH_TOKENID,
@@ -4793,7 +4849,8 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleUpdateFormsWithReminderAgent_004
  * @tc.number: FormMgrStubTest_OnRemoteRequestDenyReminderAgent_001
  * @tc.name: Verify a denied checker blocks FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT.
  * @tc.desc: test that the reminder-agent row enforces a non-empty permission policy: a deny
- *           short-circuits with the default CARRIER_STATUS shape and never reaches the service.
+ *           short-circuits with the CARRIER_REPLY_INT32 carrier, writing the deny code into the
+ *           reply with an ERR_OK status so clients keep the specific error code.
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestDenyReminderAgent_001, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestDenyReminderAgent_001 starts";
@@ -4814,10 +4871,12 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestDenyReminderAgent_001, 
     data.WriteParcelable(&want);
 
     auto result = stub->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
+    EXPECT_EQ(result, ERR_OK);
+    int32_t denyCode = 0;
+    EXPECT_TRUE(reply.ReadInt32(denyCode));
+    EXPECT_EQ(denyCode, ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE);
     EXPECT_EQ(stub->updateFormsWithReminderAgentCount, 0);
     EXPECT_EQ(denyChecker->calls, 1u);
-    EXPECT_EQ(reply.GetDataSize(), 0u);
     GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestDenyReminderAgent_001 ends";
 }
 

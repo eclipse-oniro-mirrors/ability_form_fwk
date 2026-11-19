@@ -531,7 +531,8 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0109, TestSize.Level1)
     bool isUnusedInclude = false;
     ErrCode ret = formMgrService.GetFormInstanceById(formId, isUnusedInclude, formInstance);
     EXPECT_EQ(ret, ERR_OK);
-    EXPECT_EQ(ret, ERR_OK);
+    // The facade leaves the out-param untouched on the normal path; pin the default value.
+    EXPECT_EQ(formInstance.formId, 0);
     GTEST_LOG_(INFO) << "FormMgrService_0109 end";
 }
 
