@@ -349,7 +349,7 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
         jsonDataString = Str16ToStr8(parcel.ReadString16());
     }
     nlohmann::json jsonObject = SafeJsonParse(jsonDataString, false);
-    if (jsonObject.is_discarded()) {
+    if (jsonObject.is_discarded() || !jsonObject.is_object()) {
         HILOG_ERROR("[%{public}s]fail parse jsonDataString:%{private}s", __FUNCTION__, jsonDataString.c_str());
         return false;
     }

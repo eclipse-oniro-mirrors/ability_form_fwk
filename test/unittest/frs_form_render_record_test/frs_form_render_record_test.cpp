@@ -1723,6 +1723,65 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_093, TestSize.Level0)
 }
 
 /**
+ * @tc.name: FormRenderRecordTest_VisibilityReplay_001
+ * @tc.type: FUNC
+ * @tc.desc: Verify IsFormVisible defaults to invisible for a form never marked visible,
+ *           which is the pre-reload state relied on by the PostReAddRecycledForms replay.
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_VisibilityReplay_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_VisibilityReplay_001 start";
+    EXPECT_TRUE(formRenderRecordPtr_);
+    int64_t formId = 31;
+    formRenderRecordPtr_->visibilityMap_.erase(formId);
+    EXPECT_FALSE(formRenderRecordPtr_->IsFormVisible(formId));
+
+    formRenderRecordPtr_->RecordFormVisibility(formId, false);
+    EXPECT_FALSE(formRenderRecordPtr_->IsFormVisible(formId));
+
+    formRenderRecordPtr_->RecordFormVisibility(formId, true);
+    EXPECT_TRUE(formRenderRecordPtr_->IsFormVisible(formId));
+
+    formRenderRecordPtr_->RecordFormVisibility(formId, false);
+    EXPECT_FALSE(formRenderRecordPtr_->IsFormVisible(formId));
+    formRenderRecordPtr_->visibilityMap_.erase(formId);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_VisibilityReplay_001 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_VisibilityReplay_002
+ * @tc.type: FUNC
+ * @tc.desc: Verify SetVisibleChange(false) on an existing group restores the invisible state,
+ *           the replay applied by PostReAddRecycledForms after ReloadForm re-adds a form.
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_VisibilityReplay_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_VisibilityReplay_002 start";
+    EXPECT_TRUE(formRenderRecordPtr_);
+    int64_t formId = 32;
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+    formRenderRecordPtr_->RecordFormVisibility(formId, true);
+    EXPECT_TRUE(formRenderRecordPtr_->IsFormVisible(formId));
+
+    // PostReAddRecycledForms replay path: the re-add marks the group visible, then the
+    // fix replays SetVisibleChange(false) for a form that was invisible before the re-add.
+    auto eventRunner = EventRunner::Create("VisibilityReplay002");
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = nullptr;
+    auto group = std::make_shared<FormRendererGroup>(context, runtime, handler);
+    formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, group);
+    EXPECT_EQ(ERR_OK, formRenderRecordPtr_->SetVisibleChange(formId, false));
+    EXPECT_FALSE(formRenderRecordPtr_->IsFormVisible(formId));
+
+    formRenderRecordPtr_->formRendererGroupMap_.erase(formId);
+    formRenderRecordPtr_->visibilityMap_.erase(formId);
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_VisibilityReplay_002 end";
+}
+
+/**
  * @tc.name: FormRenderRecordTest_094
  * @tc.desc: Verify SetVisibleChange
  * @tc.type: FUNC

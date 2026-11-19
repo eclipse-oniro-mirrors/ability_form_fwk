@@ -410,13 +410,16 @@ int FormDataAdapter::SetNextRefreshTime(const int64_t formId, const int64_t next
 void FormDataAdapter::UpdateFormRenderParam(const int64_t formId, const sptr<IRemoteObject> &callerToken,
     const Want &want)
 {
+    FormUpgradeInfo formUpgradeInfo;
+    FormDataMgr::GetInstance().GetFormUpgradeInfo(formId, formUpgradeInfo);
     if (want.GetParams().HasParam(Constants::PARAM_FORM_DISABLE_UIFIRST_KEY)) {
         bool isEnable = !want.GetBoolParam(Constants::PARAM_FORM_DISABLE_UIFIRST_KEY, false);
+        // The message below may reach FRS before the render record exists and get
+        // dropped; persist the flag so the first render want can carry it.
+        formUpgradeInfo.disableUIFirst = !isEnable;
         FormRenderMgr::GetInstance().SetRenderGroupEnableFlag(formId, isEnable);
     }
 
-    FormUpgradeInfo formUpgradeInfo;
-    FormDataMgr::GetInstance().GetFormUpgradeInfo(formId, formUpgradeInfo);
     FormHostRecord hostRecord;
     bool hasRecord = FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, hostRecord);
     bool hasTransparencyKey = want.GetParams().HasParam(Constants::PARAM_FORM_TRANSPARENCY_KEY);
