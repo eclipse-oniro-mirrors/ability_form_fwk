@@ -179,7 +179,10 @@ int32_t HandleCreateForm(IFormMgr &svc, MessageParcel &data, MessageParcel &repl
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    reply.WriteParcelable(&runningFormInfo);
+    if (!reply.WriteParcelable(&runningFormInfo)) {
+        HILOG_ERROR("write runningFormInfo failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     return result;
 }
 
@@ -339,45 +342,6 @@ int32_t HandleUpdateFormCrossBundle(IFormMgr &svc, MessageParcel &data, MessageP
 }
 
 /**
- * @brief handle UpdateFormsWithReminderAgent message.
- * @param data input param.
- * @param reply output param.
- * @return Returns ERR_OK on success, others on failure.
- */
-int32_t HandleUpdateFormsWithReminderAgent(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
-{
-    std::string bundleName;
-    if (!data.ReadString(bundleName)) {
-        HILOG_ERROR("read bundleName failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (bundleName.empty()) {
-        HILOG_ERROR("bundleName is empty");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    int32_t userId = 0;
-    if (!data.ReadInt32(userId)) {
-        HILOG_ERROR("read userId failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (userId < 0) {
-        HILOG_ERROR("userId is invalid");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
-    if (want == nullptr) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    int32_t result = svc.UpdateFormsWithReminderAgent(bundleName, userId, *want);
-    if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    return ERR_OK;
-}
-
-/**
      * @brief handle SetNextRefreshTime message.
      * @param data input param.
      * @param reply output param.
@@ -475,7 +439,11 @@ int32_t HandleRequestPublishForm(IFormMgr &svc, MessageParcel &data, MessageParc
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    bool withFormBindingData = data.ReadBool();
+    bool withFormBindingData = false;
+    if (!data.ReadBool(withFormBindingData)) {
+        HILOG_ERROR("read withFormBindingData failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     std::unique_ptr<FormProviderData> formProviderData = nullptr;
     if (withFormBindingData) {
         formProviderData.reset(data.ReadParcelable<FormProviderData>());
@@ -523,7 +491,7 @@ int32_t HandleSetPublishFormResult(IFormMgr &svc, MessageParcel &data, MessagePa
     if (err < static_cast<int32_t>(Constants::PublishFormErrorCode::SUCCESS) ||
         err >= static_cast<int32_t>(Constants::PublishFormErrorCode::BUTT)) {
         HILOG_ERROR("invalid PublishFormErrorCode:%{public}d", err);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     errorCodeInfo.code = static_cast<Constants::PublishFormErrorCode>(err);
     ErrCode result = svc.SetPublishFormResult(formId, errorCodeInfo);
@@ -1936,7 +1904,11 @@ int32_t HandleRequestPublishProxyForm(IFormMgr &svc, MessageParcel &data, Messag
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    bool withFormBindingData = data.ReadBool();
+    bool withFormBindingData = false;
+    if (!data.ReadBool(withFormBindingData)) {
+        HILOG_ERROR("read withFormBindingData failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     std::unique_ptr<FormProviderData> formProviderData = nullptr;
     if (withFormBindingData) {
         formProviderData.reset(data.ReadParcelable<FormProviderData>());
@@ -2075,7 +2047,11 @@ int32_t HandleRequestPublishFormWithSnapshot(IFormMgr &svc, MessageParcel &data,
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    bool withFormBindingData = data.ReadBool();
+    bool withFormBindingData = false;
+    if (!data.ReadBool(withFormBindingData)) {
+        HILOG_ERROR("read withFormBindingData failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     std::unique_ptr<FormProviderData> formBindingData = nullptr;
     if (withFormBindingData) {
         formBindingData.reset(data.ReadParcelable<FormProviderData>());
@@ -2978,7 +2954,7 @@ int32_t HandleRequestPublishFormCrossDevice(IFormMgr &svc, MessageParcel &data, 
         }
         return ERR_OK;
     }
-    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     sptr<IRemoteObject> callback = data.ReadRemoteObject();
     if (callerToken == nullptr || callback == nullptr) {
         HILOG_ERROR("ReadRemoteObject failed");
@@ -3034,6 +3010,36 @@ int32_t HandleGetVisibleFormRect(IFormMgr &svc, MessageParcel &data, MessageParc
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK && !reply.WriteParcelable(&rect)) {
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t HandleUpdateFormsWithReminderAgent(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::string bundleName;
+    if (!data.ReadString(bundleName)) {
+        HILOG_ERROR("read bundleName failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (bundleName.empty()) {
+        HILOG_ERROR("bundleName is empty");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t userId = 0;
+    if (!data.ReadInt32(userId)) {
+        HILOG_ERROR("read userId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("ReadParcelable<Want> failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = svc.UpdateFormsWithReminderAgent(bundleName, userId, *want);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;

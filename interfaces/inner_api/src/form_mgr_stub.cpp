@@ -30,38 +30,34 @@ namespace AppExecFwk {
 FormMgrStub::FormMgrStub()
 {}
 
-FormMgrStub::~FormMgrStub()
-{}
 
 /**
- * @brief Serialize a deny result following the command's legacy deny carrier.
+ * @brief Serialize a deny result following the command's deny carrier.
  *
  * Deny shape is part of the client-visible IPC contract frozen in the dispatch
- * table. CARRIER_STATUS is the default (and mandatory) shape for new commands;
- * the two legacy carriers only replicate how pre-refactor stub handlers reported
- * permission denials inside the reply parcel with an ERR_OK status.
+ * table; see DenyShape in form_permission_policy.h.
  *
  * @param shape Deny carrier declared in the dispatch-table policy.
  * @param denyCode Deny code produced by the access checker.
  * @param reply Output parcel of the current request.
- * @return Returns the status channel code: ERR_OK for legacy carriers, denyCode otherwise.
+ * @return Returns the status channel code: ERR_OK for reply carriers, denyCode for CARRIER_STATUS.
  */
 static ErrCode WriteDenyByShape(DenyShape shape, ErrCode denyCode, MessageParcel &reply)
 {
     switch (shape) {
-        case DenyShape::CARRIER_REPLY_INT32:
-            if (!reply.WriteInt32(denyCode)) {
-                return ERR_APPEXECFWK_PARCEL_ERROR;
-            }
-            return ERR_OK;
         case DenyShape::CARRIER_REPLY_BOOL:
             if (!reply.WriteBool(false)) {
                 return ERR_APPEXECFWK_PARCEL_ERROR;
             }
             return ERR_OK;
         case DenyShape::CARRIER_STATUS:
-        default:
             return denyCode;
+        case DenyShape::CARRIER_REPLY_INT32:
+        default: // Default carrier: fall through to the int32 reply write.
+            if (!reply.WriteInt32(denyCode)) {
+                return ERR_APPEXECFWK_PARCEL_ERROR;
+            }
+            return ERR_OK;
     }
 }
 /**

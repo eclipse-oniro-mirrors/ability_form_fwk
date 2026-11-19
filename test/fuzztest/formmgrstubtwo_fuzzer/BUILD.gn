@@ -30,7 +30,26 @@ ohos_fuzztest("FormMgrStubTwoFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "formmgrstubtwo_fuzzer.cpp" ]
+  sources = [
+    "formmgrstubtwo_fuzzer.cpp",
+    # The production DSO hides these symbols via libform_manager.map, but the
+    # fuzzer drives the table and handlers directly.
+    "${form_fwk_path}/interfaces/inner_api/src/form_ipc_dispatch_table.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_ipc_handlers.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_ashmem.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_color_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_info_filter.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_instances_filter.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_instance.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_js_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_lock_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_major_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_provider_data.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_provider_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_share_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/running_form_info.cpp",
+    "${form_fwk_path}/common/src/json_util_form.cpp",
+  ]
 
   deps = [
     "${form_fwk_path}:libfms_internal_static",
@@ -51,6 +70,7 @@ ohos_fuzztest("FormMgrStubTwoFuzzTest") {
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
     "ffrt:libffrt",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

@@ -14,6 +14,7 @@
  */
 
 #include <chrono>
+#include <cstdint>
 #include <dirent.h>
 #include <fstream>
 #include <gtest/gtest.h>
@@ -217,11 +218,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0081, TestSize.Level1)
 /**
  * @tc.number: FormMgrService_0082
  * @tc.name: test RegisterRemoveObserver function.
- * @tc.desc: Verify that the RegisterRemoveObserver interface is called normally
- */
-/**
- * @tc.number: FormMgrService_0082
- * @tc.name: test RegisterRemoveObserver function.
  * @tc.desc: Verify that the RegisterRemoveObserver interface delegates to facade and returns OK.
  */
 HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0082, TestSize.Level1)
@@ -235,11 +231,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0082, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0082 end";
 }
 
-/**
- * @tc.number: FormMgrService_0083
- * @tc.name: test RequestPublishProxyForm function.
- * @tc.desc: Verify that the RequestPublishProxyForm interface is called normally
- */
 /**
  * @tc.number: FormMgrService_0083
  * @tc.name: test RequestPublishProxyForm function.
@@ -265,16 +256,10 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0083, TestSize.Level1)
 /**
  * @tc.number: FormMgrService_0085
  * @tc.name: test BackgroundEvent function.
- * @tc.desc: Verify that the BackgroundEvent interface is called normally
- * and the return value is ERR_OK.
- */
-/**
- * @tc.number: FormMgrService_0085
- * @tc.name: test BackgroundEvent function.
  * @tc.desc: Verify that the BackgroundEvent interface delegates to facade, with CheckInvalidForm gating.
  */
-    HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0085, TestSize.Level1)
-    {
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0085, TestSize.Level1)
+{
     GTEST_LOG_(INFO) << "FormMgrService_0085 start";
     FormMgrService formMgrService;
     int64_t formId = 1;
@@ -488,7 +473,8 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0106, TestSize.Level1)
 /**
  * @tc.number: FormMgrService_0107
  * @tc.name: test GetFormsCount function.
- * @tc.desc: Verify that the GetFormsCount interface is called normally
+ * @tc.desc: Direct service-layer call delegates to the adapter facade (mock returns ERR_OK);
+ *           the system-app gate is enforced by the IPC dispatch policy, not here.
  */
 HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0107, TestSize.Level1)
 {
@@ -503,8 +489,9 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0107, TestSize.Level1)
 
 /**
  * @tc.number: FormMgrService_0108
- * @tc.name: test GetFormsCount function.
- * @tc.desc: Verify that the GetFormsCount interface is called normally
+ * @tc.name: test GetHostFormsCount function.
+ * @tc.desc: Direct service-layer call delegates to the adapter facade (mock returns ERR_OK);
+ *           the system-app gate is enforced by the IPC dispatch policy, not here.
  */
 HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0108, TestSize.Level1)
 {
@@ -870,24 +857,37 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0139, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0139 end";
 }
 
-// FormMgrService_0140-0179 in file fms_form_mgr_service_test.cpp
-
+ 
 /**
- * @tc.number: FormMgrService_0181
+ * @tc.number: FormMgrService_0140
  * @tc.name: test RequestOverflow function.
  * @tc.desc: Verify that the RequestOverflow interface is called normally
  */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0181, TestSize.Level1)
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0140, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FormMgrService_0181 start";
+    GTEST_LOG_(INFO) << "FormMgrService_0140 start";
     FormMgrService formMgrService;
     const int64_t formId = 1;
     OverflowInfo overflowInfo;
     bool isOverflow = true;
     EXPECT_EQ(formMgrService.RequestOverflow(formId, overflowInfo, isOverflow), ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrService_0181 end";
+    GTEST_LOG_(INFO) << "FormMgrService_0140 end";
 }
 
+/**
+ * @tc.number: FormMgrService_0142
+ * @tc.name: test RequestOverflow function.
+ * @tc.desc: Verify that the RequestOverflow interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0142, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0142 start";
+    FormMgrService formMgrService;
+    const int64_t formId = 1;
+    Rect rect;
+    EXPECT_EQ(formMgrService.GetFormRect(formId, rect), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_0142 end";
+}
 
 /**
  * @tc.number: FormMgrService_ChangeSceneAnimationState_0002
@@ -904,21 +904,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_ChangeSceneAnimationState_0002, 
     MockIsSystemAppByFullTokenID(true);
     EXPECT_EQ(formMgrService.ChangeSceneAnimationState(formId, state), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_ChangeSceneAnimationState_0002 end";
-}
-
-/**
- * @tc.number: FormMgrService_0184
- * @tc.name: test getFormRect function.
- * @tc.desc: Verify that the getFormRect interface is called normally
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0184, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0184 start";
-    FormMgrService formMgrService;
-    const int64_t formId = 1;
-    Rect rect;
-    EXPECT_EQ(formMgrService.GetFormRect(formId, rect), ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrService_0184 end";
 }
 
 /**
@@ -1117,41 +1102,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetTemplateFormsInfoByModule_000
     EXPECT_EQ(1, formInfos.size());
 
     GTEST_LOG_(INFO) << "FormMgrService_GetTemplateFormsInfoByModule_0001 end";
-}
-
-/**
- * @tc.name: FormMgrService_GetFormIdsByFormLocation_001
- * @tc.desc: Verify GetFormIdsByFormLocation with permission denied (system)
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetFormIdsByFormLocation_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_GetFormIdsByFormLocation_001 start";
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    FormMgrService formMgrService;
-    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
-    std::vector<std::string> formIds;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetFormIdsByFormLocation(formLocation, formIds));
-    GTEST_LOG_(INFO) << "FormMgrService_GetFormIdsByFormLocation_001 end";
-}
-
-/**
- * @tc.name: FormMgrService_GetFormIdsByFormLocation_002
- * @tc.desc: Verify GetFormIdsByFormLocation with permission denied (bundle)
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetFormIdsByFormLocation_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_GetFormIdsByFormLocation_002 start";
-    MockIsSACall(true);
-    MockVerifyCallingPermission(false);
-    FormMgrService formMgrService;
-    int32_t formLocation = static_cast<int32_t>(Constants::FormLocation::DESKTOP);
-    std::vector<std::string> formIds;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE,
-        formMgrService.GetFormIdsByFormLocation(formLocation, formIds));
-    GTEST_LOG_(INFO) << "FormMgrService_GetFormIdsByFormLocation_002 end";
 }
 
 /**
@@ -1934,7 +1884,69 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_DeleteForms_003, TestSize.Level1
     GTEST_LOG_(INFO) << "FormMgrService_DeleteForms_003 end";
 }
 
+/**
+ * @tc.number: FormMgrService_UnregisterFormHostService_001
+ * @tc.name: test UnregisterFormHostService function.
+ * @tc.desc: Verify that the invalid serviceId sentinel -1 is rejected with INVALID_PARAM.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormHostService_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormHostService_001 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    ErrCode ret = formMgrService.UnregisterFormHostService(-1);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormHostService_001 end";
+}
 
+/**
+ * @tc.number: FormMgrService_UnregisterFormHostService_002
+ * @tc.name: test UnregisterFormHostService function.
+ * @tc.desc: Verify that INT64_MIN serviceId is rejected with INVALID_PARAM.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormHostService_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormHostService_002 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    ErrCode ret = formMgrService.UnregisterFormHostService(INT64_MIN);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormHostService_002 end";
+}
+
+// Non-system caller and permission-denied cases are enforced by the IPC dispatch policy
+// (FORM_MGR_UNREGISTER_FORM_HOST_SERVICE: SystemCaller+Permission with
+// PERMISSION_GET_BUNDLE_INFO_PRIVILEGED), so the service layer here only exercises
+// the parameter gate and the facade delegation path.
+
+/**
+ * @tc.number: FormMgrService_UnregisterFormHostService_005
+ * @tc.name: test UnregisterFormHostService function.
+ * @tc.desc: Verify that a non-negative serviceId passes the param gate and reaches the
+ *           discovery layer. DISTRIBUTED_FORM_SUPPORTED defined → SERVICE_NOT_EXIST;
+ *           undefined → COMMON_CODE.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormHostService_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormHostService_005 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockGetCallerBundleName(ERR_OK, "com.example.helloworld");
+    ErrCode ret = formMgrService.UnregisterFormHostService(100);
+#ifdef DISTRIBUTED_FORM_SUPPORTED
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_SERVICE_NOT_EXIST);
+#else
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
+#endif
+    MockGetCallerBundleName(ERR_OK, "");
+    GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormHostService_005 end";
+}
 /**
  * @tc.name: FormMgrService_GetVisibleFormRect_Svc002
  * @tc.desc: Verify formId <= 0 is forwarded to adapter facade (pass-through, no Service intercept).

@@ -41,21 +41,14 @@ enum class CheckType : uint8_t {
 /**
  * @brief Carrier of the deny result when the pre-check rejects an IPC request.
  *
- * Deny shape is part of each command's client-visible IPC contract and cannot be
- * derived from the reply protocol automatically (two commands may share the same
- * reply format yet differ in the deny channel).
- *
- * CARRIER_REPLY_INT32 is the default because it matches the legacy majority
- * contract: most deny-carrying legacy commands transported the deny code as the
- * reply's leading int32 with an ERR_OK status, so an untagged dispatch-table row
- * keeps a legacy command on its pre-refactor deny channel. CARRIER_STATUS and
- * CARRIER_REPLY_BOOL are explicit special cases: a row that deviates from the
- * default must state its carrier.
+ * Deny shape is part of each command's client-visible IPC contract.
+ * CARRIER_REPLY_INT32 is the default carrier; every row and every new command
+ * inherits it unless an exception is declared explicitly below.
  */
 enum class DenyShape : uint8_t {
-    CARRIER_STATUS,      // Deny code rides the binder status channel (SendRequest return value).
-    CARRIER_REPLY_INT32, // Legacy: deny code is the reply's leading int32; status stays ERR_OK.
-    CARRIER_REPLY_BOOL,  // Legacy: deny surfaces as the reply's plain false bool; status stays ERR_OK.
+    CARRIER_REPLY_INT32, // Default: deny code is the reply's leading int32; status stays ERR_OK.
+    CARRIER_REPLY_BOOL,  // Exception: deny surfaces as the reply's plain false bool; status stays ERR_OK.
+    CARRIER_STATUS,      // Exception: deny code rides the binder status channel (SendRequest return value).
 };
 
 /**
@@ -72,7 +65,7 @@ struct FormPermissionPolicy {
     std::string_view permName;
     // Final deny code for the Permission step: explicit override, else GetDefaultDenyCode(permName).
     ErrCode permDenyCode = 0;
-    // Carrier of the deny result for legacy client compatibility; see DenyShape.
+    // Carrier of the deny result; defaults to the pre-refactor reply-int32 convention. See DenyShape.
     DenyShape denyShape = DenyShape::CARRIER_REPLY_INT32;
 };
 

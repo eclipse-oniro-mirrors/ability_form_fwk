@@ -30,7 +30,7 @@ namespace AppExecFwk {
 class FormMgrStub : public IRemoteStub<IFormMgr> {
 public:
     FormMgrStub();
-    virtual ~FormMgrStub();
+    virtual ~FormMgrStub() = default;
     /**
      * @brief Handle remote request.
      * @param data input param.
@@ -38,8 +38,8 @@ public:
      * @param option message option.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int OnRemoteRequest(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int OnRemoteRequest(
+        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);

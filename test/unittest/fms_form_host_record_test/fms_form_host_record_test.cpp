@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -357,7 +357,8 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0019, TestSize.Level0)
 
 /**
  * @tc.name: FormMgrService_0020
- * @tc.desc: Verify NotifyFormsPrivacyProtected unconditionally returns ERR_APPEXECFWK_FORM_COMMON_CODE (method body hardcodes this return).
+ * @tc.desc: Verify NotifyFormsPrivacyProtected unconditionally returns
+ *           ERR_APPEXECFWK_FORM_COMMON_CODE (method body hardcodes this return).
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormHostRecordTest, FormMgrService_0020, TestSize.Level0)
@@ -487,7 +488,8 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0029, TestSize.Level0)
 
 /**
  * @tc.name: FormMgrService_0030
- * @tc.desc: Verify ShareForm returns ERR_APPEXECFWK_FORM_NOT_EXIST_ID after parameter guards pass when formId lookup fails.
+ * @tc.desc: Verify ShareForm returns ERR_APPEXECFWK_FORM_NOT_EXIST_ID after parameter
+ *           guards pass when formId lookup fails.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormHostRecordTest, FormMgrService_0030, TestSize.Level0)

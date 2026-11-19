@@ -26,6 +26,8 @@
 #include "form_mgr_stub.h"
 #undef private
 #undef protected
+#include "form_ipc_dispatch_table.h"
+#include "form_stub_access_checker.h"
 #include "message_parcel.h"
 #include "securec.h"
 #include "ffrt.h"
@@ -575,57 +577,109 @@ public:
     }
 };
 
-void HandleFormMessageTwo(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &data, MessageParcel &reply)
+using FormHandlerFunc = int32_t (*)(IFormMgr &, MessageParcel &, MessageParcel &);
+
+// Each handler parses a distinct IPC command from the parcel. Each fuzz
+// execution picks one switch-case branch via a selector consumed from the fdp;
+// every handler of the chosen branch gets its own freshly consumed
+// ConsumeRandomLengthString so the mutation is not shared across handlers.
+const FormHandlerFunc FORM_MGR_TWO_FUZZ_HANDLERS[] = {
+    &FormIpcHandlers::HandleRequestPublishFormCrossUser,
+    &FormIpcHandlers::HandleRegisterFormWantCallback,
+    &FormIpcHandlers::HandleUnregisterFormWantCallback,
+    &FormIpcHandlers::HandleGetPublishedFormInfoById,
+    &FormIpcHandlers::HandleGetPublishedFormInfos,
+    &FormIpcHandlers::HandleStartAbilityByFms,
+    &FormIpcHandlers::HandleStartUIAbilityByFms,
+    &FormIpcHandlers::HandleStartAbilityByCrossBundle,
+    &FormIpcHandlers::HandleRegisterPublishFormInterceptor,
+    &FormIpcHandlers::HandleLockForms,
+    &FormIpcHandlers::HandleIsFormExempt,
+    &FormIpcHandlers::HandleIsFormProtected,
+    &FormIpcHandlers::HandleIsFormDebugSignature,
+    &FormIpcHandlers::HandleNotifyFormLocked,
+    &FormIpcHandlers::HandleUpdateFormSize,
+    &FormIpcHandlers::HandleOpenFormEditAbility,
+    &FormIpcHandlers::HandleCloseFormEditAbility,
+    &FormIpcHandlers::HandleRegisterOverflowProxy,
+    &FormIpcHandlers::HandleUnregisterOverflowProxy,
+    &FormIpcHandlers::HandleRequestOverflow,
+    &FormIpcHandlers::HandleRegisterChangeSceneAnimationStateProxy,
+    &FormIpcHandlers::HandleUnregisterChangeSceneAnimationStateProxy,
+    &FormIpcHandlers::HandleChangeSceneAnimationState,
+    &FormIpcHandlers::HandleRegisterGetFormRectProxy,
+    &FormIpcHandlers::HandleUnregisterGetFormRectProxy,
+    &FormIpcHandlers::HandleGetFormRect,
+    &FormIpcHandlers::HandleNotifyUpdateFormSize,
+    &FormIpcHandlers::HandleRegisterGetLiveFormStatusProxy,
+    &FormIpcHandlers::HandleUnregisterGetLiveFormStatusProxy,
+    &FormIpcHandlers::HandleReloadForms,
+    &FormIpcHandlers::HandleReloadAllForms,
+    &FormIpcHandlers::HandleIsFormDueControl,
+    &FormIpcHandlers::HandleSendNonTransparencyRatio,
+    &FormIpcHandlers::HandleRegisterPublishFormCrossBundleControl,
+    &FormIpcHandlers::HandleUnregisterPublishFormCrossBundleControl,
+    &FormIpcHandlers::HandleRegisterTemplateFormDetailInfoChange,
+    &FormIpcHandlers::HandleUnregisterTemplateFormDetailInfoChange,
+    &FormIpcHandlers::HandleUpdateTemplateFormDetailInfo,
+    &FormIpcHandlers::HandleGetFormIdsByFormLocation,
+    &FormIpcHandlers::HandleRegisterUpdateFormsConfigCallback,
+    &FormIpcHandlers::HandleUnregisterUpdateFormsConfigCallback,
+    &FormIpcHandlers::HandleUpdateFormsConfig,
+    &FormIpcHandlers::HandleRegisterDeleteFormsCallback,
+    &FormIpcHandlers::HandleUnregisterDeleteFormsCallback,
+    &FormIpcHandlers::HandleDeleteForms,
+    &FormIpcHandlers::HandleRecycleForms,
+    &FormIpcHandlers::HandleGetVisibleFormRect,
+    &FormIpcHandlers::HandleGetAvailableFormHostServices,
+    &FormIpcHandlers::HandleOpenFormEditPage,
+    &FormIpcHandlers::HandleOpenFormManagePage,
+    &FormIpcHandlers::HandleOpenLiveFormPage,
+    &FormIpcHandlers::HandleRegisterFormHostService,
+    &FormIpcHandlers::HandleRegisterGetVisibleFormRectProxy,
+    &FormIpcHandlers::HandleUnregisterGetVisibleFormRectProxy,
+    &FormIpcHandlers::HandleRequestPublishFormCrossDevice,
+    &FormIpcHandlers::HandleUnregisterFormHostService,
+    &FormIpcHandlers::HandleUpdateFormCrossBundle,
+    &FormIpcHandlers::HandleUpdateFormProviderInfo,
+    &FormIpcHandlers::HandleUpdateFormsWithReminderAgent,
+    &FormIpcHandlers::HandleUpdateFormsColorInfo,
+};
+
+constexpr size_t FUZZ_HANDLER_COUNT = sizeof(FORM_MGR_TWO_FUZZ_HANDLERS) / sizeof(FORM_MGR_TWO_FUZZ_HANDLERS[0]);
+constexpr size_t FUZZ_HANDLER_GROUP_SIZE = 5;
+constexpr size_t FUZZ_HANDLER_GROUP_COUNT =
+    (FUZZ_HANDLER_COUNT + FUZZ_HANDLER_GROUP_SIZE - 1) / FUZZ_HANDLER_GROUP_SIZE;
+// case 0/1: OnRemoteRequest with an fdp-consumed code; case 2..: one group of
+// FUZZ_HANDLER_GROUP_SIZE handlers per branch.
+constexpr uint32_t FUZZ_CASE_COUNT = 2 + FUZZ_HANDLER_GROUP_COUNT;
+
+// Direct handler invocation: handlers parse business params directly without
+// ReadInterfaceToken (only OnRemoteRequest consumes the token), so seed the
+// parcel with fuzz bytes only to keep handler reads aligned with the mutated
+// data. Each handler gets its own fresh parcel and reply.
+void InvokeFormHandlerTwo(FormHandlerFunc handler, FormMgrStub &formMgrStub, const std::string &fuzzData)
 {
-    if (formMgrStub == nullptr) {
+    if (handler == nullptr) {
         return;
     }
-    FormIpcHandlers::HandleRequestPublishFormCrossUser(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleRegisterFormWantCallback(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleUnregisterFormWantCallback(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleGetPublishedFormInfoById(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleGetPublishedFormInfos(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleStartAbilityByFms(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleStartUIAbilityByFms(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleStartAbilityByCrossBundle(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleRegisterPublishFormInterceptor(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleLockForms(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleIsFormExempt(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleIsFormProtected(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleIsFormDebugSignature(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleNotifyFormLocked(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleUpdateFormSize(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleOpenFormEditAbility(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleCloseFormEditAbility(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleRegisterOverflowProxy(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleUnregisterOverflowProxy(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleRequestOverflow(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleRegisterChangeSceneAnimationStateProxy(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleUnregisterChangeSceneAnimationStateProxy(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleChangeSceneAnimationState(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleRegisterGetFormRectProxy(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleUnregisterGetFormRectProxy(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleGetFormRect(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleNotifyUpdateFormSize(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleRegisterGetLiveFormStatusProxy(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleUnregisterGetLiveFormStatusProxy(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleReloadForms(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleReloadAllForms(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleIsFormDueControl(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleSendNonTransparencyRatio(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleRegisterPublishFormCrossBundleControl(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleUnregisterPublishFormCrossBundleControl(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleRegisterTemplateFormDetailInfoChange(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleUnregisterTemplateFormDetailInfoChange(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleUpdateTemplateFormDetailInfo(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleGetFormIdsByFormLocation(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleRegisterUpdateFormsConfigCallback(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleUnregisterUpdateFormsConfigCallback(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleUpdateFormsConfig(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleRegisterDeleteFormsCallback(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleUnregisterDeleteFormsCallback(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleDeleteForms(*formMgrStub, data, reply);
-    FormIpcHandlers::HandleRecycleForms(*formMgrStub, data, reply);
+    MessageParcel datas;
+    datas.WriteBuffer(fuzzData.c_str(), fuzzData.length());
+    MessageParcel reply;
+    handler(formMgrStub, datas, reply);
+}
+
+// OnRemoteRequest consumes the interface token itself, so the token is written
+// only on this path.
+void FuzzOnRemoteRequestTwo(FormMgrStub &formMgrStub, uint32_t code, const std::string &fuzzData)
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    datas.WriteBuffer(fuzzData.c_str(), fuzzData.length());
+    datas.RewindRead(ZERO_NUM);
+    MessageParcel reply;
+    MessageOption option;
+    formMgrStub.OnRemoteRequest(code, datas, reply, option);
 }
 
 bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
@@ -634,43 +688,56 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
         return true;
     }
 
-    std::string fuzzData = fdp->ConsumeRandomLengthString(MAX_LENGTH);
-    uint32_t code = fdp->ConsumeIntegralInRange<uint32_t>(MESSAGE_BASE, MESSAGE_LAST);
-
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    datas.WriteBuffer(fuzzData.c_str(), fuzzData.length());
-    datas.RewindRead(ZERO_NUM);
-    MessageParcel reply;
-    MessageOption option;
-
     std::shared_ptr<FormMgrStub> formMgrStub = std::make_shared<FormMgrStubFuzzTestTwo>();
-
-    formMgrStub->OnRemoteRequest(code, datas, reply, option);
-
-    uint32_t mappedCode = MESSAGE_BASE + code % MESSAGE_RANGE;
-    MessageParcel datas2;
-    datas2.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    datas2.WriteBuffer(fuzzData.c_str(), fuzzData.length());
-    datas2.RewindRead(ZERO_NUM);
-    MessageParcel reply2;
-    formMgrStub->OnRemoteRequest(mappedCode, datas2, reply2, option);
-
-    for (uint32_t iterCode = MESSAGE_BASE; iterCode <= MESSAGE_LAST; ++iterCode) {
-        MessageParcel parcel;
-        parcel.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-        parcel.WriteBuffer(fuzzData.c_str(), fuzzData.length());
-        parcel.RewindRead(ZERO_NUM);
-        MessageParcel iterReply;
-        MessageOption iterOption;
-        std::shared_ptr<FormMgrStub> iterStub = std::make_shared<FormMgrStubFuzzTestTwo>();
-        iterStub->OnRemoteRequest(iterCode, parcel, iterReply, iterOption);
+    uint8_t selector = fdp->ConsumeIntegral<uint8_t>();
+    switch (selector % FUZZ_CASE_COUNT) {
+        case 0: {
+            std::string fuzzData = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+            uint32_t code = fdp->ConsumeIntegralInRange<uint32_t>(MESSAGE_BASE, MESSAGE_LAST);
+            FuzzOnRemoteRequestTwo(*formMgrStub, code, fuzzData);
+            break;
+        }
+        case 1: {
+            std::string fuzzData = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+            uint32_t code = fdp->ConsumeIntegralInRange<uint32_t>(MESSAGE_BASE, MESSAGE_LAST);
+            FuzzOnRemoteRequestTwo(*formMgrStub, MESSAGE_BASE + code % MESSAGE_RANGE, fuzzData);
+            break;
+        }
+        default: {
+            uint32_t group = (selector % FUZZ_CASE_COUNT) - 2;
+            size_t begin = static_cast<size_t>(group) * FUZZ_HANDLER_GROUP_SIZE;
+            size_t end = begin + FUZZ_HANDLER_GROUP_SIZE;
+            if (end > FUZZ_HANDLER_COUNT) {
+                end = FUZZ_HANDLER_COUNT;
+            }
+            for (size_t i = begin; i < end; ++i) {
+                std::string fuzzData = fdp->ConsumeRandomLengthString(MAX_LENGTH);
+                InvokeFormHandlerTwo(FORM_MGR_TWO_FUZZ_HANDLERS[i], *formMgrStub, fuzzData);
+            }
+            break;
+        }
     }
-
-    HandleFormMessageTwo(formMgrStub, datas, reply);
 
     return true;
 }
+}
+
+// The fuzz process has no system-caller identity, so the table's default
+// FailClosedChecker would deny every registered command before deserialization.
+// Install an allow-all checker to let the OnRemoteRequest path reach the
+// dispatch table, the handlers and their business-parameter parsing.
+class AllowAllChecker : public IStubAccessChecker {
+public:
+    ErrCode Check(const FormPermissionPolicy &, const FormIpcContext &) override
+    {
+        return ERR_OK;
+    }
+};
+
+extern "C" int LLVMFuzzerInitialize(int *, char ***)
+{
+    FormIpcDispatchTable::GetInstance().SetAccessChecker(std::make_shared<AllowAllChecker>());
+    return 0;
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)

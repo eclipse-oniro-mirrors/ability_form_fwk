@@ -473,7 +473,10 @@ ohos_shared_library("libfms") {
     "-Wl,--gc-sections",
   ]
 
-  deps = [ ":libfms_internal_static" ]
+  deps = [
+    ":libfms_internal_static",
+    ":form_manager",
+  ]
 
   subsystem_name = "ability"
   part_name = "form_fwk"
