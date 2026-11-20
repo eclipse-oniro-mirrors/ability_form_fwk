@@ -60,6 +60,8 @@ public:
         std::string &formInfos) const;
 
     int DumpFormRunningFormInfos(std::string &runningFormInfosResult) const;
+
+    int DumpProcessPool(std::string &result) const;
 };
 
 

@@ -31,6 +31,30 @@ namespace AppExecFwk {
  * @class FormDumpMgr
  * Form dump mgr.
  */
+struct ProcessPoolConnectionDump {
+    int64_t formId = -1;
+    int32_t state = -1; // ConnectState value
+};
+
+struct ProcessPoolBundleDump {
+    std::string bundleName;
+    std::vector<ProcessPoolConnectionDump> connections;
+};
+
+struct ProcessPoolUserDump {
+    int32_t userId = 0;
+    int32_t activeProviders = 0;
+    int32_t pendingCount = 0;
+    int64_t headWaitMs = -1;
+    std::vector<ProcessPoolBundleDump> bundles;
+};
+
+struct ProcessPoolDumpInfo {
+    size_t threshold = 0;
+    int32_t totalActiveProviders = 0;
+    std::vector<ProcessPoolUserDump> users;
+};
+
 class FormDumpMgr final : public DelayedRefSingleton<FormDumpMgr> {
     DECLARE_DELAYED_REF_SINGLETON(FormDumpMgr)
 public:
@@ -103,6 +127,13 @@ public:
      * @param runningFormInfos All the running form information
      * @param infosResult The dump info of all the running form info.
      */
+    /**
+     * @brief Format the process pool snapshot into the dump result string.
+     * @param snapshot Pool state snapshot.
+     * @param result Dump result string.
+     */
+    void DumpProcessPool(const ProcessPoolDumpInfo &info, std::string &result) const;
+
     void DumpRunningFormInfos(const std::vector<RunningFormInfo> &runningFormInfos,
         std::string &infosResult) const;
 

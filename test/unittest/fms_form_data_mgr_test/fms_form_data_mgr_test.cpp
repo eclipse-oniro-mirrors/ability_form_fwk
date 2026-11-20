@@ -3963,39 +3963,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_DeleteInvalidTempForms_001, Test
 }
 
 /**
-* @tc.number: FmsFormDataMgrTest_GetFormCanUpdate_001
-* @tc.name: GetFormCanUpdate
-* @tc.desc: Verify that the return value is correct.
-* @tc.details: If the value corresponding to the key is not found in the map.
-
-*/
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormCanUpdate_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCanUpdate_001 start";
-    int64_t formId = FORM_ID_ZERO;
-    formDataMgr_.DeleteFormVisible(formId);
-    bool value = formDataMgr_.GetFormCanUpdate(formId);
-    EXPECT_EQ(value, true);
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCanUpdate_001 end";
-}
-
-/**
- * @tc.number: FmsFormDataMgrTest_GetFormCanUpdate_002
- * @tc.name: GetFormCanUpdate
- * @tc.desc: Verify that the return value is correct.
- * @tc.details: If the value corresponding to the key is found in the map.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormCanUpdate_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCanUpdate_002 start";
-    int64_t formId = FORM_ID_ZERO;
-    formDataMgr_.SetFormVisible(formId, true);
-    bool value = formDataMgr_.GetFormCanUpdate(formId);
-    EXPECT_EQ(value, true);
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCanUpdate_002 end";
-}
-
-/**
  * @tc.number: FmsFormDataMgrTest_SetHostRefresh_001
  * @tc.name: SetHostRefresh
  * @tc.desc: Verify that the map can be operated normally.
@@ -4676,7 +4643,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormAbilityInfo_001, TestSize
 
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateFormRecordSetIsExistRecycleTask_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormAbilityInfo_001 start";
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_UpdateFormRecordSetIsExistRecycleTask_001 start";
     std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
     ASSERT_NE(nullptr, formDataMgr);
     int64_t formId = 123;
@@ -4692,7 +4659,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateFormRecordSetIsExistRecycl
     result = formDataMgr->UpdateFormRecordSetIsExistRecycleTask(formId, isExistRecycleTask);
     EXPECT_TRUE(result);
     EXPECT_EQ(formDataMgr->formRecords_[formId].isExistRecycleTask, isExistRecycleTask);
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormAbilityInfo_001 end";
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_UpdateFormRecordSetIsExistRecycleTask_001 end";
 }
 
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormVisible_001, TestSize.Level1)
@@ -4788,39 +4755,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_DeleteInvalidTempForms_002, Test
     auto result = formDataMgr_.DeleteInvalidTempForms(userId, callingUid, matchedFormIds, removedFormsMap);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_DeleteInvalidTempForms_002 end";
-}
-
-/**
-* @tc.number: FmsFormDataMgrTest_GetFormCanUpdate_003
-* @tc.name: GetFormCanUpdate
-* @tc.desc: Verify that the return value is correct.
-* @tc.details: If the value corresponding to the key is not found in the map.
-
-*/
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormCanUpdate_003, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCanUpdate_003 start";
-    int64_t formId = FORM_ID_ZERO;
-    formDataMgr_.DeleteFormVisible(formId);
-    bool value = formDataMgr_.GetFormCanUpdate(formId);
-    EXPECT_EQ(value, true);
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCanUpdate_003 end";
-}
-
-/**
- * @tc.number: FmsFormDataMgrTest_GetFormCanUpdate_004
- * @tc.name: GetFormCanUpdate
- * @tc.desc: Verify that the return value is correct.
- * @tc.details: If the value corresponding to the key is found in the map.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormCanUpdate_004, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCanUpdate_004 start";
-    int64_t formId = FORM_ID_ZERO;
-    formDataMgr_.SetFormVisible(formId, true);
-    bool value = formDataMgr_.GetFormCanUpdate(formId);
-    EXPECT_EQ(value, true);
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCanUpdate_004 end";
 }
 
 /**

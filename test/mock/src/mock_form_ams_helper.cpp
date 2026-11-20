@@ -34,7 +34,7 @@ ErrCode FormAmsHelper::StartAbility(const Want &want, int32_t userId)
 }
 
 ErrCode FormAmsHelper::ConnectServiceAbility(
-    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect)
+    const Want &want, const sptr<FormAbilityConnection> &connect)
 {
     GTEST_LOG_(INFO) << "ConnectServiceAbility called";
     if (AppExecFwk::MockFormAmsHelper::obj) {
@@ -44,7 +44,7 @@ ErrCode FormAmsHelper::ConnectServiceAbility(
 }
 
 ErrCode FormAmsHelper::ConnectServiceAbilityWithUserId(
-    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId)
+    const Want &want, const sptr<FormAbilityConnection> &connect, int32_t userId)
 {
     GTEST_LOG_(INFO) << "ConnectServiceAbilityWithUserId called";
     if (AppExecFwk::MockFormAmsHelper::obj) {

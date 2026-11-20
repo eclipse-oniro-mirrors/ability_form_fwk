@@ -1120,6 +1120,7 @@ private:
         KEY_DUMP_RUNNING,
         KEY_DUMP_BLOCKED_APPS,
         KEY_DUMP_CROSS_DEVICE,
+        KEY_DUMP_PROCESS_POOL,
     };
     /**
      * @brief initialization of form manager service.
@@ -1143,6 +1144,11 @@ private:
     void HiDumpFormInfoByBundleName(const std::string &args, std::string &result);
     void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
     void HiDumpFormRunningFormInfos([[maybe_unused]] const std::string &args, std::string &result);
+
+    /**
+     * @brief Dump the FormExtension process pool state (hidumper -p).
+     */
+    void HiDumpProcessPool([[maybe_unused]] const std::string &args, std::string &result);
     void HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result);
     void HiDumpCrossDevice([[maybe_unused]] const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;

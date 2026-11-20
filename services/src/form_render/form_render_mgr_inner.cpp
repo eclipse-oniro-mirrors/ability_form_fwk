@@ -150,7 +150,7 @@ ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, W
 
     auto renderType = want.GetIntParam(Constants::FORM_UPDATE_TYPE_KEY, Constants::ADD_FORM_UPDATE_FORM);
     if (renderType != Constants::ADAPTER_UPDATE_FORM ||
-        FormDataMgr::GetInstance().GetFormCanUpdate(formRecord.formId) ||
+        FormDataMgr::GetInstance().GetFormVisible(formRecord.formId) ||
         FormDataMgr::GetInstance().IsDataProxyIgnoreFormVisibility(formRecord.formId)) {
         FormDataMgr::GetInstance().ResetDataProxyUpdate(formRecord.formId);
         FormStatusTaskMgr::GetInstance().PostRenderForm(formRecord, std::move(want), remoteObject);
@@ -602,7 +602,6 @@ inline ErrCode FormRenderMgrInner::ConnectRenderService(
         want.SetParam(DLP_INDEX, Constants::DEFAULT_SANDBOX_FRS_APP_INDEX);
         want.SetParam(Constants::FRS_APP_INDEX, Constants::DEFAULT_SANDBOX_FRS_APP_INDEX);
     }
-    connection->SetStateConnecting();
     auto ret = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(want, connection, GetUserId());
     if (ret != ERR_OK) {
         connection->SetStateDisconnected();
@@ -781,6 +780,16 @@ void FormRenderMgrInner::SetRenderRemoteObj(sptr<IFormRender> remoteObject)
 {
     std::unique_lock<std::shared_mutex> guard(renderRemoteObjMutex_);
     renderRemoteObj_ = remoteObject;
+}
+
+bool FormRenderMgrInner::IsConnectionDied(int64_t formId) const
+{
+    std::lock_guard<std::mutex> lock(resourceMutex_);
+    auto iter = renderFormConnections_.find(formId);
+    if (iter == renderFormConnections_.end() || iter->second == nullptr) {
+        return false;
+    }
+    return iter->second->GetConnectState() == ConnectState::DISCONNECTED;
 }
 
 int32_t FormRenderMgrInner::GetReRenderCount() const

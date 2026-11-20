@@ -14,6 +14,10 @@
  */
 
 #include "form_mgr/form_debug_adapter.h"
+#include "data_center/form_cust_config_mgr.h"
+#include "common/util/form_dump_mgr.h"
+#include "util/form_time_util.h"
+#include "form_provider/form_extension_process_pool.h"
 #include "form_mgr/form_adapter_constants.h"
 
 #include "accesstoken_kit.h"
@@ -39,6 +43,57 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+int32_t GetQueueSize(const std::deque<PendingRequest> *queue)
+{
+    return queue == nullptr ? 0 : static_cast<int32_t>(queue->size());
+}
+
+int64_t GetHeadWaitMs(const std::deque<PendingRequest> *queue, int64_t now)
+{
+    if (queue == nullptr || queue->empty()) {
+        return -1;
+    }
+    return now - queue->front().enqueueTimestamp;
+}
+
+ProcessPoolBundleDump BuildBundleDump(const std::string &bundleName,
+    const FormExtensionProcessPool::BundleSet &connectionSet)
+{
+    ProcessPoolBundleDump bundleInfo;
+    bundleInfo.bundleName = bundleName;
+    for (const auto &weakConnection : connectionSet) {
+        sptr<FormAbilityConnection> connection = weakConnection.promote();
+        if (connection == nullptr) {
+            continue;
+        }
+        bundleInfo.connections.push_back(
+            {connection->GetFormId(), static_cast<int32_t>(connection->GetConnectState())});
+    }
+    return bundleInfo;
+}
+
+ProcessPoolUserDump BuildUserDump(int32_t userId,
+    const FormExtensionProcessPool::BundleLedger &bundles, int64_t now,
+    const std::deque<PendingRequest> *pendingQueue)
+{
+    ProcessPoolUserDump userInfo;
+    userInfo.userId = userId;
+    for (const auto &[bundleName, connectionSet] : bundles) {
+        if (connectionSet.empty()) {
+            continue;
+        }
+        ProcessPoolBundleDump bundleInfo = BuildBundleDump(bundleName, connectionSet);
+        if (!bundleInfo.connections.empty()) {
+            userInfo.bundles.push_back(std::move(bundleInfo));
+        }
+    }
+    userInfo.activeProviders = static_cast<int32_t>(userInfo.bundles.size());
+    userInfo.pendingCount = GetQueueSize(pendingQueue);
+    userInfo.headWaitMs = GetHeadWaitMs(pendingQueue, now);
+    return userInfo;
+}
+} // namespace
 using namespace FormAdapterConstants;
 
 FormDebugAdapter::FormDebugAdapter()
@@ -212,6 +267,27 @@ int FormDebugAdapter::DumpFormRunningFormInfos(std::string &runningFormInfosResu
         return ret;
     }
     FormDumpMgr::GetInstance().DumpRunningFormInfos(runningFormInfos, runningFormInfosResult);
+    return ERR_OK;
+}
+
+int FormDebugAdapter::DumpProcessPool(std::string &result) const
+{
+    std::unordered_map<int32_t, FormExtensionProcessPool::BundleLedger> providers;
+    FormExtensionProcessPool::PendingQueueMap pendingQueue;
+    FormExtensionProcessPool::GetInstance().DumpProcessPoolStatus(providers, pendingQueue);
+
+    ProcessPoolDumpInfo info;
+    info.threshold = FormCustConfigMgr::GetInstance().GetFormExtensionProcessPoolMax();
+    int64_t now = Common::FormTimeUtil::GetBootTimeMs();
+    for (const auto &[userId, bundles] : providers) {
+        auto queueIter = pendingQueue.find(userId);
+        const std::deque<PendingRequest> *queue =
+            queueIter == pendingQueue.end() ? nullptr : &queueIter->second;
+        ProcessPoolUserDump userInfo = BuildUserDump(userId, bundles, now, queue);
+        info.totalActiveProviders += userInfo.activeProviders;
+        info.users.push_back(std::move(userInfo));
+    }
+    FormDumpMgr::GetInstance().DumpProcessPool(info, result);
     return ERR_OK;
 }
 

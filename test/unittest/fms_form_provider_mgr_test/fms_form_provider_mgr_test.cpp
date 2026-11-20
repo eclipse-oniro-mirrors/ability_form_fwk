@@ -63,13 +63,13 @@ void MockConnectServiceAbilityWithErrorCode(int errorCode)
 
 namespace OHOS {
 namespace AppExecFwk {
-ErrCode FormAmsHelper::ConnectServiceAbility(const Want &want, const sptr<AAFwk::IAbilityConnection> &connect)
+ErrCode FormAmsHelper::ConnectServiceAbility(const Want &want, const sptr<FormAbilityConnection> &connect)
 {
     return g_mockConnectServiceAbilityErrorCode;
 }
 
 ErrCode FormAmsHelper::ConnectServiceAbilityWithUserId(
-    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId)
+    const Want &want, const sptr<FormAbilityConnection> &connect, int32_t userId)
 {
     return g_mockConnectServiceAbilityErrorCode;
 }

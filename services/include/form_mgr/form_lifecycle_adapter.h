@@ -136,6 +136,8 @@ private:
         const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo);
     ErrCode AllotFormByInfo(const FormItemInfo &info,
         const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo);
+    ErrCode ProcessProviderAcquire(const FormItemInfo &info, FormRecord &newRecord,
+        const int64_t formId, const WantParams &wantParams);
     ErrCode AddExistFormRecord(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
         const FormRecord &record, const int64_t formId, const WantParams &wantParams, FormJsInfo &formInfo);
     ErrCode AddNewFormRecord(const FormItemInfo &info, const int64_t formId,

@@ -175,6 +175,17 @@ public:
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
     bool GetFormRecord(const int64_t formId, FormRecord &formRecord) const;
+
+    /**
+     * @brief Access a form record by reference without copying.
+     * @param formId Form id.
+     * @param callback Receives a const reference to the record. The callback
+     *        runs while holding the form record mutex and MUST NOT re-enter any
+     *        FormDataMgr method to avoid deadlock.
+     * @return true if the record was found and the callback invoked.
+     */
+    bool AccessFormRecord(const int64_t formId,
+        const std::function<void(const FormRecord &)> &callback) const;
     /**
      * @brief Get form record.
      * @param bundleName Bundle name.
@@ -1015,12 +1026,6 @@ public:
      * @param formId form id.
      */
     void DeleteFormVisible(int64_t formId);
-
-    /**
-     * @brief Check if the card can be updated.
-     * @param formId form id.
-     */
-    bool GetFormCanUpdate(int64_t formId);
 
     /**
      * @brief Merge refresh want into the cached record in place.

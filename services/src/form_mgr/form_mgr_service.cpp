@@ -126,7 +126,8 @@ const std::string FORM_DUMP_HELP = "options list:\n"
     "  -i  <form-id>                        query form info by a form ID\n"
     "  -r  --running                        query running form info\n"
     "  -a  --apps-blocked                   query blocked app name list\n"
-    "  -c  --cross-device                   query cross-device publish router state\n";
+    "  -c  --cross-device                   query cross-device publish router state\n"
+    "  -p, --process-pool                   query FormExtension process pool state\n";
 
 const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_ = {
     {"-h", FormMgrService::DumpKey::KEY_DUMP_HELP},
@@ -147,6 +148,8 @@ const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_
     {"--apps-blocked", FormMgrService::DumpKey::KEY_DUMP_BLOCKED_APPS},
     {"-c", FormMgrService::DumpKey::KEY_DUMP_CROSS_DEVICE},
     {"--cross-device", FormMgrService::DumpKey::KEY_DUMP_CROSS_DEVICE},
+    {"-p", FormMgrService::DumpKey::KEY_DUMP_PROCESS_POOL},
+    {"--process-pool", FormMgrService::DumpKey::KEY_DUMP_PROCESS_POOL},
 };
 
 FormMgrService::FormMgrService()
@@ -1670,6 +1673,8 @@ void FormMgrService::Dump(const std::vector<std::u16string> &args, std::string &
             result = "DISTRIBUTED_FORM_SUPPORTED not enabled";
             return;
 #endif
+        case DumpKey::KEY_DUMP_PROCESS_POOL:
+            return HiDumpProcessPool(value, result);
         default:
             result = "error: unknow function.";
             return;
@@ -1799,6 +1804,14 @@ void FormMgrService::HiDumpFormRunningFormInfos([[maybe_unused]]const std::strin
     FormMgrAdapterFacade::GetInstance().DumpFormRunningFormInfos(result);
 }
 
+void FormMgrService::HiDumpProcessPool([[maybe_unused]] const std::string &args, std::string &result)
+{
+    if (!CheckCallerIsSystemApp()) {
+        return;
+    }
+    FormMgrAdapterFacade::GetInstance().DumpProcessPool(result);
+}
+
 void FormMgrService::HiDumpHelp([[maybe_unused]] const std::string &args, std::string &result)
 {
     result = FORM_DUMP_HELP;
@@ -1876,8 +1889,7 @@ void FormMgrService::HiDumpFormInfoByFormId(const std::string &args, std::string
 
 bool FormMgrService::CheckCallerIsSystemApp() const
 {
-    auto callerTokenID = IPCSkeleton::GetCallingFullTokenID();
-    if (!FormUtil::IsSACall() && !Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(callerTokenID)) {
+    if (!FormUtil::IsSACall() && !FormUtil::IsSystemAppCall()) {
         HILOG_ERROR("The caller not system-app,can't use system-api");
         return false;
     }

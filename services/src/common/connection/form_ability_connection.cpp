@@ -14,11 +14,11 @@
  */
 
 #include "common/connection/form_ability_connection.h"
+#include "form_provider/form_extension_process_pool.h"
 
 #include <cinttypes>
 
 #include "fms_log_wrapper.h"
-#include "ams_mgr/form_ams_helper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/database/form_db_cache.h"
@@ -45,6 +45,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
 
     if (resultCode != ERR_OK) {
         OnConnectError(resultCode, element);
+        NotifyPoolTerminated(element);
         HILOG_ERROR("abilityName:%{public}s,resultCode:%{public}d",
             element.GetAbilityName().c_str(), resultCode);
         return;
@@ -60,7 +61,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
         RegisterToSupplyCallback();
     }
 
-    connectState_.store(ConnectState::CONNECTED);
+    SetConnectState(ConnectState::CONNECTED);
     OnPreConnectTask();
 
     Want want = OnBuildTaskWant();
@@ -141,7 +142,8 @@ void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementNam
         HILOG_ERROR("invalid connectId_:%{public}d", connectId);
     }
     ReportFormAppUnbindEvent();
-    connectState_.store(ConnectState::DISCONNECTED);
+    SetConnectState(ConnectState::DISCONNECTED);
+    NotifyPoolTerminated(element);
 }
 
 sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnection::GetAppMgr()
@@ -257,6 +259,32 @@ int64_t FormAbilityConnection::GetFormId() const
 ConnectState FormAbilityConnection::GetConnectState() const
 {
     return connectState_.load();
+}
+
+void FormAbilityConnection::NotifyPoolTerminated(const AppExecFwk::ElementName &element)
+{
+    std::string bundleName = element.GetBundleName();
+    if (bundleName.empty()) {
+        return;
+    }
+    // Temporary sptr wrap; the binder caller already holds a strong reference.
+    sptr<FormAbilityConnection> self(this);
+    FormExtensionProcessPool::GetInstance().OnConnectionTerminated(GetUserId(), bundleName, self);
+}
+
+bool FormAbilityConnection::IsPoolManaged() const
+{
+    return poolManaged_;
+}
+
+void FormAbilityConnection::SetPoolPending(bool isPoolPending)
+{
+    isPoolPending_.store(isPoolPending);
+}
+
+bool FormAbilityConnection::IsPoolPending() const
+{
+    return isPoolPending_.load();
 }
 
 void FormAbilityConnection::SetConnectState(ConnectState state)

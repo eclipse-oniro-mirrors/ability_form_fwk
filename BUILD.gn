@@ -169,6 +169,7 @@ ohos_static_library("libfms_internal_static") {
     "services/config/form_resource_param.cpp",
     "services/config/form_xml_parser.cpp",
     "services/src/ams_mgr/form_ams_helper.cpp",
+    "services/src/form_provider/form_extension_process_pool.cpp",
     "services/src/ams_mgr/form_app_mgr_helper.cpp",
     "services/src/bms_mgr/form_bms_helper.cpp",
     "services/src/bms_mgr/form_bundle_event_callback.cpp",

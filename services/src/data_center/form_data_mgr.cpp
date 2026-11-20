@@ -788,6 +788,18 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
     HILOG_DEBUG("get form record successfully");
     return true;
 }
+
+bool FormDataMgr::AccessFormRecord(const int64_t formId,
+    const std::function<void(const FormRecord &)> &callback) const
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info == formRecords_.end()) {
+        return false;
+    }
+    callback(info->second);
+    return true;
+}
 /**
  * @brief Get form record.
  * @param bundleName Bundle name.
@@ -3477,18 +3489,6 @@ void FormDataMgr::DeleteFormVisible(int64_t formId)
     if (search != formVisibleMap_.end()) {
         formVisibleMap_.erase(formId);
     }
-}
-
-bool FormDataMgr::GetFormCanUpdate(int64_t formId)
-{
-    std::lock_guard<std::shared_mutex> lock(formVisibleMapMutex_);
-    auto search = formVisibleMap_.find(formId);
-    if (search == formVisibleMap_.end()) {
-        HILOG_ERROR("form Id not find");
-        formVisibleMap_.emplace(formId, true);
-        return true;
-    }
-    return search->second;
 }
 
 void FormDataMgr::MergeRefreshWant(const int64_t formId, const Want &want)

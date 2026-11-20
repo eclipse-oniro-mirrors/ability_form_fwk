@@ -19,11 +19,10 @@
 #include <cstdint>
 #include "refbase.h"
 
+#include "common/connection/form_ability_connection.h"
+
 namespace OHOS {
 namespace AppExecFwk {
-
-// Forward declaration to avoid circular dependency
-class FormAbilityConnection;
 
 constexpr int32_t EXPONENTIAL_MULTIPLIER = 2;
 

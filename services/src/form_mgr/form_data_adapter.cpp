@@ -600,7 +600,6 @@ ErrCode FormDataAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         want.SetModuleName(info.GetModuleName());
     }
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
-    formAcquireConnection->SetConnectState(ConnectState::CONNECTING);
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
         want, formAcquireConnection, record.providerUserId);
     FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());

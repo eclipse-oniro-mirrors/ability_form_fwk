@@ -337,13 +337,14 @@ void FormProviderConnectionErrorHandler::ExecuteRetry(
     bool formExist = FormDataMgr::GetInstance().HasFormRecord(formId);
 
     std::lock_guard<std::mutex> lock(retryPolicyMutex_);
-    if (retryPolicyMap_.find(formId) == retryPolicyMap_.end()) {
+    auto policyIter = retryPolicyMap_.find(formId);
+    if (policyIter == retryPolicyMap_.end()) {
         HILOG_INFO("Retry policy already removed,skip retry for formId:%{public}" PRId64, formId);
         return;
     }
     if (!formExist) {
         CancelPendingTasks(formId);
-        retryPolicyMap_.erase(formId);
+        retryPolicyMap_.erase(policyIter);
         HILOG_WARN("%{public}s:FormRecord not found,abort retry for formId:%{public}" PRId64,
             GetScenarioName(), formId);
         return;
@@ -352,7 +353,7 @@ void FormProviderConnectionErrorHandler::ExecuteRetry(
         HILOG_ERROR("%{public}s:null originalConnection,abort retry for formId:%{public}" PRId64,
             GetScenarioName(), formId);
         CancelPendingTasks(formId);
-        retryPolicyMap_.erase(formId);
+        retryPolicyMap_.erase(policyIter);
         return;
     }
 
@@ -361,10 +362,9 @@ void FormProviderConnectionErrorHandler::ExecuteRetry(
         HILOG_ERROR("%{public}s:Create retry connection failed,abort retry for formId:%{public}" PRId64,
             GetScenarioName(), formId);
         CancelPendingTasks(formId);
-        retryPolicyMap_.erase(formId);
+        retryPolicyMap_.erase(policyIter);
         return;
     }
-    retryConnection->SetConnectState(ConnectState::CONNECTING);
 
     Want connectWant = retryConnection->CreateConnectWant();
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
@@ -372,8 +372,15 @@ void FormProviderConnectionErrorHandler::ExecuteRetry(
     if (errorCode != ERR_OK) {
         HILOG_ERROR("%{public}s:Retry connect failed,errorCode:%{public}d", GetScenarioName(), errorCode);
         CancelPendingTasks(formId);
-        retryPolicyMap_.erase(formId);
+        retryPolicyMap_.erase(policyIter);
+        return;
     }
+    // OK may mean pending in the process pool queue; start the callback timeout to
+    // clean up the retry policy if the connection is never actually initiated.
+    RetryPolicy &policy = policyIter->second;
+    policy.SetStage(RequestStage::WAITING_CALLBACK);
+    policy.SetCallbackConnectId(retryConnection->GetConnectId());
+    StartCallbackTimeout(formId, retryConnection->GetConnectId());
 }
 
 }  // namespace AppExecFwk
