@@ -418,9 +418,15 @@ constexpr size_t FUZZ_HANDLER_COUNT = sizeof(FORM_MGR_FUZZ_HANDLERS) / sizeof(FO
 constexpr size_t FUZZ_HANDLER_GROUP_SIZE = 5;
 constexpr size_t FUZZ_HANDLER_GROUP_COUNT =
     (FUZZ_HANDLER_COUNT + FUZZ_HANDLER_GROUP_SIZE - 1) / FUZZ_HANDLER_GROUP_SIZE;
-// case 0/1: OnRemoteRequest with raw/mapped code; case 2: ReadFormDataProxies;
-// case 3..: one group of FUZZ_HANDLER_GROUP_SIZE handlers per branch.
-constexpr uint32_t FUZZ_CASE_COUNT = 3 + FUZZ_HANDLER_GROUP_COUNT;
+// Selector branches: FUZZ_CASE_ONREMOTE_RAW and FUZZ_CASE_ONREMOTE_MAPPED route
+// the parcel through OnRemoteRequest with a raw or mapped code;
+// FUZZ_CASE_READ_DATA_PROXIES exercises ReadFormDataProxies; every branch
+// from FUZZ_CASE_GROUP_BASE on dispatches one handler group.
+constexpr uint32_t FUZZ_CASE_ONREMOTE_RAW = 0;
+constexpr uint32_t FUZZ_CASE_ONREMOTE_MAPPED = 1;
+constexpr uint32_t FUZZ_CASE_READ_DATA_PROXIES = 2;
+constexpr uint32_t FUZZ_CASE_GROUP_BASE = 3;
+constexpr uint32_t FUZZ_CASE_COUNT = FUZZ_CASE_GROUP_BASE + FUZZ_HANDLER_GROUP_COUNT;
 
 // Direct handler invocation: handlers parse business params directly without
 // ReadInterfaceToken (only OnRemoteRequest consumes the token), so seed the
@@ -442,6 +448,9 @@ void InvokeFormHandler(FormHandlerFunc handler, FormMgrStub &formMgrStub, const 
 void InvokeFormHandlerGroup(const FormHandlerFunc *handlers, size_t count, FormMgrStub &formMgrStub,
     const char *payload, size_t payloadSize)
 {
+    if (count == 0) {
+        return;
+    }
     for (size_t i = 0; i < count; ++i) {
         size_t begin = payloadSize * i / count;
         size_t end = payloadSize * (i + 1) / count;
@@ -476,13 +485,13 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     const char* payload = data + U32_AT_SIZE;
     size_t payloadSize = size - U32_AT_SIZE;
     switch (selector % FUZZ_CASE_COUNT) {
-        case 0:
+        case FUZZ_CASE_ONREMOTE_RAW:
             FuzzOnRemoteRequest(*formmgrstub, selector, data, size);
             break;
-        case 1:
+        case FUZZ_CASE_ONREMOTE_MAPPED:
             FuzzOnRemoteRequest(*formmgrstub, MESSAGE_BASE + selector % MESSAGE_RANGE, data, size);
             break;
-        case 2: {
+        case FUZZ_CASE_READ_DATA_PROXIES: {
             MessageParcel datas;
             datas.WriteBuffer(payload, payloadSize);
             std::vector<FormDataProxy> formDataProxies;
@@ -490,7 +499,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
             break;
         }
         default: {
-            uint32_t group = (selector % FUZZ_CASE_COUNT) - 3;
+            uint32_t group = (selector % FUZZ_CASE_COUNT) - FUZZ_CASE_GROUP_BASE;
             size_t begin = static_cast<size_t>(group) * FUZZ_HANDLER_GROUP_SIZE;
             size_t end = begin + FUZZ_HANDLER_GROUP_SIZE;
             if (end > FUZZ_HANDLER_COUNT) {

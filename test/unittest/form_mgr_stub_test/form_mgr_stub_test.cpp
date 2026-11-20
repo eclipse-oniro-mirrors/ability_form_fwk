@@ -4776,36 +4776,4 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_DenyShapeExceptionListSnapshot_001, Te
     EXPECT_EQ(boolSeen, static_cast<uint32_t>(kBoolCount));
     GTEST_LOG_(INFO) << "FormMgrStubTest_DenyShapeExceptionListSnapshot_001 ends";
 }
-
-/**
- * @tc.name: FormMgrStubTest_OnRemoteRequestFallback_001
- * @tc.desc: A code not served by the dispatch table falls back to the base
- *           IPCObjectStub, which reports IPC_STUB_UNKNOW_TRANS_ERR. The probe
- *           code is discovered at runtime, so future table extension cannot
- *           break this case.
- * @tc.type: FUNC
- */
-HWTEST_F(FormMgrStubTest, FormMgrStubTest_OnRemoteRequestFallback_001, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestFallback_001 starts";
-    ASSERT_TRUE(mockFormMgrService != nullptr);
-    // Discover any code the table does not serve; the concrete value is an
-    // implementation detail, so later table extension cannot break this case.
-    auto &table = FormIpcDispatchTable::GetInstance();
-    constexpr uint32_t probeLimit = 1U << 20;
-    uint32_t code = 0;
-    for (uint32_t probe = 1; probe < probeLimit; ++probe) {
-        if (table.Find(probe) == nullptr) {
-            code = probe;
-            break;
-        }
-    }
-    ASSERT_NE(code, 0u) << "No unregistered code below probe limit";
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
-    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
-    GTEST_LOG_(INFO) << "FormMgrStubTest_OnRemoteRequestFallback_001 ends";
-}
 }

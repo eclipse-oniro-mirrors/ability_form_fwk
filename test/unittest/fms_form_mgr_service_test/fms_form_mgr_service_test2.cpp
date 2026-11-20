@@ -770,7 +770,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0127, TestSize.Level1)
     int32_t userId = 100;
     MockEnableForms(ERR_OK);
     EXPECT_EQ(formMgrService.EnableForms(bundleName, userId, true), ERR_OK);
-
 }
 
 /**
@@ -1966,7 +1965,4 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetVisibleFormRect_Svc002, TestS
     MockFormMgrAdapterFacadeGetVisibleFormRect(ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_GetVisibleFormRect_Svc002 end";
 }
-
-
-
 }
