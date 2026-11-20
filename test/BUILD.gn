@@ -96,6 +96,8 @@ group("unittest") {
     "unittest/form_bundle_lock_mgr_test:unittest",
     "unittest/form_errors_test:unittest",
     "unittest/form_exempt_lock_mgr_test:unittest",
+    "unittest/form_ipc_dispatch_table_test:unittest",
+    "unittest/form_stub_access_checker_test:unittest",
     "unittest/form_napi_util_test:unittest",
     "unittest/form_provider_caller_test:unittest",
     "unittest/form_provider_info_test:unittest",

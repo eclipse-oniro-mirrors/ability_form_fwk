@@ -94,6 +94,7 @@ namespace Constants {
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_FORM_EDIT = 3;
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_LIVE_FORM = 4;
     constexpr const char* PARMA_REQUEST_METHOD = "requestMethod";
+    constexpr const char* START_ABILITY_BY_LIVE_FORM = "startAbilityByLiveForm";
     constexpr const char* PARAM_OPEN_FORM_EDIT_VIEW = "openFormEditView";
     constexpr const char* PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW = "openFormEditSecPageView";
     constexpr const char* PARAM_CLOSE_FORM_EDIT_VIEW = "closeFormEditView";
@@ -259,6 +260,8 @@ namespace Constants {
     constexpr int32_t MAX_FORM_DATA_SIZE = 1024;
     // max length for publish form result message
     constexpr int32_t MAX_PUBLISH_FORM_MESSAGE_LENGTH = 1024;
+    // max length of the decimal string of an int64 form id (INT64_MAX has 19 digits)
+    constexpr int32_t MAX_FORM_ID_STRING_LENGTH = 19;
     constexpr int32_t MAX_FORM_NAME_LENGTH = 128;
     constexpr int32_t MAX_BUNDLE_NAME_LENGTH = 128;
     constexpr int32_t MAX_ABILITY_NAME_LENGTH = 128;

@@ -2810,4 +2810,159 @@ HWTEST_F(FmsFormMgrProxyTest, FormMgrProxyTest_UpdateFormsConfig_004, TestSize.L
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, result);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_UpdateFormsConfig_004 end";
 }
+/**
+ * @tc.name: OpenFormManagePageTest_0100
+ * @tc.desc: test OpenFormManagePage with WriteInterfaceToken failed
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, OpenFormManagePageTest_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenFormManagePageTest_0100 start";
+    MockWriteInterfaceToken(false);
+    Want want;
+    int32_t result = proxy_->OpenFormManagePage(want);
+    EXPECT_EQ(ERR_APPEXECFWK_PARCEL_ERROR, result);
+    GTEST_LOG_(INFO) << "OpenFormManagePageTest_0100 end";
+}
+
+/**
+ * @tc.name: OpenFormManagePageTest_0200
+ * @tc.desc: test OpenFormManagePage function with success
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, OpenFormManagePageTest_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenFormManagePageTest_0200 start";
+    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _))
+        .WillRepeatedly(DoAll(Invoke([](uint32_t code, MessageParcel &data, MessageParcel &reply,
+            MessageOption &option) -> int {
+            reply.WriteInt32(ERR_OK);
+            return NO_ERROR;
+        }), Return(NO_ERROR)));
+    Want want;
+    int32_t result = proxy_->OpenFormManagePage(want);
+    EXPECT_EQ(ERR_OK, result);
+    GTEST_LOG_(INFO) << "OpenFormManagePageTest_0200 end";
+}
+
+/**
+ * @tc.name: OpenFormManagePageTest_0300
+ * @tc.desc: test OpenFormManagePage with SendRequest failed
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, OpenFormManagePageTest_0300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenFormManagePageTest_0300 start";
+    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(Return(-1));
+    Want want;
+    int32_t result = proxy_->OpenFormManagePage(want);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
+    GTEST_LOG_(INFO) << "OpenFormManagePageTest_0300 end";
+}
+
+/**
+ * @tc.name: OpenFormEditPageTest_0100
+ * @tc.desc: test OpenFormEditPage with WriteInterfaceToken failed
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, OpenFormEditPageTest_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenFormEditPageTest_0100 start";
+    MockWriteInterfaceToken(false);
+    Want want;
+    int32_t result = proxy_->OpenFormEditPage(want);
+    EXPECT_EQ(ERR_APPEXECFWK_PARCEL_ERROR, result);
+    GTEST_LOG_(INFO) << "OpenFormEditPageTest_0100 end";
+}
+
+/**
+ * @tc.name: OpenFormEditPageTest_0200
+ * @tc.desc: test OpenFormEditPage function with success
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, OpenFormEditPageTest_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenFormEditPageTest_0200 start";
+    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _))
+        .WillRepeatedly(DoAll(Invoke([](uint32_t code, MessageParcel &data, MessageParcel &reply,
+            MessageOption &option) -> int {
+            reply.WriteInt32(ERR_OK);
+            return NO_ERROR;
+        }), Return(NO_ERROR)));
+    Want want;
+    int32_t result = proxy_->OpenFormEditPage(want);
+    EXPECT_EQ(ERR_OK, result);
+    GTEST_LOG_(INFO) << "OpenFormEditPageTest_0200 end";
+}
+
+/**
+ * @tc.name: OpenFormEditPageTest_0300
+ * @tc.desc: test OpenFormEditPage with SendRequest failed
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, OpenFormEditPageTest_0300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenFormEditPageTest_0300 start";
+    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(Return(-1));
+    Want want;
+    int32_t result = proxy_->OpenFormEditPage(want);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
+    GTEST_LOG_(INFO) << "OpenFormEditPageTest_0300 end";
+}
+
+/**
+ * @tc.name: OpenLiveFormPageTest_0100
+ * @tc.desc: test OpenLiveFormPage with WriteInterfaceToken failed
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, OpenLiveFormPageTest_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenLiveFormPageTest_0100 start";
+    MockWriteInterfaceToken(false);
+    Want want;
+    std::string formId = "12345";
+    int32_t result = proxy_->OpenLiveFormPage(want, formId);
+    EXPECT_EQ(ERR_APPEXECFWK_PARCEL_ERROR, result);
+    GTEST_LOG_(INFO) << "OpenLiveFormPageTest_0100 end";
+}
+
+/**
+ * @tc.name: OpenLiveFormPageTest_0200
+ * @tc.desc: test OpenLiveFormPage function with success
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, OpenLiveFormPageTest_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenLiveFormPageTest_0200 start";
+    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _))
+        .WillRepeatedly(DoAll(Invoke([](uint32_t code, MessageParcel &data, MessageParcel &reply,
+            MessageOption &option) -> int {
+            reply.WriteInt32(ERR_OK);
+            return NO_ERROR;
+        }), Return(NO_ERROR)));
+    Want want;
+    std::string formId = "12345";
+    int32_t result = proxy_->OpenLiveFormPage(want, formId);
+    EXPECT_EQ(ERR_OK, result);
+    GTEST_LOG_(INFO) << "OpenLiveFormPageTest_0200 end";
+}
+
+/**
+ * @tc.name: OpenLiveFormPageTest_0300
+ * @tc.desc: test OpenLiveFormPage with SendRequest failed
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, OpenLiveFormPageTest_0300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenLiveFormPageTest_0300 start";
+    EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(Return(-1));
+    Want want;
+    std::string formId = "12345";
+    int32_t result = proxy_->OpenLiveFormPage(want, formId);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
+    GTEST_LOG_(INFO) << "OpenLiveFormPageTest_0300 end";
+}
 }

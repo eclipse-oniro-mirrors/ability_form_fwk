@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,9 +21,12 @@
 
 #define private public
 #define protected public
+#include "form_ipc_handlers.h"
 #include "form_mgr_stub.h"
 #undef private
 #undef protected
+#include "form_ipc_dispatch_table.h"
+#include "form_stub_access_checker.h"
 #include "message_parcel.h"
 #include "securec.h"
 #include "ffrt.h"
@@ -56,7 +59,6 @@ namespace OHOS {
 
 constexpr size_t U32_AT_SIZE = 4;
 constexpr size_t MESSAGE_BASE = 3001;
-constexpr size_t MESSAGE_MAX = 3080;
 constexpr size_t MESSAGE_RANGE = 80;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.appexecfwk.FormMgr";
 
@@ -291,7 +293,7 @@ public:
     {
         return ERR_OK;
     }
-    
+
     ErrCode RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
         const sptr<IRemoteObject> &callerToken) override
     {
@@ -335,88 +337,138 @@ public:
     }
 };
 
-void HandleFormMessage(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &data, MessageParcel &reply)
+using FormHandlerFunc = int32_t (*)(IFormMgr &, MessageParcel &, MessageParcel &);
+
+// Each handler parses a distinct IPC command from the parcel. They are grouped
+// so a single fuzz execution exercises only a handful of handlers: the selector
+// (first 4 bytes) picks one switch-case branch, and the remaining bytes are
+// split into one disjoint slice per handler of that branch.
+const FormHandlerFunc FORM_MGR_FUZZ_HANDLERS[] = {
+    &FormIpcHandlers::HandleRegisterFormRemoveObserverByBundle,
+    &FormIpcHandlers::HandleGetFormsCount,
+    &FormIpcHandlers::HandleGetHostFormsCount,
+    &FormIpcHandlers::HandleGetRunningFormInfos,
+    &FormIpcHandlers::HandleGetRunningFormInfosByBundleName,
+    &FormIpcHandlers::HandleGetFormInstanceById,
+    &FormIpcHandlers::HandleGetAllFormsInfo,
+    &FormIpcHandlers::HandleGetFormsInfoByApp,
+    &FormIpcHandlers::HandleGetFormsInfoByModule,
+    &FormIpcHandlers::HandleIsRequestPublishFormSupported,
+    &FormIpcHandlers::HandleShareForm,
+    &FormIpcHandlers::HandleCheckFMSReady,
+    &FormIpcHandlers::HandleDeleteForm,
+    &FormIpcHandlers::HandleStopRenderingForm,
+    &FormIpcHandlers::HandleReleaseForm,
+    &FormIpcHandlers::HandleSetNextRefreshTime,
+    &FormIpcHandlers::HandleLifecycleUpdate,
+    &FormIpcHandlers::HandleRequestForm,
+    &FormIpcHandlers::HandleNotifyWhetherVisibleForms,
+    &FormIpcHandlers::HandleCastTempForm,
+    &FormIpcHandlers::HandleDumpFormInfoByBundleName,
+    &FormIpcHandlers::HandleDumpFormInfoByFormId,
+    &FormIpcHandlers::HandleDumpFormTimerByFormId,
+    &FormIpcHandlers::HandleDeleteInvalidForms,
+    &FormIpcHandlers::HandleNotifyFormsVisible,
+    &FormIpcHandlers::HandleNotifyFormsPrivacyProtected,
+    &FormIpcHandlers::HandleNotifyFormsEnableUpdate,
+    &FormIpcHandlers::HandleRegisterFormAddObserverByBundle,
+    &FormIpcHandlers::HandleAddForm,
+    &FormIpcHandlers::HandleUpdateForm,
+    &FormIpcHandlers::HandleRequestPublishForm,
+    &FormIpcHandlers::HandleMessageEvent,
+    &FormIpcHandlers::HandleBackgroundEvent,
+    &FormIpcHandlers::HandleRouterEvent,
+    &FormIpcHandlers::HandleInsightIntentEvent,
+    &FormIpcHandlers::HandleAcquireFormState,
+    &FormIpcHandlers::HandleGetFormsInfo,
+    &FormIpcHandlers::HandleStartAbility,
+    &FormIpcHandlers::HandleRecvFormShareInfoFromRemote,
+    &FormIpcHandlers::HandleAcquireFormData,
+    &FormIpcHandlers::HandleGetFormInstancesByFilter,
+    &FormIpcHandlers::HandleGetAllTemplateFormsInfo,
+    &FormIpcHandlers::HandleGetTemplateFormsInfoByApp,
+    &FormIpcHandlers::HandleGetTemplateFormsInfoByModule,
+    &FormIpcHandlers::HandleCreateForm,
+    &FormIpcHandlers::HandleReleaseRenderer,
+    &FormIpcHandlers::HandleSetPublishFormResult,
+    &FormIpcHandlers::HandleAcquireAddFormResult,
+    &FormIpcHandlers::HandleHasFormVisible,
+    &FormIpcHandlers::HandleDumpStorageFormInfos,
+    &FormIpcHandlers::HandleGetFormsInfoByFilter,
+    &FormIpcHandlers::HandleIsSystemAppForm,
+    &FormIpcHandlers::HandleRegisterAddObserver,
+    &FormIpcHandlers::HandleRegisterRemoveObserver,
+    &FormIpcHandlers::HandleRegisterFormRouterProxy,
+    &FormIpcHandlers::HandleUnregisterFormRouterProxy,
+    &FormIpcHandlers::HandleUpdateProxyForm,
+    &FormIpcHandlers::HandleRequestPublishProxyForm,
+    &FormIpcHandlers::HandleUnregisterPublishFormInterceptor,
+    &FormIpcHandlers::HandleRegisterClickCallbackEventObserver,
+    &FormIpcHandlers::HandleUnregisterClickCallbackEventObserver,
+    &FormIpcHandlers::HandleSetFormsRecyclable,
+    &FormIpcHandlers::HandleRecoverForms,
+    &FormIpcHandlers::HandleUpdateFormLocation,
+    &FormIpcHandlers::HandleRequestPublishFormWithSnapshot,
+    &FormIpcHandlers::HandleBatchRefreshForms,
+    &FormIpcHandlers::HandleEnableForms,
+    &FormIpcHandlers::HandleIsFormBundleForbidden,
+};
+
+constexpr size_t FUZZ_HANDLER_COUNT = sizeof(FORM_MGR_FUZZ_HANDLERS) / sizeof(FORM_MGR_FUZZ_HANDLERS[0]);
+constexpr size_t FUZZ_HANDLER_GROUP_SIZE = 5;
+constexpr size_t FUZZ_HANDLER_GROUP_COUNT =
+    (FUZZ_HANDLER_COUNT + FUZZ_HANDLER_GROUP_SIZE - 1) / FUZZ_HANDLER_GROUP_SIZE;
+// Selector branches: FUZZ_CASE_ONREMOTE_RAW and FUZZ_CASE_ONREMOTE_MAPPED route
+// the parcel through OnRemoteRequest with a raw or mapped code;
+// FUZZ_CASE_READ_DATA_PROXIES exercises ReadFormDataProxies; every branch
+// from FUZZ_CASE_GROUP_BASE on dispatches one handler group.
+constexpr uint32_t FUZZ_CASE_ONREMOTE_RAW = 0;
+constexpr uint32_t FUZZ_CASE_ONREMOTE_MAPPED = 1;
+constexpr uint32_t FUZZ_CASE_READ_DATA_PROXIES = 2;
+constexpr uint32_t FUZZ_CASE_GROUP_BASE = 3;
+constexpr uint32_t FUZZ_CASE_COUNT = FUZZ_CASE_GROUP_BASE + FUZZ_HANDLER_GROUP_COUNT;
+
+// Direct handler invocation: handlers parse business params directly without
+// ReadInterfaceToken (only OnRemoteRequest consumes the token), so seed the
+// parcel with fuzz bytes only to keep handler reads aligned with the mutated
+// data. Each handler gets its own fresh parcel and reply.
+void InvokeFormHandler(FormHandlerFunc handler, FormMgrStub &formMgrStub, const char* data, size_t size)
 {
-    if (formMgrStub == nullptr) {
+    if (handler == nullptr) {
         return;
     }
-    formMgrStub->HandleRegisterFormRemoveObserverByBundle(data, reply);
-    formMgrStub->HandleGetFormsCount(data, reply);
-    formMgrStub->HandleGetHostFormsCount(data, reply);
-    formMgrStub->HandleGetRunningFormInfos(data, reply);
-    formMgrStub->HandleGetRunningFormInfosByBundleName(data, reply);
-    formMgrStub->HandleGetFormInstanceById(data, reply);
-    formMgrStub->HandleGetAllFormsInfo(data, reply);
-    formMgrStub->HandleGetFormsInfoByApp(data, reply);
-    formMgrStub->HandleGetFormsInfoByModule(data, reply);
-    formMgrStub->HandleIsRequestPublishFormSupported(data, reply);
-    formMgrStub->HandleShareForm(data, reply);
-    formMgrStub->HandleCheckFMSReady(data, reply);
-    formMgrStub->HandleDeleteForm(data, reply);
-    formMgrStub->HandleStopRenderingForm(data, reply);
-    formMgrStub->HandleReleaseForm(data, reply);
-    formMgrStub->HandleSetNextRefreshTime(data, reply);
-    formMgrStub->HandleLifecycleUpdate(data, reply);
-    formMgrStub->HandleRequestForm(data, reply);
-    formMgrStub->HandleNotifyWhetherVisibleForms(data, reply);
-    formMgrStub->HandleCastTempForm(data, reply);
-    formMgrStub->HandleDumpFormInfoByBundleName(data, reply);
-    formMgrStub->HandleDumpFormInfoByFormId(data, reply);
-    formMgrStub->HandleDumpFormTimerByFormId(data, reply);
-    formMgrStub->HandleDeleteInvalidForms(data, reply);
-    formMgrStub->HandleNotifyFormsVisible(data, reply);
-    formMgrStub->HandleNotifyFormsPrivacyProtected(data, reply);
-    formMgrStub->HandleNotifyFormsEnableUpdate(data, reply);
-    formMgrStub->HandleRegisterFormAddObserverByBundle(data, reply);
-    formMgrStub->HandleAddForm(data, reply);
-    formMgrStub->HandleUpdateForm(data, reply);
-    formMgrStub->HandleRequestPublishForm(data, reply);
-    formMgrStub->HandleMessageEvent(data, reply);
-    formMgrStub->HandleBackgroundEvent(data, reply);
-    formMgrStub->HandleRouterEvent(data, reply);
-    formMgrStub->HandleInsightIntentEvent(data, reply);
-    formMgrStub->HandleAcquireFormState(data, reply);
-    formMgrStub->HandleGetFormsInfo(data, reply);
-    formMgrStub->HandleStartAbility(data, reply);
-    formMgrStub->HandleRecvFormShareInfoFromRemote(data, reply);
-    formMgrStub->HandleAcquireFormData(data, reply);
-    formMgrStub->HandleGetFormInstancesByFilter(data, reply);
-    formMgrStub->HandleGetAllTemplateFormsInfo(data, reply);
-    formMgrStub->HandleGetTemplateFormsInfoByApp(data, reply);
-    formMgrStub->HandleGetTemplateFormsInfoByModule(data, reply);
+    MessageParcel datas;
+    datas.WriteBuffer(data, size);
+    MessageParcel reply;
+    handler(formMgrStub, datas, reply);
 }
 
-void HandleFormRequest(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &data, MessageParcel &reply)
+// Split the branch payload into one disjoint slice per handler so each command
+// parses its own bytes instead of replaying the same mutation.
+void InvokeFormHandlerGroup(const FormHandlerFunc *handlers, size_t count, FormMgrStub &formMgrStub,
+    const char *payload, size_t payloadSize)
 {
-    if (formMgrStub == nullptr) {
+    if (count == 0) {
         return;
     }
-    formMgrStub->HandleCreateForm(data, reply);
-    formMgrStub->HandleReleaseRenderer(data, reply);
-    formMgrStub->HandleSetPublishFormResult(data, reply);
-    formMgrStub->HandleAcquireAddFormResult(data, reply);
-    formMgrStub->HandleHasFormVisible(data, reply);
-    formMgrStub->HandleDumpStorageFormInfos(data, reply);
-    formMgrStub->HandleGetFormsInfoByFilter(data, reply);
-    formMgrStub->HandleIsSystemAppForm(data, reply);
-    formMgrStub->HandleRegisterAddObserver(data, reply);
-    formMgrStub->HandleRegisterRemoveObserver(data, reply);
-    formMgrStub->HandleRegisterFormRouterProxy(data, reply);
-    formMgrStub->HandleUnregisterFormRouterProxy(data, reply);
-    formMgrStub->HandleUpdateProxyForm(data, reply);
-    formMgrStub->HandleRequestPublishProxyForm(data, reply);
-    formMgrStub->HandleUnregisterPublishFormInterceptor(data, reply);
-    formMgrStub->HandleRegisterClickCallbackEventObserver(data, reply);
-    formMgrStub->HandleUnregisterClickCallbackEventObserver(data, reply);
-    std::vector<FormDataProxy> formDataProxies;
-    formMgrStub->ReadFormDataProxies(data, formDataProxies);
-    formMgrStub->HandleSetFormsRecyclable(data, reply);
-    formMgrStub->HandleRecoverForms(data, reply);
-    formMgrStub->HandleUpdateFormLocation(data, reply);
-    formMgrStub->HandleRequestPublishFormWithSnapshot(data, reply);
-    formMgrStub->HandleBatchRefreshForms(data, reply);
-    formMgrStub->HandleEnableForms(data, reply);
-    formMgrStub->HandleIsFormBundleForbidden(data, reply);
+    for (size_t i = 0; i < count; ++i) {
+        size_t begin = payloadSize * i / count;
+        size_t end = payloadSize * (i + 1) / count;
+        InvokeFormHandler(handlers[i], formMgrStub, payload + begin, end - begin);
+    }
+}
+
+// OnRemoteRequest consumes the interface token itself, so the token is written
+// only on this path.
+void FuzzOnRemoteRequest(FormMgrStub &formMgrStub, uint32_t code, const char* data, size_t size)
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    formMgrStub.OnRemoteRequest(code, datas, reply, option);
 }
 
 uint32_t GetU32Data(const char* ptr)
@@ -427,31 +479,57 @@ uint32_t GetU32Data(const char* ptr)
 
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
-    uint32_t code = GetU32Data(data);
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
     std::shared_ptr<FormMgrStub> formmgrstub = std::make_shared<FormMgrStubFuzzTest>();
-    formmgrstub->OnRemoteRequest(code, datas, reply, option);
-    code = MESSAGE_BASE + code % MESSAGE_RANGE;
-    formmgrstub->OnRemoteRequest(code, datas, reply, option);
-    for (uint32_t code = MESSAGE_BASE; code < MESSAGE_MAX; code++) {
-        MessageParcel parcel;
-        parcel.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-        parcel.WriteBuffer(data, size);
-        parcel.RewindRead(0);
-        MessageParcel reply;
-        MessageOption option;
-        std::shared_ptr<FormMgrStub> formMgrStub = std::make_shared<FormMgrStubFuzzTest>();
-        formMgrStub->OnRemoteRequest(code, parcel, reply, option);
+    uint32_t selector = GetU32Data(data);
+    // Bytes after the selector feed the payload of the chosen branch only.
+    const char* payload = data + U32_AT_SIZE;
+    size_t payloadSize = size - U32_AT_SIZE;
+    switch (selector % FUZZ_CASE_COUNT) {
+        case FUZZ_CASE_ONREMOTE_RAW:
+            FuzzOnRemoteRequest(*formmgrstub, selector, data, size);
+            break;
+        case FUZZ_CASE_ONREMOTE_MAPPED:
+            FuzzOnRemoteRequest(*formmgrstub, MESSAGE_BASE + selector % MESSAGE_RANGE, data, size);
+            break;
+        case FUZZ_CASE_READ_DATA_PROXIES: {
+            MessageParcel datas;
+            datas.WriteBuffer(payload, payloadSize);
+            std::vector<FormDataProxy> formDataProxies;
+            ReadFormDataProxies(datas, formDataProxies);
+            break;
+        }
+        default: {
+            uint32_t group = (selector % FUZZ_CASE_COUNT) - FUZZ_CASE_GROUP_BASE;
+            size_t begin = static_cast<size_t>(group) * FUZZ_HANDLER_GROUP_SIZE;
+            size_t end = begin + FUZZ_HANDLER_GROUP_SIZE;
+            if (end > FUZZ_HANDLER_COUNT) {
+                end = FUZZ_HANDLER_COUNT;
+            }
+            InvokeFormHandlerGroup(FORM_MGR_FUZZ_HANDLERS + begin, end - begin,
+                *formmgrstub, payload, payloadSize);
+            break;
+        }
     }
-    HandleFormMessage(formmgrstub, datas, reply);
-    HandleFormRequest(formmgrstub, datas, reply);
     return true;
 }
+}
+
+// The fuzz process has no system-caller identity, so the table's default
+// FailClosedChecker would deny every registered command before deserialization.
+// Install an allow-all checker to let the OnRemoteRequest path reach the
+// dispatch table, the handlers and their business-parameter parsing.
+class AllowAllChecker : public IStubAccessChecker {
+public:
+    OHOS::ErrCode Check(const FormPermissionPolicy &, const FormIpcContext &) override
+    {
+        return OHOS::ERR_OK;
+    }
+};
+
+extern "C" int LLVMFuzzerInitialize(int *, char ***)
+{
+    FormIpcDispatchTable::GetInstance().SetAccessChecker(std::make_shared<AllowAllChecker>());
+    return 0;
 }
 
 /* Fuzzer entry point */

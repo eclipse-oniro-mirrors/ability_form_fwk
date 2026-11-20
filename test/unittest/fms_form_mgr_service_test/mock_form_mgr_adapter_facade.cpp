@@ -92,6 +92,8 @@ namespace {
     int g_getVisibleFormRect = OHOS::ERR_OK;
     int g_registerGetVisibleFormRectProxy = OHOS::ERR_OK;
     int g_unregisterGetVisibleFormRectProxy = OHOS::ERR_OK;
+    int g_startHostPage = OHOS::ERR_OK;
+    bool g_isForegroundApp = true;
 }
 
 void MockEnableUpdateForm(int mockRet)
@@ -300,6 +302,16 @@ void MockFormMgrAdapterFacadeRegisterGetVisibleFormRectProxy(int mockRet)
 void MockFormMgrAdapterFacadeUnregisterGetVisibleFormRectProxy(int mockRet)
 {
     g_unregisterGetVisibleFormRectProxy = mockRet;
+}
+
+void MockFormMgrAdapterFacadeStartHostPage(int mockRet)
+{
+    g_startHostPage = mockRet;
+}
+
+void MockFormMgrAdapterFacadeIsForegroundApp(bool mockRet)
+{
+    g_isForegroundApp = mockRet;
 }
 
 int FormMgrAdapterFacade::EnableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
@@ -688,6 +700,18 @@ ErrCode FormMgrAdapterFacade::UnregisterGetVisibleFormRectProxy()
 {
     GTEST_LOG_(INFO) << "UnregisterGetVisibleFormRectProxy called " << g_unregisterGetVisibleFormRectProxy;
     return g_unregisterGetVisibleFormRectProxy;
+}
+
+ErrCode FormMgrAdapterFacade::StartHostPage(const Want &want, int32_t routerCode, const std::string &requestMethod)
+{
+    GTEST_LOG_(INFO) << "StartHostPage called " << g_startHostPage;
+    return g_startHostPage;
+}
+
+bool FormMgrAdapterFacade::IsForegroundApp()
+{
+    GTEST_LOG_(INFO) << "IsForegroundApp called " << g_isForegroundApp;
+    return g_isForegroundApp;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

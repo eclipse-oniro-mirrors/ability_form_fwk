@@ -1284,6 +1284,37 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Open the form manage page by form manager service.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OpenFormManagePage(const Want &want)
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Open the form edit page by form manager service.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OpenFormEditPage(const Want &want)
+    {
+        return ERR_OK;
+    }
+
+    /**
+     * @brief Open the live form page by form manager service.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @param formId Indicates the unique id of the live form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OpenLiveFormPage(const Want &want, const std::string &formId)
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -1424,6 +1455,9 @@ public:
         FORM_MGR_UNREGISTER_GET_VISIBLE_FORM_RECT_PROXY,
         FORM_MGR_GET_VISIBLE_FORM_RECT,
         FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT,
+        FORM_MGR_OPEN_FORM_MANAGE_PAGE,
+        FORM_MGR_OPEN_FORM_EDIT_PAGE,
+        FORM_MGR_OPEN_LIVE_FORM_PAGE,
     };
 };
 }  // namespace AppExecFwk

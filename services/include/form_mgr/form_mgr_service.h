@@ -507,6 +507,31 @@ public:
     int32_t StartAbilityByCrossBundle(const Want &want) override;
 
     /**
+     * @brief Open the form manage page by form manager service. Thin split router
+     *        entry; the page logic and authorization live in FormCallbackAdapter.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OpenFormManagePage(const Want &want) override;
+
+    /**
+     * @brief Open the form edit page by form manager service. Thin split router
+     *        entry; the page logic and authorization live in FormCallbackAdapter.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OpenFormEditPage(const Want &want) override;
+
+    /**
+     * @brief Open the live form page by form manager service. Thin split router
+     *        entry; the formId validation and page logic live in FormCallbackAdapter.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @param formId Indicates the unique id of the live form owned by the caller.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OpenLiveFormPage(const Want &want, const std::string &formId) override;
+
+    /**
      * @brief Share form by formID and deviceID.
      * @param formId Indicates the unique id of form.
      * @param deviceId Indicates the remote device ID.
@@ -1109,19 +1134,6 @@ private:
      */
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 
-    enum class DumpKey {
-        KEY_DUMP_HELP = 0,
-        KEY_DUMP_STORAGE,
-        KEY_DUMP_BY_BUNDLE_NAME,
-        KEY_DUMP_BY_FORM_ID,
-        KEY_DUMP_TEMPORARY,
-        KEY_DUMP_STATIC,
-        KEY_DUMP_VISIBLE,
-        KEY_DUMP_RUNNING,
-        KEY_DUMP_BLOCKED_APPS,
-        KEY_DUMP_CROSS_DEVICE,
-        KEY_DUMP_PROCESS_POOL,
-    };
     /**
      * @brief initialization of form manager service.
      */
@@ -1134,23 +1146,6 @@ private:
 
     void InitFormShareMgrSerialQueue();
 
-    void Dump(const std::vector<std::u16string> &args, std::string &result);
-    bool ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value, std::string &result);
-    void HiDumpHelp([[maybe_unused]] const std::string &args, std::string &result);
-    void HiDumpStorageFormInfos([[maybe_unused]] const std::string &args, std::string &result);
-    void HiDumpTemporaryFormInfos([[maybe_unused]] const std::string &args, std::string &result);
-    void HiDumpStaticBundleFormInfos([[maybe_unused]] const std::string &args, std::string &result);
-    void HiDumpHasFormVisible(const std::string &args, std::string &result);
-    void HiDumpFormInfoByBundleName(const std::string &args, std::string &result);
-    void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
-    void HiDumpFormRunningFormInfos([[maybe_unused]] const std::string &args, std::string &result);
-
-    /**
-     * @brief Dump the FormExtension process pool state (hidumper -p).
-     */
-    void HiDumpProcessPool([[maybe_unused]] const std::string &args, std::string &result);
-    void HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result);
-    void HiDumpCrossDevice([[maybe_unused]] const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;
     static std::string GetCurrentDateTime();
     bool PublishFormCrossBundleControl(const Want &want);
@@ -1161,7 +1156,6 @@ private:
     std::shared_ptr<FormOsAccountSubscriber> osAccountSubscriber_;
     std::mutex snapshotSetMutex_;
     static const int32_t ENABLE_FORM_UPDATE = 5;
-    const static std::map<std::string, DumpKey> dumpKeyMap_;
     std::string onStartBeginTime_;
     std::string onStartPublishTime_;
     std::string onStartEndTime_;

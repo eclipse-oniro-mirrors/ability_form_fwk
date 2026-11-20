@@ -1,0 +1,66 @@
+# Copyright (c) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
+
+config("form_ipc_dispatch_table_test_config") {
+  include_dirs = [
+    "${form_fwk_path}/interfaces/inner_api/include",
+  ]
+}
+
+ohos_unittest("FormIpcDispatchTableTest") {
+  module_out_path = "form_fwk/form_fwk/form_ipc_dispatch_table"
+
+  configs = [ ":form_ipc_dispatch_table_test_config" ]
+
+  sources = [
+    "form_ipc_dispatch_table_test.cpp",
+    # Compile the real table and its handlers into the test executable: the
+    # production DSO exports only GetInstance/SetAccessChecker via
+    # libform_manager.map; the table lookup and handler symbols stay local,
+    # so the test cannot resolve them from libform_manager.z.so.
+    "${form_fwk_path}/interfaces/inner_api/src/form_ipc_dispatch_table.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_ipc_handlers.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_ashmem.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_info_filter.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_instances_filter.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_instance.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_js_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_lock_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_major_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_provider_data.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_provider_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_share_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/running_form_info.cpp",
+    "${form_fwk_path}/common/src/json_util_form.cpp",
+  ]
+
+  deps = [
+    "${form_fwk_path}:form_manager",
+  ]
+
+  external_deps = [
+    "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "googletest:gmock_main",
+  ]
+}
+
+group("unittest") {
+  testonly = true
+  deps = [ ":FormIpcDispatchTableTest" ]
+}

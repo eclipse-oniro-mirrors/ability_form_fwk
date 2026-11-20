@@ -27,7 +27,9 @@
 #include "common_event_support.h"
 #include "fms_log_wrapper.h"
 #include "form_event_report.h"
+#include "form_ipc_dispatch_table.h"
 #include "form_mgr_errors.h"
+#include "form_stub_access_checker.h"
 #include "ams_mgr/form_ams_helper.h"
 #include "bms_mgr/form_bms_helper.h"
 #include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
@@ -41,11 +43,11 @@
 #include "form_mgr/form_ams_adapter.h"
 #include "form_mgr/form_edit_service.h"
 #include "form_mgr/form_mgr_adapter_facade.h"
+#include "form_mgr/form_mgr_dump_handler.h"
 #include "form_instance.h"
 #include "common/util/form_serial_queue.h"
 #include "feature/form_share/form_share_mgr.h"
 #include "common/timer_mgr/form_timer_mgr.h"
-#include "common/util/form_trust_mgr.h"
 #include "common/util/form_util.h"
 #include "form_xml_parser.h"
 #include "form_resource_param.h"
@@ -112,45 +114,7 @@ using namespace std::chrono;
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<FormMgrService>::GetInstance().get());
 
-constexpr int32_t FORM_DUMP_ARGC_MAX = 2;
-
 constexpr int32_t FORM_CON_NET_MAX = 100;
-
-const std::string FORM_DUMP_HELP = "options list:\n"
-    "  -h, --help                           list available commands\n"
-    "  -b, --bundle-form-info               query all form infos from bundle, Un-added form info will also be dumped\n"
-    "  -v, --visible                        query form visible infos from args like bundleName_userId_instIndex\n"
-    "  -s, --storage                        query form storage info\n"
-    "  -t, --temp                           query temporary form info\n"
-    "  -n  <bundle-name>                    query form info by a bundle name\n"
-    "  -i  <form-id>                        query form info by a form ID\n"
-    "  -r  --running                        query running form info\n"
-    "  -a  --apps-blocked                   query blocked app name list\n"
-    "  -c  --cross-device                   query cross-device publish router state\n"
-    "  -p, --process-pool                   query FormExtension process pool state\n";
-
-const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_ = {
-    {"-h", FormMgrService::DumpKey::KEY_DUMP_HELP},
-    {"--help", FormMgrService::DumpKey::KEY_DUMP_HELP},
-    {"-b", FormMgrService::DumpKey::KEY_DUMP_STATIC},   // *****
-    {"--bundle-form-info", FormMgrService::DumpKey::KEY_DUMP_STATIC},
-    {"-v", FormMgrService::DumpKey::KEY_DUMP_VISIBLE},
-    {"--visible", FormMgrService::DumpKey::KEY_DUMP_VISIBLE},
-    {"-s", FormMgrService::DumpKey::KEY_DUMP_STORAGE},
-    {"--storage", FormMgrService::DumpKey::KEY_DUMP_STORAGE},
-    {"-t", FormMgrService::DumpKey::KEY_DUMP_TEMPORARY},
-    {"--temp", FormMgrService::DumpKey::KEY_DUMP_TEMPORARY},
-    {"-n", FormMgrService::DumpKey::KEY_DUMP_BY_BUNDLE_NAME},
-    {"-i", FormMgrService::DumpKey::KEY_DUMP_BY_FORM_ID},
-    {"-r", FormMgrService::DumpKey::KEY_DUMP_RUNNING},
-    {"--running", FormMgrService::DumpKey::KEY_DUMP_RUNNING},
-    {"-a", FormMgrService::DumpKey::KEY_DUMP_BLOCKED_APPS},
-    {"--apps-blocked", FormMgrService::DumpKey::KEY_DUMP_BLOCKED_APPS},
-    {"-c", FormMgrService::DumpKey::KEY_DUMP_CROSS_DEVICE},
-    {"--cross-device", FormMgrService::DumpKey::KEY_DUMP_CROSS_DEVICE},
-    {"-p", FormMgrService::DumpKey::KEY_DUMP_PROCESS_POOL},
-    {"--process-pool", FormMgrService::DumpKey::KEY_DUMP_PROCESS_POOL},
-};
 
 FormMgrService::FormMgrService()
     : SystemAbility(FORM_MGR_SERVICE_ID, true),
@@ -178,10 +142,6 @@ FormMgrService::~FormMgrService()
 */
 int32_t FormMgrService::CheckFMSReady()
 {
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-
     if (state_ != ServiceRunningState::STATE_RUNNING) {
         HILOG_ERROR("fms is not running");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -210,7 +170,11 @@ int32_t FormMgrService::CheckFMSReady()
 
 bool FormMgrService::IsSystemAppForm(const std::string &bundleName)
 {
-    HILOG_DEBUG("check %{public}s is system form", bundleName.c_str());
+    HILOG_DEBUG("check %{public}s is system form.", bundleName.c_str());
+    if (!FormUtil::CheckIsFRSCall()) {
+        HILOG_ERROR("caller is not FRS, deny system-form query");
+        return false;
+    }
 
     std::vector<FormRecord> formRecords;
     FormDataMgr::GetInstance().GetFormRecord(bundleName, formRecords);
@@ -236,15 +200,10 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
 
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("add form permission denied");
-        return ret;
-    }
     ReportAddFormEvent(formId, want);
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_AddForm",
         API_TIME_OUT_30S, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    ret = FormMgrAdapterFacade::GetInstance().AddForm(formId, want, callerToken, formInfo);
+    int ret = FormMgrAdapterFacade::GetInstance().AddForm(formId, want, callerToken, formInfo);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     const auto callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
@@ -269,11 +228,6 @@ int FormMgrService::CreateForm(const Want &want, RunningFormInfo &runningFormInf
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
 
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("create form permission denied");
-        return ret;
-    }
     ReportAddFormEvent(0, want);
     return FormMgrAdapterFacade::GetInstance().CreateForm(want, runningFormInfo);
 }
@@ -310,17 +264,6 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
 
     FormRecord record;
     FormDataMgr::GetInstance().GetFormRecord(formId, record);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]delete form permission denied", __FUNCTION__);
-        FormEventReport::SendFormFailedEvent(FormEventName::DELETE_FORM_FAILED,
-            formId,
-            record.bundleName,
-            record.formName,
-            static_cast<int32_t>(DeleteFormErrorType::DELETE_NORMAL_FORM_FAILED),
-            ret);
-        return ret;
-    }
     FormEventInfo eventInfo;
     eventInfo.formId = formId;
     std::vector<FormHostRecord> formHostRecords;
@@ -335,7 +278,7 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
     FormEventReport::SendSecondFormEvent(FormEventName::DELETE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_DeleteForm",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    ret = FormMgrAdapterFacade::GetInstance().DeleteForm(formId, callerToken);
+    ErrCode ret = FormMgrAdapterFacade::GetInstance().DeleteForm(formId, callerToken);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     HILOG_WARN("delete form result:%{public}d,formId:%{public}" PRId64, ret, formId);
     return ret;
@@ -349,15 +292,9 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
  */
 int FormMgrService::StopRenderingForm(const int64_t formId, const std::string &compId)
 {
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]delete form permission denied", __FUNCTION__);
-        return ret;
-    }
-
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
-    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
+    ErrCode ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("[%{public}s]invalid formId or not under currentActiveUser", __FUNCTION__);
         return ret;
@@ -379,11 +316,6 @@ int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
 
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("release form permission denied");
-        return ret;
-    }
     FormEventInfo eventInfo;
     eventInfo.formId = formId;
     FormEventReport::SendSecondFormEvent(FormEventName::RELEASE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
@@ -419,36 +351,22 @@ int FormMgrService::UpdateForm(const int64_t formId, const FormProviderInfo &for
  */
 int FormMgrService::UpdateFormCrossBundle(const int64_t formId, const FormProviderData &formBindingData)
 {
-    HILOG_INFO("[%{public}s]call,formId:%{public}" PRId64, __FUNCTION__, formId);
-    if (!CheckCallerIsSystemApp()) {
-        HILOG_ERROR("updateFormCrossBundle caller is not system app");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_UPDATE_FORM_CROSS_BUNDLE)) {
-        HILOG_ERROR("updateFormCrossBundle permission denied");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_UPDATE_FORM_CROSS_BUNDLE;
-    }
-    if (!CheckAcrossLocalAccountsPermission()) {
-        HILOG_ERROR("updateFormCrossBundle across local accounts permission failed");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
+    HILOG_INFO("call, formId:%{public}" PRId64, formId);
     auto callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapterFacade::GetInstance().UpdateFormCrossBundle(formId, callingUid, formBindingData);
 }
 
+/**
+ * @brief Update forms with reminder agent, restricted to system callers with REQUIRE_FORM permission.
+ * @param bundleName The bundle name of the target form provider.
+ * @param userId The id of the target user.
+ * @param want The want of the reminder agent.
+ * @return Returns ERR_OK on success, others on failure.
+ */
 int32_t FormMgrService::UpdateFormsWithReminderAgent(
     const std::string &bundleName, const int32_t userId, const Want &want)
 {
-    HILOG_INFO("call,bundleName:%{public}s,userId:%{public}d", bundleName.c_str(), userId);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("updateFormsWithReminderAgent permission denied");
-        return ret;
-    }
-    if (bundleName.empty() || userId < 0) {
-        HILOG_ERROR("invalid bundleName or userId");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
+    HILOG_INFO("call, bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
     return FormMgrAdapterFacade::GetInstance().UpdateFormsWithReminderAgent(bundleName, userId, want);
 }
 
@@ -465,11 +383,6 @@ int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
         __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]request form permission denied", __FUNCTION__);
-        return ret;
-    }
     FormEventInfo eventInfo;
     eventInfo.formId = formId;
     eventInfo.bundleName = want.GetElement().GetBundleName();
@@ -499,12 +412,6 @@ int FormMgrService::SetNextRefreshTime(const int64_t formId, const int64_t nextT
 
 int FormMgrService::ReleaseRenderer(int64_t formId, const std::string &compId)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]request form permission denied", __FUNCTION__);
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().ReleaseRenderer(formId, compId);
 }
 
@@ -549,37 +456,16 @@ ErrCode FormMgrService::RequestPublishFormCrossUser(Want &want, int32_t userId, 
     if (userId == Constants::INVALID_USER_ID) {
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_AGENT_REQUIRE_FORM, true);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]request form permission denied", __FUNCTION__);
-        return ret;
-    }
-    if (!CheckAcrossLocalAccountsPermission()) {
-        HILOG_ERROR("[%{public}s]Across local accounts permission failed", __FUNCTION__);
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
     return FormMgrAdapterFacade::GetInstance().RequestPublishFormCrossUser(want, userId, formId);
 }
 
 ErrCode FormMgrService::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]request form permission denied", __FUNCTION__);
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().SetPublishFormResult(formId, errorCodeInfo);
 }
 
 ErrCode FormMgrService::AcquireAddFormResult(const int64_t formId)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_AGENT_REQUIRE_FORM);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]request form permission denied", __FUNCTION__);
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().AcquireAddFormResult(formId);
 }
 
@@ -595,14 +481,9 @@ int FormMgrService::NotifyWhetherVisibleForms(const std::vector<int64_t> &formId
 {
     HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("event notify visible permission denied");
-        return ret;
-    }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_NotifyWhetherVisibleForms",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    ret = FormMgrAdapterFacade::GetInstance().NotifyWhetherVisibleForms(formIds, callerToken, formVisibleType);
+    ErrCode ret = FormMgrAdapterFacade::GetInstance().NotifyWhetherVisibleForms(formIds, callerToken, formVisibleType);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return ret;
 }
@@ -616,10 +497,6 @@ bool FormMgrService::HasFormVisible(const uint32_t tokenId)
 {
     HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
-    if (!FormUtil::IsSACall()) {
-        HILOG_ERROR("query form visible with tokenid not a SACall");
-        return false;
-    }
     return FormMgrAdapterFacade::GetInstance().HasFormVisible(tokenId);
 }
 
@@ -633,14 +510,9 @@ int FormMgrService::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
 {
     HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("cast temp form permission denied");
-        return ret;
-    }
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
-    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
+    ErrCode ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("[%{public}s]invalid formId or not under currentActiveUser", __FUNCTION__);
         return ret;
@@ -664,12 +536,6 @@ int FormMgrService::LifecycleUpdate(const std::vector<int64_t> &formIds,
 {
     HILOG_INFO("updateType:%{public}d", updateType);
 
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]delete form permission denied", __FUNCTION__);
-        return ret;
-    }
-
     if (updateType) {
         return FormMgrAdapterFacade::GetInstance().EnableUpdateForm(formIds, callerToken);
     } else {
@@ -683,10 +549,7 @@ int FormMgrService::LifecycleUpdate(const std::vector<int64_t> &formIds,
  */
 int FormMgrService::DumpStorageFormInfos(std::string &formInfos)
 {
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    return FormMgrAdapterFacade::GetInstance().DumpStorageFormInfos(formInfos);
+    return FormMgrDumpHandler::DumpStorageFormInfos(formInfos);
 }
 /**
  * @brief Dump form info by a bundle name.
@@ -696,10 +559,7 @@ int FormMgrService::DumpStorageFormInfos(std::string &formInfos)
  */
 int FormMgrService::DumpFormInfoByBundleName(const std::string &bundleName, std::string &formInfos)
 {
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    return FormMgrAdapterFacade::GetInstance().DumpFormInfoByBundleName(bundleName, formInfos);
+    return FormMgrDumpHandler::DumpFormInfoByBundleName(bundleName, formInfos);
 }
 /**
  * @brief Dump form info by a bundle name.
@@ -709,10 +569,7 @@ int FormMgrService::DumpFormInfoByBundleName(const std::string &bundleName, std:
  */
 int FormMgrService::DumpFormInfoByFormId(const std::int64_t formId, std::string &formInfo)
 {
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    return FormMgrAdapterFacade::GetInstance().DumpFormInfoByFormId(formId, formInfo);
+    return FormMgrDumpHandler::DumpFormInfoByFormId(formId, formInfo);
 }
 /**
  * @brief Dump form timer by form id.
@@ -722,10 +579,7 @@ int FormMgrService::DumpFormInfoByFormId(const std::int64_t formId, std::string 
  */
 int FormMgrService::DumpFormTimerByFormId(const std::int64_t formId, std::string &isTimingService)
 {
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    return FormMgrAdapterFacade::GetInstance().DumpFormTimerByFormId(formId, isTimingService);
+    return FormMgrDumpHandler::DumpFormTimerByFormId(formId, isTimingService);
 }
 
 /**
@@ -741,14 +595,9 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
         __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]request form permission denied", __FUNCTION__);
-        return ret;
-    }
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
-    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
+    ErrCode ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("[%{public}s]invalid formId or not under currentActiveUser", __FUNCTION__);
         return ret;
@@ -785,14 +634,9 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]request form permission denied", __FUNCTION__);
-        return ret;
-    }
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
-    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
+    ErrCode ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("[%{public}s]invalid formId or not under currentActiveUser", __FUNCTION__);
         return ret;
@@ -825,15 +669,10 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
  */
 int FormMgrService::InsightIntentEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]request form permission denied", __FUNCTION__);
-        return ret;
-    }
+    HILOG_INFO("call");
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
-    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
+    ErrCode ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("[%{public}s]invalid formId or not under currentActiveUser", __FUNCTION__);
         return ret;
@@ -854,14 +693,9 @@ int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr
         __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]request form permission denied", __FUNCTION__);
-        return ret;
-    }
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
-    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
+    ErrCode ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("the formId is not under currentActiveUser or invalid");
         return ret;
@@ -1052,6 +886,8 @@ ErrCode FormMgrService::Init()
             return ERR_INVALID_OPERATION;
         }
     }
+    // Assemble the real access checker before Publish, since remote IPC may arrive right after publish.
+    FormIpcDispatchTable::GetInstance().SetAccessChecker(std::make_shared<FormStubAccessChecker>());
     /* Publish service maybe failed, so we need call this function at the last,
      * so it can't affect the TDD test program */
     if (!Publish(DelayedSingleton<FormMgrService>::GetInstance().get())) {
@@ -1127,17 +963,12 @@ ErrCode FormMgrService::CheckFormPermission(std::string_view permission, bool ch
 int FormMgrService::DeleteInvalidForms(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, int32_t &numFormsDeleted)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]delete form permission denied", __FUNCTION__);
-        return ret;
-    }
+    HILOG_DEBUG("call");
     FormEventInfo eventInfo;
     FormEventReport::SendFormEvent(FormEventName::DELETE_INVALID_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_DeleteInvalidForms",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    ret = FormMgrAdapterFacade::GetInstance().DeleteInvalidForms(formIds, callerToken, numFormsDeleted);
+    int ret = FormMgrAdapterFacade::GetInstance().DeleteInvalidForms(formIds, callerToken, numFormsDeleted);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return ret;
 }
@@ -1152,12 +983,7 @@ int FormMgrService::DeleteInvalidForms(const std::vector<int64_t> &formIds,
 int FormMgrService::AcquireFormState(const Want &want,
     const sptr<IRemoteObject> &callerToken, FormStateInfo &stateInfo)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("acquire form state permission denied");
-        return ret;
-    }
+    HILOG_DEBUG("call");
     FormEventInfo eventInfo;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
@@ -1175,12 +1001,6 @@ int FormMgrService::AcquireFormState(const Want &want,
 int FormMgrService::RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("register form router proxy permission denied");
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().RegisterFormRouterProxy(formIds, callerToken);
 }
 
@@ -1191,12 +1011,6 @@ int FormMgrService::RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
 */
 int FormMgrService::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("unregister form router proxy permission denied");
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().UnregisterFormRouterProxy(formIds);
 }
 
@@ -1214,23 +1028,13 @@ int FormMgrService::NotifyFormsVisible(const std::vector<int64_t> &formIds,
         __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("notify form visible permission denied");
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().NotifyFormsVisible(formIds, isVisible, callerToken);
 }
 
 int FormMgrService::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bool isProtected,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("notify form is privacy protected permission denied");
-        return ret;
-    }
+    HILOG_DEBUG("call");
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
@@ -1244,12 +1048,6 @@ int FormMgrService::NotifyFormsPrivacyProtected(const std::vector<int64_t> &form
 int FormMgrService::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds,
     bool isEnableUpdate, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("notify form enable update permission denied");
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().NotifyFormsEnableUpdate(formIds, isEnableUpdate, callerToken);
 }
 
@@ -1260,14 +1058,7 @@ int FormMgrService::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds,
  */
 int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!CheckAcrossLocalAccountsPermission()) {
-        HILOG_ERROR("[%{public}s]Across local accounts permission failed", __FUNCTION__);
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
+    HILOG_DEBUG("call");
     return FormMgrAdapterFacade::GetInstance().GetAllFormsInfo(formInfos);
 }
 
@@ -1278,17 +1069,7 @@ int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
  */
 int FormMgrService::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!CheckAcrossLocalAccountsPermission()) {
-        HILOG_ERROR("[%{public}s]Across local accounts permission failed", __FUNCTION__);
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
+    HILOG_DEBUG("call");
     return FormMgrAdapterFacade::GetInstance().GetAllTemplateFormsInfo(formInfos);
 }
 
@@ -1300,14 +1081,7 @@ int FormMgrService::GetAllTemplateFormsInfo(std::vector<FormInfo> &formInfos)
  */
 int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!CheckAcrossLocalAccountsPermission()) {
-        HILOG_ERROR("[%{public}s]Across local accounts permission failed", __FUNCTION__);
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
+    HILOG_DEBUG("call");
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_GetFormsInfoByApp",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     ErrCode ret = FormMgrAdapterFacade::GetInstance().GetFormsInfoByApp(bundleName, formInfos);
@@ -1323,17 +1097,7 @@ int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormI
  */
 int FormMgrService::GetTemplateFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!CheckAcrossLocalAccountsPermission()) {
-        HILOG_ERROR("[%{public}s]Across local accounts permission failed", __FUNCTION__);
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
+    HILOG_DEBUG("call");
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_GetTemplateFormsInfoByApp",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     ErrCode ret = FormMgrAdapterFacade::GetInstance().GetTemplateFormsInfoByApp(bundleName, formInfos);
@@ -1351,14 +1115,7 @@ int FormMgrService::GetTemplateFormsInfoByApp(const std::string &bundleName, std
 int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
                                          std::vector<FormInfo> &formInfos)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!CheckAcrossLocalAccountsPermission()) {
-        HILOG_ERROR("[%{public}s]Across local accounts permission failed", __FUNCTION__);
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
+    HILOG_DEBUG("call");
     return FormMgrAdapterFacade::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
 }
 
@@ -1372,31 +1129,13 @@ int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &m
 int FormMgrService::GetTemplateFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
                                                  std::vector<FormInfo> &formInfos)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!CheckAcrossLocalAccountsPermission()) {
-        HILOG_ERROR("[%{public}s]Across local accounts permission failed", __FUNCTION__);
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
+    HILOG_DEBUG("call");
     return FormMgrAdapterFacade::GetInstance().GetTemplateFormsInfoByModule(bundleName, moduleName, formInfos);
 }
 
 int FormMgrService::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        HILOG_ERROR("[%{public}s]Need system authority", __FUNCTION__);
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!CheckAcrossLocalAccountsPermission()) {
-        HILOG_ERROR("[%{public}s]Across local accounts permission failed", __FUNCTION__);
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
+    HILOG_DEBUG("call");
     return FormMgrAdapterFacade::GetInstance().GetFormsInfoByFilter(filter, formInfos);
 }
 
@@ -1465,20 +1204,11 @@ int32_t FormMgrService::AcquireFormData(int64_t formId, int64_t requestCode, con
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]request form permission denied", __FUNCTION__);
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().AcquireFormData(formId, requestCode, callerToken, formData);
 }
 
 bool FormMgrService::IsRequestPublishFormSupported()
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return false;
-    }
     return FormMgrAdapterFacade::GetInstance().IsRequestPublishFormSupported();
 }
 
@@ -1488,11 +1218,6 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
         __FUNCTION__,
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), GetOnKvDataServiceAddTime().c_str());
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_START_ABILITIES_FROM_BACKGROUND);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("start ability check permission denied");
-        return ret;
-    }
     // check abilityName and uri to void implicit want.
     if (want.GetElement().GetAbilityName().empty() && want.GetUriString().empty()) {
         HILOG_ERROR("empty AbilityName and uri");
@@ -1529,15 +1254,7 @@ ErrCode FormMgrService::StartUIAbilityByFms(const Want &want)
 
 int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
-
+    HILOG_INFO("call");
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         HILOG_ERROR("capability not support");
         return ERR_APPEXECFWK_SYSTEMCAP_ERROR;
@@ -1546,7 +1263,33 @@ int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
         HILOG_ERROR("PublishFormCrossBundleControl failed");
         return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
     }
-    return FormMgrAdapterFacade::GetInstance().StartAbilityByFms(want);
+    if (!FormMgrAdapterFacade::GetInstance().IsForegroundApp()) {
+        HILOG_ERROR("This application is not a foreground program");
+        return ERR_APPEXECFWK_FORM_NOT_TRUST;
+    }
+    return FormMgrAdapterFacade::GetInstance().StartHostPage(want,
+        Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE, Constants::OPEN_FORM_MANAGE_VIEW);
+}
+
+int32_t FormMgrService::OpenFormManagePage(const Want &want)
+{
+    HILOG_INFO("call");
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    return FormMgrAdapterFacade::GetInstance().OpenFormManagePage(want);
+}
+
+int32_t FormMgrService::OpenFormEditPage(const Want &want)
+{
+    HILOG_INFO("call");
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    return FormMgrAdapterFacade::GetInstance().OpenFormEditPage(want);
+}
+
+int32_t FormMgrService::OpenLiveFormPage(const Want &want, const std::string &formId)
+{
+    HILOG_INFO("call");
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    return FormMgrAdapterFacade::GetInstance().OpenLiveFormPage(want, formId);
 }
 
 void FormMgrService::InitFormShareMgrSerialQueue()
@@ -1589,15 +1332,9 @@ int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, c
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    auto ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("share form permission denied");
-        return ret;
-    }
-
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
-    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
+    ErrCode ret = FormDataMgr::GetInstance().CheckInvalidForm(formId, userId);
     if (ret != ERR_OK) {
         HILOG_ERROR("[%{public}s]invalid formId or not under currentActiveUser", __FUNCTION__);
         return ret;
@@ -1610,10 +1347,7 @@ int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, c
 
 int32_t FormMgrService::RecvFormShareInfoFromRemote(const FormShareInfo &info)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!FormUtil::IsSACall()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
+    HILOG_DEBUG("call");
 
     InitFormShareMgrSerialQueue();
 
@@ -1624,61 +1358,7 @@ int32_t FormMgrService::RecvFormShareInfoFromRemote(const FormShareInfo &info)
 
 int FormMgrService::Dump(int fd, const std::vector<std::u16string> &args)
 {
-    std::string result;
-    Dump(args, result);
-    int ret = dprintf(fd, "%s\n", result.c_str());
-    if (ret < 0) {
-        HILOG_ERROR("format dprintf error");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    return ERR_OK;
-}
-
-void FormMgrService::Dump(const std::vector<std::u16string> &args, std::string &result)
-{
-    if (!CheckCallerIsSystemApp()) {
-        result = "error: permission denied.";
-        return;
-    }
-    DumpKey key;
-    std::string value;
-    if (!ParseOption(args, key, value, result)) {
-        result.append('\n' + FORM_DUMP_HELP);
-        return;
-    }
-
-    switch (key) {
-        case DumpKey::KEY_DUMP_HELP:
-            return HiDumpHelp(value, result);
-        case DumpKey::KEY_DUMP_STATIC:
-            return HiDumpStaticBundleFormInfos(value, result);
-        case DumpKey::KEY_DUMP_STORAGE:
-            return HiDumpStorageFormInfos(value, result);
-        case DumpKey::KEY_DUMP_VISIBLE:
-            return HiDumpHasFormVisible(value, result);
-        case DumpKey::KEY_DUMP_TEMPORARY:
-            return HiDumpTemporaryFormInfos(value, result);
-        case DumpKey::KEY_DUMP_BY_BUNDLE_NAME:
-            return HiDumpFormInfoByBundleName(value, result);
-        case DumpKey::KEY_DUMP_BY_FORM_ID:
-            return HiDumpFormInfoByFormId(value, result);
-        case DumpKey::KEY_DUMP_RUNNING:
-            return HiDumpFormRunningFormInfos(value, result);
-        case DumpKey::KEY_DUMP_BLOCKED_APPS:
-            return HiDumpFormBlockedApps(value, result);
-        case DumpKey::KEY_DUMP_CROSS_DEVICE:
-#ifdef DISTRIBUTED_FORM_SUPPORTED
-            return HiDumpCrossDevice(value, result);
-#else
-            result = "DISTRIBUTED_FORM_SUPPORTED not enabled";
-            return;
-#endif
-        case DumpKey::KEY_DUMP_PROCESS_POOL:
-            return HiDumpProcessPool(value, result);
-        default:
-            result = "error: unknow function.";
-            return;
-    }
+    return FormMgrDumpHandler::Dump(fd, args);
 }
 
 int32_t FormMgrService::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
@@ -1765,128 +1445,6 @@ void FormMgrService::OnAddSystemAbility(int32_t systemAbilityId, const std::stri
     HILOG_INFO("FMS KV data service add time:%{public}s", GetOnKvDataServiceAddTime().c_str());
 }
 
-bool FormMgrService::ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value,
-    std::string &result)
-{
-    auto size = args.size();
-    if (size == 0) {
-        result = "error: must contain arguments.";
-        return false;
-    }
-
-    if (size > FORM_DUMP_ARGC_MAX) {
-        result = "error: arguments numer out of limit.";
-        return false;
-    }
-
-    std::string optionKey = Str16ToStr8(args[0]);
-    auto iter = dumpKeyMap_.find(optionKey);
-    if (iter == dumpKeyMap_.end()) {
-        result = "error: unknown option.";
-        return false;
-    }
-
-    key = iter->second;
-
-    if (args.size() == FORM_DUMP_ARGC_MAX) {
-        value = Str16ToStr8(args[1]);
-    }
-
-    return true;
-}
-
-void FormMgrService::HiDumpFormRunningFormInfos([[maybe_unused]]const std::string &args, std::string &result)
-{
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return;
-    }
-    FormMgrAdapterFacade::GetInstance().DumpFormRunningFormInfos(result);
-}
-
-void FormMgrService::HiDumpProcessPool([[maybe_unused]] const std::string &args, std::string &result)
-{
-    if (!CheckCallerIsSystemApp()) {
-        return;
-    }
-    FormMgrAdapterFacade::GetInstance().DumpProcessPool(result);
-}
-
-void FormMgrService::HiDumpHelp([[maybe_unused]] const std::string &args, std::string &result)
-{
-    result = FORM_DUMP_HELP;
-}
-
-void FormMgrService::HiDumpStorageFormInfos([[maybe_unused]] const std::string &args, std::string &result)
-{
-    DumpStorageFormInfos(result);
-}
-
-void FormMgrService::HiDumpTemporaryFormInfos([[maybe_unused]] const std::string &args, std::string &result)
-{
-    if (!CheckCallerIsSystemApp()) {
-        return;
-    }
-    FormMgrAdapterFacade::GetInstance().DumpTemporaryFormInfos(result);
-}
-
-void FormMgrService::HiDumpStaticBundleFormInfos([[maybe_unused]] const std::string &args, std::string &result)
-{
-    if (!CheckCallerIsSystemApp()) {
-        return;
-    }
-    FormMgrAdapterFacade::GetInstance().DumpStaticBundleFormInfos(result);
-}
-
-void FormMgrService::HiDumpFormInfoByBundleName(const std::string &args, std::string &result)
-{
-    if (args.empty()) {
-        result = "error: request a bundle name.";
-        return;
-    }
-    DumpFormInfoByBundleName(args, result);
-}
-
-void FormMgrService::HiDumpHasFormVisible(const std::string &args, std::string &result)
-{
-    if (args.empty()) {
-        result = "error:request bundle info like bundleName_userId_instIndex.";
-        return;
-    }
-    FormMgrAdapterFacade::GetInstance().DumpHasFormVisible(args, result);
-}
-
-void FormMgrService::HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result)
-{
-    if (!CheckCallerIsSystemApp()) {
-        return;
-    }
-    FormTrustMgr::GetInstance().GetUntrustAppNameList(result);
-}
-
-void FormMgrService::HiDumpCrossDevice([[maybe_unused]] const std::string &args, std::string &result)
-{
-#ifdef DISTRIBUTED_FORM_SUPPORTED
-    FormMgrAdapterFacade::GetInstance().DumpCrossDevice(result);
-#else
-    result = "DISTRIBUTED_FORM_SUPPORTED not enabled";
-#endif
-}
-
-void FormMgrService::HiDumpFormInfoByFormId(const std::string &args, std::string &result)
-{
-    if (args.empty()) {
-        result = "error: request a form ID.";
-        return;
-    }
-    int64_t formId = atoll(args.c_str());
-    if (formId == 0) {
-        result = "error: form ID is invalid.";
-        return;
-    }
-    DumpFormInfoByFormId(formId, result);
-}
-
 bool FormMgrService::CheckCallerIsSystemApp() const
 {
     if (!FormUtil::IsSACall() && !FormUtil::IsSystemAppCall()) {
@@ -1933,12 +1491,7 @@ bool FormMgrService::CheckAcrossLocalAccountsPermission() const
 ErrCode FormMgrService::RegisterFormAddObserverByBundle(const std::string bundleName,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]register form add observer permission denied", __FUNCTION__);
-        return ret;
-    }
+    HILOG_DEBUG("call");
     if (callerToken == nullptr) {
         HILOG_ERROR("[%{public}s]callerToken is null", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -1949,12 +1502,7 @@ ErrCode FormMgrService::RegisterFormAddObserverByBundle(const std::string bundle
 ErrCode FormMgrService::RegisterFormRemoveObserverByBundle(const std::string bundleName,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("register form remove observer permission denied");
-        return ret;
-    }
+    HILOG_DEBUG("call");
     if (callerToken == nullptr) {
         HILOG_ERROR("[%{public}s]callerToken is null", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -1964,24 +1512,17 @@ ErrCode FormMgrService::RegisterFormRemoveObserverByBundle(const std::string bun
 
 int32_t FormMgrService::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     return FormMgrAdapterFacade::GetInstance().GetFormsCount(isTempFormFlag, formCount);
 }
 
 int32_t FormMgrService::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     return FormMgrAdapterFacade::GetInstance().GetHostFormsCount(bundleName, formCount);
 }
 
 ErrCode FormMgrService::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("get running form infos permission denied");
-        return ret;
-    }
+    HILOG_DEBUG("call");
     auto callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = FormUtil::GetCallerUserId(callingUid);
     return FormMgrAdapterFacade::GetInstance().GetRunningFormInfos(isUnusedIncluded, runningFormInfos, userId);
@@ -1990,12 +1531,7 @@ ErrCode FormMgrService::GetRunningFormInfos(bool isUnusedIncluded, std::vector<R
 ErrCode FormMgrService::GetRunningFormInfosByBundleName(
     const std::string &bundleName, bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("get running form infos by bundle name permission denied");
-        return ret;
-    }
+    HILOG_DEBUG("call");
     return FormMgrAdapterFacade::GetInstance().GetRunningFormInfosByBundleName(
         bundleName, isUnusedIncluded, runningFormInfos);
 }
@@ -2003,56 +1539,26 @@ ErrCode FormMgrService::GetRunningFormInfosByBundleName(
 ErrCode FormMgrService::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
     std::vector<FormInstance> &formInstances)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("get form instances by filter permission denied");
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().GetFormInstancesByFilter(formInstancesFilter, formInstances);
 }
 
 ErrCode FormMgrService::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]get form instance by id permission denied", __FUNCTION__);
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().GetFormInstanceById(formId, formInstance);
 }
 
 ErrCode FormMgrService::GetFormInstanceById(const int64_t formId, bool isUnusedIncluded, FormInstance &formInstance)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]get form instance by id permission denied", __FUNCTION__);
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().GetFormInstanceById(formId, isUnusedIncluded, formInstance);
 }
 
 ErrCode FormMgrService::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("register notifyVisible or notifyInVisible observer permission denied");
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().RegisterAddObserver(bundleName, callerToken);
 }
 
 ErrCode FormMgrService::RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("unregister notifyVisible or notifyInVisible observer permission denied");
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().RegisterRemoveObserver(bundleName, callerToken);
 }
 
@@ -2068,15 +1574,7 @@ ErrCode FormMgrService::RequestPublishProxyForm(Want &want, bool withFormBinding
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
     const std::vector<FormDataProxy> &formDataProxies)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-
-    if (!CheckAcrossLocalAccountsPermission()) {
-        HILOG_ERROR("[%{public}s]Across local accounts permission failed", __FUNCTION__);
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
+    HILOG_DEBUG("call");
     return FormMgrAdapterFacade::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId,
         formDataProxies);
 }
@@ -2089,11 +1587,6 @@ ErrCode FormMgrService::RegisterClickEventObserver(
         HILOG_ERROR("[%{public}s]empty callerTokenParameter", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]register form add observer permission denied", __FUNCTION__);
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().RegisterClickEventObserver(bundleName, formEventType, observer);
 }
 
@@ -2105,56 +1598,28 @@ ErrCode FormMgrService::UnregisterClickEventObserver(
         HILOG_ERROR("[%{public}s]empty callerTokenParameter", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]register form add observer permission denied", __FUNCTION__);
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().UnregisterClickEventObserver(bundleName, formEventType, observer);
 }
 
 int32_t FormMgrService::SetFormsRecyclable(const std::vector<int64_t> &formIds)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("set forms recyclable permission denied");
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().SetFormsRecyclable(formIds);
 }
 
 int32_t FormMgrService::RecycleForms(const std::vector<int64_t> &formIds, const Want &want)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("recycle forms permission denied");
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().RecycleForms(formIds, want);
 }
 
 int32_t FormMgrService::RecoverForms(const std::vector<int64_t> &formIds, const Want &want)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("recover forms permission denied");
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().RecoverForms(formIds, want);
 }
 
 ErrCode FormMgrService::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
 {
     std::lock_guard<std::mutex> lock(snapshotSetMutex_);
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("update formLocation form infos permission denied");
-        return ret;
-    }
+    HILOG_DEBUG("call");
     if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
         formLocation >= static_cast<int32_t>(Constants::FormLocation::FORM_LOCATION_END)) {
         HILOG_ERROR("invalid formLocation:%{public}d", formLocation);
@@ -2168,12 +1633,6 @@ ErrCode FormMgrService::UpdateFormLocation(const int64_t &formId, const int32_t 
 
 ErrCode FormMgrService::BatchRefreshForms(const int32_t formRefreshType)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("batch update forms permission denied");
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().BatchRefreshForms(formRefreshType);
 }
 
@@ -2234,11 +1693,6 @@ void FormMgrService::OnSystemloadLevel(int32_t level)
 
 int32_t FormMgrService::EnableForms(const std::string bundleName, const int32_t userId, const bool enable)
 {
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]disable forms permission denied", __FUNCTION__);
-        return ret;
-    }
     if (userId < 0) {
         HILOG_ERROR("invalid userId");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -2248,10 +1702,7 @@ int32_t FormMgrService::EnableForms(const std::string bundleName, const int32_t 
 
 bool FormMgrService::IsFormBundleForbidden(const std::string &bundleName)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return false;
-    }
+    HILOG_DEBUG("call");
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormBundleForbidden",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     bool result = FormBundleForbidMgr::GetInstance().IsBundleForbidden(bundleName);
@@ -2261,23 +1712,17 @@ bool FormMgrService::IsFormBundleForbidden(const std::string &bundleName)
 
 int32_t FormMgrService::LockForms(const std::vector<FormLockInfo> &formLockInfos, LockChangeType type)
 {
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("lock forms permission denied");
-        return ret;
-    }
-
     int32_t retErrCode = ERR_OK;
     for (const auto &info : formLockInfos) {
         if (type == LockChangeType::SWITCH_CHANGE) {
-            ret = FormMgrAdapterFacade::GetInstance().SwitchLockForms(info.bundleName, info.userId, info.lock);
+            ErrCode ret = FormMgrAdapterFacade::GetInstance().SwitchLockForms(info.bundleName, info.userId, info.lock);
             if (ret != ERR_OK) {
                 HILOG_ERROR("SwitchLockForms failed,bundleName:%{public}s,userId:%{public}d,"
                     "lock: %{public}d, ret: %{public}d", info.bundleName.c_str(), info.userId, info.lock, ret);
                 retErrCode = ret;
             }
         } else {
-            ret = FormMgrAdapterFacade::GetInstance().ProtectLockForms(info.bundleName, info.userId, info.lock);
+            ErrCode ret = FormMgrAdapterFacade::GetInstance().ProtectLockForms(info.bundleName, info.userId, info.lock);
             if (ret != ERR_OK) {
                 HILOG_ERROR("ProtectLockForms failed,bundleName:%{public}s,userId:%{public}d,"
                     "protect: %{public}d, ret: %{public}d", info.bundleName.c_str(), info.userId, info.lock, ret);
@@ -2291,10 +1736,7 @@ int32_t FormMgrService::LockForms(const std::vector<FormLockInfo> &formLockInfos
 
 bool FormMgrService::IsFormBundleProtected(const std::string &bundleName, int64_t formId)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return false;
-    }
+    HILOG_DEBUG("call");
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormBundleProtected",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
@@ -2305,12 +1747,7 @@ bool FormMgrService::IsFormBundleProtected(const std::string &bundleName, int64_
 
 bool FormMgrService::IsFormBundleDebugSignature(const std::string &bundleName)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode checkResult = CheckFormPermission();
-    if (checkResult != ERR_OK) {
-        HILOG_ERROR("check bundle signature permission denied");
-        return false;
-    }
+    HILOG_DEBUG("call");
     BundleInfo bundleInfo;
     int32_t userId = FormUtil::GetCallerUserId(IPCSkeleton::GetCallingUid());
     int32_t flags = static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION) |
@@ -2338,24 +1775,13 @@ bool FormMgrService::IsFormBundleExempt(int64_t formId)
 
 int32_t FormMgrService::NotifyFormLocked(const int64_t &formId, bool isLocked)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]disable forms permission denied", __FUNCTION__);
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().NotifyFormLocked(formId, isLocked);
 }
 
 ErrCode FormMgrService::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
     float formViewScale)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]update formSize permission denied", __FUNCTION__);
-        return ret;
-    }
+    HILOG_DEBUG("call");
     FormMgrAdapterFacade::GetInstance().UpdateFormSize(formId, width, height, borderWidth, formViewScale);
     return ERR_OK;
 }
@@ -2400,19 +1826,15 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
         formInfoParam.SetParam("cardId", String::Box(std::to_string(formId)));
         formInfoParam.SetParam("formConfigAbility", String::Box(abilityName));
         wantarams.SetParam("formInfo", WantParamWrapper::Box(formInfoParam));
-        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARAM_OPEN_FORM_EDIT_VIEW));
     } else {
-        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW));
         wantarams.SetParam(Constants::PARAM_SEC_PAGE_ABILITY_NAME, String::Box(abilityName));
     }
-    wantarams.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
-        Integer::Box(Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT));
 
     Want want;
-    want.SetAction(Constants::FORM_PAGE_ACTION);
     want.SetElementName(callerName, abilityName);
     want.SetParams(wantarams);
-    return FormMgrAdapterFacade::GetInstance().StartAbilityByFms(want);
+    return FormMgrAdapterFacade::GetInstance().StartHostPage(want, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT,
+        isMainPage ? Constants::PARAM_OPEN_FORM_EDIT_VIEW : Constants::PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW);
 }
 
 ErrCode FormMgrService::CloseFormEditAbility(bool isMainPage)
@@ -2424,19 +1846,11 @@ ErrCode FormMgrService::CloseFormEditAbility(bool isMainPage)
 
 ErrCode FormMgrService::RegisterOverflowProxy(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
     return FormMgrAdapterFacade::GetInstance().RegisterOverflowProxy(callerToken);
 }
 
 ErrCode FormMgrService::UnregisterOverflowProxy()
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
     return FormMgrAdapterFacade::GetInstance().UnregisterOverflowProxy();
 }
 
@@ -2449,47 +1863,28 @@ ErrCode FormMgrService::RequestOverflow(const int64_t formId, const OverflowInfo
 
 ErrCode FormMgrService::RegisterChangeSceneAnimationStateProxy(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
     return FormMgrAdapterFacade::GetInstance().RegisterChangeSceneAnimationStateProxy(callerToken);
 }
 
 ErrCode FormMgrService::UnregisterChangeSceneAnimationStateProxy()
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
     return FormMgrAdapterFacade::GetInstance().UnregisterChangeSceneAnimationStateProxy();
 }
 
 ErrCode FormMgrService::ChangeSceneAnimationState(const int64_t formId, int32_t state)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
+    HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapterFacade::GetInstance().ChangeSceneAnimationState(formId, callingUid, state);
 }
 
 ErrCode FormMgrService::RegisterGetFormRectProxy(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
     return FormMgrAdapterFacade::GetInstance().RegisterGetFormRectProxy(callerToken);
 }
 
 ErrCode FormMgrService::UnregisterGetFormRectProxy()
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
     return FormMgrAdapterFacade::GetInstance().UnregisterGetFormRectProxy();
 }
 
@@ -2502,35 +1897,18 @@ ErrCode FormMgrService::GetFormRect(const int64_t formId, Rect &rect)
 
 ErrCode FormMgrService::RegisterGetVisibleFormRectProxy(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
     return FormMgrAdapterFacade::GetInstance().RegisterGetVisibleFormRectProxy(callerToken);
 }
 
 ErrCode FormMgrService::UnregisterGetVisibleFormRectProxy()
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
     return FormMgrAdapterFacade::GetInstance().UnregisterGetVisibleFormRectProxy();
 }
 
 ErrCode FormMgrService::GetVisibleFormRect(const int64_t formId, Rect &rect)
 {
 #ifndef WATCH_API_DISABLE
-    HILOG_INFO("[%{public}s]call,formId:%{public}" PRId64, __FUNCTION__, formId);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
+    HILOG_INFO("call, formId:%{public}" PRId64, formId);
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS:GetVisibleFormRect",
         FORM_VISIBLE_RECT_QUERY_TIMEOUT_SEC, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     ErrCode result = FormMgrAdapterFacade::GetInstance().GetVisibleFormRect(
@@ -2544,30 +1922,16 @@ ErrCode FormMgrService::GetVisibleFormRect(const int64_t formId, Rect &rect)
 
 ErrCode FormMgrService::UpdateFormSize(const int64_t formId, const int32_t newDimension, const Rect &newRect)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("[%{public}s]update formSize permission denied", __FUNCTION__);
-        return ret;
-    }
     return FormMgrAdapterFacade::GetInstance().UpdateFormSize(formId, newDimension, newRect);
 }
 
 ErrCode FormMgrService::RegisterGetLiveFormStatusProxy(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
     return FormMgrAdapterFacade::GetInstance().RegisterGetLiveFormStatusProxy(callerToken);
 }
 
 ErrCode FormMgrService::UnregisterGetLiveFormStatusProxy()
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
     return FormMgrAdapterFacade::GetInstance().UnregisterGetLiveFormStatusProxy();
 }
 
@@ -2621,11 +1985,7 @@ ErrCode FormMgrService::ReloadAllForms(int32_t &reloadNum)
 
 bool FormMgrService::IsFormDueControl(const FormMajorInfo &formMajorInfo, const bool isDisablePolicy)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        HILOG_ERROR("[%{public}s]need system authority", __FUNCTION__);
-        return false;
-    }
+    HILOG_DEBUG("call");
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormDueControl",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     bool result = FormMgrAdapterFacade::GetInstance().CheckFormDueControl(formMajorInfo, isDisablePolicy);
@@ -2635,37 +1995,18 @@ bool FormMgrService::IsFormDueControl(const FormMajorInfo &formMajorInfo, const 
 
 ErrCode FormMgrService::SendNonTransparencyRatio(int64_t formId, int32_t ratio)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("send non-transparency ratio permission denied");
-        return ret;
-    }
+    HILOG_DEBUG("call");
     FormAbnormalReporter::GetInstance().AddRecord(formId, ratio);
     return ERR_OK;
 }
 
 ErrCode FormMgrService::RegisterPublishFormCrossBundleControl(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
     return FormMgrAdapterFacade::GetInstance().RegisterPublishFormCrossBundleControl(callerToken);
 }
 
 ErrCode FormMgrService::UnregisterPublishFormCrossBundleControl()
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_PUBLISH_FORM_CROSS_BUNDLE_CONTROL)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
     return FormMgrAdapterFacade::GetInstance().UnregisterPublishFormCrossBundleControl();
 }
 
@@ -2714,140 +2055,62 @@ bool FormMgrService::PublishFormCrossBundleControl(const Want &want)
 
 ErrCode FormMgrService::RegisterTemplateFormDetailInfoChange(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!CheckAcrossLocalAccountsPermission()) {
-        HILOG_ERROR("[%{public}s]across local accounts permission failed", __FUNCTION__);
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
+    HILOG_INFO("call");
     return FormMgrAdapterFacade::GetInstance().RegisterTemplateFormDetailInfoChange(callerToken);
 }
 
 ErrCode FormMgrService::UnregisterTemplateFormDetailInfoChange()
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!CheckAcrossLocalAccountsPermission()) {
-        HILOG_ERROR("[%{public}s]across local accounts permission failed", __FUNCTION__);
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
+    HILOG_INFO("call");
     return FormMgrAdapterFacade::GetInstance().UnregisterTemplateFormDetailInfoChange();
 }
 
 ErrCode FormMgrService::UpdateTemplateFormDetailInfo(
     const std::vector<TemplateFormDetailInfo> &templateFormInfo)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
     return FormMgrAdapterFacade::GetInstance().UpdateTemplateFormDetailInfo(templateFormInfo);
 }
 
 ErrCode FormMgrService::RegisterUpdateFormsConfigCallback(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
     return FormMgrAdapterFacade::GetInstance().RegisterUpdateFormsConfigCallback(callerToken);
 }
 
 ErrCode FormMgrService::UnregisterUpdateFormsConfigCallback()
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
     return FormMgrAdapterFacade::GetInstance().UnregisterUpdateFormsConfigCallback();
 }
 
 ErrCode FormMgrService::UpdateFormsConfig(const std::vector<FormCustomConfig> &configs)
 {
-    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_FORM_CUSTOM_CONFIG)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG;
-    }
     return FormMgrAdapterFacade::GetInstance().UpdateFormsConfig(configs);
 }
 
 ErrCode FormMgrService::RegisterDeleteFormsCallback(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
     return FormMgrAdapterFacade::GetInstance().RegisterDeleteFormsCallback(callerToken);
 }
 
 ErrCode FormMgrService::UnregisterDeleteFormsCallback()
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
     return FormMgrAdapterFacade::GetInstance().UnregisterDeleteFormsCallback();
 }
 
 ErrCode FormMgrService::DeleteForms(const std::vector<FormRecordFilter> &filters)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_FORM_CUSTOM_CONFIG)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_CUSTOM_CONFIG;
-    }
     return FormMgrAdapterFacade::GetInstance().DeleteForms(filters);
 }
 
 ErrCode FormMgrService::RegisterFormWantCallback(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
+    HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapterFacade::GetInstance().RegisterFormWantCallback(callingUid, callerToken);
 }
 
 ErrCode FormMgrService::UnregisterFormWantCallback()
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
+    HILOG_INFO("call");
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     return FormMgrAdapterFacade::GetInstance().UnregisterFormWantCallback(callingUid);
 }
@@ -2866,13 +2129,7 @@ std::string FormMgrService::GetOnKvDataServiceAddTime() const
 
 ErrCode FormMgrService::RegisterFormHostService(const FormHostServiceInfo &serviceInfo, int64_t &serviceId)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
+    HILOG_INFO("call");
 #ifdef DISTRIBUTED_FORM_SUPPORTED
     return FormMgrAdapterFacade::GetInstance().RegisterFormHostService(serviceInfo, serviceId);
 #else
@@ -2883,13 +2140,7 @@ ErrCode FormMgrService::RegisterFormHostService(const FormHostServiceInfo &servi
 
 ErrCode FormMgrService::UnregisterFormHostService(int64_t serviceId)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
-    }
+    HILOG_INFO("call");
 #ifdef DISTRIBUTED_FORM_SUPPORTED
     return FormMgrAdapterFacade::GetInstance().UnregisterFormHostService(serviceId);
 #else
@@ -2900,13 +2151,7 @@ ErrCode FormMgrService::UnregisterFormHostService(int64_t serviceId)
 
 ErrCode FormMgrService::GetAvailableFormHostServices(std::vector<PeerFormHostServiceInfo> &services)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_AGENT_REQUIRE_FORM)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_AGENT_REQUIRE_FORM;
-    }
+    HILOG_INFO("call");
 #ifdef DISTRIBUTED_FORM_SUPPORTED
     return FormMgrAdapterFacade::GetInstance().GetAvailableFormHostServices(services);
 #else
@@ -2918,13 +2163,7 @@ ErrCode FormMgrService::GetAvailableFormHostServices(std::vector<PeerFormHostSer
 ErrCode FormMgrService::RequestPublishFormCrossDevice(const FormCrossDeviceRequest &request,
     const sptr<IRemoteObject> &callerToken, const sptr<IRemoteObject> &callback)
 {
-    HILOG_INFO("[%{public}s]call", __FUNCTION__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_AGENT_REQUIRE_FORM)) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_AGENT_REQUIRE_FORM;
-    }
+    HILOG_INFO("call");
     if (callerToken == nullptr || callback == nullptr) {
         HILOG_ERROR("callerToken or callback null");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;

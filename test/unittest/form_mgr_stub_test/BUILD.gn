@@ -28,6 +28,22 @@ ohos_unittest("FmsFormMgrStubTest") {
   sources = [
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "form_mgr_stub_test.cpp",
+    # The production DSO exports only GetInstance/SetAccessChecker via
+    # libform_manager.map; the test exercises the table and handlers directly.
+    "${form_fwk_path}/interfaces/inner_api/src/form_ipc_dispatch_table.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_ipc_handlers.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_ashmem.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_info_filter.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_instances_filter.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_instance.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_js_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_lock_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_major_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_provider_data.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_provider_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/form_share_info.cpp",
+    "${form_fwk_path}/interfaces/inner_api/src/running_form_info.cpp",
+    "${form_fwk_path}/common/src/json_util_form.cpp",
   ]
 
   deps = [
@@ -46,10 +62,10 @@ ohos_unittest("FmsFormMgrStubTest") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
-    "googletest:gmock_main",
   ]
 }
 

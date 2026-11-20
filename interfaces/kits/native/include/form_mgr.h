@@ -582,6 +582,28 @@ public:
     ErrCode StartUIAbilityByFms(const Want &want);
 
     /**
+     * @brief Open the form manage page by form manager service.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OpenFormManagePage(const Want &want);
+
+    /**
+     * @brief Open the form edit page by form manager service.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OpenFormEditPage(const Want &want);
+
+    /**
+     * @brief Open the live form page by form manager service.
+     * @param want includes ability name, parameters and related info sending to an ability.
+     * @param formId Indicates the unique id of the live form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OpenLiveFormPage(const Want &want, const std::string &formId);
+
+    /**
      * @brief Start an ability by cross bundle.
      * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
