@@ -30,6 +30,7 @@
 #undef protected
 #include "securec.h"
 #include "ffrt.h"
+#include "inner_event.h"
 
 extern "C" void* ffrt_alloc_auto_managed_function_storage_base(ffrt_function_kind_t kind)
 {

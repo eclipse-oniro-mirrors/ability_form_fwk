@@ -643,7 +643,6 @@ const FormHandlerFunc FORM_MGR_TWO_FUZZ_HANDLERS[] = {
     &FormIpcHandlers::HandleUpdateFormCrossBundle,
     &FormIpcHandlers::HandleUpdateFormProviderInfo,
     &FormIpcHandlers::HandleUpdateFormsWithReminderAgent,
-    &FormIpcHandlers::HandleUpdateFormsColorInfo,
 };
 
 constexpr size_t FUZZ_HANDLER_COUNT = sizeof(FORM_MGR_TWO_FUZZ_HANDLERS) / sizeof(FORM_MGR_TWO_FUZZ_HANDLERS[0]);
@@ -728,9 +727,9 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
 // dispatch table, the handlers and their business-parameter parsing.
 class AllowAllChecker : public IStubAccessChecker {
 public:
-    ErrCode Check(const FormPermissionPolicy &, const FormIpcContext &) override
+    OHOS::ErrCode Check(const FormPermissionPolicy &, const FormIpcContext &) override
     {
-        return ERR_OK;
+        return OHOS::ERR_OK;
     }
 };
 

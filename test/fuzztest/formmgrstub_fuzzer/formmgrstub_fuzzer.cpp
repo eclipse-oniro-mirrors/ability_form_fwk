@@ -511,9 +511,9 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 // dispatch table, the handlers and their business-parameter parsing.
 class AllowAllChecker : public IStubAccessChecker {
 public:
-    ErrCode Check(const FormPermissionPolicy &, const FormIpcContext &) override
+    OHOS::ErrCode Check(const FormPermissionPolicy &, const FormIpcContext &) override
     {
-        return ERR_OK;
+        return OHOS::ERR_OK;
     }
 };
 

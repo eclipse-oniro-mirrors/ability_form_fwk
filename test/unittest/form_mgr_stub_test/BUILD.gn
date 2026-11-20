@@ -28,13 +28,11 @@ ohos_unittest("FmsFormMgrStubTest") {
   sources = [
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "form_mgr_stub_test.cpp",
-    "form_mgr_stub_color_info_test.cpp",
     # The production DSO exports only GetInstance/SetAccessChecker via
     # libform_manager.map; the test exercises the table and handlers directly.
     "${form_fwk_path}/interfaces/inner_api/src/form_ipc_dispatch_table.cpp",
     "${form_fwk_path}/interfaces/inner_api/src/form_ipc_handlers.cpp",
     "${form_fwk_path}/interfaces/inner_api/src/form_ashmem.cpp",
-    "${form_fwk_path}/interfaces/inner_api/src/form_color_info.cpp",
     "${form_fwk_path}/interfaces/inner_api/src/form_info_filter.cpp",
     "${form_fwk_path}/interfaces/inner_api/src/form_instances_filter.cpp",
     "${form_fwk_path}/interfaces/inner_api/src/form_instance.cpp",
