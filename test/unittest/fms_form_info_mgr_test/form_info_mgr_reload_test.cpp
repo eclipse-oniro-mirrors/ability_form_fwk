@@ -273,7 +273,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_ClassifyBundles_0400, TestSize.Level0)
 
 /**
  * @tc.name: FormInfoMgr_ClassifyBundles_0500
- * @tc.desc: ClassifyBundles when bundle disabled (not in versionMap but still installed), skipped
+ * @tc.desc: ClassifyBundles when bundle disabled but still installed with form extension, skipped
  * @tc.type: FUNC
  */
 HWTEST_F(FormInfoMgrTest, FormInfoMgr_ClassifyBundles_0500, TestSize.Level1)
@@ -286,11 +286,46 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_ClassifyBundles_0500, TestSize.Level1)
     bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
     FormInfoMgr::GetInstance().bundleFormInfoMap_.clear();
     FormInfoMgr::GetInstance().bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
-    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoByFlags(_, _, _, _)).Times(1).WillOnce(Return(true));
+    // Disabled but still installed: only bundles owning a form extension are kept.
+    BundleInfo bundleInfo;
+    HapModuleInfo hapModuleInfo;
+    ExtensionAbilityInfo extensionInfo;
+    extensionInfo.type = ExtensionAbilityType::FORM;
+    hapModuleInfo.extensionInfos.emplace_back(extensionInfo);
+    bundleInfo.hapModuleInfos.emplace_back(hapModuleInfo);
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoByFlags(_, _, _, _)).Times(1)
+        .WillOnce(DoAll(SetArgReferee<3>(bundleInfo), Return(true)));
     std::unordered_map<std::string, std::uint32_t> bundleVersionMap;
     auto result = FormInfoMgr::GetInstance().ClassifyBundles(false, USER_ID, bundleVersionMap);
     EXPECT_EQ(0, static_cast<int>(result.TotalWorkload()));
     GTEST_LOG_(INFO) << "FormInfoMgr_ClassifyBundles_0500 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_ClassifyBundles_0510
+ * @tc.desc: ClassifyBundles when installed bundle has no form extension, goes to removeBundles
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_ClassifyBundles_0510, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_ClassifyBundles_0510 start";
+    auto bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(GetTestFormInfo());
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    FormInfoMgr::GetInstance().bundleFormInfoMap_.clear();
+    FormInfoMgr::GetInstance().bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfo;
+    // Installed bundle whose BundleInfo carries no form extension info.
+    BundleInfo bundleInfo;
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetBundleInfoByFlags(_, _, _, _)).Times(1)
+        .WillOnce(DoAll(SetArgReferee<3>(bundleInfo), Return(true)));
+    std::unordered_map<std::string, std::uint32_t> bundleVersionMap;
+    auto result = FormInfoMgr::GetInstance().ClassifyBundles(false, USER_ID, bundleVersionMap);
+    EXPECT_EQ(1, static_cast<int>(result.removeBundles.size()));
+    EXPECT_EQ(FORM_BUNDLE_NAME_TEST, result.removeBundles[0]);
+    EXPECT_EQ(1, static_cast<int>(result.TotalWorkload()));
+    GTEST_LOG_(INFO) << "FormInfoMgr_ClassifyBundles_0510 end";
 }
 
 /**
