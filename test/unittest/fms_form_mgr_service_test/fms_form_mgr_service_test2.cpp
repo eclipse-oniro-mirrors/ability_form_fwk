@@ -251,8 +251,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0083, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0083 end";
 }
 
-
-
 /**
  * @tc.number: FormMgrService_0085
  * @tc.name: test BackgroundEvent function.
@@ -330,8 +328,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0090, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0090 end";
 }
 
-
-
 /**
  * @tc.number: FormMgrService_0093
  * @tc.name: test GetFormInstanceById function.
@@ -350,7 +346,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0093, TestSize.Level1)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrService.GetFormInstanceById(formId, formInstance));
     GTEST_LOG_(INFO) << "FormMgrService_0093 end";
 }
-
 
 /**
  * @tc.number: FormMgrService_0096
@@ -604,7 +599,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0113, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0113 end";
 }
 
-
 /**
  * @tc.number: FormMgrService_0114
  * @tc.name: test updateForm function.
@@ -856,7 +850,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0139, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0139 end";
 }
 
- 
 /**
  * @tc.number: FormMgrService_0140
  * @tc.name: test RequestOverflow function.
@@ -1225,7 +1218,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetPublishedFormInfos_0002, Test
     GTEST_LOG_(INFO) << "FormMgrService_GetPublishedFormInfos_0002 end";
 }
 
-
 /**
  * @tc.number: FormMgrService_StartAbilityByCrossBundle_0003
  * @tc.name: test StartAbilityByCrossBundle PublishFormCrossBundleControl failed.
@@ -1523,7 +1515,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterChangeSceneAnimationStat
     GTEST_LOG_(INFO) << "FormMgrService_RegisterChangeSceneAnimationStateProxy_0002 end";
 }
 
-
 /**
  * @tc.number: FormMgrService_RegisterOverflowProxy_0002
  * @tc.name: test RegisterOverflowProxy success.
@@ -1540,7 +1531,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterOverflowProxy_0002, Test
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_RegisterOverflowProxy_0002 end";
 }
-
 
 /**
  * @tc.number: FormMgrService_RegisterGetFormRectProxy_0002
@@ -1559,7 +1549,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterGetFormRectProxy_0002, T
     GTEST_LOG_(INFO) << "FormMgrService_RegisterGetFormRectProxy_0002 end";
 }
 
-
 /**
  * @tc.number: FormMgrService_RegisterGetLiveFormStatusProxy_0002
  * @tc.name: test RegisterGetLiveFormStatusProxy success.
@@ -1577,7 +1566,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterGetLiveFormStatusProxy_0
     GTEST_LOG_(INFO) << "FormMgrService_RegisterGetLiveFormStatusProxy_0002 end";
 }
 
-
 /**
  * @tc.number: FormMgrService_UnregisterGetLiveFormStatusProxy_0002
  * @tc.name: test UnregisterGetLiveFormStatusProxy success.
@@ -1593,7 +1581,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterGetLiveFormStatusProxy
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_UnregisterGetLiveFormStatusProxy_0002 end";
 }
-
 
 /**
  * @tc.number: FormMgrService_UpdateFormSize_0002
@@ -1615,8 +1602,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UpdateFormSize_0002, TestSize.Le
     GTEST_LOG_(INFO) << "FormMgrService_UpdateFormSize_0002 end";
 }
 
-
-
 /**
  * @tc.number: FormMgrService_RegisterTemplateFormDetailInfoChange_0004
  * @tc.name: test RegisterTemplateFormDetailInfoChange success.
@@ -1635,8 +1620,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterTemplateFormDetailInfoCh
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_RegisterTemplateFormDetailInfoChange_0004 end";
 }
-
-
 
 /**
  * @tc.number: FormMgrService_UnregisterTemplateFormDetailInfoChange_0004
@@ -1672,8 +1655,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UpdateTemplateFormDetailInfo_000
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_UpdateTemplateFormDetailInfo_0002 end";
 }
-
-
 
 /**
  * @tc.number: FormMgrService_UnregisterPublishFormCrossBundleControl_0003
@@ -1742,8 +1723,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_PublishFormCrossBundleControl_00
     GTEST_LOG_(INFO) << "FormMgrService_PublishFormCrossBundleControl_0003 end";
 }
 
-
-
 /**
  * @tc.number: FormMgrService_RegisterFormWantCallback_003
  * @tc.name: test RegisterFormWantCallback function.
@@ -1761,8 +1740,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterFormWantCallback_003, Te
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_RegisterFormWantCallback_003 end";
 }
-
-
 
 /**
  * @tc.number: FormMgrService_UnregisterFormWantCallback_003
@@ -1818,8 +1795,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormWantCallback_004, 
     GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormWantCallback_004 end";
 }
 
-
-
 /**
  * @tc.number: FormMgrService_RegisterDeleteFormsCallback_003
  * @tc.name: test RegisterDeleteFormsCallback function.
@@ -1839,8 +1814,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_RegisterDeleteFormsCallback_003,
     GTEST_LOG_(INFO) << "FormMgrService_RegisterDeleteFormsCallback_003 end";
 }
 
-
-
 /**
  * @tc.number: FormMgrService_UnregisterDeleteFormsCallback_003
  * @tc.name: test UnregisterDeleteFormsCallback function.
@@ -1858,8 +1831,6 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterDeleteFormsCallback_00
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_UnregisterDeleteFormsCallback_003 end";
 }
-
-
 
 /**
  * @tc.number: FormMgrService_DeleteForms_003
@@ -1946,6 +1917,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_UnregisterFormHostService_005, T
     MockGetCallerBundleName(ERR_OK, "");
     GTEST_LOG_(INFO) << "FormMgrService_UnregisterFormHostService_005 end";
 }
+
 /**
  * @tc.name: FormMgrService_GetVisibleFormRect_Svc002
  * @tc.desc: Verify formId <= 0 is forwarded to adapter facade (pass-through, no Service intercept).
