@@ -23,6 +23,7 @@ group("fuzztest") {
     "facrconnectionFourth_fuzzer:fuzztest",
     "facrconnectionTwo_fuzzer:fuzztest",
     "formabilityconnection_fuzzer:fuzztest",
+    "formextensionprocesspool_fuzzer:fuzztest",
     "formabilityconnectionreporter_fuzzer:fuzztest",
     "formamsadapter_fuzzer:fuzztest",
     "formeditservice_fuzzer:fuzztest",

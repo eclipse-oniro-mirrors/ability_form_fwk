@@ -143,6 +143,7 @@ ErrCode FormCommonAdapter::GetFormConfigInfo(const Want& want, FormItemInfo &for
         HILOG_ERROR("formLocation not FormLocation enum,formLocation = %{public}d", formLocation);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+    formLocation = SanitizeFormLocation(formLocation, IsTrustedFormLocationCaller());
     formItemInfo.SetFormLocation((Constants::FormLocation)formLocation);
 
     int renderingMode = want.GetParams().GetIntParam(Constants::PARAM_FORM_RENDERINGMODE_KEY,
@@ -854,6 +855,23 @@ void FormCommonAdapter::UpdateFormCloudUpdateDuration(const std::string &bundleN
     }
 
     formDataMgr_->UpdateFormCloudUpdateDuration(bundleName, durationArray.back());
+}
+
+
+bool FormCommonAdapter::IsTrustedFormLocationCaller() const
+{
+    return FormUtil::IsSACall() || FormUtil::IsSystemAppCall();
+}
+
+int32_t FormCommonAdapter::SanitizeFormLocation(int32_t location, bool isTrustedCaller)
+{
+    bool isCenterLocation = FormUtil::IsFormCenterLocation(
+        static_cast<Constants::FormLocation>(location));
+    if (isCenterLocation && !isTrustedCaller) {
+        HILOG_WARN("untrusted caller with center location %{public}d, sanitize to other", location);
+        return static_cast<int32_t>(Constants::FormLocation::OTHER);
+    }
+    return location;
 }
 
 } // namespace AppExecFwk

@@ -866,6 +866,11 @@ int FormMgrAdapterFacade::DumpFormRunningFormInfos(std::string &runningFormInfos
     return FormDebugAdapter::GetInstance().DumpFormRunningFormInfos(runningFormInfosResult);
 }
 
+int FormMgrAdapterFacade::DumpProcessPool(std::string &result) const
+{
+    return FormDebugAdapter::GetInstance().DumpProcessPool(result);
+}
+
 ErrCode FormMgrAdapterFacade::RegisterFormWantCallback(int32_t callingUid,
     const sptr<IRemoteObject> &callerToken)
 {

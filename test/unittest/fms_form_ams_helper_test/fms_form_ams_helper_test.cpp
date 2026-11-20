@@ -20,7 +20,9 @@
 #define private public
 #define protected public
 #include "ams_mgr/form_ams_helper.h"
+#include "common/connection/form_ability_connection.h"
 #include "form_mgr_errors.h"
+#include "form_provider/connection/form_delete_connection.h"
 #undef private
 #undef protected
 #include "mock_ability_manager.h"
@@ -235,6 +237,26 @@ HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_SetAndClearAbilityManager_001, Test
     EXPECT_EQ(formAmsHelper.abilityManager_, nullptr);
     EXPECT_EQ(formAmsHelper.abilityManagerDeath_, nullptr);
     GTEST_LOG_(INFO) << "FormAmsHelper_SetAndClearAbilityManager_001 end";
+}
+
+/**
+ * @tc.name: FormAmsHelper_ConnectServiceAbilityWithUserId_AmsUnreachable_001
+ * @tc.desc: Verify connection state stays DISCONNECTED when ability manager service is unreachable.
+ * @tc.type: FUNC
+ * @tc.require: 20260910614554
+ */
+HWTEST_F(FmsFormAmsHelperTest, FormAmsHelper_ConnectServiceAbilityWithUserId_AmsUnreachable_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormAmsHelper_ConnectServiceAbilityWithUserId_AmsUnreachable_001 start";
+    MockGetAbilityManager(false);
+    FormAmsHelper formAmsHelper;
+    Want want;
+    sptr<FormDeleteConnection> connect = new (std::nothrow) FormDeleteConnection(1, "bundle", "ability", 100);
+    ASSERT_NE(nullptr, connect.GetRefPtr());
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formAmsHelper.ConnectServiceAbilityWithUserId(
+        want, connect, 100));
+    EXPECT_EQ(ConnectState::DISCONNECTED, connect->GetConnectState());
+    GTEST_LOG_(INFO) << "FormAmsHelper_ConnectServiceAbilityWithUserId_AmsUnreachable_001 end";
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -745,6 +745,10 @@ void FormMgrService::OnStart()
 
     if (FormResourceParam::IsBopdMode()) {
         HILOG_ERROR("is bopd mode");
+        // bopd mode need publish sa
+        if (!Publish(DelayedSingleton<FormMgrService>::GetInstance().get())) {
+            HILOG_ERROR("FormMgrService::Onstart Publish failed");
+        }
         return;
     }
     HILOG_INFO("start,time:%{public}s", onStartBeginTime_.c_str());
@@ -1443,8 +1447,7 @@ void FormMgrService::OnAddSystemAbility(int32_t systemAbilityId, const std::stri
 
 bool FormMgrService::CheckCallerIsSystemApp() const
 {
-    auto callerTokenID = IPCSkeleton::GetCallingFullTokenID();
-    if (!FormUtil::IsSACall() && !Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(callerTokenID)) {
+    if (!FormUtil::IsSACall() && !FormUtil::IsSystemAppCall()) {
         HILOG_ERROR("The caller not system-app,can't use system-api");
         return false;
     }

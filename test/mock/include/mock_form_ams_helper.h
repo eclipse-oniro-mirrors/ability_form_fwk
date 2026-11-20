@@ -21,6 +21,7 @@
 #include "gmock/gmock.h"
 #include "want.h"
 #include "ability_connect_callback_interface.h"
+#include "common/connection/form_ability_connection.h"
 #include "insight_intent/insight_intent_execute_lite_param.h"
 
 namespace OHOS {
@@ -31,9 +32,9 @@ public:
     virtual ~AbstractMockFormAmsHelper() = default;
     virtual ErrCode StartAbility(const Want &want, int32_t userId) = 0;
     virtual ErrCode ConnectServiceAbility(
-        const Want &want, const sptr<AAFwk::IAbilityConnection> &connect) = 0;
+        const Want &want, const sptr<FormAbilityConnection> &connect) = 0;
     virtual ErrCode ConnectServiceAbilityWithUserId(
-        const Want &want, const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId) = 0;
+        const Want &want, const sptr<FormAbilityConnection> &connect, int32_t userId) = 0;
     virtual ErrCode ExecuteUIAbilityForegroundIntentWithSpecifyTokenId(
         const Want &want, const sptr<IRemoteObject> &callerAbilityToken,
         const InsightIntentExecuteLiteParam &param, uint64_t specifiedFullTokenId) = 0;
@@ -48,9 +49,9 @@ public:
     ~MockFormAmsHelper() override = default;
     MOCK_METHOD2(StartAbility, ErrCode(const Want &want, int32_t userId));
     MOCK_METHOD2(ConnectServiceAbility, ErrCode(const Want &want,
-        const sptr<AAFwk::IAbilityConnection> &connect));
+        const sptr<FormAbilityConnection> &connect));
     MOCK_METHOD3(ConnectServiceAbilityWithUserId, ErrCode(const Want &want,
-        const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId));
+        const sptr<FormAbilityConnection> &connect, int32_t userId));
     MOCK_METHOD4(ExecuteUIAbilityForegroundIntentWithSpecifyTokenId, ErrCode(const Want &want,
         const sptr<IRemoteObject> &callerAbilityToken, const InsightIntentExecuteLiteParam &param,
         uint64_t specifiedFullTokenId));

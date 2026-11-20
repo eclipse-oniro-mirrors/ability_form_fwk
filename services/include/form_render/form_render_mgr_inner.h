@@ -82,6 +82,15 @@ public:
 
     int32_t GetReRenderCount() const;
 
+    /**
+     * @brief Check whether the form's render connection died in the FRS
+     *        recovery window (connection present and DISCONNECTED, task-7
+     *        scheme C). Sandbox inner inherits this query (shared ledger).
+     * @param formId Form id.
+     * @return true if the connection exists and is DISCONNECTED.
+     */
+    bool IsConnectionDied(int64_t formId) const;
+
     sptr<IFormRender> GetRenderRemoteObj() const;
 
     void SetRenderRemoteObj(sptr<IFormRender> remoteObject);

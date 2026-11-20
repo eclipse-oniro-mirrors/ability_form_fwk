@@ -435,7 +435,7 @@ void FormDumpMgr::AppendLiveFormStatus(const std::string &formId,
         formInfo += "[ INACTIVE ]\n";
         return;
     }
- 
+
     std::string status = it->second;
     const char* activeState = FormConstantsUtil::GetLiveFormActiveState(status);
     if (activeState == nullptr) {
@@ -452,5 +452,31 @@ void FormDumpMgr::AppendIsTemplateForm(std::string &formInfo, const bool isTempl
     formInfo += "    isTemplateForm ";
     formInfo += "[" + std::to_string(isTemplateForm) + "]\n";
 }
+
+void FormDumpMgr::DumpProcessPool(const ProcessPoolDumpInfo &info, std::string &result) const
+{
+    result.append("================FormExtensionProcessPool================\n");
+    result.append("threshold [ " + std::to_string(info.threshold) + " ]\n");
+    result.append("total active providers [ " + std::to_string(info.totalActiveProviders) + " ]\n");
+    for (const auto &user : info.users) {
+        result.append("\nuser [ " + std::to_string(user.userId) + " ]\n");
+        result.append("active providers [ " + std::to_string(user.activeProviders)
+            + " ] pending [ " + std::to_string(user.pendingCount)
+            + " ] headWaitMs [ " + std::to_string(user.headWaitMs) + " ]\n");
+        for (const auto &bundle : user.bundles) {
+            result.append("\nprovider bundleName [ " + bundle.bundleName + " ]\n");
+            result.append("connection count [ "
+                + std::to_string(bundle.connections.size()) + " ]\n");
+            for (const auto &conn : bundle.connections) {
+                auto state = static_cast<ConnectState>(conn.state);
+                std::string stateStr = state == ConnectState::CONNECTED ? "CONNECTED"
+                    : state == ConnectState::CONNECTING ? "CONNECTING" : "DISCONNECTED";
+                result.append("    formId [ " + std::to_string(conn.formId)
+                    + " ] state [ " + stateStr + " ]\n");
+            }
+        }
+    }
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

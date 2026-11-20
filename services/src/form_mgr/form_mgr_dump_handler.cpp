@@ -20,12 +20,10 @@
 
 #include "fms_log_wrapper.h"
 #include "form_mgr/form_mgr_adapter_facade.h"
-#include "ipc_skeleton.h"
 #include "common/util/form_util.h"
 #include "common/util/form_trust_mgr.h"
 #include "form_mgr_errors.h"
 #include "string_ex.h"
-#include "tokenid_kit.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -42,7 +40,8 @@ const std::string FORM_DUMP_HELP = "options list:\n"
     "  -i  <form-id>                        query form info by a form ID\n"
     "  -r  --running                        query running form info\n"
     "  -a  --apps-blocked                   query blocked app name list\n"
-    "  -c  --cross-device                   query cross-device publish router state\n";
+    "  -c  --cross-device                   query cross-device publish router state\n"
+    "  -p, --process-pool                   query FormExtension process pool state\n";
 
 const std::map<std::string, FormMgrDumpHandler::DumpKey> FormMgrDumpHandler::dumpKeyMap_ = {
     {"-h", DumpKey::KEY_DUMP_HELP},
@@ -63,12 +62,13 @@ const std::map<std::string, FormMgrDumpHandler::DumpKey> FormMgrDumpHandler::dum
     {"--apps-blocked", DumpKey::KEY_DUMP_BLOCKED_APPS},
     {"-c", DumpKey::KEY_DUMP_CROSS_DEVICE},
     {"--cross-device", DumpKey::KEY_DUMP_CROSS_DEVICE},
+    {"-p", DumpKey::KEY_DUMP_PROCESS_POOL},
+    {"--process-pool", DumpKey::KEY_DUMP_PROCESS_POOL},
 };
 
 bool FormMgrDumpHandler::CheckCallerIsSystemApp()
 {
-    auto callerTokenID = IPCSkeleton::GetCallingFullTokenID();
-    if (!FormUtil::IsSACall() && !Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(callerTokenID)) {
+    if (!FormUtil::IsSACall() && !FormUtil::IsSystemAppCall()) {
         HILOG_ERROR("The caller not system-app,can't use system-api");
         return false;
     }
@@ -126,6 +126,8 @@ void FormMgrDumpHandler::Dump(const std::vector<std::u16string> &args, std::stri
             result = "DISTRIBUTED_FORM_SUPPORTED not enabled";
             return;
 #endif
+        case DumpKey::KEY_DUMP_PROCESS_POOL:
+            return HiDumpProcessPool(value, result);
         default:
             result = "error: unknow function.";
             return;
@@ -223,6 +225,11 @@ void FormMgrDumpHandler::HiDumpFormBlockedApps([[maybe_unused]] const std::strin
 void FormMgrDumpHandler::HiDumpCrossDevice([[maybe_unused]] const std::string &args, std::string &result)
 {
     FormMgrAdapterFacade::GetInstance().DumpCrossDevice(result);
+}
+
+void FormMgrDumpHandler::HiDumpProcessPool([[maybe_unused]] const std::string &args, std::string &result)
+{
+    FormMgrAdapterFacade::GetInstance().DumpProcessPool(result);
 }
 
 void FormMgrDumpHandler::HiDumpFormInfoByFormId(const std::string &args, std::string &result)

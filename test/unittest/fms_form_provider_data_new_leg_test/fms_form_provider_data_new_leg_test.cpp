@@ -26,6 +26,7 @@
 #include "form_provider/form_provider_mgr.h"
 #include "feature/form_share/form_share_mgr.h"
 #undef private
+#include "common/connection/form_ability_connection.h"
 #include "form_ashmem.h"
 #include "fms_log_wrapper.h"
 #include "nlohmann/json.hpp"
@@ -399,7 +400,7 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_017, TestSize.Level0)
     FormProviderMgr formProviderMgr;
     FormRecord record;
     Want want;
-    sptr<AAFwk::IAbilityConnection> formRefreshConnection = nullptr;
+    sptr<FormAbilityConnection> formRefreshConnection = nullptr;
     MockConnectServiceAbility(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
         formProviderMgr.RebindByFreeInstall(record, want, formRefreshConnection));
@@ -417,7 +418,7 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_018, TestSize.Level0)
     FormProviderMgr formProviderMgr;
     FormRecord record;
     Want want;
-    sptr<AAFwk::IAbilityConnection> formRefreshConnection = nullptr;
+    sptr<FormAbilityConnection> formRefreshConnection = nullptr;
     MockConnectServiceAbility(true);
     EXPECT_EQ(ERR_OK, formProviderMgr.RebindByFreeInstall(record, want, formRefreshConnection));
     GTEST_LOG_(INFO) << "FormProviderMgr_018 end";

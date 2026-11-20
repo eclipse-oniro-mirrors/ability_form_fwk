@@ -41,6 +41,7 @@ public:
         KEY_DUMP_RUNNING,
         KEY_DUMP_BLOCKED_APPS,
         KEY_DUMP_CROSS_DEVICE,
+        KEY_DUMP_PROCESS_POOL,
     };
 
     /**
@@ -87,6 +88,11 @@ private:
     static void HiDumpFormRunningFormInfos(const std::string &args, std::string &result);
     static void HiDumpFormBlockedApps(const std::string &args, std::string &result);
     static void HiDumpCrossDevice(const std::string &args, std::string &result);
+
+    /**
+     * @brief Dump the FormExtension process pool state (hidumper -p).
+     */
+    static void HiDumpProcessPool(const std::string &args, std::string &result);
 
     static bool CheckCallerIsSystemApp();
     static const std::map<std::string, DumpKey> dumpKeyMap_;

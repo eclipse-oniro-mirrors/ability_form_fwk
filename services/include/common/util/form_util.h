@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_UTIL_H
 #define OHOS_FORM_FWK_FORM_UTIL_H
 
+#include "form_constants.h"
 #include <string_view>
 
 #include "want.h"
@@ -98,6 +99,21 @@ public:
      * @return Returns true if is SA call; returns false otherwise.
      */
     static bool IsSACall();
+
+    /**
+     * @brief Check whether the current IPC caller is a system app
+     *        (by full token ID).
+     * @return true if the caller is a system app.
+     */
+    static bool IsSystemAppCall();
+
+    /**
+     * @brief Check whether the location belongs to the card center family
+     *        (FORM_CENTER / FORM_MANAGER and their negative screen variants).
+     * @param location Form location.
+     * @return true if the location is a card center family location.
+     */
+    static bool IsFormCenterLocation(Constants::FormLocation location);
 
     /**
      * @brief Checks whether the caller has a certain permission.

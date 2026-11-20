@@ -84,9 +84,9 @@ void DoSomethingInterestingPart2(FuzzedDataProvider *fdp)
     sptr<IRemoteObject> remoteObjects = nullptr;
     int resultCode = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     Want want;
-    sptr<AAFwk::IAbilityConnection> connect = nullptr;
+    sptr<FormAbilityConnection> connect = nullptr;
     int32_t userId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
-    
+
     formAmsHelper.GetAbilityManager();
     formAmsHelper.ConnectServiceAbility(want, connect);
     formAmsHelper.DisconnectServiceAbility(connect);
@@ -109,10 +109,11 @@ void DoSomethingInterestingPart2(FuzzedDataProvider *fdp)
         formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
         formIds.insert(formId);
     }
-    sptr<IAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds, bundleName, abilityName,
-        userId);
+    sptr<FormAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds,
+        bundleName, abilityName, userId);
     batchDeleteConnection->OnAbilityConnectDone(element, providerToken, userId);
-    sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId, bundleName, abilityName, userId);
+    sptr<FormAbilityConnection> castTempConnection =
+        new FormCastTempConnection(formId, bundleName, abilityName, userId);
     castTempConnection->OnAbilityConnectDone(element, remoteObjects, resultCode);
 }
 
@@ -128,29 +129,29 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     int resultCode = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     bool isFreeInstall = fdp->ConsumeBool();
     formAbilityConnection->SetFreeInstall(isFreeInstall);
-    
+
     int32_t connectId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     formAbilityConnection->SetConnectId(connectId);
     int32_t getConnectId = formAbilityConnection->GetConnectId();
-    
+
     int64_t formId = fdp->ConsumeIntegralInRange<int64_t>(MIN_NUM, MAX_NUM);
     formAbilityConnection->SetFormId(formId);
     int64_t getFormId = formAbilityConnection->GetFormId();
-    
+
     std::string bundleName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     std::string abilityName = fdp->ConsumeRandomLengthString(MAX_LENGTH);
     int32_t userId = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     formAbilityConnection->SetProviderKey(bundleName, abilityName, userId);
     std::string getProviderKey = formAbilityConnection->GetProviderKey();
-    
+
     sptr<IRemoteObject> hostToken = nullptr;
     formAbilityConnection->SetHostToken(hostToken);
     formAbilityConnection->GetHostToken();
-    
+
     sptr<IRemoteObject> providerToken = nullptr;
     formAbilityConnection->SetProviderToken(providerToken);
     sptr<IRemoteObject> getProviderToken = formAbilityConnection->GetProviderToken();
-    
+
     formAbilityConnection->OnAbilityConnectDone(element, remoteObjects, resultCode);
     formAbilityConnection->onFormAppConnect();
     formAbilityConnection->ReportFormAppUnbindEvent();
@@ -176,9 +177,9 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     sptr<IRemoteObject> procRemoteObject = nullptr;
     int procResultCode = fdp->ConsumeIntegralInRange(MIN_NUM, MAX_NUM);
     formAbilityConnection->ProcessFreeInstall(procElement, procRemoteObject, procResultCode);
-    
+
     DoSomethingInterestingPart2(fdp);
-    
+
     return true;
 }
 }

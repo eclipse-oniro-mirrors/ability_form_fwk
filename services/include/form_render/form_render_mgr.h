@@ -91,6 +91,18 @@ public:
 
     bool IsRerenderForRenderServiceDied(int64_t formId);
 
+    /**
+     * @brief FRS restart recovery signal:
+     *        the form's render connection is DISCONNECTED and the user's
+     *        recovery count is positive (only true inside the FRS death
+     *        recovery window). Does NOT reuse IsRerenderForRenderServiceDied
+     *        (that API is a conservative count-limit exemption with a
+     *        missing-record false-positive branch).
+     * @param formId Form id.
+     * @return true when recovering from an FRS death.
+     */
+    bool IsFormRenderConnectionDied(int64_t formId);
+
     void OnRenderingBlock(const std::string &bundleName);
 
     ErrCode ReleaseRenderer(int64_t formId, const FormRecord &formRecord, const std::string &compId);

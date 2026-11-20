@@ -26,6 +26,11 @@ FormEventNotifyConnection::FormEventNotifyConnection(const std::vector<int64_t> 
     const int32_t userId) : formEvents_(formEvents), formVisibleType_(formVisibleType)
 {
     SetProviderKey(bundleName, abilityName, userId);
+    if (!formEvents.empty()) {
+        SetFormId(formEvents.front());
+    }
+    poolManaged_ = true;
+    connectionType_ = ConnectionType::EVENT_NOTIFY;
 }
 
 void FormEventNotifyConnection::OnExecuteConnectTask(const Want &want, const sptr<IRemoteObject> &remoteObject)

@@ -37,6 +37,8 @@ FormAcquireConnection::FormAcquireConnection(const int64_t formId, const FormIte
     SetProviderKey(info.GetProviderBundleName(), info.GetAbilityName(), userId);
     SetModuleName(info.GetModuleName());
     SetHostToken(hostToken);
+    poolManaged_ = true;
+    connectionType_ = ConnectionType::ACQUIRE;
 }
 
 sptr<FormAbilityConnection> FormAcquireConnection::CreateRetryConnection() const
@@ -48,7 +50,7 @@ sptr<FormAbilityConnection> FormAcquireConnection::CreateRetryConnection() const
 
 void FormAcquireConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    ConnectState state = connectState_.load();
+    ConnectState state = GetConnectState();
     HILOG_INFO("formId:%{public}" PRId64 ", resultCode:%{public}d, state:%{public}d",
         GetFormId(), resultCode, static_cast<int32_t>(state));
     // Was connected: dual-signal retry handler (before base resets state).

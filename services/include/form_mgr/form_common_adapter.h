@@ -297,6 +297,19 @@ protected:
     mutable std::mutex deathRecipientsMutex_;
     std::unordered_map<std::string, std::vector<sptr<IRemoteObject>>> formObservers_;
     std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>> deathRecipients_;
+
+private:
+    /**
+     * @brief Sanitize the form location from the caller want. FORM_CENTER
+     *        family values are only trusted from system-app callers; third-
+     *        party callers get sanitized back to OTHER (-1).
+     * @param location Raw location parsed from want.
+     * @param isTrustedCaller Whether the IPC caller is a system app or SA.
+     * @return Sanitized location.
+     */
+    static int32_t SanitizeFormLocation(int32_t location, bool isTrustedCaller);
+
+    bool IsTrustedFormLocationCaller() const;
 };
 
 } // namespace AppExecFwk
