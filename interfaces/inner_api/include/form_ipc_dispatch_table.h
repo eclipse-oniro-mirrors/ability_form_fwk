@@ -79,10 +79,9 @@ public:
 
     /**
      * @brief Install an access checker.
-     * @param checker The checker to install.
-     * @note Threading contract: Set/Get are not synchronized. The owner must install the real
-     *       checker once during service startup, before the SA is published, so that IPC
-     *       worker threads only read the checker after publication.
+     * @param checker The checker to install; nullptr falls back to FailClosedChecker.
+     * @note Access is synchronized (atomic load/store), so a re-install while IPC worker
+     *       threads read the checker is safe.
      */
     void SetAccessChecker(std::shared_ptr<IStubAccessChecker> checker);
 
