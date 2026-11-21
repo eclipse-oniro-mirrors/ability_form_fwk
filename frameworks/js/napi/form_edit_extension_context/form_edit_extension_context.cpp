@@ -16,7 +16,6 @@
 #include "form_edit_extension_context.h"
 #include "hilog_tag_wrapper.h"
 #include "fms_log_wrapper.h"
-#include "form_constants.h"
 #include "form_mgr.h"
 
 
@@ -48,22 +47,15 @@ bool FormEditExtensionContext::SetWindowBackgroundColor(const std::string &color
     return true;
 }
 
-ErrCode FormEditExtensionContext::StartAbilityByFms(const AAFwk::Want &want)
+ErrCode FormEditExtensionContext::OpenFormEditPage(const AAFwk::Want &want)
 {
-    TAG_LOGI(AAFwkTag::UI_EXT, "StartAbilityByFms wantToHost: %{private}s", want.ToString().c_str());
-    Want wantToHost(want);
-    std::string requestMethod = "openFormEditSecPageView";
-    wantToHost.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT);
-    wantToHost.SetParam(Constants::PARMA_REQUEST_METHOD, requestMethod);
-    wantToHost.SetAction(Constants::FORM_PAGE_ACTION);
-
-    TAG_LOGI(AAFwkTag::UI_EXT, "StartAbilityByFms wantToHost: %{private}s", wantToHost.ToString().c_str());
-    ErrCode err = AppExecFwk::FormMgr::GetInstance().StartAbilityByFms(wantToHost);
+    TAG_LOGI(AAFwkTag::UI_EXT, "OpenFormEditPage want: %{private}s", want.ToString().c_str());
+    ErrCode err = AppExecFwk::FormMgr::GetInstance().OpenFormEditPage(want);
     if (err != ERR_OK) {
         TAG_LOGE(AAFwkTag::UI_EXT, "ret = %{public}d", err);
         return err;
     }
-    TAG_LOGI(AAFwkTag::UI_EXT, "StartAbilityByFms success");
+    TAG_LOGI(AAFwkTag::UI_EXT, "OpenFormEditPage success");
     return ERR_OK;
 }
 

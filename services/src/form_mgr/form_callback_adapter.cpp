@@ -833,6 +833,21 @@ ErrCode FormCallbackAdapter::OpenLiveFormPage(const Want &want, const std::strin
     if (ret != ERR_OK) {
         return ret;
     }
+    int64_t liveFormId = 0;
+    if (!FormUtil::ConvertStringToInt64(formId, liveFormId)) {
+        HILOG_ERROR("invalid live formId:%{public}s", formId.c_str());
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(liveFormId, formRecord)) {
+        HILOG_ERROR("live form record not exist, formId:%{public}s", formId.c_str());
+        return ERR_APPEXECFWK_FORM_NOT_EXIST;
+    }
+    // Authorization fact: the live form record belongs to the caller.
+    if (formRecord.bundleName != callerName) {
+        HILOG_ERROR("live form not belong to caller:%{public}s", callerName.c_str());
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
     HILOG_DEBUG("support launcher check start");
     std::unordered_map<std::string, std::string> liveFormStatusMap;
     GetLiveFormStatus(liveFormStatusMap);

@@ -364,12 +364,6 @@ napi_value JsFormProvider::OnOpenFormManager(napi_env env, size_t argc, napi_val
     const std::string bundleName = want.GetBundle();
     const std::string abilityName = want.GetElement().GetAbilityName();
     want.SetElementName(bundleName, abilityName);
-    want.SetAction(AppExecFwk::Constants::FORM_PAGE_ACTION);
-    want.SetParam(AppExecFwk::Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
-                  AppExecFwk::Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE);
-    const std::string key = AppExecFwk::Constants::PARMA_REQUEST_METHOD;
-    const std::string value = AppExecFwk::Constants::OPEN_FORM_MANAGE_VIEW;
-    want.SetParam(key, value);
 
 #ifdef NO_RUNTIME_EMULATOR
     time_t beginTime = time(nullptr);
@@ -378,7 +372,7 @@ napi_value JsFormProvider::OnOpenFormManager(napi_env env, size_t argc, napi_val
         want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY),
         want.GetStringParam(Constants::PARAM_FORM_NAME_KEY)};
 #endif
-    auto ret = FormMgr::GetInstance().StartAbilityByFms(want);
+    auto ret = FormMgr::GetInstance().OpenFormManagePage(want);
 #ifdef NO_RUNTIME_EMULATOR
     std::thread([ret, beginTime, publishFormData]() {
         int64_t processorId = FormEventHiAppEvent::AddProcessor();
@@ -388,7 +382,7 @@ napi_value JsFormProvider::OnOpenFormManager(napi_env env, size_t argc, napi_val
     }).detach();
 #endif
     if (ret != ERR_OK) {
-        HILOG_ERROR("fail to StartAbilityByFms,error code:%{public}d", static_cast<int>(ret));
+        HILOG_ERROR("fail to OpenFormManagePage,error code:%{public}d", static_cast<int>(ret));
         if (ret == ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED ||
             ret == ERR_APPEXECFWK_FORM_GET_INFO_FAILED || ret == ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED) {
             NapiFormUtil::ThrowByInternalErrorCode(env, ret);
@@ -419,12 +413,6 @@ napi_value JsFormProvider::OnOpenFormManagerCrossBundle(napi_env env, size_t arg
     const std::string bundleName = want.GetBundle();
     const std::string abilityName = want.GetElement().GetAbilityName();
     want.SetElementName(bundleName, abilityName);
-    want.SetAction(AppExecFwk::Constants::FORM_PAGE_ACTION);
-    want.SetParam(AppExecFwk::Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
-                  AppExecFwk::Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE);
-    const std::string key = AppExecFwk::Constants::PARMA_REQUEST_METHOD;
-    const std::string value = AppExecFwk::Constants::OPEN_FORM_MANAGE_VIEW;
-    want.SetParam(key, value);
 
 #ifdef NO_RUNTIME_EMULATOR
     time_t beginTime = time(nullptr);

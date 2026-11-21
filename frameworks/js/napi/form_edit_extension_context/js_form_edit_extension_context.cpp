@@ -145,7 +145,7 @@ napi_value JsFormEditExtensionContext::OnStartSecondPage(napi_env env, NapiCallb
             return;
         }
 
-        ErrCode errCode = context->StartAbilityByFms(want);
+        ErrCode errCode = context->OpenFormEditPage(want);
         napi_value abilityResult = AppExecFwk::WrapAbilityResult(env, static_cast<int>(errCode), want);
         if (abilityResult == nullptr) {
             TAG_LOGE(AAFwkTag::UI_EXT, "Wrap abilityResult failed");
