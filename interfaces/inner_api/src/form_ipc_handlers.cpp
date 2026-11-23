@@ -3061,7 +3061,7 @@ int32_t HandleOpenFormManagePage(IFormMgr &svc, MessageParcel &data, MessageParc
     return result;
 }
 
-int32_t HandleOpenFormEditPage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
+int32_t HandleOpenFormEditSecondPage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
@@ -3069,7 +3069,7 @@ int32_t HandleOpenFormEditPage(IFormMgr &svc, MessageParcel &data, MessageParcel
         HILOG_ERROR("get want failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int32_t result = svc.OpenFormEditPage(*want);
+    int32_t result = svc.OpenFormEditSecondPage(*want);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

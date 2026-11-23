@@ -303,7 +303,7 @@ public:
 
     ErrCode OpenFormManagePage(const Want &want);
 
-    ErrCode OpenFormEditPage(const Want &want);
+    ErrCode OpenFormEditSecondPage(const Want &want);
 
     ErrCode OpenLiveFormPage(const Want &want, const std::string &formId);
 

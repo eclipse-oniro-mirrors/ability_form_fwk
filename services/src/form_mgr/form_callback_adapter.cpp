@@ -813,7 +813,7 @@ ErrCode FormCallbackAdapter::OpenFormManagePage(const Want &want)
         Constants::OPEN_FORM_MANAGE_VIEW);
 }
 
-ErrCode FormCallbackAdapter::OpenFormEditPage(const Want &want)
+ErrCode FormCallbackAdapter::OpenFormEditSecondPage(const Want &want)
 {
     HILOG_INFO("call");
     std::string callerName;

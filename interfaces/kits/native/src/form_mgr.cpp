@@ -1694,7 +1694,7 @@ int32_t FormMgr::OpenFormManagePage(const Want &want)
     return remoteProxy_->OpenFormManagePage(want);
 }
 
-int32_t FormMgr::OpenFormEditPage(const Want &want)
+int32_t FormMgr::OpenFormEditSecondPage(const Want &want)
 {
     HILOG_DEBUG("call");
     int32_t errCode = Connect();
@@ -1706,7 +1706,7 @@ int32_t FormMgr::OpenFormEditPage(const Want &want)
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    return remoteProxy_->OpenFormEditPage(want);
+    return remoteProxy_->OpenFormEditSecondPage(want);
 }
 
 int32_t FormMgr::OpenLiveFormPage(const Want &want, const std::string &formId)

@@ -1278,11 +1278,11 @@ int32_t FormMgrService::OpenFormManagePage(const Want &want)
     return FormMgrAdapterFacade::GetInstance().OpenFormManagePage(want);
 }
 
-int32_t FormMgrService::OpenFormEditPage(const Want &want)
+int32_t FormMgrService::OpenFormEditSecondPage(const Want &want)
 {
     HILOG_INFO("call");
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    return FormMgrAdapterFacade::GetInstance().OpenFormEditPage(want);
+    return FormMgrAdapterFacade::GetInstance().OpenFormEditSecondPage(want);
 }
 
 int32_t FormMgrService::OpenLiveFormPage(const Want &want, const std::string &formId)

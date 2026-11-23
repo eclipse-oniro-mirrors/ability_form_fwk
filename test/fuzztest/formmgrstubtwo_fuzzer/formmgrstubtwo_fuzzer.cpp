@@ -632,7 +632,7 @@ const FormHandlerFunc FORM_MGR_TWO_FUZZ_HANDLERS[] = {
     &FormIpcHandlers::HandleRecycleForms,
     &FormIpcHandlers::HandleGetVisibleFormRect,
     &FormIpcHandlers::HandleGetAvailableFormHostServices,
-    &FormIpcHandlers::HandleOpenFormEditPage,
+    &FormIpcHandlers::HandleOpenFormEditSecondPage,
     &FormIpcHandlers::HandleOpenFormManagePage,
     &FormIpcHandlers::HandleOpenLiveFormPage,
     &FormIpcHandlers::HandleRegisterFormHostService,

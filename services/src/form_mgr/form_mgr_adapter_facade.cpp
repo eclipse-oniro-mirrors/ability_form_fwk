@@ -796,10 +796,10 @@ ErrCode FormMgrAdapterFacade::OpenFormManagePage(const Want &want)
     return FormCallbackAdapter::GetInstance().OpenFormManagePage(want);
 }
 
-ErrCode FormMgrAdapterFacade::OpenFormEditPage(const Want &want)
+ErrCode FormMgrAdapterFacade::OpenFormEditSecondPage(const Want &want)
 {
     HILOG_INFO("called");
-    return FormCallbackAdapter::GetInstance().OpenFormEditPage(want);
+    return FormCallbackAdapter::GetInstance().OpenFormEditSecondPage(want);
 }
 
 ErrCode FormMgrAdapterFacade::OpenLiveFormPage(const Want &want, const std::string &formId)

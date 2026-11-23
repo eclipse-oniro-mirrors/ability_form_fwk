@@ -2862,28 +2862,28 @@ HWTEST_F(FmsFormMgrProxyTest, OpenFormManagePageTest_0300, TestSize.Level1)
 }
 
 /**
- * @tc.name: OpenFormEditPageTest_0100
- * @tc.desc: test OpenFormEditPage with WriteInterfaceToken failed
+ * @tc.name: OpenFormEditSecondPageTest_0100
+ * @tc.desc: test OpenFormEditSecondPage with WriteInterfaceToken failed
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, OpenFormEditPageTest_0100, TestSize.Level1)
+HWTEST_F(FmsFormMgrProxyTest, OpenFormEditSecondPageTest_0100, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "OpenFormEditPageTest_0100 start";
+    GTEST_LOG_(INFO) << "OpenFormEditSecondPageTest_0100 start";
     MockWriteInterfaceToken(false);
     Want want;
-    int32_t result = proxy_->OpenFormEditPage(want);
+    int32_t result = proxy_->OpenFormEditSecondPage(want);
     EXPECT_EQ(ERR_APPEXECFWK_PARCEL_ERROR, result);
-    GTEST_LOG_(INFO) << "OpenFormEditPageTest_0100 end";
+    GTEST_LOG_(INFO) << "OpenFormEditSecondPageTest_0100 end";
 }
 
 /**
- * @tc.name: OpenFormEditPageTest_0200
- * @tc.desc: test OpenFormEditPage function with success
+ * @tc.name: OpenFormEditSecondPageTest_0200
+ * @tc.desc: test OpenFormEditSecondPage function with success
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, OpenFormEditPageTest_0200, TestSize.Level1)
+HWTEST_F(FmsFormMgrProxyTest, OpenFormEditSecondPageTest_0200, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "OpenFormEditPageTest_0200 start";
+    GTEST_LOG_(INFO) << "OpenFormEditSecondPageTest_0200 start";
     EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _))
         .WillRepeatedly(DoAll(Invoke([](uint32_t code, MessageParcel &data, MessageParcel &reply,
             MessageOption &option) -> int {
@@ -2891,25 +2891,25 @@ HWTEST_F(FmsFormMgrProxyTest, OpenFormEditPageTest_0200, TestSize.Level1)
             return NO_ERROR;
         }), Return(NO_ERROR)));
     Want want;
-    int32_t result = proxy_->OpenFormEditPage(want);
+    int32_t result = proxy_->OpenFormEditSecondPage(want);
     EXPECT_EQ(ERR_OK, result);
-    GTEST_LOG_(INFO) << "OpenFormEditPageTest_0200 end";
+    GTEST_LOG_(INFO) << "OpenFormEditSecondPageTest_0200 end";
 }
 
 /**
- * @tc.name: OpenFormEditPageTest_0300
- * @tc.desc: test OpenFormEditPage with SendRequest failed
+ * @tc.name: OpenFormEditSecondPageTest_0300
+ * @tc.desc: test OpenFormEditSecondPage with SendRequest failed
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrProxyTest, OpenFormEditPageTest_0300, TestSize.Level1)
+HWTEST_F(FmsFormMgrProxyTest, OpenFormEditSecondPageTest_0300, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "OpenFormEditPageTest_0300 start";
+    GTEST_LOG_(INFO) << "OpenFormEditSecondPageTest_0300 start";
     EXPECT_CALL(*iremoteObject_, SendRequest(_, _, _, _)).Times(1)
         .WillRepeatedly(Return(-1));
     Want want;
-    int32_t result = proxy_->OpenFormEditPage(want);
+    int32_t result = proxy_->OpenFormEditSecondPage(want);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
-    GTEST_LOG_(INFO) << "OpenFormEditPageTest_0300 end";
+    GTEST_LOG_(INFO) << "OpenFormEditSecondPageTest_0300 end";
 }
 
 /**

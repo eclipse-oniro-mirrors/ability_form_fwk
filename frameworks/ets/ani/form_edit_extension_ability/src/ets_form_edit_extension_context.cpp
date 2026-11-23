@@ -231,7 +231,7 @@ void EtsFormEditExtensionContext::OnStartSecondPage(ani_env *env, ani_object ani
             nullptr);
         return;
     }
-    ErrCode errCode = contextPtr->OpenFormEditPage(want);
+    ErrCode errCode = contextPtr->OpenFormEditSecondPage(want);
     int resultCode = 0;
     ani_object abilityResult = AppExecFwk::WrapAbilityResult(env, resultCode, want);
     if (abilityResult == nullptr) {

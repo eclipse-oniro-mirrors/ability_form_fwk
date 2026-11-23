@@ -47,15 +47,15 @@ bool FormEditExtensionContext::SetWindowBackgroundColor(const std::string &color
     return true;
 }
 
-ErrCode FormEditExtensionContext::OpenFormEditPage(const AAFwk::Want &want)
+ErrCode FormEditExtensionContext::OpenFormEditSecondPage(const AAFwk::Want &want)
 {
-    TAG_LOGI(AAFwkTag::UI_EXT, "OpenFormEditPage want: %{private}s", want.ToString().c_str());
-    ErrCode err = AppExecFwk::FormMgr::GetInstance().OpenFormEditPage(want);
+    TAG_LOGI(AAFwkTag::UI_EXT, "OpenFormEditSecondPage want: %{private}s", want.ToString().c_str());
+    ErrCode err = AppExecFwk::FormMgr::GetInstance().OpenFormEditSecondPage(want);
     if (err != ERR_OK) {
         TAG_LOGE(AAFwkTag::UI_EXT, "ret = %{public}d", err);
         return err;
     }
-    TAG_LOGI(AAFwkTag::UI_EXT, "OpenFormEditPage success");
+    TAG_LOGI(AAFwkTag::UI_EXT, "OpenFormEditSecondPage success");
     return ERR_OK;
 }
 

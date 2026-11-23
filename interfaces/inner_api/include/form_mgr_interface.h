@@ -1299,7 +1299,7 @@ public:
      * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int32_t OpenFormEditPage(const Want &want)
+    virtual int32_t OpenFormEditSecondPage(const Want &want)
     {
         return ERR_OK;
     }
@@ -1456,7 +1456,7 @@ public:
         FORM_MGR_GET_VISIBLE_FORM_RECT,
         FORM_MGR_UPDATE_FORMS_WITH_REMINDER_AGENT,
         FORM_MGR_OPEN_FORM_MANAGE_PAGE,
-        FORM_MGR_OPEN_FORM_EDIT_PAGE,
+        FORM_MGR_OPEN_FORM_EDIT_SECOND_PAGE,
         FORM_MGR_OPEN_LIVE_FORM_PAGE,
     };
 };

@@ -1933,7 +1933,7 @@ int32_t FormMgrProxy::OpenFormManagePage(const Want &want)
     return result;
 }
 
-int32_t FormMgrProxy::OpenFormEditPage(const Want &want)
+int32_t FormMgrProxy::OpenFormEditSecondPage(const Want &want)
 {
     HILOG_INFO("start");
     MessageParcel data;
@@ -1951,7 +1951,7 @@ int32_t FormMgrProxy::OpenFormEditPage(const Want &want)
     MessageParcel reply;
     MessageOption option;
     int error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_OPEN_FORM_EDIT_PAGE,
+        IFormMgr::Message::FORM_MGR_OPEN_FORM_EDIT_SECOND_PAGE,
         data,
         reply,
         option);
