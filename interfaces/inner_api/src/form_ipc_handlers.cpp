@@ -57,13 +57,13 @@ template<typename T>
 bool WriteParcelableVector(std::vector<T> &parcelableVector, Parcel &reply)
 {
     if (!reply.WriteInt32(parcelableVector.size())) {
-        HILOG_ERROR("write ParcelableVector failed");
+        HILOG_ERROR("[%{public}s]write ParcelableVector failed", __FUNCTION__);
         return false;
     }
 
     for (auto &parcelable: parcelableVector) {
         if (!reply.WriteParcelable(&parcelable)) {
-            HILOG_ERROR("write ParcelableVector failed");
+            HILOG_ERROR("[%{public}s]write ParcelableVector failed", __FUNCTION__);
             return false;
         }
     }
@@ -130,7 +130,7 @@ int32_t HandleAddForm(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
@@ -148,7 +148,7 @@ int32_t HandleAddForm(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
     FormJsInfo formJsInfo;
     int32_t result = svc.AddForm(formId, *want, client, formJsInfo);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!reply.WriteParcelable(&formJsInfo)) {
@@ -176,7 +176,7 @@ int32_t HandleCreateForm(IFormMgr &svc, MessageParcel &data, MessageParcel &repl
     RunningFormInfo runningFormInfo;
     int32_t result = svc.CreateForm(*want, runningFormInfo);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!reply.WriteParcelable(&runningFormInfo)) {
@@ -196,17 +196,17 @@ int32_t HandleDeleteForm(IFormMgr &svc, MessageParcel &data, MessageParcel &repl
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("read client failed");
+        HILOG_ERROR("[%{public}s]read client failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.DeleteForm(formId, client);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -222,17 +222,17 @@ int32_t HandleStopRenderingForm(IFormMgr &svc, MessageParcel &data, MessageParce
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::string compId;
     if (!data.ReadString(compId)) {
-        HILOG_ERROR("read compId failed");
+        HILOG_ERROR("[%{public}s]read compId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.StopRenderingForm(formId, compId);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -248,12 +248,12 @@ int32_t HandleReleaseForm(IFormMgr &svc, MessageParcel &data, MessageParcel &rep
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("read client failed");
+        HILOG_ERROR("[%{public}s]read client failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool delCache = false;
@@ -263,7 +263,7 @@ int32_t HandleReleaseForm(IFormMgr &svc, MessageParcel &data, MessageParcel &rep
     }
     int32_t result = svc.ReleaseForm(formId, client, delCache);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -279,17 +279,17 @@ int32_t HandleUpdateForm(IFormMgr &svc, MessageParcel &data, MessageParcel &repl
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<FormProviderData> formBindingData(data.ReadParcelable<FormProviderData>());
     if (formBindingData == nullptr) {
-        HILOG_ERROR("fail get formBindingData");
+        HILOG_ERROR("[%{public}s]fail get formBindingData", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.UpdateForm(formId, *formBindingData);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -299,7 +299,7 @@ int32_t HandleUpdateFormProviderInfo(IFormMgr &svc, MessageParcel &data, Message
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<FormProviderInfo> formProviderInfo(data.ReadParcelable<FormProviderInfo>());
@@ -309,7 +309,7 @@ int32_t HandleUpdateFormProviderInfo(IFormMgr &svc, MessageParcel &data, Message
     }
     int32_t result = svc.UpdateForm(formId, *formProviderInfo);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -325,17 +325,17 @@ int32_t HandleUpdateFormCrossBundle(IFormMgr &svc, MessageParcel &data, MessageP
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<FormProviderData> formBindingData(data.ReadParcelable<FormProviderData>());
     if (formBindingData == nullptr) {
-        HILOG_ERROR("fail get formBindingData");
+        HILOG_ERROR("[%{public}s]fail get formBindingData", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.UpdateFormCrossBundle(formId, *formBindingData);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -351,7 +351,7 @@ int32_t HandleSetNextRefreshTime(IFormMgr &svc, MessageParcel &data, MessageParc
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int64_t nextTime = 0;
@@ -361,7 +361,7 @@ int32_t HandleSetNextRefreshTime(IFormMgr &svc, MessageParcel &data, MessageParc
     }
     int32_t result = svc.SetNextRefreshTime(formId, nextTime);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -377,17 +377,17 @@ int32_t HandleReleaseRenderer(IFormMgr &svc, MessageParcel &data, MessageParcel 
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::string compId;
     if (!data.ReadString(compId)) {
-        HILOG_ERROR("read compId failed");
+        HILOG_ERROR("[%{public}s]read compId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.ReleaseRenderer(formId, compId);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -403,7 +403,7 @@ int32_t HandleRequestPublishFormCrossUser(IFormMgr &svc, MessageParcel &data, Me
 {
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
-        HILOG_ERROR("get want failed");
+        HILOG_ERROR("[%{public}s]get want failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -416,7 +416,7 @@ int32_t HandleRequestPublishFormCrossUser(IFormMgr &svc, MessageParcel &data, Me
     int64_t formId = 0;
     ErrCode result = svc.RequestPublishFormCrossUser(*want, userId, formId);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
@@ -435,7 +435,7 @@ int32_t HandleRequestPublishForm(IFormMgr &svc, MessageParcel &data, MessageParc
 {
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
-        HILOG_ERROR("get want failed");
+        HILOG_ERROR("[%{public}s]get want failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -448,14 +448,14 @@ int32_t HandleRequestPublishForm(IFormMgr &svc, MessageParcel &data, MessageParc
     if (withFormBindingData) {
         formProviderData.reset(data.ReadParcelable<FormProviderData>());
         if (formProviderData == nullptr) {
-            HILOG_ERROR("get formProviderData failed");
+            HILOG_ERROR("[%{public}s]get formProviderData failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
     int64_t formId = 0;
     ErrCode result = svc.RequestPublishForm(*want, withFormBindingData, formProviderData, formId);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
@@ -468,7 +468,7 @@ int32_t HandleSetPublishFormResult(IFormMgr &svc, MessageParcel &data, MessagePa
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::string message;
@@ -496,7 +496,7 @@ int32_t HandleSetPublishFormResult(IFormMgr &svc, MessageParcel &data, MessagePa
     errorCodeInfo.code = static_cast<Constants::PublishFormErrorCode>(err);
     ErrCode result = svc.SetPublishFormResult(formId, errorCodeInfo);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -506,12 +506,12 @@ int32_t HandleAcquireAddFormResult(IFormMgr &svc, MessageParcel &data, MessagePa
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     ErrCode result = svc.AcquireAddFormResult(formId);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -528,17 +528,17 @@ int32_t HandleLifecycleUpdate(IFormMgr &svc, MessageParcel &data, MessageParcel 
     std::vector<int64_t> formIds;
     bool ret = data.ReadInt64Vector(&formIds);
     if (!ret) {
-        HILOG_ERROR("read formIds failed");
+        HILOG_ERROR("[%{public}s]read formIds failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
+        HILOG_ERROR("[%{public}s]formIds size %{public}zu exceeds limit %{public}d", __FUNCTION__,
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s]get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool updateType = false;
@@ -548,7 +548,7 @@ int32_t HandleLifecycleUpdate(IFormMgr &svc, MessageParcel &data, MessageParcel 
     }
     int32_t result = svc.LifecycleUpdate(formIds, client, updateType);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -562,27 +562,27 @@ int32_t HandleLifecycleUpdate(IFormMgr &svc, MessageParcel &data, MessageParcel 
  */
 int32_t HandleRequestForm(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
 
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s]get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s]ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.RequestForm(formId, client, *want);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -599,17 +599,17 @@ int32_t HandleNotifyWhetherVisibleForms(IFormMgr &svc, MessageParcel &data, Mess
     std::vector<int64_t> formIds;
     bool ret = data.ReadInt64Vector(&formIds);
     if (!ret) {
-        HILOG_ERROR("read formIds failed");
+        HILOG_ERROR("[%{public}s]read formIds failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
+        HILOG_ERROR("[%{public}s]formIds size %{public}zu exceeds limit %{public}d", __FUNCTION__,
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("read client failed");
+        HILOG_ERROR("[%{public}s]read client failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t formVisibleType = 0;
@@ -619,7 +619,7 @@ int32_t HandleNotifyWhetherVisibleForms(IFormMgr &svc, MessageParcel &data, Mess
     }
     int32_t result = svc.NotifyWhetherVisibleForms(formIds, client, formVisibleType);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -633,7 +633,7 @@ int32_t HandleNotifyWhetherVisibleForms(IFormMgr &svc, MessageParcel &data, Mess
  */
 int32_t HandleHasFormVisible(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     uint32_t tokenId = 0;
     if (!data.ReadUint32(tokenId)) {
         HILOG_ERROR("read tokenId failed");
@@ -641,7 +641,7 @@ int32_t HandleHasFormVisible(IFormMgr &svc, MessageParcel &data, MessageParcel &
     }
     bool result = svc.HasFormVisible(tokenId);
     if (!reply.WriteBool(result)) {
-        HILOG_ERROR("write action failed");
+        HILOG_ERROR("[%{public}s]write action failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -657,17 +657,17 @@ int32_t HandleCastTempForm(IFormMgr &svc, MessageParcel &data, MessageParcel &re
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("read client failed");
+        HILOG_ERROR("[%{public}s]read client failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.CastTempForm(formId, client);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -684,14 +684,14 @@ int32_t HandleDumpStorageFormInfos(IFormMgr &svc, MessageParcel &data, MessagePa
     std::string formInfos;
     int32_t result = svc.DumpStorageFormInfos(formInfos);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
         std::vector<std::string> dumpInfos;
         SplitString(formInfos, dumpInfos);
         if (!reply.WriteStringVector(dumpInfos)) {
-            HILOG_ERROR("WriteStringVector<dumpInfos> failed");
+            HILOG_ERROR("[%{public}s]WriteStringVector<dumpInfos> failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -711,7 +711,7 @@ int32_t HandleDumpFormInfoByBundleName(IFormMgr &svc, MessageParcel &data, Messa
     std::string formInfos;
     int32_t result = svc.DumpFormInfoByBundleName(bundleName, formInfos);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
@@ -719,7 +719,7 @@ int32_t HandleDumpFormInfoByBundleName(IFormMgr &svc, MessageParcel &data, Messa
         std::vector<std::string> dumpInfos;
         SplitString(formInfos, dumpInfos);
         if (!reply.WriteStringVector(dumpInfos)) {
-            HILOG_ERROR("WriteStringVector<dumpInfos> failed");
+            HILOG_ERROR("[%{public}s]WriteStringVector<dumpInfos> failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -737,20 +737,20 @@ int32_t HandleDumpFormInfoByFormId(IFormMgr &svc, MessageParcel &data, MessagePa
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::string formInfo;
     int32_t result = svc.DumpFormInfoByFormId(formId, formInfo);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
         std::vector<std::string> dumpInfos;
         SplitString(formInfo, dumpInfos);
         if (!reply.WriteStringVector(dumpInfos)) {
-            HILOG_ERROR("WriteStringVector<dumpInfos> failed");
+            HILOG_ERROR("[%{public}s]WriteStringVector<dumpInfos> failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -767,20 +767,20 @@ int32_t HandleDumpFormTimerByFormId(IFormMgr &svc, MessageParcel &data, MessageP
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::string isTimingService;
     int32_t result = svc.DumpFormTimerByFormId(formId, isTimingService);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
         std::vector<std::string> dumpInfos;
         SplitString(isTimingService, dumpInfos);
         if (!reply.WriteStringVector(dumpInfos)) {
-            HILOG_ERROR("WriteStringVector<dumpInfos> failed");
+            HILOG_ERROR("[%{public}s]WriteStringVector<dumpInfos> failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -797,22 +797,22 @@ int32_t HandleMessageEvent(IFormMgr &svc, MessageParcel &data, MessageParcel &re
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s]ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s]get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.MessageEvent(formId, *want, client);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -826,25 +826,25 @@ int32_t HandleMessageEvent(IFormMgr &svc, MessageParcel &data, MessageParcel &re
  */
 int32_t HandleRouterEvent(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s]ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s]get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.RouterEvent(formId, *want, client);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -858,25 +858,25 @@ int32_t HandleRouterEvent(IFormMgr &svc, MessageParcel &data, MessageParcel &rep
  */
 int32_t HandleBackgroundEvent(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s]ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s]get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.BackgroundEvent(formId, *want, client);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -890,25 +890,25 @@ int32_t HandleBackgroundEvent(IFormMgr &svc, MessageParcel &data, MessageParcel 
  */
 int32_t HandleInsightIntentEvent(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s]ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s]get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.InsightIntentEvent(formId, *want, client);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -922,26 +922,26 @@ int32_t HandleInsightIntentEvent(IFormMgr &svc, MessageParcel &data, MessageParc
  */
 int32_t HandleDeleteInvalidForms(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("read formIds failed");
+        HILOG_ERROR("[%{public}s]read formIds failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
+        HILOG_ERROR("[%{public}s]formIds size %{public}zu exceeds limit %{public}d", __FUNCTION__,
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s]get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t numFormsDeleted = 0;
     int32_t result = svc.DeleteInvalidForms(formIds, callerToken, numFormsDeleted);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!reply.WriteInt32(numFormsDeleted)) {
@@ -959,7 +959,7 @@ int32_t HandleDeleteInvalidForms(IFormMgr &svc, MessageParcel &data, MessageParc
  */
 int32_t HandleAcquireFormState(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     FormStateInfo stateInfo {};
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
@@ -968,12 +968,12 @@ int32_t HandleAcquireFormState(IFormMgr &svc, MessageParcel &data, MessageParcel
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s]get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.AcquireFormState(*want, callerToken, stateInfo);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!reply.WriteInt32(static_cast<int32_t>(stateInfo.state))) {
@@ -991,31 +991,31 @@ int32_t HandleAcquireFormState(IFormMgr &svc, MessageParcel &data, MessageParcel
  */
 int32_t HandleNotifyFormsVisible(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("read formIds failed");
+        HILOG_ERROR("[%{public}s]read formIds failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
+        HILOG_ERROR("[%{public}s]formIds size %{public}zu exceeds limit %{public}d", __FUNCTION__,
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     bool isVisible = false;
     if (!data.ReadBool(isVisible)) {
-        HILOG_ERROR("ReadBool failed");
+        HILOG_ERROR("[%{public}s]ReadBool failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s]get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     int32_t result = svc.NotifyFormsVisible(formIds, isVisible, callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1023,31 +1023,31 @@ int32_t HandleNotifyFormsVisible(IFormMgr &svc, MessageParcel &data, MessageParc
 
 int32_t HandleNotifyFormsPrivacyProtected(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("read formIds failed");
+        HILOG_ERROR("[%{public}s]read formIds failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
+        HILOG_ERROR("[%{public}s]formIds size %{public}zu exceeds limit %{public}d", __FUNCTION__,
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     bool isProtected = false;
     if (!data.ReadBool(isProtected)) {
-        HILOG_ERROR("ReadBool failed");
+        HILOG_ERROR("[%{public}s]ReadBool failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s]get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     int32_t result = svc.NotifyFormsPrivacyProtected(formIds, isProtected, callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1061,31 +1061,31 @@ int32_t HandleNotifyFormsPrivacyProtected(IFormMgr &svc, MessageParcel &data, Me
  */
 int32_t HandleNotifyFormsEnableUpdate(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("read formIds failed");
+        HILOG_ERROR("[%{public}s]read formIds failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
+        HILOG_ERROR("[%{public}s]formIds size %{public}zu exceeds limit %{public}d", __FUNCTION__,
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     bool isEnableUpdate = false;
     if (!data.ReadBool(isEnableUpdate)) {
-        HILOG_ERROR("ReadBool failed");
+        HILOG_ERROR("[%{public}s]ReadBool failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s]get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     int32_t result = svc.NotifyFormsEnableUpdate(formIds, isEnableUpdate, callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1099,17 +1099,17 @@ int32_t HandleNotifyFormsEnableUpdate(IFormMgr &svc, MessageParcel &data, Messag
  */
 int32_t HandleGetAllFormsInfo(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("max parcel capacity:%{public}zu", MAX_PARCEL_CAPACITY);
+    HILOG_INFO("[%{public}s]max parcel capacity:%{public}zu", __FUNCTION__, MAX_PARCEL_CAPACITY);
     std::vector<FormInfo> infos;
     int32_t result = svc.GetAllFormsInfo(infos);
     (void)reply.SetMaxCapacity(MAX_PARCEL_CAPACITY);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
         if (!WriteParcelableVector(infos, reply)) {
-            HILOG_ERROR("write failed");
+            HILOG_ERROR("[%{public}s]write failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -1124,17 +1124,17 @@ int32_t HandleGetAllFormsInfo(IFormMgr &svc, MessageParcel &data, MessageParcel 
  */
 int32_t HandleGetAllTemplateFormsInfo(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("max parcel capacity:%{public}zu", MAX_PARCEL_CAPACITY);
+    HILOG_INFO("[%{public}s]max parcel capacity:%{public}zu", __FUNCTION__, MAX_PARCEL_CAPACITY);
     std::vector<FormInfo> infos;
     int32_t result = svc.GetAllTemplateFormsInfo(infos);
     (void)reply.SetMaxCapacity(MAX_PARCEL_CAPACITY);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
         if (!WriteParcelableVector(infos, reply)) {
-            HILOG_ERROR("write failed");
+            HILOG_ERROR("[%{public}s]write failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -1149,17 +1149,17 @@ int32_t HandleGetAllTemplateFormsInfo(IFormMgr &svc, MessageParcel &data, Messag
  */
 int32_t HandleGetFormsInfoByApp(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName = data.ReadString();
     std::vector<FormInfo> infos;
     int32_t result = svc.GetFormsInfoByApp(bundleName, infos);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
         if (!WriteParcelableVector(infos, reply)) {
-            HILOG_ERROR("write failed");
+            HILOG_ERROR("[%{public}s]write failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -1174,17 +1174,17 @@ int32_t HandleGetFormsInfoByApp(IFormMgr &svc, MessageParcel &data, MessageParce
  */
 int32_t HandleGetTemplateFormsInfoByApp(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName = data.ReadString();
     std::vector<FormInfo> infos;
     int32_t result = svc.GetTemplateFormsInfoByApp(bundleName, infos);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
         if (!WriteParcelableVector(infos, reply)) {
-            HILOG_ERROR("write failed");
+            HILOG_ERROR("[%{public}s]write failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -1199,18 +1199,18 @@ int32_t HandleGetTemplateFormsInfoByApp(IFormMgr &svc, MessageParcel &data, Mess
  */
 int32_t HandleGetFormsInfoByModule(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName = data.ReadString();
     std::string moduleName = data.ReadString();
     std::vector<FormInfo> infos;
     int32_t result = svc.GetFormsInfoByModule(bundleName, moduleName, infos);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
         if (!WriteParcelableVector(infos, reply)) {
-            HILOG_ERROR("write failed");
+            HILOG_ERROR("[%{public}s]write failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -1225,18 +1225,18 @@ int32_t HandleGetFormsInfoByModule(IFormMgr &svc, MessageParcel &data, MessagePa
  */
 int32_t HandleGetTemplateFormsInfoByModule(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName = data.ReadString();
     std::string moduleName = data.ReadString();
     std::vector<FormInfo> infos;
     int32_t result = svc.GetTemplateFormsInfoByModule(bundleName, moduleName, infos);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
         if (!WriteParcelableVector(infos, reply)) {
-            HILOG_ERROR("write failed");
+            HILOG_ERROR("[%{public}s]write failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -1245,14 +1245,14 @@ int32_t HandleGetTemplateFormsInfoByModule(IFormMgr &svc, MessageParcel &data, M
 
 int32_t HandleGetFormsInfoByFilter(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     FormInfoFilter filter;
     if (!data.ReadString(filter.bundleName)) {
-        HILOG_ERROR("read bundleName failed");
+        HILOG_ERROR("[%{public}s]read bundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.ReadString(filter.moduleName)) {
-        HILOG_ERROR("read moduleName failed");
+        HILOG_ERROR("[%{public}s]read moduleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.ReadInt32Vector(&filter.supportDimensions)) {
@@ -1277,11 +1277,11 @@ int32_t HandleGetFormsInfoByFilter(IFormMgr &svc, MessageParcel &data, MessagePa
     std::vector<FormInfo> infos;
     int32_t result = svc.GetFormsInfoByFilter(filter, infos);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK && !WriteParcelableVector(infos, reply)) {
-        HILOG_ERROR("write failed");
+        HILOG_ERROR("[%{public}s]write failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1289,21 +1289,21 @@ int32_t HandleGetFormsInfoByFilter(IFormMgr &svc, MessageParcel &data, MessagePa
 
 int32_t HandleGetFormsInfo(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::unique_ptr<FormInfoFilter> filter(data.ReadParcelable<FormInfoFilter>());
     if (filter == nullptr) {
-        HILOG_ERROR("fail get filter");
+        HILOG_ERROR("[%{public}s]fail get filter", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::vector<FormInfo> infos;
     int32_t result = svc.GetFormsInfo(*filter, infos);
     if (!reply.WriteBool(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
         if (!WriteParcelableVector(infos, reply)) {
-            HILOG_ERROR("write failed");
+            HILOG_ERROR("[%{public}s]write failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -1312,20 +1312,20 @@ int32_t HandleGetFormsInfo(IFormMgr &svc, MessageParcel &data, MessageParcel &re
 
 int32_t HandleGetPublishedFormInfoById(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     RunningFormInfo info;
     int32_t result = svc.GetPublishedFormInfoById(formId, info);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK && !reply.WriteParcelable(&info)) {
-        HILOG_ERROR("write failed");
+        HILOG_ERROR("[%{public}s]write failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1333,15 +1333,15 @@ int32_t HandleGetPublishedFormInfoById(IFormMgr &svc, MessageParcel &data, Messa
 
 int32_t HandleGetPublishedFormInfos(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::vector<RunningFormInfo> infos;
     int32_t result = svc.GetPublishedFormInfos(infos);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK && !WriteParcelableVector(infos, reply)) {
-        HILOG_ERROR("write failed");
+        HILOG_ERROR("[%{public}s]write failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1349,10 +1349,10 @@ int32_t HandleGetPublishedFormInfos(IFormMgr &svc, MessageParcel &data, MessageP
 
 int32_t HandleShareForm(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::string deviceId;
@@ -1362,18 +1362,18 @@ int32_t HandleShareForm(IFormMgr &svc, MessageParcel &data, MessageParcel &reply
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s]get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int64_t requestCode = 0;
     if (!data.ReadInt64(requestCode)) {
-        HILOG_ERROR("read requestCode failed");
+        HILOG_ERROR("[%{public}s]read requestCode failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     auto result = svc.ShareForm(formId, deviceId, callerToken, requestCode);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1381,26 +1381,26 @@ int32_t HandleShareForm(IFormMgr &svc, MessageParcel &data, MessageParcel &reply
 
 int32_t HandleAcquireFormData(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int64_t requestCode = 0;
     if (!data.ReadInt64(requestCode)) {
-        HILOG_ERROR("read requestCode failed");
+        HILOG_ERROR("[%{public}s]read requestCode failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remoteObject failed");
+        HILOG_ERROR("[%{public}s]get remoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     AAFwk::WantParams customizeData;
     int32_t result = svc.AcquireFormData(formId, requestCode, callerToken, customizeData);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
@@ -1416,7 +1416,7 @@ int32_t HandleAcquireFormData(IFormMgr &svc, MessageParcel &data, MessageParcel 
 
 int32_t HandleRecvFormShareInfoFromRemote(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::unique_ptr<FormShareInfo> info(data.ReadParcelable<FormShareInfo>());
     if (!info) {
         HILOG_ERROR("fail ReadParcelable<FormShareInfo>");
@@ -1424,7 +1424,7 @@ int32_t HandleRecvFormShareInfoFromRemote(IFormMgr &svc, MessageParcel &data, Me
     }
     auto result = svc.RecvFormShareInfoFromRemote(*info);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1432,10 +1432,10 @@ int32_t HandleRecvFormShareInfoFromRemote(IFormMgr &svc, MessageParcel &data, Me
 
 int32_t HandleIsRequestPublishFormSupported(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     bool result = svc.IsRequestPublishFormSupported();
     if (!reply.WriteBool(result)) {
-        HILOG_ERROR("write action failed");
+        HILOG_ERROR("[%{public}s]write action failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -1443,20 +1443,20 @@ int32_t HandleIsRequestPublishFormSupported(IFormMgr &svc, MessageParcel &data, 
 
 int32_t HandleStartAbility(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
-        HILOG_ERROR("get want failed");
+        HILOG_ERROR("[%{public}s]get want failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remote object failed");
+        HILOG_ERROR("[%{public}s]get remote object failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.StartAbility(*want, callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1464,15 +1464,15 @@ int32_t HandleStartAbility(IFormMgr &svc, MessageParcel &data, MessageParcel &re
 
 int32_t HandleStartAbilityByFms(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
-        HILOG_ERROR("get want failed");
+        HILOG_ERROR("[%{public}s]get want failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.StartAbilityByFms(*want);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1480,15 +1480,15 @@ int32_t HandleStartAbilityByFms(IFormMgr &svc, MessageParcel &data, MessageParce
 
 int32_t HandleStartUIAbilityByFms(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
-        HILOG_ERROR("get want failed");
+        HILOG_ERROR("[%{public}s]get want failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     ErrCode result = svc.StartUIAbilityByFms(*want);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -1496,15 +1496,15 @@ int32_t HandleStartUIAbilityByFms(IFormMgr &svc, MessageParcel &data, MessagePar
 
 int32_t HandleStartAbilityByCrossBundle(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
-        HILOG_ERROR("get want failed");
+        HILOG_ERROR("[%{public}s]get want failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
     }
     int32_t result = svc.StartAbilityByCrossBundle(*want);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
     }
     return result;
@@ -1512,10 +1512,10 @@ int32_t HandleStartAbilityByCrossBundle(IFormMgr &svc, MessageParcel &data, Mess
 
 int32_t HandleCheckFMSReady(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int32_t result = svc.CheckFMSReady();
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write action failed");
+        HILOG_ERROR("[%{public}s]write action failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -1526,7 +1526,7 @@ int32_t HandleIsSystemAppForm(IFormMgr &svc, MessageParcel &data, MessageParcel 
     std::string bundleName = data.ReadString();
     bool result = svc.IsSystemAppForm(bundleName);
     if (!reply.WriteBool(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -1534,21 +1534,21 @@ int32_t HandleIsSystemAppForm(IFormMgr &svc, MessageParcel &data, MessageParcel 
 
 int32_t HandleRegisterFormAddObserverByBundle(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     std::string bundleName = data.ReadString();
     if (bundleName.size() > Constants::MAX_BUNDLE_NAME_LENGTH) {
-        HILOG_ERROR("bundleName too long: %{public}zu", bundleName.size());
+        HILOG_ERROR("[%{public}s]bundleName too long: %{public}zu", __FUNCTION__, bundleName.size());
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remoteObject failed");
+        HILOG_ERROR("[%{public}s]get remoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto result = svc.RegisterFormAddObserverByBundle(bundleName, callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1556,21 +1556,21 @@ int32_t HandleRegisterFormAddObserverByBundle(IFormMgr &svc, MessageParcel &data
 
 int32_t HandleRegisterFormRemoveObserverByBundle(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
 
     std::string bundleName = data.ReadString();
     if (bundleName.size() > Constants::MAX_BUNDLE_NAME_LENGTH) {
-        HILOG_ERROR("bundleName too long: %{public}zu", bundleName.size());
+        HILOG_ERROR("[%{public}s]bundleName too long: %{public}zu", __FUNCTION__, bundleName.size());
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remoteObject failed");
+        HILOG_ERROR("[%{public}s]get remoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto result = svc.RegisterFormRemoveObserverByBundle(bundleName, callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1578,7 +1578,7 @@ int32_t HandleRegisterFormRemoveObserverByBundle(IFormMgr &svc, MessageParcel &d
 
 int32_t HandleGetFormsCount(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     bool isTempFormFlag = false;
     if (!data.ReadBool(isTempFormFlag)) {
         HILOG_ERROR("fail read temp flag");
@@ -1588,11 +1588,11 @@ int32_t HandleGetFormsCount(IFormMgr &svc, MessageParcel &data, MessageParcel &r
     int32_t formCount = 0;
     int32_t result = svc.GetFormsCount(isTempFormFlag, formCount);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!reply.WriteInt32(formCount)) {
-        HILOG_ERROR("write formCount failed");
+        HILOG_ERROR("[%{public}s]write formCount failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1600,23 +1600,23 @@ int32_t HandleGetFormsCount(IFormMgr &svc, MessageParcel &data, MessageParcel &r
 
 int32_t HandleGetFormInstancesByFilter(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::unique_ptr<FormInstancesFilter> filter(data.ReadParcelable<FormInstancesFilter>());
     if (filter == nullptr) {
-        HILOG_ERROR("fail get filter");
+        HILOG_ERROR("[%{public}s]fail get filter", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::vector<FormInstance> infos;
     auto result = svc.GetFormInstancesByFilter(*filter, infos);
     HILOG_DEBUG("info size = %{public}zu", infos.size());
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
-        HILOG_INFO("result is ok");
+        HILOG_INFO("[%{public}s]result is ok", __FUNCTION__);
         if (!WriteParcelableVector(infos, reply)) {
-            HILOG_ERROR("write failed");
+            HILOG_ERROR("[%{public}s]write failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -1625,26 +1625,26 @@ int32_t HandleGetFormInstancesByFilter(IFormMgr &svc, MessageParcel &data, Messa
 
 int32_t HandleGetFormInstanceById(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool isUnusedInclude = false;
     if (!data.ReadBool(isUnusedInclude)) {
-        HILOG_ERROR("read isUnusedInclude failed");
+        HILOG_ERROR("[%{public}s]read isUnusedInclude failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     FormInstance info;
     auto result = svc.GetFormInstanceById(formId, isUnusedInclude, info);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
         if (!reply.WriteParcelable(&info)) {
-            HILOG_ERROR("write failed");
+            HILOG_ERROR("[%{public}s]write failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -1653,21 +1653,21 @@ int32_t HandleGetFormInstanceById(IFormMgr &svc, MessageParcel &data, MessagePar
 
 int32_t HandleGetHostFormsCount(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::string bundleName;
     if (!data.ReadString(bundleName)) {
-        HILOG_ERROR("read bundleName failed");
+        HILOG_ERROR("[%{public}s]read bundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     int32_t formCount = 0;
     int32_t result = svc.GetHostFormsCount(bundleName, formCount);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!reply.WriteInt32(formCount)) {
-        HILOG_ERROR("write formCount failed");
+        HILOG_ERROR("[%{public}s]write formCount failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1675,21 +1675,21 @@ int32_t HandleGetHostFormsCount(IFormMgr &svc, MessageParcel &data, MessageParce
 
 int32_t HandleGetRunningFormInfos(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     bool isUnusedInclude = false;
     if (!data.ReadBool(isUnusedInclude)) {
-        HILOG_ERROR("read isUnusedInclude failed");
+        HILOG_ERROR("[%{public}s]read isUnusedInclude failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::vector<RunningFormInfo> runningFormInfos;
     ErrCode result = svc.GetRunningFormInfos(isUnusedInclude, runningFormInfos);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
         if (!WriteParcelableVector(runningFormInfos, reply)) {
-            HILOG_ERROR("write failed");
+            HILOG_ERROR("[%{public}s]write failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -1698,26 +1698,26 @@ int32_t HandleGetRunningFormInfos(IFormMgr &svc, MessageParcel &data, MessagePar
 
 int32_t HandleGetRunningFormInfosByBundleName(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName;
     if (!data.ReadString(bundleName)) {
-        HILOG_ERROR("read bundleName failed");
+        HILOG_ERROR("[%{public}s]read bundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool isUnusedInclude = false;
     if (!data.ReadBool(isUnusedInclude)) {
-        HILOG_ERROR("read isUnusedInclude failed");
+        HILOG_ERROR("[%{public}s]read isUnusedInclude failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::vector<RunningFormInfo> runningFormInfos;
     ErrCode result = svc.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
         if (!WriteParcelableVector(runningFormInfos, reply)) {
-            HILOG_ERROR("write failed");
+            HILOG_ERROR("[%{public}s]write failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
@@ -1726,15 +1726,15 @@ int32_t HandleGetRunningFormInfosByBundleName(IFormMgr &svc, MessageParcel &data
 
 int32_t HandleRegisterPublishFormInterceptor(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     sptr<IRemoteObject> interceptor = data.ReadRemoteObject();
     if (interceptor == nullptr) {
-        HILOG_ERROR("get remoteObject failed");
+        HILOG_ERROR("[%{public}s]get remoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.RegisterPublishFormInterceptor(interceptor);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1742,15 +1742,15 @@ int32_t HandleRegisterPublishFormInterceptor(IFormMgr &svc, MessageParcel &data,
 
 int32_t HandleUnregisterPublishFormInterceptor(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     sptr<IRemoteObject> interceptor = data.ReadRemoteObject();
     if (interceptor == nullptr) {
-        HILOG_ERROR("get remoteObject failed");
+        HILOG_ERROR("[%{public}s]get remoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.UnregisterPublishFormInterceptor(interceptor);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1758,12 +1758,12 @@ int32_t HandleUnregisterPublishFormInterceptor(IFormMgr &svc, MessageParcel &dat
 
 int32_t HandleRegisterClickCallbackEventObserver(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName = data.ReadString();
     std::string formEventType = data.ReadString();
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remoteObject failed");
+        HILOG_ERROR("[%{public}s]get remoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return svc.RegisterClickEventObserver(bundleName, formEventType, callerToken);
@@ -1771,12 +1771,12 @@ int32_t HandleRegisterClickCallbackEventObserver(IFormMgr &svc, MessageParcel &d
 
 int32_t HandleUnregisterClickCallbackEventObserver(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName = data.ReadString();
     std::string formEventType = data.ReadString();
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remoteObject failed");
+        HILOG_ERROR("[%{public}s]get remoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return svc.UnregisterClickEventObserver(bundleName, formEventType, callerToken);
@@ -1784,20 +1784,20 @@ int32_t HandleUnregisterClickCallbackEventObserver(IFormMgr &svc, MessageParcel 
 
 int32_t HandleRegisterAddObserver(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName;
     if (!data.ReadString(bundleName)) {
-        HILOG_ERROR("read bundleName failed");
+        HILOG_ERROR("[%{public}s]read bundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remoteObject failed");
+        HILOG_ERROR("[%{public}s]get remoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto result = svc.RegisterAddObserver(bundleName, callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1805,20 +1805,20 @@ int32_t HandleRegisterAddObserver(IFormMgr &svc, MessageParcel &data, MessagePar
 
 int32_t HandleRegisterRemoveObserver(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName;
     if (!data.ReadString(bundleName)) {
-        HILOG_ERROR("read bundleName failed");
+        HILOG_ERROR("[%{public}s]read bundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remoteObject failed");
+        HILOG_ERROR("[%{public}s]get remoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto result = svc.RegisterRemoveObserver(bundleName, callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1826,25 +1826,25 @@ int32_t HandleRegisterRemoveObserver(IFormMgr &svc, MessageParcel &data, Message
 
 int32_t HandleRegisterFormRouterProxy(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("read formIds failed");
+        HILOG_ERROR("[%{public}s]read formIds failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
+        HILOG_ERROR("[%{public}s]formIds size %{public}zu exceeds limit %{public}d", __FUNCTION__,
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("get remoteObject failed");
+        HILOG_ERROR("[%{public}s]get remoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto result = svc.RegisterFormRouterProxy(formIds, callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1852,20 +1852,20 @@ int32_t HandleRegisterFormRouterProxy(IFormMgr &svc, MessageParcel &data, Messag
 
 int32_t HandleUnregisterFormRouterProxy(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("read formIds failed");
+        HILOG_ERROR("[%{public}s]read formIds failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
+        HILOG_ERROR("[%{public}s]formIds size %{public}zu exceeds limit %{public}d", __FUNCTION__,
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     auto result = svc.UnregisterFormRouterProxy(formIds);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1875,22 +1875,22 @@ int32_t HandleUpdateProxyForm(IFormMgr &svc, MessageParcel &data, MessageParcel 
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<FormProviderData> formProviderData(data.ReadParcelable<FormProviderData>());
     if (formProviderData == nullptr) {
-        HILOG_ERROR("get formProviderData failed");
+        HILOG_ERROR("[%{public}s]get formProviderData failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::vector<FormDataProxy> formDataProxies;
     if (!ReadFormDataProxies(data, formDataProxies)) {
-        HILOG_ERROR("fail get formDataProxies");
+        HILOG_ERROR("[%{public}s]fail get formDataProxies", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.UpdateProxyForm(formId, *formProviderData, formDataProxies);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1900,7 +1900,7 @@ int32_t HandleRequestPublishProxyForm(IFormMgr &svc, MessageParcel &data, Messag
 {
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
-        HILOG_ERROR("error to get want");
+        HILOG_ERROR("[%{public}s]error to get want", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -1919,13 +1919,13 @@ int32_t HandleRequestPublishProxyForm(IFormMgr &svc, MessageParcel &data, Messag
     }
     std::vector<FormDataProxy> formDataProxies;
     if (!ReadFormDataProxies(data, formDataProxies)) {
-        HILOG_ERROR("fail get formDataProxies");
+        HILOG_ERROR("[%{public}s]fail get formDataProxies", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int64_t formId = 0;
     ErrCode result = svc.RequestPublishProxyForm(*want, withFormBindingData, formProviderData, formId, formDataProxies);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
@@ -1936,20 +1936,20 @@ int32_t HandleRequestPublishProxyForm(IFormMgr &svc, MessageParcel &data, Messag
 
 int32_t HandleSetFormsRecyclable(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("read formIds failed");
+        HILOG_ERROR("[%{public}s]read formIds failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
+        HILOG_ERROR("[%{public}s]formIds size %{public}zu exceeds limit %{public}d", __FUNCTION__,
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     int32_t result = svc.SetFormsRecyclable(formIds);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1957,25 +1957,25 @@ int32_t HandleSetFormsRecyclable(IFormMgr &svc, MessageParcel &data, MessageParc
 
 int32_t HandleRecycleForms(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("read formIds failed");
+        HILOG_ERROR("[%{public}s]read formIds failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
+        HILOG_ERROR("[%{public}s]formIds size %{public}zu exceeds limit %{public}d", __FUNCTION__,
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s]ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.RecycleForms(formIds, *want);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -1983,25 +1983,25 @@ int32_t HandleRecycleForms(IFormMgr &svc, MessageParcel &data, MessageParcel &re
 
 int32_t HandleRecoverForms(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("read formIds failed");
+        HILOG_ERROR("[%{public}s]read formIds failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formIds.size() > Constants::MAX_FORM_IDS_SIZE) {
-        HILOG_ERROR("formIds size %{public}zu exceeds limit %{public}d",
+        HILOG_ERROR("[%{public}s]formIds size %{public}zu exceeds limit %{public}d", __FUNCTION__,
             formIds.size(), Constants::MAX_FORM_IDS_SIZE);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s]ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.RecoverForms(formIds, *want);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -2009,15 +2009,15 @@ int32_t HandleRecoverForms(IFormMgr &svc, MessageParcel &data, MessageParcel &re
 
 int32_t HandleUpdateFormLocation(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t formLocation = 0;
     if (!data.ReadInt32(formLocation)) {
-        HILOG_ERROR("read formLocation failed");
+        HILOG_ERROR("[%{public}s]read formLocation failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
@@ -2027,7 +2027,7 @@ int32_t HandleUpdateFormLocation(IFormMgr &svc, MessageParcel &data, MessageParc
     }
     ErrCode result = svc.UpdateFormLocation(formId, formLocation);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -2043,7 +2043,7 @@ int32_t HandleRequestPublishFormWithSnapshot(IFormMgr &svc, MessageParcel &data,
 {
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
-        HILOG_ERROR("error to get want");
+        HILOG_ERROR("[%{public}s]error to get want", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -2064,7 +2064,7 @@ int32_t HandleRequestPublishFormWithSnapshot(IFormMgr &svc, MessageParcel &data,
     int64_t formId = 0;
     ErrCode result = svc.RequestPublishFormWithSnapshot(*want, withFormBindingData, formBindingData, formId);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     } else {
         reply.WriteInt64(formId);
@@ -2085,7 +2085,7 @@ int32_t HandleBatchRefreshForms(IFormMgr &svc, MessageParcel &data, MessageParce
     }
     ErrCode result = svc.BatchRefreshForms(formRefreshType);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -2093,10 +2093,10 @@ int32_t HandleBatchRefreshForms(IFormMgr &svc, MessageParcel &data, MessageParce
 
 int32_t HandleEnableForms(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName;
     if (!data.ReadString(bundleName)) {
-        HILOG_ERROR("read bundleName failed");
+        HILOG_ERROR("[%{public}s]read bundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (bundleName.empty()) {
@@ -2105,7 +2105,7 @@ int32_t HandleEnableForms(IFormMgr &svc, MessageParcel &data, MessageParcel &rep
     }
     int32_t userId = 0;
     if (!data.ReadInt32(userId)) {
-        HILOG_ERROR("read userId failed");
+        HILOG_ERROR("[%{public}s]read userId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool enable = false;
@@ -2115,7 +2115,7 @@ int32_t HandleEnableForms(IFormMgr &svc, MessageParcel &data, MessageParcel &rep
     }
     int32_t result = svc.EnableForms(bundleName, userId, enable);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -2123,11 +2123,11 @@ int32_t HandleEnableForms(IFormMgr &svc, MessageParcel &data, MessageParcel &rep
 
 int32_t HandleIsFormBundleForbidden(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName = data.ReadString();
     bool result = svc.IsFormBundleForbidden(bundleName);
     if (!reply.WriteBool(result)) {
-        HILOG_ERROR("write action failed");
+        HILOG_ERROR("[%{public}s]write action failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2135,7 +2135,7 @@ int32_t HandleIsFormBundleForbidden(IFormMgr &svc, MessageParcel &data, MessageP
 
 int32_t HandleLockForms(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::vector<FormLockInfo> formLockInfo;
     int32_t infoSize = 0;
     if (!data.ReadInt32(infoSize)) {
@@ -2168,7 +2168,7 @@ int32_t HandleLockForms(IFormMgr &svc, MessageParcel &data, MessageParcel &reply
 
     int32_t result = svc.LockForms(formLockInfo, type);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -2176,20 +2176,20 @@ int32_t HandleLockForms(IFormMgr &svc, MessageParcel &data, MessageParcel &reply
 
 int32_t HandleIsFormProtected(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName;
     if (!data.ReadString(bundleName)) {
-        HILOG_ERROR("read bundleName failed");
+        HILOG_ERROR("[%{public}s]read bundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool result = svc.IsFormBundleProtected(bundleName, formId);
     if (!reply.WriteBool(result)) {
-        HILOG_ERROR("write action failed");
+        HILOG_ERROR("[%{public}s]write action failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2197,15 +2197,15 @@ int32_t HandleIsFormProtected(IFormMgr &svc, MessageParcel &data, MessageParcel 
 
 int32_t HandleIsFormDebugSignature(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName;
     if (!data.ReadString(bundleName)) {
-        HILOG_ERROR("read bundleName failed");
+        HILOG_ERROR("[%{public}s]read bundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool result = svc.IsFormBundleDebugSignature(bundleName);
     if (!reply.WriteBool(result)) {
-        HILOG_ERROR("write action failed");
+        HILOG_ERROR("[%{public}s]write action failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2213,15 +2213,15 @@ int32_t HandleIsFormDebugSignature(IFormMgr &svc, MessageParcel &data, MessagePa
 
 int32_t HandleIsFormExempt(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool result = svc.IsFormBundleExempt(formId);
     if (!reply.WriteBool(result)) {
-        HILOG_ERROR("write action failed");
+        HILOG_ERROR("[%{public}s]write action failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2229,10 +2229,10 @@ int32_t HandleIsFormExempt(IFormMgr &svc, MessageParcel &data, MessageParcel &re
 
 int32_t HandleNotifyFormLocked(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool isLocked = false;
@@ -2242,7 +2242,7 @@ int32_t HandleNotifyFormLocked(IFormMgr &svc, MessageParcel &data, MessageParcel
     }
     int32_t result = svc.NotifyFormLocked(formId, isLocked);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2250,10 +2250,10 @@ int32_t HandleNotifyFormLocked(IFormMgr &svc, MessageParcel &data, MessageParcel
 
 int32_t HandleUpdateFormSize(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     float width = 0.0f;
@@ -2278,7 +2278,7 @@ int32_t HandleUpdateFormSize(IFormMgr &svc, MessageParcel &data, MessageParcel &
     }
     ErrCode result = svc.UpdateFormSize(formId, width, height, borderWidth, formViewScale);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -2286,15 +2286,15 @@ int32_t HandleUpdateFormSize(IFormMgr &svc, MessageParcel &data, MessageParcel &
 
 int32_t HandleOpenFormEditAbility(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string abilityName;
     if (!data.ReadString(abilityName)) {
-        HILOG_ERROR("read abilityName failed");
+        HILOG_ERROR("[%{public}s]read abilityName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool isMainPage = false;
@@ -2304,7 +2304,7 @@ int32_t HandleOpenFormEditAbility(IFormMgr &svc, MessageParcel &data, MessagePar
     }
     ErrCode result = svc.OpenFormEditAbility(abilityName, formId, isMainPage);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -2312,7 +2312,7 @@ int32_t HandleOpenFormEditAbility(IFormMgr &svc, MessageParcel &data, MessagePar
 
 int32_t HandleCloseFormEditAbility(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     bool isMainPage = true;
     if (!data.ReadBool(isMainPage)) {
         HILOG_ERROR("fail to read isMainPage from parcel");
@@ -2320,7 +2320,7 @@ int32_t HandleCloseFormEditAbility(IFormMgr &svc, MessageParcel &data, MessagePa
     }
     ErrCode result = svc.CloseFormEditAbility(isMainPage);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2331,7 +2331,7 @@ int32_t HandleRegisterOverflowProxy(IFormMgr &svc, MessageParcel &data, MessageP
     HILOG_INFO("Handle save overflow proxy to service");
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("read callerToken failed");
+        HILOG_ERROR("[%{public}s]read callerToken failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     ErrCode result = svc.RegisterOverflowProxy(callerToken);
@@ -2344,10 +2344,10 @@ int32_t HandleRegisterOverflowProxy(IFormMgr &svc, MessageParcel &data, MessageP
 
 int32_t HandleUnregisterOverflowProxy(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     ErrCode result = svc.UnregisterOverflowProxy();
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write proxy failed");
+        HILOG_ERROR("[%{public}s]write proxy failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2355,10 +2355,10 @@ int32_t HandleUnregisterOverflowProxy(IFormMgr &svc, MessageParcel &data, Messag
 
 int32_t HandleRequestOverflow(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("Call");
+    HILOG_INFO("[%{public}s]Call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<OverflowInfo> overflowInfoPtr(data.ReadParcelable<OverflowInfo>());
@@ -2373,7 +2373,7 @@ int32_t HandleRequestOverflow(IFormMgr &svc, MessageParcel &data, MessageParcel 
     }
     ErrCode result = svc.RequestOverflow(formId, *overflowInfoPtr, isOverflow);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("Write request result failed");
+        HILOG_ERROR("[%{public}s]Write request result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2381,15 +2381,15 @@ int32_t HandleRequestOverflow(IFormMgr &svc, MessageParcel &data, MessageParcel 
 
 int32_t HandleRegisterChangeSceneAnimationStateProxy(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("read callerToken failed");
+        HILOG_ERROR("[%{public}s]read callerToken failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     ErrCode result = svc.RegisterChangeSceneAnimationStateProxy(callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2397,10 +2397,10 @@ int32_t HandleRegisterChangeSceneAnimationStateProxy(IFormMgr &svc, MessageParce
 
 int32_t HandleUnregisterChangeSceneAnimationStateProxy(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     ErrCode result = svc.UnregisterChangeSceneAnimationStateProxy();
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2408,10 +2408,10 @@ int32_t HandleUnregisterChangeSceneAnimationStateProxy(IFormMgr &svc, MessagePar
 
 int32_t HandleChangeSceneAnimationState(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("Call");
+    HILOG_INFO("[%{public}s]Call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t state = 0;
@@ -2425,7 +2425,7 @@ int32_t HandleChangeSceneAnimationState(IFormMgr &svc, MessageParcel &data, Mess
     }
     ErrCode result = svc.ChangeSceneAnimationState(formId, state);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2433,15 +2433,15 @@ int32_t HandleChangeSceneAnimationState(IFormMgr &svc, MessageParcel &data, Mess
 
 int32_t HandleRegisterGetFormRectProxy(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("handle save query proxy to service");
+    HILOG_DEBUG("[%{public}s]handle save query proxy to service", __FUNCTION__);
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("read callerToken failed");
+        HILOG_ERROR("[%{public}s]read callerToken failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     ErrCode result = svc.RegisterGetFormRectProxy(callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write proxy failed");
+        HILOG_ERROR("[%{public}s]write proxy failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2449,10 +2449,10 @@ int32_t HandleRegisterGetFormRectProxy(IFormMgr &svc, MessageParcel &data, Messa
 
 int32_t HandleUnregisterGetFormRectProxy(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     ErrCode result = svc.UnregisterGetFormRectProxy();
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2462,7 +2462,7 @@ int32_t HandleGetFormRect(IFormMgr &svc, MessageParcel &data, MessageParcel &rep
 {
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -2483,10 +2483,10 @@ int32_t HandleGetFormRect(IFormMgr &svc, MessageParcel &data, MessageParcel &rep
 
 int32_t HandleNotifyUpdateFormSize(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("Call");
+    HILOG_INFO("[%{public}s]Call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t newDimension = 0;
@@ -2501,7 +2501,7 @@ int32_t HandleNotifyUpdateFormSize(IFormMgr &svc, MessageParcel &data, MessagePa
     }
     ErrCode result = svc.UpdateFormSize(formId, newDimension, *newRect);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("Write request result failed");
+        HILOG_ERROR("[%{public}s]Write request result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2509,15 +2509,15 @@ int32_t HandleNotifyUpdateFormSize(IFormMgr &svc, MessageParcel &data, MessagePa
 
 int32_t HandleRegisterGetLiveFormStatusProxy(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("handle save query proxy to service");
+    HILOG_DEBUG("[%{public}s]handle save query proxy to service", __FUNCTION__);
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("read callerToken failed");
+        HILOG_ERROR("[%{public}s]read callerToken failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     ErrCode result = svc.RegisterGetLiveFormStatusProxy(callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write proxy failed");
+        HILOG_ERROR("[%{public}s]write proxy failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2525,10 +2525,10 @@ int32_t HandleRegisterGetLiveFormStatusProxy(IFormMgr &svc, MessageParcel &data,
 
 int32_t HandleUnregisterGetLiveFormStatusProxy(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     ErrCode result = svc.UnregisterGetLiveFormStatusProxy();
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2536,7 +2536,7 @@ int32_t HandleUnregisterGetLiveFormStatusProxy(IFormMgr &svc, MessageParcel &dat
 
 int32_t HandleIsFormDueControl(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::unique_ptr<FormMajorInfo> formMajorInfo(data.ReadParcelable<FormMajorInfo>());
     if (formMajorInfo == nullptr) {
         HILOG_ERROR("Read formMajorInfo failed");
@@ -2549,7 +2549,7 @@ int32_t HandleIsFormDueControl(IFormMgr &svc, MessageParcel &data, MessageParcel
     }
     bool result = svc.IsFormDueControl(*formMajorInfo, isDisablePolicy);
     if (!reply.WriteBool(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2557,16 +2557,16 @@ int32_t HandleIsFormDueControl(IFormMgr &svc, MessageParcel &data, MessageParcel
 
 int32_t HandleReloadForms(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("Call");
+    HILOG_INFO("[%{public}s]Call", __FUNCTION__);
     int32_t reloadNum = 0;
     std::string moduleName;
     if (!data.ReadString(moduleName)) {
-        HILOG_ERROR("read moduleName failed");
+        HILOG_ERROR("[%{public}s]read moduleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::string abilityName;
     if (!data.ReadString(abilityName)) {
-        HILOG_ERROR("read abilityName failed");
+        HILOG_ERROR("[%{public}s]read abilityName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::string formName;
@@ -2576,12 +2576,12 @@ int32_t HandleReloadForms(IFormMgr &svc, MessageParcel &data, MessageParcel &rep
     }
     ErrCode result = svc.ReloadForms(reloadNum, moduleName, abilityName, formName);
     if (!reply.WriteInt32(reloadNum)) {
-        HILOG_ERROR("Write reload number of forms failed");
+        HILOG_ERROR("[%{public}s]Write reload number of forms failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("Write request result failed");
+        HILOG_ERROR("[%{public}s]Write request result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2589,15 +2589,15 @@ int32_t HandleReloadForms(IFormMgr &svc, MessageParcel &data, MessageParcel &rep
 
 int32_t HandleReloadAllForms(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("Call");
+    HILOG_INFO("[%{public}s]Call", __FUNCTION__);
     int32_t reloadNum = 0;
     ErrCode result = svc.ReloadAllForms(reloadNum);
     if (!reply.WriteInt32(reloadNum)) {
-        HILOG_ERROR("Write reload number of forms failed");
+        HILOG_ERROR("[%{public}s]Write reload number of forms failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("Write request result failed");
+        HILOG_ERROR("[%{public}s]Write request result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2605,10 +2605,10 @@ int32_t HandleReloadAllForms(IFormMgr &svc, MessageParcel &data, MessageParcel &
 
 int32_t HandleSendNonTransparencyRatio(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int64_t formId = 0;
     if (!data.ReadInt64(formId)) {
-        HILOG_ERROR("read formId failed");
+        HILOG_ERROR("[%{public}s]read formId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t ratio = 0;
@@ -2618,7 +2618,7 @@ int32_t HandleSendNonTransparencyRatio(IFormMgr &svc, MessageParcel &data, Messa
     }
     ErrCode result = svc.SendNonTransparencyRatio(formId, ratio);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("Write request result failed");
+        HILOG_ERROR("[%{public}s]Write request result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2626,11 +2626,11 @@ int32_t HandleSendNonTransparencyRatio(IFormMgr &svc, MessageParcel &data, Messa
 
 int32_t HandleRegisterTemplateFormDetailInfoChange(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     ErrCode result = svc.RegisterTemplateFormDetailInfoChange(callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write proxy failed");
+        HILOG_ERROR("[%{public}s]write proxy failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2638,10 +2638,10 @@ int32_t HandleRegisterTemplateFormDetailInfoChange(IFormMgr &svc, MessageParcel 
 
 int32_t HandleUnregisterTemplateFormDetailInfoChange(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     ErrCode result = svc.UnregisterTemplateFormDetailInfoChange();
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2649,11 +2649,11 @@ int32_t HandleUnregisterTemplateFormDetailInfoChange(IFormMgr &svc, MessageParce
 
 int32_t HandleUpdateTemplateFormDetailInfo(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::vector<TemplateFormDetailInfo> templateFormInfo;
     int32_t size = 0;
     if (!data.ReadInt32(size)) {
-        HILOG_ERROR("read size failed");
+        HILOG_ERROR("[%{public}s]read size failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (size > Constants::TEMPLATE_FORM_MAX_SIZE) {
@@ -2670,7 +2670,7 @@ int32_t HandleUpdateTemplateFormDetailInfo(IFormMgr &svc, MessageParcel &data, M
     }
     ErrCode result = svc.UpdateTemplateFormDetailInfo(templateFormInfo);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write request result failed.");
+        HILOG_ERROR("[%{public}s]write request result failed.", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2678,7 +2678,7 @@ int32_t HandleUpdateTemplateFormDetailInfo(IFormMgr &svc, MessageParcel &data, M
 
 int32_t HandleRegisterPublishFormCrossBundleControl(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (!callerToken) {
         HILOG_ERROR("caller token is null");
@@ -2686,7 +2686,7 @@ int32_t HandleRegisterPublishFormCrossBundleControl(IFormMgr &svc, MessageParcel
     }
     ErrCode result = svc.RegisterPublishFormCrossBundleControl(callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write proxy failed");
+        HILOG_ERROR("[%{public}s]write proxy failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2694,10 +2694,10 @@ int32_t HandleRegisterPublishFormCrossBundleControl(IFormMgr &svc, MessageParcel
 
 int32_t HandleUnregisterPublishFormCrossBundleControl(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     ErrCode result = svc.UnregisterPublishFormCrossBundleControl();
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2705,20 +2705,20 @@ int32_t HandleUnregisterPublishFormCrossBundleControl(IFormMgr &svc, MessageParc
 
 int32_t HandleGetFormIdsByFormLocation(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::vector<std::string> formIds;
     int32_t formLocation = 0;
     if (!data.ReadInt32(formLocation)) {
-        HILOG_ERROR("read formLocation failed");
+        HILOG_ERROR("[%{public}s]read formLocation failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     ErrCode result = svc.GetFormIdsByFormLocation(formLocation, formIds);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
-        HILOG_INFO("result is ok");
+        HILOG_INFO("[%{public}s]result is ok", __FUNCTION__);
         if (!reply.WriteStringVector(formIds)) {
             HILOG_ERROR("WriteStringVector<formIds> failed");
             return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -2730,15 +2730,15 @@ int32_t HandleGetFormIdsByFormLocation(IFormMgr &svc, MessageParcel &data, Messa
 
 int32_t HandleRegisterFormWantCallback(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     auto callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("ReadRemoteObject failed");
+        HILOG_ERROR("[%{public}s]ReadRemoteObject failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     ErrCode result = svc.RegisterFormWantCallback(callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2746,10 +2746,10 @@ int32_t HandleRegisterFormWantCallback(IFormMgr &svc, MessageParcel &data, Messa
 
 int32_t HandleUnregisterFormWantCallback(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     ErrCode result = svc.UnregisterFormWantCallback();
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2757,15 +2757,15 @@ int32_t HandleUnregisterFormWantCallback(IFormMgr &svc, MessageParcel &data, Mes
 
 int32_t HandleRegisterUpdateFormsConfigCallback(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("read callerToken failed.");
+        HILOG_ERROR("[%{public}s]read callerToken failed.", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     ErrCode result = svc.RegisterUpdateFormsConfigCallback(callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write request result failed.");
+        HILOG_ERROR("[%{public}s]write request result failed.", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2773,10 +2773,10 @@ int32_t HandleRegisterUpdateFormsConfigCallback(IFormMgr &svc, MessageParcel &da
 
 int32_t HandleUnregisterUpdateFormsConfigCallback(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     ErrCode result = svc.UnregisterUpdateFormsConfigCallback();
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write request result failed.");
+        HILOG_ERROR("[%{public}s]write request result failed.", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2784,16 +2784,17 @@ int32_t HandleUnregisterUpdateFormsConfigCallback(IFormMgr &svc, MessageParcel &
 
 int32_t HandleUpdateFormsConfig(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int32_t size = 0;
     if (!data.ReadInt32(size)) {
-        HILOG_ERROR("read size failed");
+        HILOG_ERROR("[%{public}s]read size failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (size <= 0 || size > Constants::UPDATE_FORM_CONFIG_MAX_NUM) {
-        HILOG_ERROR("invalid size: %{public}d, max: %{public}d", size, Constants::UPDATE_FORM_CONFIG_MAX_NUM);
+        HILOG_ERROR("[%{public}s]invalid size: %{public}d, max: %{public}d",
+            __FUNCTION__, size, Constants::UPDATE_FORM_CONFIG_MAX_NUM);
         if (!reply.WriteInt32(ERR_APPEXECFWK_FORM_COMMON_CODE)) {
-            HILOG_ERROR("write error code failed");
+            HILOG_ERROR("[%{public}s]write error code failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
         return ERR_OK;
@@ -2805,7 +2806,7 @@ int32_t HandleUpdateFormsConfig(IFormMgr &svc, MessageParcel &data, MessageParce
         if (config == nullptr) {
             HILOG_ERROR("read config failed at index %{public}d.", i);
             if (!reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR)) {
-                HILOG_ERROR("write error code failed");
+                HILOG_ERROR("[%{public}s]write error code failed", __FUNCTION__);
                 return ERR_APPEXECFWK_PARCEL_ERROR;
             }
             return ERR_OK;
@@ -2814,7 +2815,7 @@ int32_t HandleUpdateFormsConfig(IFormMgr &svc, MessageParcel &data, MessageParce
     }
     ErrCode result = svc.UpdateFormsConfig(configs);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed, result=%{public}d", result);
+        HILOG_ERROR("[%{public}s]write result failed, result=%{public}d", __FUNCTION__, result);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2822,15 +2823,15 @@ int32_t HandleUpdateFormsConfig(IFormMgr &svc, MessageParcel &data, MessageParce
 
 int32_t HandleRegisterDeleteFormsCallback(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("read callerToken failed.");
+        HILOG_ERROR("[%{public}s]read callerToken failed.", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     ErrCode result = svc.RegisterDeleteFormsCallback(callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write request result failed.");
+        HILOG_ERROR("[%{public}s]write request result failed.", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2838,10 +2839,10 @@ int32_t HandleRegisterDeleteFormsCallback(IFormMgr &svc, MessageParcel &data, Me
 
 int32_t HandleUnregisterDeleteFormsCallback(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     ErrCode result = svc.UnregisterDeleteFormsCallback();
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write request result failed.");
+        HILOG_ERROR("[%{public}s]write request result failed.", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2849,16 +2850,17 @@ int32_t HandleUnregisterDeleteFormsCallback(IFormMgr &svc, MessageParcel &data, 
 
 int32_t HandleDeleteForms(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int32_t size = 0;
     if (!data.ReadInt32(size)) {
-        HILOG_ERROR("read size failed");
+        HILOG_ERROR("[%{public}s]read size failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (size <= 0 || size > Constants::DELETE_FORMS_FILTER_MAX_NUM) {
-        HILOG_ERROR("invalid size: %{public}d, max: %{public}d", size, Constants::DELETE_FORMS_FILTER_MAX_NUM);
+        HILOG_ERROR("[%{public}s]invalid size: %{public}d, max: %{public}d",
+            __FUNCTION__, size, Constants::DELETE_FORMS_FILTER_MAX_NUM);
         if (!reply.WriteInt32(ERR_APPEXECFWK_FORM_INVALID_PARAM)) {
-            HILOG_ERROR("write error code failed");
+            HILOG_ERROR("[%{public}s]write error code failed", __FUNCTION__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
         return ERR_OK;
@@ -2870,7 +2872,7 @@ int32_t HandleDeleteForms(IFormMgr &svc, MessageParcel &data, MessageParcel &rep
         if (filter == nullptr) {
             HILOG_ERROR("read filter failed at index %{public}d.", i);
             if (!reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR)) {
-                HILOG_ERROR("write error code failed");
+                HILOG_ERROR("[%{public}s]write error code failed", __FUNCTION__);
                 return ERR_APPEXECFWK_PARCEL_ERROR;
             }
             return ERR_OK;
@@ -2879,7 +2881,7 @@ int32_t HandleDeleteForms(IFormMgr &svc, MessageParcel &data, MessageParcel &rep
     }
     ErrCode result = svc.DeleteForms(filters);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed, result=%{public}d", result);
+        HILOG_ERROR("[%{public}s]write result failed, result=%{public}d", __FUNCTION__, result);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2887,7 +2889,7 @@ int32_t HandleDeleteForms(IFormMgr &svc, MessageParcel &data, MessageParcel &rep
 
 int32_t HandleRegisterFormHostService(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::unique_ptr<FormHostServiceInfo> service(data.ReadParcelable<FormHostServiceInfo>());
     if (service == nullptr) {
         HILOG_ERROR("read FormHostServiceInfo failed");
@@ -2899,7 +2901,7 @@ int32_t HandleRegisterFormHostService(IFormMgr &svc, MessageParcel &data, Messag
     int64_t serviceId = -1;
     ErrCode result = svc.RegisterFormHostService(*service, serviceId);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK && !reply.WriteInt64(serviceId)) {
@@ -2911,7 +2913,7 @@ int32_t HandleRegisterFormHostService(IFormMgr &svc, MessageParcel &data, Messag
 
 int32_t HandleUnregisterFormHostService(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     int64_t serviceId = 0;
     if (!data.ReadInt64(serviceId)) {
         HILOG_ERROR("read serviceId failed");
@@ -2919,7 +2921,7 @@ int32_t HandleUnregisterFormHostService(IFormMgr &svc, MessageParcel &data, Mess
     }
     ErrCode result = svc.UnregisterFormHostService(serviceId);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2927,11 +2929,11 @@ int32_t HandleUnregisterFormHostService(IFormMgr &svc, MessageParcel &data, Mess
 
 int32_t HandleGetAvailableFormHostServices(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::vector<PeerFormHostServiceInfo> services;
     ErrCode result = svc.GetAvailableFormHostServices(services);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (result == ERR_OK) {
@@ -2945,7 +2947,7 @@ int32_t HandleGetAvailableFormHostServices(IFormMgr &svc, MessageParcel &data, M
 
 int32_t HandleRequestPublishFormCrossDevice(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::unique_ptr<FormCrossDeviceRequest> request(data.ReadParcelable<FormCrossDeviceRequest>());
     if (request == nullptr) {
         HILOG_ERROR("read FormCrossDeviceRequest failed");
@@ -2957,7 +2959,7 @@ int32_t HandleRequestPublishFormCrossDevice(IFormMgr &svc, MessageParcel &data, 
 sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     sptr<IRemoteObject> callback = data.ReadRemoteObject();
     if (callerToken == nullptr || callback == nullptr) {
-        HILOG_ERROR("ReadRemoteObject failed");
+        HILOG_ERROR("[%{public}s]ReadRemoteObject failed", __FUNCTION__);
         if (!reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR)) {
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
@@ -2965,7 +2967,7 @@ sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     }
     ErrCode result = svc.RequestPublishFormCrossDevice(*request, callerToken, callback);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2976,12 +2978,12 @@ int32_t HandleRegisterGetVisibleFormRectProxy(IFormMgr &svc, MessageParcel &data
     HILOG_DEBUG("handle save query visible form rect proxy to service");
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
-        HILOG_ERROR("read callerToken failed");
+        HILOG_ERROR("[%{public}s]read callerToken failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     ErrCode result = svc.RegisterGetVisibleFormRectProxy(callerToken);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write proxy failed");
+        HILOG_ERROR("[%{public}s]write proxy failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -2989,10 +2991,10 @@ int32_t HandleRegisterGetVisibleFormRectProxy(IFormMgr &svc, MessageParcel &data
 
 int32_t HandleUnregisterGetVisibleFormRectProxy(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     ErrCode result = svc.UnregisterGetVisibleFormRectProxy();
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -3017,10 +3019,10 @@ int32_t HandleGetVisibleFormRect(IFormMgr &svc, MessageParcel &data, MessageParc
 
 int32_t HandleUpdateFormsWithReminderAgent(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("call");
+    HILOG_DEBUG("[%{public}s]call", __FUNCTION__);
     std::string bundleName;
     if (!data.ReadString(bundleName)) {
-        HILOG_ERROR("read bundleName failed");
+        HILOG_ERROR("[%{public}s]read bundleName failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (bundleName.empty()) {
@@ -3029,17 +3031,17 @@ int32_t HandleUpdateFormsWithReminderAgent(IFormMgr &svc, MessageParcel &data, M
     }
     int32_t userId = 0;
     if (!data.ReadInt32(userId)) {
-        HILOG_ERROR("read userId failed");
+        HILOG_ERROR("[%{public}s]read userId failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
-        HILOG_ERROR("ReadParcelable<Want> failed");
+        HILOG_ERROR("[%{public}s]ReadParcelable<Want> failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.UpdateFormsWithReminderAgent(bundleName, userId, *want);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -3047,15 +3049,15 @@ int32_t HandleUpdateFormsWithReminderAgent(IFormMgr &svc, MessageParcel &data, M
 
 int32_t HandleOpenFormManagePage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
-        HILOG_ERROR("get want failed");
+        HILOG_ERROR("[%{public}s]get want failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.OpenFormManagePage(*want);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -3063,15 +3065,15 @@ int32_t HandleOpenFormManagePage(IFormMgr &svc, MessageParcel &data, MessageParc
 
 int32_t HandleOpenFormEditPage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
-        HILOG_ERROR("get want failed");
+        HILOG_ERROR("[%{public}s]get want failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = svc.OpenFormEditPage(*want);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
@@ -3079,10 +3081,10 @@ int32_t HandleOpenFormEditPage(IFormMgr &svc, MessageParcel &data, MessageParcel
 
 int32_t HandleOpenLiveFormPage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
-        HILOG_ERROR("get want failed");
+        HILOG_ERROR("[%{public}s]get want failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::string formId = data.ReadString();
@@ -3094,7 +3096,7 @@ int32_t HandleOpenLiveFormPage(IFormMgr &svc, MessageParcel &data, MessageParcel
     }
     int32_t result = svc.OpenLiveFormPage(*want, formId);
     if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
+        HILOG_ERROR("[%{public}s]write result failed", __FUNCTION__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
