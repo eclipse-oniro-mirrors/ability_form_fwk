@@ -49,7 +49,7 @@ public:
 
     bool SetWindowBackgroundColor(const std::string &color);
 
-    ErrCode StartAbilityByFms(const AAFwk::Want &want);
+    ErrCode OpenFormEditSecondPage(const AAFwk::Want &want);
 
     ErrCode StartUIAbilityByFms(const AAFwk::Want &want);
 

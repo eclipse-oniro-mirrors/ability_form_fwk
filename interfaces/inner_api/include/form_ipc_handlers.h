@@ -153,7 +153,7 @@ int32_t HandleUnregisterGetVisibleFormRectProxy(IFormMgr &svc, MessageParcel &da
 int32_t HandleGetVisibleFormRect(IFormMgr &svc, MessageParcel &data, MessageParcel &reply);
 int32_t HandleUpdateFormsWithReminderAgent(IFormMgr &svc, MessageParcel &data, MessageParcel &reply);
 int32_t HandleOpenFormManagePage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply);
-int32_t HandleOpenFormEditPage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply);
+int32_t HandleOpenFormEditSecondPage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply);
 int32_t HandleOpenLiveFormPage(IFormMgr &svc, MessageParcel &data, MessageParcel &reply);
 } // namespace FormIpcHandlers
 } // namespace AppExecFwk

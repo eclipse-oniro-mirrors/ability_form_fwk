@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -28,6 +28,10 @@ ohos_unittest("FmsFormMgrStubTest") {
   sources = [
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "form_mgr_stub_test.cpp",
+    # form_mgr_stub.cpp must be compiled here too: OnRemoteRequest has to read
+    # the same FormIpcDispatchTable singleton the fixture installs the checker
+    # into, instead of the one hidden inside libform_manager.z.so.
+    "${form_fwk_path}/interfaces/inner_api/src/form_mgr_stub.cpp",
     # The production DSO exports only GetInstance/SetAccessChecker via
     # libform_manager.map; the test exercises the table and handlers directly.
     "${form_fwk_path}/interfaces/inner_api/src/form_ipc_dispatch_table.cpp",

@@ -303,11 +303,11 @@ public:
 
     ErrCode OpenFormManagePage(const Want &want);
 
-    ErrCode OpenFormEditPage(const Want &want);
+    ErrCode OpenFormEditSecondPage(const Want &want);
 
     ErrCode OpenLiveFormPage(const Want &want, const std::string &formId);
 
-    ErrCode StartHostPage(const Want &want, int32_t routerCode, const std::string &requestMethod);
+    ErrCode StartFormHostPage(const Want &want, int32_t routerCode, const std::string &requestMethod);
 
     bool IsForegroundApp();
 

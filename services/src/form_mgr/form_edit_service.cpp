@@ -60,7 +60,7 @@ ErrCode FormEditService::CloseFormEditAbility(const int32_t uid, bool isMainPage
     Want want;
     want.SetBundle(callerName);
     want.SetParams(wantarams);
-    return FormMgrAdapterFacade::GetInstance().StartHostPage(want, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT,
+    return FormMgrAdapterFacade::GetInstance().StartFormHostPage(want, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT,
         isMainPage ? Constants::PARAM_CLOSE_FORM_EDIT_VIEW : Constants::PARAM_CLOSE_FORM_EDIT_SEC_PAGE_VIEW);
 }
 }  // namespace AppExecFwk

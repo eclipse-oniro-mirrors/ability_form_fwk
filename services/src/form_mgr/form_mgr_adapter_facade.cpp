@@ -792,32 +792,29 @@ ErrCode FormMgrAdapterFacade::StartAbilityByFms(const Want &want)
 
 ErrCode FormMgrAdapterFacade::OpenFormManagePage(const Want &want)
 {
-    HILOG_INFO("called");
     return FormCallbackAdapter::GetInstance().OpenFormManagePage(want);
 }
 
-ErrCode FormMgrAdapterFacade::OpenFormEditPage(const Want &want)
+ErrCode FormMgrAdapterFacade::OpenFormEditSecondPage(const Want &want)
 {
-    HILOG_INFO("called");
-    return FormCallbackAdapter::GetInstance().OpenFormEditPage(want);
+    return FormCallbackAdapter::GetInstance().OpenFormEditSecondPage(want);
 }
 
 ErrCode FormMgrAdapterFacade::OpenLiveFormPage(const Want &want, const std::string &formId)
 {
-    HILOG_INFO("called");
     return FormCallbackAdapter::GetInstance().OpenLiveFormPage(want, formId);
 }
 
-ErrCode FormMgrAdapterFacade::StartHostPage(const Want &want, int32_t routerCode,
+ErrCode FormMgrAdapterFacade::StartFormHostPage(const Want &want, int32_t routerCode,
     const std::string &requestMethod)
 {
-    HILOG_INFO("called");
-    return FormCallbackAdapter::GetInstance().StartHostPage(want, routerCode, requestMethod);
+    HILOG_INFO("[%{public}s]called", __FUNCTION__);
+    return FormCallbackAdapter::GetInstance().StartFormHostPage(want, routerCode, requestMethod);
 }
 
 bool FormMgrAdapterFacade::IsForegroundApp()
 {
-    HILOG_INFO("called");
+    HILOG_INFO("[%{public}s]called", __FUNCTION__);
     return FormCallbackAdapter::GetInstance().IsForegroundApp();
 }
 

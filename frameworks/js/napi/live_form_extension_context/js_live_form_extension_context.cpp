@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -306,7 +306,7 @@ napi_value JsLiveFormExtensionContext::OnStartAbilityByLiveForm(napi_env env, Na
             return;
         }
 
-        ErrCode errCode = context->StartAbilityByFms(want, formId);
+        ErrCode errCode = context->OpenLiveFormPage(want, formId);
         if (errCode == ERR_OK) {
             task.ResolveWithNoError(env, CreateJsUndefined(env));
             return;

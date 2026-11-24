@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -405,15 +405,9 @@ void OpenFormManager([[maybe_unused]] ani_env *env, ani_object wantObj)
     const std::string bundleName = want.GetBundle();
     const std::string abilityName = want.GetElement().GetAbilityName();
     want.SetElementName(bundleName, abilityName);
-    want.SetAction(AppExecFwk::Constants::FORM_PAGE_ACTION);
-    want.SetParam(AppExecFwk::Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
-                  AppExecFwk::Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE);
-    const std::string key = AppExecFwk::Constants::PARMA_REQUEST_METHOD;
-    const std::string value = AppExecFwk::Constants::OPEN_FORM_MANAGE_VIEW;
-    want.SetParam(key, value);
 
-    auto ret = FormMgr::GetInstance().StartAbilityByFms(want);
-    HILOG_INFO("OpenFormManager StartAbilityByFms return code:%{public}d", static_cast<int>(ret));
+    auto ret = FormMgr::GetInstance().OpenFormManagePage(want);
+    HILOG_INFO("OpenFormManager return code:%{public}d", static_cast<int>(ret));
     if (ret != ERR_OK) {
         HILOG_ERROR("OpenFormManager failed,error code:%{public}d", static_cast<int>(ret));
         PrepareExceptionAndThrow(env, ret);
@@ -647,12 +641,6 @@ void OpenFormManagerCrossBundle(ani_env *env, ani_object aniWant)
     const std::string bundleName = want.GetBundle();
     const std::string abilityName = want.GetElement().GetAbilityName();
     want.SetElementName(bundleName, abilityName);
-    want.SetAction(AppExecFwk::Constants::FORM_PAGE_ACTION);
-    want.SetParam(AppExecFwk::Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
-                  AppExecFwk::Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE);
-    const std::string key = AppExecFwk::Constants::PARMA_REQUEST_METHOD;
-    const std::string value = AppExecFwk::Constants::OPEN_FORM_MANAGE_VIEW;
-    want.SetParam(key, value);
 
     auto ret = FormMgr::GetInstance().StartAbilityByCrossBundle(want);
     if (ret != ERR_OK) {

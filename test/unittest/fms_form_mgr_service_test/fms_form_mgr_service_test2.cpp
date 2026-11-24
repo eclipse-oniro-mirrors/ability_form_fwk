@@ -1242,7 +1242,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByCrossBundle_0003, 
  * @tc.name: test StartAbilityByCrossBundle foreground app success.
  * @tc.desc: Verify that StartAbilityByCrossBundle returns success when caller is system app,
  *           want has SHOW_SINGLE_FORM_KEY, caller bundle resolves, app is foreground, and
- *           StartHostPage succeeds.
+ *           StartFormHostPage succeeds.
  */
 HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByCrossBundle_0004, TestSize.Level1)
 {
@@ -1254,7 +1254,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByCrossBundle_0004, 
     want.SetParam(Constants::FORM_MANAGER_SHOW_SINGLE_FORM_KEY, true);
     MockGetCallerBundleName(ERR_OK);
     MockFormMgrAdapterFacadeIsForegroundApp(true);
-    MockFormMgrAdapterFacadeStartHostPage(ERR_OK);
+    MockFormMgrAdapterFacadeStartFormHostPage(ERR_OK);
     int32_t ret = formMgrService.StartAbilityByCrossBundle(want);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByCrossBundle_0004 end";
@@ -1472,7 +1472,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_OpenFormEditAbility_0005, TestSi
     bool isMainPage = true;
     MockFormBmsHelperGetBundleNameByUid(ERR_OK, "caller");
     MockFormDataMgrGetRunningFormInfosByFormId(ERR_OK, "caller", FormVisibilityType::VISIBLE);
-    MockFormMgrAdapterFacadeStartHostPage(ERR_OK);
+    MockFormMgrAdapterFacadeStartFormHostPage(ERR_OK);
     ErrCode ret = formMgrService.OpenFormEditAbility(abilityName, formId, isMainPage);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_OpenFormEditAbility_0005 end";
@@ -1492,7 +1492,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_OpenFormEditAbility_0006, TestSi
     bool isMainPage = false;
     MockFormBmsHelperGetBundleNameByUid(ERR_OK, "caller");
     MockFormDataMgrGetRunningFormInfosByFormId(ERR_OK, "caller", FormVisibilityType::VISIBLE);
-    MockFormMgrAdapterFacadeStartHostPage(ERR_OK);
+    MockFormMgrAdapterFacadeStartFormHostPage(ERR_OK);
     ErrCode ret = formMgrService.OpenFormEditAbility(abilityName, formId, isMainPage);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_OpenFormEditAbility_0006 end";
@@ -1936,5 +1936,223 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_GetVisibleFormRect_Svc002, TestS
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
     MockFormMgrAdapterFacadeGetVisibleFormRect(ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_GetVisibleFormRect_Svc002 end";
+}
+
+/**
+ * @tc.number: FormMgrService_StartAbilityByFms_0001
+ * @tc.name: test StartAbilityByFms non-system app rejected.
+ * @tc.desc: Verify that StartAbilityByFms returns ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS when
+ *           the caller is neither a SA nor a system app (new system-app gate).
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByFms_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByFms_0001 start";
+    FormMgrService formMgrService;
+    Want want;
+    want.SetElementName("com.form.dst", "DstAbility");
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    // Facade must not be reached: pin its return to a distinct error to prove rejection happens before forwarding.
+    MockFormMgrAdapterFacadeStartAbilityByFms(ERR_APPEXECFWK_FORM_NOT_TRUST);
+    int32_t ret = formMgrService.StartAbilityByFms(want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+    MockFormMgrAdapterFacadeStartAbilityByFms(ERR_OK);
+    MockIsSACall(true);
+    MockIsSystemAppByFullTokenID(true);
+    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByFms_0001 end";
+}
+
+/**
+ * @tc.number: FormMgrService_StartAbilityByFms_0002
+ * @tc.name: test StartAbilityByFms system app but get bundle failed.
+ * @tc.desc: Verify that StartAbilityByFms returns ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED when
+ *           the caller is a system app but GetCallerBundleName fails.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByFms_0002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByFms_0002 start";
+    FormMgrService formMgrService;
+    Want want;
+    want.SetElementName("com.form.dst", "DstAbility");
+    MockIsSACall(true);
+    MockIsSystemAppByFullTokenID(true);
+    MockGetCallerBundleName(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    int32_t ret = formMgrService.StartAbilityByFms(want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    MockGetCallerBundleName(ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByFms_0002 end";
+}
+
+/**
+ * @tc.number: FormMgrService_StartAbilityByFms_0003
+ * @tc.name: test StartAbilityByFms destination bundle not caller.
+ * @tc.desc: Verify that StartAbilityByFms returns ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME when
+ *           the destination bundle name differs from the caller bundle name.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByFms_0003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByFms_0003 start";
+    FormMgrService formMgrService;
+    Want want;
+    want.SetElementName("com.form.dst", "DstAbility");
+    MockIsSACall(true);
+    MockIsSystemAppByFullTokenID(true);
+    MockGetCallerBundleName(ERR_OK, "com.form.caller");
+    int32_t ret = formMgrService.StartAbilityByFms(want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME);
+    MockGetCallerBundleName(ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByFms_0003 end";
+}
+
+/**
+ * @tc.number: FormMgrService_StartAbilityByFms_0004
+ * @tc.name: test StartAbilityByFms success forwards to facade.
+ * @tc.desc: Verify that StartAbilityByFms returns ERR_OK when the caller is a system app,
+ *           destination bundle equals caller bundle, and the facade succeeds.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByFms_0004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByFms_0004 start";
+    FormMgrService formMgrService;
+    Want want;
+    want.SetElementName("com.form.self", "DstAbility");
+    MockIsSACall(true);
+    MockIsSystemAppByFullTokenID(true);
+    MockGetCallerBundleName(ERR_OK, "com.form.self");
+    MockFormMgrAdapterFacadeStartAbilityByFms(ERR_OK);
+    int32_t ret = formMgrService.StartAbilityByFms(want);
+    EXPECT_EQ(ret, ERR_OK);
+    MockGetCallerBundleName(ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByFms_0004 end";
+}
+
+/**
+ * @tc.number: FormMgrService_StartAbilityByFms_0005
+ * @tc.name: test StartAbilityByFms propagates facade error.
+ * @tc.desc: Verify that StartAbilityByFms returns the facade error code when forwarding fails.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_StartAbilityByFms_0005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByFms_0005 start";
+    FormMgrService formMgrService;
+    Want want;
+    want.SetElementName("com.form.self", "DstAbility");
+    MockIsSACall(true);
+    MockIsSystemAppByFullTokenID(true);
+    MockGetCallerBundleName(ERR_OK, "com.form.self");
+    MockFormMgrAdapterFacadeStartAbilityByFms(ERR_APPEXECFWK_FORM_NOT_TRUST);
+    int32_t ret = formMgrService.StartAbilityByFms(want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_TRUST);
+    MockFormMgrAdapterFacadeStartAbilityByFms(ERR_OK);
+    MockGetCallerBundleName(ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_StartAbilityByFms_0005 end";
+}
+
+/**
+ * @tc.number: FormMgrService_OpenFormManagePage_0001
+ * @tc.name: test OpenFormManagePage success.
+ * @tc.desc: Verify that OpenFormManagePage returns ERR_OK when the facade succeeds.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_OpenFormManagePage_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_OpenFormManagePage_0001 start";
+    FormMgrService formMgrService;
+    Want want;
+    want.SetElementName("com.form.host", "ManageAbility");
+    MockFormMgrAdapterFacadeOpenFormManagePage(ERR_OK);
+    int32_t ret = formMgrService.OpenFormManagePage(want);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_OpenFormManagePage_0001 end";
+}
+
+/**
+ * @tc.number: FormMgrService_OpenFormManagePage_0002
+ * @tc.name: test OpenFormManagePage propagates facade error.
+ * @tc.desc: Verify that OpenFormManagePage returns the facade error code when opening fails.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_OpenFormManagePage_0002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_OpenFormManagePage_0002 start";
+    FormMgrService formMgrService;
+    Want want;
+    want.SetElementName("com.form.host", "ManageAbility");
+    MockFormMgrAdapterFacadeOpenFormManagePage(ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+    int32_t ret = formMgrService.OpenFormManagePage(want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+    MockFormMgrAdapterFacadeOpenFormManagePage(ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_OpenFormManagePage_0002 end";
+}
+
+/**
+ * @tc.number: FormMgrService_OpenFormEditSecondPage_0001
+ * @tc.name: test OpenFormEditSecondPage success.
+ * @tc.desc: Verify that OpenFormEditSecondPage returns ERR_OK when the facade succeeds.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_OpenFormEditSecondPage_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_OpenFormEditSecondPage_0001 start";
+    FormMgrService formMgrService;
+    Want want;
+    want.SetElementName("com.form.host", "EditAbility");
+    MockFormMgrAdapterFacadeOpenFormEditSecondPage(ERR_OK);
+    int32_t ret = formMgrService.OpenFormEditSecondPage(want);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_OpenFormEditSecondPage_0001 end";
+}
+
+/**
+ * @tc.number: FormMgrService_OpenFormEditSecondPage_0002
+ * @tc.name: test OpenFormEditSecondPage propagates facade error.
+ * @tc.desc: Verify that OpenFormEditSecondPage returns the facade error code when opening fails.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_OpenFormEditSecondPage_0002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_OpenFormEditSecondPage_0002 start";
+    FormMgrService formMgrService;
+    Want want;
+    want.SetElementName("com.form.host", "EditAbility");
+    MockFormMgrAdapterFacadeOpenFormEditSecondPage(ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+    int32_t ret = formMgrService.OpenFormEditSecondPage(want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
+    MockFormMgrAdapterFacadeOpenFormEditSecondPage(ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_OpenFormEditSecondPage_0002 end";
+}
+
+/**
+ * @tc.number: FormMgrService_OpenLiveFormPage_0001
+ * @tc.name: test OpenLiveFormPage success.
+ * @tc.desc: Verify that OpenLiveFormPage returns ERR_OK when the facade succeeds.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_OpenLiveFormPage_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_OpenLiveFormPage_0001 start";
+    FormMgrService formMgrService;
+    Want want;
+    want.SetElementName("com.form.host", "LiveFormAbility");
+    const std::string formId = "123456789";
+    MockFormMgrAdapterFacadeOpenLiveFormPage(ERR_OK);
+    int32_t ret = formMgrService.OpenLiveFormPage(want, formId);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_OpenLiveFormPage_0001 end";
+}
+
+/**
+ * @tc.number: FormMgrService_OpenLiveFormPage_0002
+ * @tc.name: test OpenLiveFormPage propagates facade error.
+ * @tc.desc: Verify that OpenLiveFormPage returns the facade error code when the page
+ *           cannot be opened (e.g. CallerCheck ownership failure inside the adapter).
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_OpenLiveFormPage_0002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_OpenLiveFormPage_0002 start";
+    FormMgrService formMgrService;
+    Want want;
+    want.SetElementName("com.form.host", "LiveFormAbility");
+    const std::string formId = "123456789";
+    MockFormMgrAdapterFacadeOpenLiveFormPage(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+    int32_t ret = formMgrService.OpenLiveFormPage(want, formId);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+    MockFormMgrAdapterFacadeOpenLiveFormPage(ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_OpenLiveFormPage_0002 end";
 }
 }

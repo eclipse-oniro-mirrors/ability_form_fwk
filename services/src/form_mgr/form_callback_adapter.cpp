@@ -799,7 +799,7 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
 
 ErrCode FormCallbackAdapter::OpenFormManagePage(const Want &want)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::string callerName;
     ErrCode ret = CheckDestinationIsCaller(want, callerName);
     if (ret != ERR_OK) {
@@ -809,27 +809,38 @@ ErrCode FormCallbackAdapter::OpenFormManagePage(const Want &want)
         HILOG_ERROR("This application is not a foreground program");
         return ERR_APPEXECFWK_FORM_NOT_TRUST;
     }
-    return StartHostPage(want, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE,
+    return StartFormHostPage(want, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE,
         Constants::OPEN_FORM_MANAGE_VIEW);
 }
 
-ErrCode FormCallbackAdapter::OpenFormEditPage(const Want &want)
+ErrCode FormCallbackAdapter::OpenFormEditSecondPage(const Want &want)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::string callerName;
     ErrCode ret = CheckDestinationIsCaller(want, callerName);
     if (ret != ERR_OK) {
         return ret;
     }
-    return StartHostPage(want, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT,
+
+    return StartFormHostPage(want, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT,
         Constants::PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW);
 }
 
 ErrCode FormCallbackAdapter::OpenLiveFormPage(const Want &want, const std::string &formId)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::string callerName;
     ErrCode ret = CheckDestinationIsCaller(want, callerName);
+    if (ret != ERR_OK) {
+        return ret;
+    }
+    int64_t liveFormId = 0;
+    if (!FormUtil::ConvertStringToInt64(formId, liveFormId)) {
+        HILOG_ERROR("invalid live formId:%{public}s", formId.c_str());
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    ret = CallerCheck(liveFormId, callingUid);
     if (ret != ERR_OK) {
         return ret;
     }
@@ -850,11 +861,11 @@ ErrCode FormCallbackAdapter::OpenLiveFormPage(const Want &want, const std::strin
     Want liveWant(want);
     // The formId from the explicit IPC argument is pinned into the Want sent to the host.
     liveWant.SetParam(Constants::PARAM_LIVE_FORM_ID_KEY, formId);
-    return StartHostPage(liveWant, Constants::PAGE_ROUTER_SERVICE_CODE_LIVE_FORM,
+    return StartFormHostPage(liveWant, Constants::PAGE_ROUTER_SERVICE_CODE_LIVE_FORM,
         Constants::START_ABILITY_BY_LIVE_FORM);
 }
 
-ErrCode FormCallbackAdapter::StartHostPage(const Want &want, int32_t routerCode,
+ErrCode FormCallbackAdapter::StartFormHostPage(const Want &want, int32_t routerCode,
     const std::string &requestMethod)
 {
     Want wantToHost(want);
@@ -876,7 +887,7 @@ ErrCode FormCallbackAdapter::StartHostPage(const Want &want, int32_t routerCode,
     wantToHost.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, dstBundleName);
     wantToHost.SetParam(Constants::PARAM_ABILITY_NAME_KEY, dstAbilityName);
 
-    HILOG_INFO("dstBundleName:%{public}s, dstAbilityName:%{public}s",
+    HILOG_INFO("[%{public}s]dstBundleName:%{public}s, dstAbilityName:%{public}s", __FUNCTION__,
         dstBundleName.c_str(), dstAbilityName.c_str());
 
     AppExecFwk::AbilityInfo abilityInfo;
@@ -908,7 +919,7 @@ ErrCode FormCallbackAdapter::StartHostPage(const Want &want, int32_t routerCode,
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
 
-    HILOG_INFO("StartAbility wantToHost:%{public}s", wantToHost.ToString().c_str());
+    HILOG_INFO("[%{public}s]StartAbility wantToHost:%{public}s", __FUNCTION__, wantToHost.ToString().c_str());
     return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
 }
 

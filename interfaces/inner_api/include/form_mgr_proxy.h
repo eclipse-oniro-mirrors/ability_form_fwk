@@ -437,7 +437,7 @@ public:
      * @param want includes ability name, parameters and related info sending to an ability.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t OpenFormEditPage(const Want &want) override;
+    int32_t OpenFormEditSecondPage(const Want &want) override;
 
     /**
      * @brief Open the live form page by form manager service.

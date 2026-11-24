@@ -67,6 +67,15 @@ constexpr const char* TEST_BUNDLE_NAME = "com.test.bundle";
 constexpr const char* TEST_ABILITY_NAME = "MainAbility";
 constexpr const char* TEST_MODULE_NAME = "entry";
 constexpr const char* TEST_FORM_NAME = "widget";
+// Live form status string is two digits: the first digit is the active state
+// ('0'=INACTIVE, '1'=PAUSE, '2'=ACTIVE) and the second digit is launcher support
+// ('0'=unsupported, '1'=supported). See FormConstantsUtil::LIVE_FORM_STATUS_MAP.
+constexpr const char* LIVE_FORM_STATUS_PAUSE_NOT_SUPPORT_LAUNCHER = "10";
+constexpr const char* LIVE_FORM_STATUS_ACTIVE_NOT_SUPPORT_LAUNCHER = "20";
+constexpr const char* LIVE_FORM_STATUS_ACTIVE_SUPPORT_LAUNCHER = "21";
+constexpr const char* LIVE_FORM_STATUS_INVALID = "99";
+// A live form id key that differs from the requested one.
+constexpr const char* OTHER_LIVE_FORM_ID = "other_form";
 
 class MockFormHostDelegateStub : public FormHostDelegateStub {
 public:
@@ -173,6 +182,8 @@ void FmsFormCallbackAdapterTest::SetUp()
 
 void FmsFormCallbackAdapterTest::TearDown()
 {
+    // Exception-safe cleanup for cases registering live form status delegates.
+    FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Clear();
 }
 
 // ========== RegisterFormRouterProxy Tests ==========
@@ -1309,7 +1320,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_009, TestSize.Level1)
     // Register mock delegate with live form status "10" (PAUSE, isSupportLauncher=false)
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->getLiveFormStatusResult_ = ERR_OK;
-    mockDelegate->liveFormStatusData_ = {{"form_999", "10"}};
+    mockDelegate->liveFormStatusData_ = {{"form_999", LIVE_FORM_STATUS_PAUSE_NOT_SUPPORT_LAUNCHER}};
     ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
@@ -1343,7 +1354,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_010, TestSize.Level1)
     // Register mock delegate with an unknown status value
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->getLiveFormStatusResult_ = ERR_OK;
-    mockDelegate->liveFormStatusData_ = {{"form_888", "99"}};
+    mockDelegate->liveFormStatusData_ = {{"form_888", LIVE_FORM_STATUS_INVALID}};
     ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
@@ -1377,7 +1388,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_011, TestSize.Level1)
     // Register mock delegate with status "21" (ACTIVE, isSupportLauncher=true)
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->getLiveFormStatusResult_ = ERR_OK;
-    mockDelegate->liveFormStatusData_ = {{"form_777", "21"}};
+    mockDelegate->liveFormStatusData_ = {{"form_777", LIVE_FORM_STATUS_ACTIVE_SUPPORT_LAUNCHER}};
     ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
@@ -1826,7 +1837,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetLiveFormStatus_003, TestSize.Level1)
     // Register a proper mock delegate
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->getLiveFormStatusResult_ = ERR_OK;
-    mockDelegate->liveFormStatusData_ = {{"form_123", "21"}};
+    mockDelegate->liveFormStatusData_ = {{"form_123", LIVE_FORM_STATUS_ACTIVE_SUPPORT_LAUNCHER}};
     ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
@@ -1834,7 +1845,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetLiveFormStatus_003, TestSize.Level1)
     auto result = FormCallbackAdapter::GetInstance().GetLiveFormStatus(liveFormStatusMap);
     EXPECT_EQ(result, ERR_OK);
     EXPECT_EQ(liveFormStatusMap.size(), 1u);
-    EXPECT_EQ(liveFormStatusMap["form_123"], "21");
+    EXPECT_EQ(liveFormStatusMap["form_123"], LIVE_FORM_STATUS_ACTIVE_SUPPORT_LAUNCHER);
 
     // Cleanup
     FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Clear();
@@ -3059,6 +3070,286 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetVisibleFormRect_Adapter_008, TestSize.Le
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
 
     GTEST_LOG_(INFO) << "GetVisibleFormRect_Adapter_008 end";
+}
+
+/**
+ * @tc.name: OpenLiveFormPage_001
+ * @tc.desc: Verify CheckDestinationIsCaller bundle resolution failure returns GET_BUNDLE_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, OpenLiveFormPage_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_001 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(Return(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED));
+
+    auto result = FormCallbackAdapter::GetInstance().OpenLiveFormPage(want, std::to_string(TEST_FORM_ID));
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_001 end";
+}
+
+/**
+ * @tc.name: OpenLiveFormPage_002
+ * @tc.desc: Verify destination bundle different from caller bundle returns INVALID_BUNDLENAME
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, OpenLiveFormPage_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_002 start";
+
+    Want want;
+    want.SetElementName("com.other.bundle", TEST_ABILITY_NAME);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(TEST_BUNDLE_NAME), Return(ERR_OK)));
+
+    auto result = FormCallbackAdapter::GetInstance().OpenLiveFormPage(want, std::to_string(TEST_FORM_ID));
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME);
+
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_002 end";
+}
+
+/**
+ * @tc.name: OpenLiveFormPage_003
+ * @tc.desc: Verify non-numeric formId string returns INVALID_PARAM
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, OpenLiveFormPage_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_003 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(TEST_BUNDLE_NAME), Return(ERR_OK)));
+
+    auto result = FormCallbackAdapter::GetInstance().OpenLiveFormPage(want, "invalid_form_id");
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_003 end";
+}
+
+/**
+ * @tc.name: OpenLiveFormPage_004
+ * @tc.desc: Verify negative formId passes string conversion but fails CallerCheck with INVALID_PARAM
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, OpenLiveFormPage_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_004 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(TEST_BUNDLE_NAME), Return(ERR_OK)));
+
+    auto result = FormCallbackAdapter::GetInstance().OpenLiveFormPage(want, "-1");
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_004 end";
+}
+
+/**
+ * @tc.name: OpenLiveFormPage_005
+ * @tc.desc: Verify CallerCheck with non-existent form record returns NOT_EXIST_ID
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, OpenLiveFormPage_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_005 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(TEST_BUNDLE_NAME), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(Return(false));
+
+    auto result = FormCallbackAdapter::GetInstance().OpenLiveFormPage(want, std::to_string(TEST_FORM_ID));
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_005 end";
+}
+
+/**
+ * @tc.name: OpenLiveFormPage_006
+ * @tc.desc: Verify CallerCheck uid mismatch returns OPERATION_NOT_SELF
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, OpenLiveFormPage_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_006 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = INVALID_UID;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(TEST_BUNDLE_NAME), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    auto result = FormCallbackAdapter::GetInstance().OpenLiveFormPage(want, std::to_string(TEST_FORM_ID));
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF);
+
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_006 end";
+}
+
+/**
+ * @tc.name: OpenLiveFormPage_007
+ * @tc.desc: Verify live form id absent from status map returns LIVE_OP_UNSUPPORTED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, OpenLiveFormPage_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_007 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+    const std::string formIdStr = std::to_string(TEST_FORM_ID);
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = TEST_CALLING_UID;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(TEST_BUNDLE_NAME), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    // Registered delegate reports status of another form; the requested formId is not in the map.
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->getLiveFormStatusResult_ = ERR_OK;
+    mockDelegate->liveFormStatusData_ = {{OTHER_LIVE_FORM_ID, LIVE_FORM_STATUS_ACTIVE_SUPPORT_LAUNCHER}};
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
+        TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    auto result = FormCallbackAdapter::GetInstance().OpenLiveFormPage(want, formIdStr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED);
+
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_007 end";
+}
+
+/**
+ * @tc.name: OpenLiveFormPage_008
+ * @tc.desc: Verify live form status not supporting launcher returns LIVE_OP_UNSUPPORTED
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, OpenLiveFormPage_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_008 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+    const std::string formIdStr = std::to_string(TEST_FORM_ID);
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = TEST_CALLING_UID;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(TEST_BUNDLE_NAME), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+
+    // Status LIVE_FORM_STATUS_ACTIVE_NOT_SUPPORT_LAUNCHER means ACTIVE but launcher unsupported.
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->getLiveFormStatusResult_ = ERR_OK;
+    mockDelegate->liveFormStatusData_ = {{formIdStr, LIVE_FORM_STATUS_ACTIVE_NOT_SUPPORT_LAUNCHER}};
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
+        TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    auto result = FormCallbackAdapter::GetInstance().OpenLiveFormPage(want, formIdStr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_LIVE_OP_UNSUPPORTED);
+
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_008 end";
+}
+
+/**
+ * @tc.name: OpenLiveFormPage_009
+ * @tc.desc: Verify full success path starts host page with pinned live formId parameter
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCallbackAdapterTest, OpenLiveFormPage_009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_009 start";
+
+    Want want;
+    want.SetElementName(TEST_BUNDLE_NAME, TEST_ABILITY_NAME);
+    const std::string formIdStr = std::to_string(TEST_FORM_ID);
+
+    FormRecord record;
+    record.formId = TEST_FORM_ID;
+    record.uid = TEST_CALLING_UID;
+    record.bundleName = TEST_BUNDLE_NAME;
+    record.abilityName = TEST_ABILITY_NAME;
+
+    EXPECT_CALL(*MockIPCSkeleton::obj, GetCallingUid())
+        .WillRepeatedly(Return(TEST_CALLING_UID));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetCallerBundleName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(TEST_BUNDLE_NAME), Return(ERR_OK)));
+    EXPECT_CALL(*MockFormDataMgr::obj, FindMatchedFormId(TEST_FORM_ID))
+        .WillOnce(Return(TEST_FORM_ID));
+    EXPECT_CALL(*MockFormDataMgr::obj, GetFormRecord(TEST_FORM_ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(record), Return(true)));
+    EXPECT_CALL(*MockFormBmsHelper::obj, GetAbilityInfoByAction(_, _, _, _))
+        .WillOnce([](const std::string &, int32_t, AbilityInfo &info, ExtensionAbilityInfo &) {
+            info.bundleName = "com.test.host";
+            info.name = "HostAbility";
+            return true;
+        });
+    // Capture the want sent to the host and assert the explicit formId param is pinned.
+    Want capturedWant;
+    EXPECT_CALL(*MockFormAmsHelper::obj, StartAbility(_, _))
+        .WillOnce(DoAll(SaveArg<0>(&capturedWant), Return(ERR_OK)));
+
+    // Status LIVE_FORM_STATUS_ACTIVE_SUPPORT_LAUNCHER means ACTIVE and launcher supported.
+    auto mockDelegate = new MockFormHostDelegateStub();
+    mockDelegate->getLiveFormStatusResult_ = ERR_OK;
+    mockDelegate->liveFormStatusData_ = {{formIdStr, LIVE_FORM_STATUS_ACTIVE_SUPPORT_LAUNCHER}};
+    ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
+        TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
+
+    auto result = FormCallbackAdapter::GetInstance().OpenLiveFormPage(want, formIdStr);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(capturedWant.GetStringParam(Constants::PARAM_LIVE_FORM_ID_KEY), formIdStr);
+
+    GTEST_LOG_(INFO) << "OpenLiveFormPage_009 end";
 }
 
 }  // namespace AppExecFwk
