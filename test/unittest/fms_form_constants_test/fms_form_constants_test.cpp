@@ -36,6 +36,7 @@ HWTEST_F(FormConstantsTest, GetDimensionString_001, TestSize.Level1)
         {Constants::Dimension::DIMENSION_2_2, "2*2"},
         {Constants::Dimension::DIMENSION_2_4, "2*4"},
         {Constants::Dimension::DIMENSION_4_4, "4*4"},
+        {Constants::Dimension::DIMENSION_2_1_LEGACY, "2*1"},
         {Constants::Dimension::DIMENSION_1_1, "1*1"},
         {Constants::Dimension::DIMENSION_6_4, "6*4"},
         {Constants::Dimension::DIMENSION_2_3, "2*3"},
@@ -47,7 +48,6 @@ HWTEST_F(FormConstantsTest, GetDimensionString_001, TestSize.Level1)
         EXPECT_STREQ(FormConstantsUtil::GetDimensionString(item.first), item.second);
     }
     EXPECT_EQ(FormConstantsUtil::GetDimensionString(static_cast<Constants::Dimension>(0)), nullptr);
-    EXPECT_EQ(FormConstantsUtil::GetDimensionString(static_cast<Constants::Dimension>(5)), nullptr);
     EXPECT_EQ(FormConstantsUtil::GetDimensionString(static_cast<Constants::Dimension>(12)), nullptr);
 }
 
@@ -60,6 +60,7 @@ HWTEST_F(FormConstantsTest, Dimension_Enum_001, TestSize.Level1)
 {
     EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_MIN), 1);
     EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_1_2), 1);
+    EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_2_1_LEGACY), 5);
     EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_1_1), 6);
     EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_6_4), 7);
     EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_2_3), 8);

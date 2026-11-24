@@ -303,6 +303,7 @@ namespace Constants {
         DIMENSION_2_2,
         DIMENSION_2_4,
         DIMENSION_4_4,
+        DIMENSION_2_1_LEGACY,
         DIMENSION_1_1 = 6,
         DIMENSION_6_4 = 7,
         DIMENSION_2_3 = 8,

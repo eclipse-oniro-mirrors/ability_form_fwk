@@ -31,6 +31,7 @@
 #include "form_mgr/form_mgr_service.h"
 #undef private
 #include "form_mgr_errors.h"
+#include "form_constants.h"
 #include "form_provider/form_supply_callback.h"
 #include "common/util/form_util.h"
 #include "if_system_ability_manager.h"
@@ -71,8 +72,10 @@ const std::string FORM_PROVIDER_MODULE_SOURCE_DIR = "";
 const std::string FORM_HOST_BUNDLE_NAME = "com.form.host.app";
 
 const int32_t PARAM_FORM_DIMENSION_VALUE = 1;
-const int32_t PARAM_FORM_DIMENSION_2_1 = 10;
-const int32_t PARAM_FORM_DIMENSION_6_4 = 7;
+const int32_t PARAM_FORM_DIMENSION_1_2 = static_cast<int32_t>(Constants::Dimension::DIMENSION_1_2);
+const int32_t PARAM_FORM_DIMENSION_2_2 = static_cast<int32_t>(Constants::Dimension::DIMENSION_2_2);
+const int32_t PARAM_FORM_DIMENSION_2_1 = static_cast<int32_t>(Constants::Dimension::DIMENSION_2_1);
+const int32_t PARAM_FORM_DIMENSION_6_4 = static_cast<int32_t>(Constants::Dimension::DIMENSION_6_4);
 const int32_t DEFAULT_CALLING_UID = 20000001;
 
 const std::string DEVICE_ID = "ohos-phone1";
@@ -136,7 +139,8 @@ void FmsFormMgrAddFormTest::CreateProviderData()
     formInfo.scheduledUpdateTime = "06:06";
     formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
     formInfo.formVisibleNotify = true;
-    formInfo.supportDimensions = {1, 2, 10, 7};
+    formInfo.supportDimensions = {PARAM_FORM_DIMENSION_1_2, PARAM_FORM_DIMENSION_2_2,
+        PARAM_FORM_DIMENSION_2_1, PARAM_FORM_DIMENSION_6_4};
     formInfo.defaultDimension = 1;
     formInfo.supportShapes = {1};
     FormInfoStorage formInfoStorage;

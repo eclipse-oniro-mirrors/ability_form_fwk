@@ -748,7 +748,7 @@ HWTEST_F(FmsFormCommonAdapterTest, IsDimensionValid_005, TestSize.Level1)
 
 /**
  * @tc.name: IsDimensionValid_006
- * @tc.desc: Verify DIMENSION_2_1 validation and legacy value 5 rejection.
+ * @tc.desc: Verify DIMENSION_2_1 validation, legacy value 5 support and unsupported values.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormCommonAdapterTest, IsDimensionValid_006, TestSize.Level1)
@@ -767,8 +767,16 @@ HWTEST_F(FmsFormCommonAdapterTest, IsDimensionValid_006, TestSize.Level1)
     formInfoNoMatch.supportDimensions.push_back(2);
     EXPECT_FALSE(FormCommonAdapter::GetInstance().IsDimensionValid(formInfoNoMatch, dimension2x1));
 
-    EXPECT_FALSE(FormCommonAdapter::GetInstance().IsDimensionValid(formInfoMatch, 5));
-    EXPECT_FALSE(FormCommonAdapter::GetInstance().IsDimensionValid(formInfoMatch,
+    FormInfo formInfoLegacy;
+    formInfoLegacy.supportDimensions.push_back(1);
+    formInfoLegacy.supportDimensions.push_back(
+        static_cast<int32_t>(Constants::Dimension::DIMENSION_2_1_LEGACY));
+    EXPECT_TRUE(FormCommonAdapter::GetInstance().IsDimensionValid(formInfoLegacy,
+        static_cast<int32_t>(Constants::Dimension::DIMENSION_2_1_LEGACY)));
+
+    EXPECT_FALSE(FormCommonAdapter::GetInstance().IsDimensionValid(formInfoNoMatch,
+        static_cast<int32_t>(Constants::Dimension::DIMENSION_2_1_LEGACY)));
+    EXPECT_FALSE(FormCommonAdapter::GetInstance().IsDimensionValid(formInfoNoMatch,
         static_cast<int32_t>(Constants::Dimension::DIMENSION_MAX) + 1));
 
     GTEST_LOG_(INFO) << "IsDimensionValid_006 end";
