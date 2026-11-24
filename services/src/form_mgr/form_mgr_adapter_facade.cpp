@@ -792,19 +792,16 @@ ErrCode FormMgrAdapterFacade::StartAbilityByFms(const Want &want)
 
 ErrCode FormMgrAdapterFacade::OpenFormManagePage(const Want &want)
 {
-    HILOG_INFO("called");
     return FormCallbackAdapter::GetInstance().OpenFormManagePage(want);
 }
 
 ErrCode FormMgrAdapterFacade::OpenFormEditSecondPage(const Want &want)
 {
-    HILOG_INFO("called");
     return FormCallbackAdapter::GetInstance().OpenFormEditSecondPage(want);
 }
 
 ErrCode FormMgrAdapterFacade::OpenLiveFormPage(const Want &want, const std::string &formId)
 {
-    HILOG_INFO("called");
     return FormCallbackAdapter::GetInstance().OpenLiveFormPage(want, formId);
 }
 

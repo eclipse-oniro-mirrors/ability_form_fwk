@@ -1276,21 +1276,18 @@ int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
 
 int32_t FormMgrService::OpenFormManagePage(const Want &want)
 {
-    HILOG_INFO("call");
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormMgrAdapterFacade::GetInstance().OpenFormManagePage(want);
 }
 
 int32_t FormMgrService::OpenFormEditSecondPage(const Want &want)
 {
-    HILOG_INFO("call");
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormMgrAdapterFacade::GetInstance().OpenFormEditSecondPage(want);
 }
 
 int32_t FormMgrService::OpenLiveFormPage(const Want &want, const std::string &formId)
 {
-    HILOG_INFO("call");
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormMgrAdapterFacade::GetInstance().OpenLiveFormPage(want, formId);
 }

@@ -799,7 +799,7 @@ ErrCode FormCallbackAdapter::StartAbilityByFms(const Want &want)
 
 ErrCode FormCallbackAdapter::OpenFormManagePage(const Want &want)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("[%{public}s]call", __FUNCTION__);
     std::string callerName;
     ErrCode ret = CheckDestinationIsCaller(want, callerName);
     if (ret != ERR_OK) {
@@ -887,7 +887,7 @@ ErrCode FormCallbackAdapter::StartFormHostPage(const Want &want, int32_t routerC
     wantToHost.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, dstBundleName);
     wantToHost.SetParam(Constants::PARAM_ABILITY_NAME_KEY, dstAbilityName);
 
-    HILOG_INFO("dstBundleName:%{public}s, dstAbilityName:%{public}s",
+    HILOG_INFO("[%{public}s]dstBundleName:%{public}s, dstAbilityName:%{public}s", __FUNCTION__,
         dstBundleName.c_str(), dstAbilityName.c_str());
 
     AppExecFwk::AbilityInfo abilityInfo;
@@ -919,7 +919,7 @@ ErrCode FormCallbackAdapter::StartFormHostPage(const Want &want, int32_t routerC
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
 
-    HILOG_INFO("StartAbility wantToHost:%{public}s", wantToHost.ToString().c_str());
+    HILOG_INFO("[%{public}s]StartAbility wantToHost:%{public}s", __FUNCTION__, wantToHost.ToString().c_str());
     return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
 }
 

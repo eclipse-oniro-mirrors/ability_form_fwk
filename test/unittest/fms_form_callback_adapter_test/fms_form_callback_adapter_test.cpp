@@ -1320,7 +1320,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_009, TestSize.Level1)
     // Register mock delegate with live form status "10" (PAUSE, isSupportLauncher=false)
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->getLiveFormStatusResult_ = ERR_OK;
-    mockDelegate->liveFormStatusData_ = {{"form_999", "10"}};
+    mockDelegate->liveFormStatusData_ = {{"form_999", LIVE_FORM_STATUS_PAUSE_NOT_SUPPORT_LAUNCHER}};
     ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
@@ -1354,7 +1354,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_010, TestSize.Level1)
     // Register mock delegate with an unknown status value
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->getLiveFormStatusResult_ = ERR_OK;
-    mockDelegate->liveFormStatusData_ = {{"form_888", "99"}};
+    mockDelegate->liveFormStatusData_ = {{"form_888", LIVE_FORM_STATUS_INVALID}};
     ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
@@ -1388,7 +1388,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, StartAbilityByFms_011, TestSize.Level1)
     // Register mock delegate with status "21" (ACTIVE, isSupportLauncher=true)
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->getLiveFormStatusResult_ = ERR_OK;
-    mockDelegate->liveFormStatusData_ = {{"form_777", "21"}};
+    mockDelegate->liveFormStatusData_ = {{"form_777", LIVE_FORM_STATUS_ACTIVE_SUPPORT_LAUNCHER}};
     ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
@@ -1837,7 +1837,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetLiveFormStatus_003, TestSize.Level1)
     // Register a proper mock delegate
     auto mockDelegate = new MockFormHostDelegateStub();
     mockDelegate->getLiveFormStatusResult_ = ERR_OK;
-    mockDelegate->liveFormStatusData_ = {{"form_123", "21"}};
+    mockDelegate->liveFormStatusData_ = {{"form_123", LIVE_FORM_STATUS_ACTIVE_SUPPORT_LAUNCHER}};
     ASSERT_EQ(FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Register(
         TEST_CALLING_UID, sptr<IRemoteObject>(mockDelegate)), ERR_OK);
 
@@ -1845,7 +1845,7 @@ HWTEST_F(FmsFormCallbackAdapterTest, GetLiveFormStatus_003, TestSize.Level1)
     auto result = FormCallbackAdapter::GetInstance().GetLiveFormStatus(liveFormStatusMap);
     EXPECT_EQ(result, ERR_OK);
     EXPECT_EQ(liveFormStatusMap.size(), 1u);
-    EXPECT_EQ(liveFormStatusMap["form_123"], "21");
+    EXPECT_EQ(liveFormStatusMap["form_123"], LIVE_FORM_STATUS_ACTIVE_SUPPORT_LAUNCHER);
 
     // Cleanup
     FormCallbackAdapter::GetInstance().liveFormStatusRegistry_->Clear();
