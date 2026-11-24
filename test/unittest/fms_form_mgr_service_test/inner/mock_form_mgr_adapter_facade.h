@@ -48,8 +48,11 @@ void MockUpdateFormsWithReminderAgent(int mockRet);
 void MockFormMgrAdapterFacadeGetVisibleFormRect(int mockRet);
 void MockFormMgrAdapterFacadeRegisterGetVisibleFormRectProxy(int mockRet);
 void MockFormMgrAdapterFacadeUnregisterGetVisibleFormRectProxy(int mockRet);
-void MockFormMgrAdapterFacadeStartHostPage(int mockRet);
+void MockFormMgrAdapterFacadeStartFormHostPage(int mockRet);
 void MockFormMgrAdapterFacadeIsForegroundApp(bool mockRet);
+void MockFormMgrAdapterFacadeOpenFormManagePage(int mockRet);
+void MockFormMgrAdapterFacadeOpenFormEditSecondPage(int mockRet);
+void MockFormMgrAdapterFacadeOpenLiveFormPage(int mockRet);
 }  // namespace AppExecFwk
 }  // namespace OHOS
 

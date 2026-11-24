@@ -808,16 +808,16 @@ ErrCode FormMgrAdapterFacade::OpenLiveFormPage(const Want &want, const std::stri
     return FormCallbackAdapter::GetInstance().OpenLiveFormPage(want, formId);
 }
 
-ErrCode FormMgrAdapterFacade::StartHostPage(const Want &want, int32_t routerCode,
+ErrCode FormMgrAdapterFacade::StartFormHostPage(const Want &want, int32_t routerCode,
     const std::string &requestMethod)
 {
-    HILOG_INFO("called");
-    return FormCallbackAdapter::GetInstance().StartHostPage(want, routerCode, requestMethod);
+    HILOG_INFO("[%{public}s]called", __FUNCTION__);
+    return FormCallbackAdapter::GetInstance().StartFormHostPage(want, routerCode, requestMethod);
 }
 
 bool FormMgrAdapterFacade::IsForegroundApp()
 {
-    HILOG_INFO("called");
+    HILOG_INFO("[%{public}s]called", __FUNCTION__);
     return FormCallbackAdapter::GetInstance().IsForegroundApp();
 }
 

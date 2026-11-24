@@ -92,8 +92,11 @@ namespace {
     int g_getVisibleFormRect = OHOS::ERR_OK;
     int g_registerGetVisibleFormRectProxy = OHOS::ERR_OK;
     int g_unregisterGetVisibleFormRectProxy = OHOS::ERR_OK;
-    int g_startHostPage = OHOS::ERR_OK;
+    int g_startFormHostPage = OHOS::ERR_OK;
     bool g_isForegroundApp = true;
+    int g_openFormManagePage = OHOS::ERR_OK;
+    int g_openFormEditSecondPage = OHOS::ERR_OK;
+    int g_openLiveFormPage = OHOS::ERR_OK;
 }
 
 void MockEnableUpdateForm(int mockRet)
@@ -304,14 +307,29 @@ void MockFormMgrAdapterFacadeUnregisterGetVisibleFormRectProxy(int mockRet)
     g_unregisterGetVisibleFormRectProxy = mockRet;
 }
 
-void MockFormMgrAdapterFacadeStartHostPage(int mockRet)
+void MockFormMgrAdapterFacadeStartFormHostPage(int mockRet)
 {
-    g_startHostPage = mockRet;
+    g_startFormHostPage = mockRet;
 }
 
 void MockFormMgrAdapterFacadeIsForegroundApp(bool mockRet)
 {
     g_isForegroundApp = mockRet;
+}
+
+void MockFormMgrAdapterFacadeOpenFormManagePage(int mockRet)
+{
+    g_openFormManagePage = mockRet;
+}
+
+void MockFormMgrAdapterFacadeOpenFormEditSecondPage(int mockRet)
+{
+    g_openFormEditSecondPage = mockRet;
+}
+
+void MockFormMgrAdapterFacadeOpenLiveFormPage(int mockRet)
+{
+    g_openLiveFormPage = mockRet;
 }
 
 int FormMgrAdapterFacade::EnableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
@@ -702,16 +720,34 @@ ErrCode FormMgrAdapterFacade::UnregisterGetVisibleFormRectProxy()
     return g_unregisterGetVisibleFormRectProxy;
 }
 
-ErrCode FormMgrAdapterFacade::StartHostPage(const Want &want, int32_t routerCode, const std::string &requestMethod)
+ErrCode FormMgrAdapterFacade::StartFormHostPage(const Want &want, int32_t routerCode, const std::string &requestMethod)
 {
-    GTEST_LOG_(INFO) << "StartHostPage called " << g_startHostPage;
-    return g_startHostPage;
+    GTEST_LOG_(INFO) << "StartFormHostPage called " << g_startFormHostPage;
+    return g_startFormHostPage;
 }
 
 bool FormMgrAdapterFacade::IsForegroundApp()
 {
     GTEST_LOG_(INFO) << "IsForegroundApp called " << g_isForegroundApp;
     return g_isForegroundApp;
+}
+
+ErrCode FormMgrAdapterFacade::OpenFormManagePage(const Want &want)
+{
+    GTEST_LOG_(INFO) << "OpenFormManagePage called " << g_openFormManagePage;
+    return g_openFormManagePage;
+}
+
+ErrCode FormMgrAdapterFacade::OpenFormEditSecondPage(const Want &want)
+{
+    GTEST_LOG_(INFO) << "OpenFormEditSecondPage called " << g_openFormEditSecondPage;
+    return g_openFormEditSecondPage;
+}
+
+ErrCode FormMgrAdapterFacade::OpenLiveFormPage(const Want &want, const std::string &formId)
+{
+    GTEST_LOG_(INFO) << "OpenLiveFormPage called " << g_openLiveFormPage;
+    return g_openLiveFormPage;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

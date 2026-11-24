@@ -1230,6 +1230,9 @@ int32_t FormMgrService::StartAbilityByFms(const Want &want)
 {
     HILOG_INFO("[%{public}s]call", __FUNCTION__);
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
     std::string dstBundleName = want.GetElement().GetBundleName();
     std::string bundleName;
     auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
@@ -1267,7 +1270,7 @@ int32_t FormMgrService::StartAbilityByCrossBundle(const Want &want)
         HILOG_ERROR("This application is not a foreground program");
         return ERR_APPEXECFWK_FORM_NOT_TRUST;
     }
-    return FormMgrAdapterFacade::GetInstance().StartHostPage(want,
+    return FormMgrAdapterFacade::GetInstance().StartFormHostPage(want,
         Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE, Constants::OPEN_FORM_MANAGE_VIEW);
 }
 
@@ -1833,7 +1836,7 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
     Want want;
     want.SetElementName(callerName, abilityName);
     want.SetParams(wantarams);
-    return FormMgrAdapterFacade::GetInstance().StartHostPage(want, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT,
+    return FormMgrAdapterFacade::GetInstance().StartFormHostPage(want, Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT,
         isMainPage ? Constants::PARAM_OPEN_FORM_EDIT_VIEW : Constants::PARAM_OPEN_FORM_EDIT_SEC_PAGE_VIEW);
 }
 
