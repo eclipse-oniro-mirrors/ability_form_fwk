@@ -2152,6 +2152,26 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0055, TestSize.Level0)
 }
 
 /**
+ * @tc.name: FormDataMgr_0055_4X2
+ * @tc.desc: test IsSameForm function with DIMENSION_4_2
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0055_4X2, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0055_4X2 start";
+    FormRecord record;
+    record.formName = "aa";
+    record.specification = static_cast<int32_t>(OHOS::AppExecFwk::Constants::Dimension::DIMENSION_4_2);
+    AbilityFormInfo abilityFormInfo;
+    abilityFormInfo.name = "aa";
+    std::string dimension4x2 = "4*2";
+    abilityFormInfo.supportDimensions.emplace_back(dimension4x2);
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(true, formDataMgr.IsSameForm(record, abilityFormInfo));
+    GTEST_LOG_(INFO) << "FormDataMgr_0055_4X2 end";
+}
+
+/**
  * @tc.name: FormDataMgr_0056
  * @tc.desc: test IsSameForm function
  * @tc.type: FUNC

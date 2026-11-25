@@ -722,6 +722,66 @@ HWTEST_F(FmsFormCommonAdapterTest, IsDimensionValid_003, TestSize.Level1)
     GTEST_LOG_(INFO) << "IsDimensionValid_003 end";
 }
 
+/**
+ * @tc.name: IsDimensionValid_005
+ * @tc.desc: Verify DIMENSION_4_2 validation against supportDimensions.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCommonAdapterTest, IsDimensionValid_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsDimensionValid_005 start";
+
+    int32_t dimension4x2 = static_cast<int32_t>(Constants::Dimension::DIMENSION_4_2);
+
+    FormInfo formInfoMatch;
+    formInfoMatch.supportDimensions.push_back(1);
+    formInfoMatch.supportDimensions.push_back(dimension4x2);
+    EXPECT_TRUE(FormCommonAdapter::GetInstance().IsDimensionValid(formInfoMatch, dimension4x2));
+
+    FormInfo formInfoNoMatch;
+    formInfoNoMatch.supportDimensions.push_back(1);
+    formInfoNoMatch.supportDimensions.push_back(2);
+    EXPECT_FALSE(FormCommonAdapter::GetInstance().IsDimensionValid(formInfoNoMatch, dimension4x2));
+
+    GTEST_LOG_(INFO) << "IsDimensionValid_005 end";
+}
+
+/**
+ * @tc.name: IsDimensionValid_006
+ * @tc.desc: Verify DIMENSION_2_1 validation, legacy value 5 support and unsupported values.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormCommonAdapterTest, IsDimensionValid_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "IsDimensionValid_006 start";
+
+    int32_t dimension2x1 = static_cast<int32_t>(Constants::Dimension::DIMENSION_2_1);
+
+    FormInfo formInfoMatch;
+    formInfoMatch.supportDimensions.push_back(1);
+    formInfoMatch.supportDimensions.push_back(dimension2x1);
+    EXPECT_TRUE(FormCommonAdapter::GetInstance().IsDimensionValid(formInfoMatch, dimension2x1));
+
+    FormInfo formInfoNoMatch;
+    formInfoNoMatch.supportDimensions.push_back(1);
+    formInfoNoMatch.supportDimensions.push_back(2);
+    EXPECT_FALSE(FormCommonAdapter::GetInstance().IsDimensionValid(formInfoNoMatch, dimension2x1));
+
+    FormInfo formInfoLegacy;
+    formInfoLegacy.supportDimensions.push_back(1);
+    formInfoLegacy.supportDimensions.push_back(
+        static_cast<int32_t>(Constants::Dimension::DIMENSION_2_1_LEGACY));
+    EXPECT_TRUE(FormCommonAdapter::GetInstance().IsDimensionValid(formInfoLegacy,
+        static_cast<int32_t>(Constants::Dimension::DIMENSION_2_1_LEGACY)));
+
+    EXPECT_FALSE(FormCommonAdapter::GetInstance().IsDimensionValid(formInfoNoMatch,
+        static_cast<int32_t>(Constants::Dimension::DIMENSION_2_1_LEGACY)));
+    EXPECT_FALSE(FormCommonAdapter::GetInstance().IsDimensionValid(formInfoNoMatch,
+        static_cast<int32_t>(Constants::Dimension::DIMENSION_MAX) + 1));
+
+    GTEST_LOG_(INFO) << "IsDimensionValid_006 end";
+}
+
 // ========== Method 11: RegisterAddObserver Tests ==========
 
 /**

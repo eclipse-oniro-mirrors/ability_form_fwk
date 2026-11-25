@@ -88,7 +88,12 @@ const BundleInfoMap CreateBundleFormInfoMapWithTemplateForm(bool isTemplateForm 
     formInfo.updateDuration = 1;
     formInfo.scheduledUpdateTime = "06:06";
     formInfo.formVisibleNotify = true;
-    formInfo.supportDimensions = {1, 2, 5, 7};
+    formInfo.supportDimensions = {
+        static_cast<int32_t>(Constants::Dimension::DIMENSION_1_2),
+        static_cast<int32_t>(Constants::Dimension::DIMENSION_2_2),
+        static_cast<int32_t>(Constants::Dimension::DIMENSION_2_1),
+        static_cast<int32_t>(Constants::Dimension::DIMENSION_6_4)
+    };
     formInfo.defaultDimension = 1;
     formInfo.supportShapes = {1};
     formInfo.isTemplateForm = isTemplateForm;

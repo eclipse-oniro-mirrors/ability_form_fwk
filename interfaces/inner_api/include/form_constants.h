@@ -305,12 +305,14 @@ namespace Constants {
         DIMENSION_2_2,
         DIMENSION_2_4,
         DIMENSION_4_4,
-        DIMENSION_2_1,
-        DIMENSION_1_1,
-        DIMENSION_6_4,
-        DIMENSION_2_3,
-        DIMENSION_3_3,
-        DIMENSION_MAX = DIMENSION_3_3
+        DIMENSION_2_1_LEGACY,
+        DIMENSION_1_1 = 6,
+        DIMENSION_6_4 = 7,
+        DIMENSION_2_3 = 8,
+        DIMENSION_3_3 = 9,
+        DIMENSION_2_1 = 10,
+        DIMENSION_4_2 = 11,
+        DIMENSION_MAX = DIMENSION_4_2
     };
 
     enum class Shape : int8_t {

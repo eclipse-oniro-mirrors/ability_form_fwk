@@ -25,11 +25,13 @@ const std::unordered_map<Constants::Dimension, std::string> DIMENSION_MAP = {
     {Constants::Dimension::DIMENSION_2_2, "2*2"},
     {Constants::Dimension::DIMENSION_2_4, "2*4"},
     {Constants::Dimension::DIMENSION_4_4, "4*4"},
-    {Constants::Dimension::DIMENSION_2_1, "2*1"},
+    {Constants::Dimension::DIMENSION_2_1_LEGACY, "2*1"},
     {Constants::Dimension::DIMENSION_1_1, "1*1"},
     {Constants::Dimension::DIMENSION_6_4, "6*4"},
     {Constants::Dimension::DIMENSION_2_3, "2*3"},
-    {Constants::Dimension::DIMENSION_3_3, "3*3"}
+    {Constants::Dimension::DIMENSION_3_3, "3*3"},
+    {Constants::Dimension::DIMENSION_2_1, "2*1"},
+    {Constants::Dimension::DIMENSION_4_2, "4*2"}
 };
 
 struct StatusInfo {

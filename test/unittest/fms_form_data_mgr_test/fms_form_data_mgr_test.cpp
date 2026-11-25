@@ -6268,6 +6268,61 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetSpecification_004, TestSize.L
 }
 
 /**
+ * @tc.number: FmsFormDataMgrTest_SetSpecification_005
+ * @tc.name: SetSpecification
+ * @tc.desc: Verify that DIMENSION_4_2 and DIMENSION_MAX are accepted.
+ * @tc.details: specification = DIMENSION_4_2(11) and DIMENSION_MAX, return ERR_OK.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetSpecification_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetSpecification_005 start";
+
+    int64_t formId = 1;
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(formId, record);
+
+    int32_t specification4x2 = static_cast<int32_t>(Constants::Dimension::DIMENSION_4_2);
+    EXPECT_EQ(ERR_OK, formDataMgr_.SetSpecification(formId, specification4x2));
+    EXPECT_EQ(specification4x2, formDataMgr_.formRecords_[formId].specification);
+
+    int32_t specificationMax = static_cast<int32_t>(Constants::Dimension::DIMENSION_MAX);
+    EXPECT_EQ(ERR_OK, formDataMgr_.SetSpecification(formId, specificationMax));
+    EXPECT_EQ(specificationMax, formDataMgr_.formRecords_[formId].specification);
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetSpecification_005 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_SetSpecification_006
+ * @tc.name: SetSpecification
+ * @tc.desc: Verify DIMENSION_2_1 acceptance and out-of-range rejection.
+ * @tc.details: specification = DIMENSION_2_1(10) return ERR_OK; specification = MAX+1(12) return error.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetSpecification_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetSpecification_006 start";
+
+    int64_t formId = 1;
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    InitFormItemInfo(formId, formItemInfo);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(formId, record);
+
+    int32_t specification2x1 = static_cast<int32_t>(Constants::Dimension::DIMENSION_2_1);
+    EXPECT_EQ(ERR_OK, formDataMgr_.SetSpecification(formId, specification2x1));
+    EXPECT_EQ(specification2x1, formDataMgr_.formRecords_[formId].specification);
+
+    int32_t specificationOverMax = static_cast<int32_t>(Constants::Dimension::DIMENSION_MAX) + 1;
+    EXPECT_NE(ERR_OK, formDataMgr_.SetSpecification(formId, specificationOverMax));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetSpecification_006 end";
+}
+
+/**
  * @tc.number: FmsFormDataMgrTest_SetHostTransparentFormColor_002
  * @tc.name: SetHostTransparentFormColor
  * @tc.desc: Verify that the function works correctly.

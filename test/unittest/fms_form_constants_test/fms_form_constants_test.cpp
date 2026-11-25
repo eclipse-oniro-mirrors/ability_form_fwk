@@ -31,16 +31,45 @@ class FormConstantsTest : public testing::Test {};
  */
 HWTEST_F(FormConstantsTest, GetDimensionString_001, TestSize.Level1)
 {
-    const char* expectedDimensions[] = {
-        "1*2", "2*2", "2*4", "4*4", "2*1", "1*1", "6*4", "2*3", "3*3"
+    const std::pair<Constants::Dimension, const char*> expectedDimensions[] = {
+        {Constants::Dimension::DIMENSION_1_2, "1*2"},
+        {Constants::Dimension::DIMENSION_2_2, "2*2"},
+        {Constants::Dimension::DIMENSION_2_4, "2*4"},
+        {Constants::Dimension::DIMENSION_4_4, "4*4"},
+        {Constants::Dimension::DIMENSION_2_1_LEGACY, "2*1"},
+        {Constants::Dimension::DIMENSION_1_1, "1*1"},
+        {Constants::Dimension::DIMENSION_6_4, "6*4"},
+        {Constants::Dimension::DIMENSION_2_3, "2*3"},
+        {Constants::Dimension::DIMENSION_3_3, "3*3"},
+        {Constants::Dimension::DIMENSION_2_1, "2*1"},
+        {Constants::Dimension::DIMENSION_4_2, "4*2"},
     };
-    for (int32_t dimension = static_cast<int32_t>(Constants::Dimension::DIMENSION_MIN);
-        dimension <= static_cast<int32_t>(Constants::Dimension::DIMENSION_MAX); ++dimension) {
-        EXPECT_STREQ(FormConstantsUtil::GetDimensionString(static_cast<Constants::Dimension>(dimension)),
-            expectedDimensions[dimension - 1]);
+    for (const auto& item : expectedDimensions) {
+        EXPECT_STREQ(FormConstantsUtil::GetDimensionString(item.first), item.second);
     }
     EXPECT_EQ(FormConstantsUtil::GetDimensionString(static_cast<Constants::Dimension>(0)), nullptr);
-    EXPECT_EQ(FormConstantsUtil::GetDimensionString(static_cast<Constants::Dimension>(10)), nullptr);
+    EXPECT_EQ(FormConstantsUtil::GetDimensionString(static_cast<Constants::Dimension>(12)), nullptr);
+}
+
+/**
+ * @tc.name: Dimension_Enum_001
+ * @tc.desc: Verify Dimension enum values and DIMENSION_MAX bound.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormConstantsTest, Dimension_Enum_001, TestSize.Level1)
+{
+    EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_MIN), 1);
+    EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_1_2), 1);
+    EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_2_1_LEGACY), 5);
+    EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_1_1), 6);
+    EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_6_4), 7);
+    EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_2_3), 8);
+    EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_3_3), 9);
+    EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_2_1), 10);
+    EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_4_2), 11);
+    EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_MAX),
+        static_cast<int32_t>(Constants::Dimension::DIMENSION_4_2));
+    EXPECT_EQ(static_cast<int32_t>(Constants::Dimension::DIMENSION_MAX), 11);
 }
 
 /**
