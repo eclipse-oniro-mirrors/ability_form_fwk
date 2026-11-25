@@ -1531,11 +1531,14 @@ void FormDataMgr::ClearRefreshFlag(const int64_t formId)
         HILOG_ERROR("[%{public}s]form info not find,form:%{public}" PRId64, __FUNCTION__, formId);
         return;
     }
-    if (itFormRecord->second.isHostRefresh || itFormRecord->second.isReminderAgentRefresh) {
-        HILOG_INFO("clean refresh flag,form:%{public}" PRId64, formId);
+    if (itFormRecord->second.isHostRefresh) {
+        HILOG_INFO("clean host refresh flag, form:%{public}" PRId64, formId);
         itFormRecord->second.isHostRefresh = false;
-        itFormRecord->second.isReminderAgentRefresh = false;
         itFormRecord->second.refreshWantMap.clear();
+    }
+    if (itFormRecord->second.isReminderAgentRefresh) {
+        HILOG_INFO("clean reminder agent refresh flag, form:%{public}" PRId64, formId);
+        itFormRecord->second.isReminderAgentRefresh = false;
     }
 }
 

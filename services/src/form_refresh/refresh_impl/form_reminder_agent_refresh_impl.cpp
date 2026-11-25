@@ -38,8 +38,7 @@ FormReminderAgentRefreshImpl::~FormReminderAgentRefreshImpl() {}
 
 int FormReminderAgentRefreshImpl::DoControlCheck(RefreshData &data)
 {
-    // Cache want before control checks so intercepted refresh can be recovered later.
-    FormDataMgr::GetInstance().MergeRefreshWant(data.formId, data.want);
+    data.want.SetParam(Constants::HAS_REMINDER_AGENT_REFRESH_DATA_KEY, true);
     FormDataMgr::GetInstance().SetReminderAgentRefresh(data.formId, true);
     // Execute base class control checks
     return BaseFormRefresh::DoControlCheck(data);

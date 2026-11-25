@@ -534,6 +534,9 @@ namespace Constants {
 
     constexpr const int32_t DELAY_REFRESH_PER_BATCH = 6;
 
+    constexpr const char* HAS_REMINDER_AGENT_REFRESH_DATA_KEY =
+        "ohos.extra.param.key.has_reminder_agent_refresh_data";
+
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -119,6 +119,8 @@ napi_value CreateJsFormParam(napi_env engine)
         "FORM_FONT_SIZE_SCALE_KEY", CreateJsValue(engine, AppExecFwk::Constants::FORM_FONT_SIZE_SCALE_KEY));
     napi_set_named_property(engine, objValue,
         "FORM_FONT_WEIGHT_SCALE_KEY", CreateJsValue(engine, AppExecFwk::Constants::FORM_FONT_WEIGHT_SCALE_KEY));
+    napi_set_named_property(engine, objValue, "HAS_REMINDER_AGENT_REFRESH_DATA_KEY",
+        CreateJsValue(engine, AppExecFwk::Constants::HAS_REMINDER_AGENT_REFRESH_DATA_KEY));
     return objValue;
 }
 
