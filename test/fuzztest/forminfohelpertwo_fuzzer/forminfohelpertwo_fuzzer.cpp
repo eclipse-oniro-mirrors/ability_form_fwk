@@ -131,11 +131,6 @@ static ExtensionAbilityInfo GenerateExtensionInfo(FuzzedDataProvider *fdp)
     return extensionInfo;
 }
 
-// ===================================================================
-// Scenario A: LoadFormConfigInfoByBundleNames (public, L82-127)
-// Covers: empty bundleNames -> INVALID_PARAM (L86-88);
-//   non-empty -> BatchGetBundleInfo fails in fuzz env -> GET_BUNDLE_FAILED (L92-98).
-// ===================================================================
 static void ScenarioA(FuzzedDataProvider *fdp)
 {
     int32_t userId = fdp->ConsumeIntegral<int32_t>();
@@ -159,15 +154,6 @@ static void ScenarioA(FuzzedDataProvider *fdp)
     }
 }
 
-// ===================================================================
-// Scenario B: ResolveEnableTint (public, L129-138) + IsAccountMetadataEnabled (private, L352-364)
-// ResolveEnableTint covers: isSystemApp=true + enableTint=BOOL_UNSPECIFIED -> BOOL_TRUE (L131-134);
-//   isSystemApp=true + enableTint already BOOL_TRUE -> no change (L132 false);
-//   isSystemApp=false -> BOOL_FALSE (L135-137).
-// IsAccountMetadataEnabled covers: !isSystemApp -> false (L355-357);
-//   isSystemApp + matching customizeData -> true (L358-362);
-//   isSystemApp + no match -> false (L363).
-// ===================================================================
 static void ScenarioB(FuzzedDataProvider *fdp)
 {
     // --- ResolveEnableTint branches ---
@@ -229,14 +215,6 @@ static void ScenarioB(FuzzedDataProvider *fdp)
     }
 }
 
-// ===================================================================
-// Scenario C: LoadAbilityFormConfigInfo (private, L391-407) + LoadFormsForExtension (private, L284-318)
-// LoadAbilityFormConfigInfo covers: empty hapModuleInfos -> empty loop;
-//   non-empty hapModuleInfos -> FormBmsHelper::GetFormsInfoByModule fails -> continue.
-// LoadFormsForExtension covers: hasDistributedForm=false path (default) -> GetResMgr -> GetProfilesByResMgr
-//   -> metaData+templateMetaData both true -> early return (L311-314);
-//   hasDistributedForm=true path -> client->GetProfileFromSharedHap fails -> return (L297-300).
-// ===================================================================
 static void ScenarioC(FuzzedDataProvider *fdp)
 {
     // --- LoadAbilityFormConfigInfo: empty hapModuleInfos ---
@@ -289,12 +267,6 @@ static void ScenarioC(FuzzedDataProvider *fdp)
     }
 }
 
-// ===================================================================
-// Scenario D: GetCompressedProfile (private, L206-224) + GetRawFileProfile (private, L226-252)
-// Both dereference resMgr directly (no null guard), so a valid (non-null) ResourceManager
-// is obtained via GetResourceManager. With an empty ResourceManager, GetProfileDataByName
-// and GetProfileByName return != SUCCESS -> false branch.
-// ===================================================================
 static void ScenarioD(FuzzedDataProvider *fdp)
 {
     BundleInfo bundleInfo = GenerateBundleInfo(fdp);
@@ -313,10 +285,6 @@ static void ScenarioD(FuzzedDataProvider *fdp)
     FormInfoHelper::GetRawFileProfile(resMgr, profileName, profile);
 }
 
-// ===================================================================
-// Scenario E: LoadFormConfigInfoByBundleNames with fuzz-derived bundle sets +
-//   ResolveEnableTint edge cases. Supplements A/B with wider input variety.
-// ===================================================================
 static void ScenarioE(FuzzedDataProvider *fdp)
 {
     int32_t userId = fdp->ConsumeIntegral<int32_t>();

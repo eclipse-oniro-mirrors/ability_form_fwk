@@ -199,15 +199,6 @@ static FormRecord MakeBaseRecord(int64_t formId, const std::string &bundleName)
     return r;
 }
 
-// ===================================================================
-// Scenario A: ProcessProviderAcquire branch coverage
-// Covers: needAcquire=true -> AcquireProviderFormInfoAsync path (L256-267);
-//   needAcquire=false + isLocationChange=true -> ConnectAmsChangeLocation (L268-272);
-//   needAcquire=false + isLocationChange=false -> return ERR_OK (L273);
-//   PARAM_HOST_BG_INVERSE_COLOR_KEY in wantParams -> needAcquire=true variant.
-//   DbDirectRender skip branch (L251-255) needs IsFormRenderConnectionDied=true,
-//   unreachable without a real dead render connection; skipped intentionally.
-// ===================================================================
 static void ScenarioA(FuzzedDataProvider *fdp)
 {
     auto &adapter = FormLifecycleAdapter::GetInstance();
@@ -264,12 +255,6 @@ static void ScenarioA(FuzzedDataProvider *fdp)
     }
 }
 
-// ===================================================================
-// Scenario B: IsLiveFormActive branch coverage (L1137-1146)
-// Covers: formId not in map -> false; formId present + ACTIVE -> true;
-//   formId present + INACTIVE -> false; formId present + PAUSE -> false;
-//   formId present + unknown status -> GetLiveFormActiveState nullptr -> false.
-// ===================================================================
 static void ScenarioB(FuzzedDataProvider *fdp)
 {
     auto &adapter = FormLifecycleAdapter::GetInstance();
@@ -295,11 +280,6 @@ static void ScenarioB(FuzzedDataProvider *fdp)
     adapter.IsLiveFormActive(ABSENT_ID, liveFormStatusMap);
 }
 
-// ===================================================================
-// Scenario C: HandleAddRequestPublishForm branch coverage (L622-636)
-// Covers: AddRequestPublishForm inner call; tempFormFlag=true -> skip observer;
-//   tempFormFlag=false -> HandleFormAddObserver branch.
-// ===================================================================
 static void ScenarioC(FuzzedDataProvider *fdp)
 {
     auto &adapter = FormLifecycleAdapter::GetInstance();
@@ -339,13 +319,6 @@ static void ScenarioC(FuzzedDataProvider *fdp)
     }
 }
 
-// ===================================================================
-// Scenario D: BatchNotifyFormsColorModeUpdate + ConsumeColorModeCache deep paths
-// Covers: BatchNotify L1601 -> GetFormRecordsByUserId success (seeded records);
-//   loop body -> GetFormsInfoByRecord fail branch (no FormInfoMgr seed) -> continue;
-//   ConsumeColorMode L1661 -> empty-cache early return + non-empty cache lookup
-//   -> GetFormRecordById found (proceed) / not-found (skip) branches -> cache erase.
-// ===================================================================
 static void ScenarioD(FuzzedDataProvider *fdp)
 {
     constexpr int64_t FORM_ID_D1 = SCENARIO_D_BASE + 1;
