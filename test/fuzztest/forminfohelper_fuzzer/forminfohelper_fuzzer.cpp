@@ -37,6 +37,19 @@ extern "C" void* ffrt_alloc_auto_managed_function_storage_base(ffrt_function_kin
     return malloc(ffrt_auto_managed_function_storage_size);
 }
 
+// The stub allocator does not return storage inside a real ffrt task, so
+// ffrt_submit_base must be stubbed as well to avoid heap corruption.
+extern "C" void ffrt_submit_base(ffrt_function_header_t* f, const ffrt_deps_t* inDeps,
+    const ffrt_deps_t* outDeps, const ffrt_task_attr_t* attr)
+{
+    if (f != nullptr) {
+        if (f->destroy != nullptr) {
+            f->destroy(f);
+        }
+        free(f);
+    }
+}
+
 extern "C" ffrt_task_handle_t ffrt_queue_submit_h(
     ffrt_queue_t queue, ffrt_function_header_t* f, const ffrt_task_attr_t* attr)
 {
