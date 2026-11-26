@@ -78,6 +78,9 @@ void RefreshCacheMgr::ConsumeHealthyControlFlag(std::vector<FormRecord>::iterato
     if (record->isRefreshDuringDisableForm) {
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(record->formId, false);
         Want want = CreateWant(record, userId);
+        if (record->isReminderAgentRefresh) {
+            want.SetParam(Constants::HAS_REMINDER_AGENT_REFRESH_DATA_KEY, true);
+        }
         RefreshData data;
         data.formId = record->formId;
         data.record = *record;
@@ -133,11 +136,14 @@ void RefreshCacheMgr::ConsumeInvisibleFlag(const std::vector<FormRecord> &visibl
         if (isActiveUser) {
             want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
         }
-        if (record.isHostRefresh || record.isReminderAgentRefresh) {
+        if (record.isHostRefresh) {
             auto it = record.refreshWantMap.find(formId);
             if (it != record.refreshWantMap.end()) {
                 FormWant::MergeWantParams(want, it->second.GetWant());
             }
+        }
+        if (record.isReminderAgentRefresh) {
+            want.SetParam(Constants::HAS_REMINDER_AGENT_REFRESH_DATA_KEY, true);
         }
         RefreshData data;
         data.formId = formId;

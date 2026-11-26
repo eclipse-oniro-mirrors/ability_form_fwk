@@ -114,8 +114,9 @@ HWTEST_F(FmsFormReminderAgentRefreshTest, TestConfig_002, TestSize.Level0)
 
 /**
  * @tc.number: FmsFormReminderAgentRefreshTest_DoControlCheck_001
- * @tc.name: DoControlCheck caches want and sets reminder flag
- * @tc.desc: Verify DoControlCheck calls MergeRefreshWant and SetReminderAgentRefresh before base check.
+ * @tc.name: DoControlCheck sets reminder param and flag
+ * @tc.desc: Verify DoControlCheck sets HAS_REMINDER_AGENT_REFRESH_DATA_KEY in want and
+ *           SetReminderAgentRefresh before base check.
  */
 HWTEST_F(FmsFormReminderAgentRefreshTest, TestDoControlCheck_001, TestSize.Level1)
 {
@@ -125,19 +126,19 @@ HWTEST_F(FmsFormReminderAgentRefreshTest, TestDoControlCheck_001, TestSize.Level
     data.callingUid = TEST_CALLING_UID;
     data.want = Want();
 
-    EXPECT_CALL(*MockFormDataMgr::obj, MergeRefreshWant(TEST_FORM_ID, _))
-        .Times(1);
     EXPECT_CALL(*MockFormDataMgr::obj, SetReminderAgentRefresh(TEST_FORM_ID, true))
         .Times(1);
     // All control checks return false/pass, so base returns ERR_CONTINUE_REFRESH
     auto ret = impl.DoControlCheck(data);
     EXPECT_EQ(ret, ERR_CONTINUE_REFRESH);
+    EXPECT_TRUE(data.want.HasParameter(Constants::HAS_REMINDER_AGENT_REFRESH_DATA_KEY));
+    EXPECT_TRUE(data.want.GetBoolParam(Constants::HAS_REMINDER_AGENT_REFRESH_DATA_KEY, false));
 }
 
 /**
  * @tc.number: FmsFormReminderAgentRefreshTest_DoControlCheck_002
  * @tc.name: DoControlCheck intercepted by healthy control
- * @tc.desc: Verify DoControlCheck returns ERR_OK when healthy control intercepts.
+ * @tc.desc: Verify DoControlCheck sets reminder param and returns ERR_OK when healthy control intercepts.
  */
 HWTEST_F(FmsFormReminderAgentRefreshTest, TestDoControlCheck_002, TestSize.Level1)
 {
@@ -148,18 +149,17 @@ HWTEST_F(FmsFormReminderAgentRefreshTest, TestDoControlCheck_002, TestSize.Level
     data.callingUid = TEST_CALLING_UID;
     data.want = Want();
 
-    EXPECT_CALL(*MockFormDataMgr::obj, MergeRefreshWant(TEST_FORM_ID, _))
-        .Times(1);
     EXPECT_CALL(*MockFormDataMgr::obj, SetReminderAgentRefresh(TEST_FORM_ID, true))
         .Times(1);
     auto ret = impl.DoControlCheck(data);
     EXPECT_EQ(ret, ERR_OK);
+    EXPECT_TRUE(data.want.HasParameter(Constants::HAS_REMINDER_AGENT_REFRESH_DATA_KEY));
 }
 
 /**
  * @tc.number: FmsFormReminderAgentRefreshTest_DoControlCheck_003
  * @tc.name: DoControlCheck intercepted by invisible
- * @tc.desc: Verify DoControlCheck returns ERR_OK when invisible intercepts.
+ * @tc.desc: Verify DoControlCheck sets reminder param and returns ERR_OK when invisible intercepts.
  */
 HWTEST_F(FmsFormReminderAgentRefreshTest, TestDoControlCheck_003, TestSize.Level1)
 {
@@ -170,18 +170,17 @@ HWTEST_F(FmsFormReminderAgentRefreshTest, TestDoControlCheck_003, TestSize.Level
     data.callingUid = TEST_CALLING_UID;
     data.want = Want();
 
-    EXPECT_CALL(*MockFormDataMgr::obj, MergeRefreshWant(TEST_FORM_ID, _))
-        .Times(1);
     EXPECT_CALL(*MockFormDataMgr::obj, SetReminderAgentRefresh(TEST_FORM_ID, true))
         .Times(1);
     auto ret = impl.DoControlCheck(data);
     EXPECT_EQ(ret, ERR_OK);
+    EXPECT_TRUE(data.want.HasParameter(Constants::HAS_REMINDER_AGENT_REFRESH_DATA_KEY));
 }
 
 /**
  * @tc.number: FmsFormReminderAgentRefreshTest_DoControlCheck_004
  * @tc.name: DoControlCheck intercepted by screen off
- * @tc.desc: Verify DoControlCheck returns ERR_OK when screen off intercepts.
+ * @tc.desc: Verify DoControlCheck sets reminder param and returns ERR_OK when screen off intercepts.
  */
 HWTEST_F(FmsFormReminderAgentRefreshTest, TestDoControlCheck_004, TestSize.Level1)
 {
@@ -192,18 +191,17 @@ HWTEST_F(FmsFormReminderAgentRefreshTest, TestDoControlCheck_004, TestSize.Level
     data.callingUid = TEST_CALLING_UID;
     data.want = Want();
 
-    EXPECT_CALL(*MockFormDataMgr::obj, MergeRefreshWant(TEST_FORM_ID, _))
-        .Times(1);
     EXPECT_CALL(*MockFormDataMgr::obj, SetReminderAgentRefresh(TEST_FORM_ID, true))
         .Times(1);
     auto ret = impl.DoControlCheck(data);
     EXPECT_EQ(ret, ERR_OK);
+    EXPECT_TRUE(data.want.HasParameter(Constants::HAS_REMINDER_AGENT_REFRESH_DATA_KEY));
 }
 
 /**
  * @tc.number: FmsFormReminderAgentRefreshTest_DoControlCheck_005
  * @tc.name: DoControlCheck intercepted by need-to-fresh false
- * @tc.desc: Verify DoControlCheck returns ERR_OK when IsNeedToFresh returns false.
+ * @tc.desc: Verify DoControlCheck sets reminder param and returns ERR_OK when IsNeedToFresh returns false.
  */
 HWTEST_F(FmsFormReminderAgentRefreshTest, TestDoControlCheck_005, TestSize.Level1)
 {
@@ -214,12 +212,11 @@ HWTEST_F(FmsFormReminderAgentRefreshTest, TestDoControlCheck_005, TestSize.Level
     data.callingUid = TEST_CALLING_UID;
     data.want = Want();
 
-    EXPECT_CALL(*MockFormDataMgr::obj, MergeRefreshWant(TEST_FORM_ID, _))
-        .Times(1);
     EXPECT_CALL(*MockFormDataMgr::obj, SetReminderAgentRefresh(TEST_FORM_ID, true))
         .Times(1);
     EXPECT_CALL(*MockFormDataMgr::obj, SetNeedRefresh(TEST_FORM_ID, true))
         .Times(1);
     auto ret = impl.DoControlCheck(data);
     EXPECT_EQ(ret, ERR_OK);
+    EXPECT_TRUE(data.want.HasParameter(Constants::HAS_REMINDER_AGENT_REFRESH_DATA_KEY));
 }

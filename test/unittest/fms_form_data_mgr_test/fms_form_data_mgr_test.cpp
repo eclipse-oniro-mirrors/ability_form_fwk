@@ -7551,7 +7551,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ClearRefreshFlag_002, TestSize.L
 /**
  * @tc.number: FmsFormDataMgrTest_ClearRefreshFlag_003
  * @tc.name: ClearRefreshFlag
- * @tc.desc: Verify ClearRefreshFlag clears flags when only isReminderAgentRefresh is true.
+ * @tc.desc: Verify ClearRefreshFlag clears only isReminderAgentRefresh but preserves refreshWantMap
+ *           when only isReminderAgentRefresh is true.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ClearRefreshFlag_003, TestSize.Level1)
 {
@@ -7569,9 +7570,37 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ClearRefreshFlag_003, TestSize.L
     ASSERT_TRUE(itFormRecord != formDataMgr_.formRecords_.end());
     EXPECT_EQ(itFormRecord->second.isHostRefresh, false);
     EXPECT_EQ(itFormRecord->second.isReminderAgentRefresh, false);
-    EXPECT_TRUE(itFormRecord->second.refreshWantMap.empty());
+    // isHostRefresh is false, so refreshWantMap must NOT be cleared
+    EXPECT_FALSE(itFormRecord->second.refreshWantMap.empty());
     formDataMgr_.formRecords_.erase(formId);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ClearRefreshFlag_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_ClearRefreshFlag_005
+ * @tc.name: ClearRefreshFlag
+ * @tc.desc: Verify ClearRefreshFlag clears isHostRefresh and refreshWantMap but leaves
+ *           isReminderAgentRefresh unchanged when only isHostRefresh is true.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ClearRefreshFlag_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ClearRefreshFlag_005 start";
+    FormRecord formRecord;
+    int64_t formId = FORM_ID_ONE;
+    formRecord.formId = formId;
+    formRecord.isHostRefresh = true;
+    formRecord.isReminderAgentRefresh = false;
+    Want want;
+    formRecord.refreshWantMap[formId] = FormWant(want);
+    formDataMgr_.formRecords_.emplace(formId, formRecord);
+    formDataMgr_.ClearRefreshFlag(formId);
+    auto itFormRecord = formDataMgr_.formRecords_.find(formId);
+    ASSERT_TRUE(itFormRecord != formDataMgr_.formRecords_.end());
+    EXPECT_EQ(itFormRecord->second.isHostRefresh, false);
+    EXPECT_EQ(itFormRecord->second.isReminderAgentRefresh, false);
+    EXPECT_TRUE(itFormRecord->second.refreshWantMap.empty());
+    formDataMgr_.formRecords_.erase(formId);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ClearRefreshFlag_005 end";
 }
 
 /**
