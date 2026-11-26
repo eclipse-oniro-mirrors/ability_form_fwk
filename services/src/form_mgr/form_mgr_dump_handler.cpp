@@ -157,20 +157,30 @@ int FormMgrDumpHandler::DumpFormTimerByFormId(const int64_t formId, std::string 
 bool FormMgrDumpHandler::ParseOption(const std::vector<std::u16string> &args, DumpKey &key,
     std::string &value, std::string &result)
 {
-    if (args.empty() || static_cast<int32_t>(args.size()) > FORM_DUMP_ARGC_MAX) {
-        result = "error: invalid arguments.";
+    auto size = args.size();
+    if (size == 0) {
+        result = "error: must contain arguments.";
         return false;
     }
-    std::string argStr = Str16ToStr8(args[0]);
-    auto it = dumpKeyMap_.find(argStr);
-    if (it == dumpKeyMap_.end()) {
+
+    if (static_cast<int32_t>(size) > FORM_DUMP_ARGC_MAX) {
+        result = "error: arguments numer out of limit.";
+        return false;
+    }
+
+    std::string optionKey = Str16ToStr8(args[0]);
+    auto iter = dumpKeyMap_.find(optionKey);
+    if (iter == dumpKeyMap_.end()) {
         result = "error: unknown option.";
         return false;
     }
-    key = it->second;
-    if (args.size() > 1) {
+
+    key = iter->second;
+
+    if (size == FORM_DUMP_ARGC_MAX) {
         value = Str16ToStr8(args[1]);
     }
+
     return true;
 }
 
